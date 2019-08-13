@@ -76,7 +76,9 @@
     "build:node": "cross-env BABEL_ENV=commonjs BUILD_ENV=node webpack --config webpack.node.config.js",
     "build": "npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "cross-env BUILD_ENV=development webpack --watch",
-    "lint": "eslint src"
+    "lint": "eslint src",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "repository": {
     "type": "git",
@@ -110,6 +112,8 @@
     "gl-vec3": "^1.0.3",
     "lodash": "^4.17.4",
     "ndarray": "^1.0.18",
-    "ndarray-linear-interpolate": "^1.0.0"
-  }
+    "ndarray-linear-interpolate": "^1.0.0",
+    "snyk": "^1.192.4"
+  },
+  "snyk": true
 }
