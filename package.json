@@ -1,17 +1,16 @@
 {
-  "name": "quagga",
-  "version": "0.12.1",
+  "name": "@ericblade/quagga2",
+  "version": "0.0.1",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
   "typings": "type-definitions/quagga.d.ts",
   "browser": "dist/quagga.min.js",
-  "typings": "type-definitions/quagga.d.ts",
   "devDependencies": {
     "async": "^1.4.2",
     "babel-cli": "^6.5.1",
     "babel-core": "^6.21.0",
     "babel-eslint": "^7.1.1",
-    "babel-istanbul": "^0.8.0",
+    "babel-istanbul": "^0.12.2",
     "babel-istanbul-loader": "^0.1.0",
     "babel-loader": "^6.2.10",
     "babel-plugin-add-module-exports": "^0.2.1",
@@ -40,7 +39,7 @@
     "chai": "^3.4.1",
     "core-js": "^2.4.1",
     "cross-env": "^3.1.4",
-    "eslint": "^1.10.3",
+    "eslint": "^4.19.1",
     "grunt": "^0.4.5",
     "grunt-cli": "^0.1.13",
     "grunt-contrib-nodeunit": "^0.4.1",
@@ -82,12 +81,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/serratus/quaggaJS.git"
+    "url": "https://github.com/ericblade/quagga2.git"
   },
   "bugs": {
-    "url": "https://github.com/serratus/quaggaJS/issues"
+    "url": "https://github.com/ericblade/quagga2/issues"
   },
   "keywords": [
+    "quagga2",
     "quagga",
     "quaggajs",
     "barcode",
