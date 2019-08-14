@@ -131,7 +131,7 @@
   "dependencies": {
     "get-pixels": "^3.3.2",
     "gl-mat2": "^1.0.0",
-    "gl-vec2": "^1.0.0",
+    "gl-vec2": "^1.3.0",
     "gl-vec3": "^1.0.3",
     "lodash": "^4.17.4",
     "ndarray": "^1.0.18",
