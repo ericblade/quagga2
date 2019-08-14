@@ -5,3 +5,6 @@ coverage/
 _site/
 .idea/
 .vscode/
+dist/
+lib/quagga.js
+
