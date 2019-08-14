@@ -61,8 +61,8 @@
     "phantomjs": "^2.1.7",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
-    "webpack": "^2.2.1",
-    "webpack-sources": "^0.1.4"
+    "webpack": "^2.7.0",
+    "webpack-sources": "^1.4.3"
   },
   "directories": {
     "doc": "doc"
