@@ -36,7 +36,7 @@
     "babel-plugin-transform-es2015-unicode-regex": "^6.3.13",
     "babel-plugin-transform-object-rest-spread": "^6.5.0",
     "babel-plugin-transform-regenerator": "^6.21.0",
-    "chai": "^3.4.1",
+    "chai": "^4.2.0",
     "core-js": "^2.4.1",
     "cross-env": "^3.1.4",
     "eslint": "^4.19.1",
