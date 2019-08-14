@@ -1,7 +1,11 @@
-quaggaJS
-========
+quagga2
+=======
 
 [![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+This is a fork of the original QuaggaJS library, that will be maintained until such time as the 
+original author and maintainer returns, or it has been completely replaced by built-in browser and
+node functionality.
 
 - [Changelog](#changelog) (2017-06-07)
 - [Browser Support](#browser-support)
@@ -101,27 +105,19 @@ the __script__ tag.
 ### NPM
 
 ```console
-> npm install quagga
+> npm install @ericblade/quagga2
 ```
 
 And then import it as dependency in your project:
 
 ```javascript
-import Quagga from 'quagga'; // ES6
-const Quagga = require('quagga').default; // Common JS (important: default)
+import Quagga from '@ericblade/quagga2'; // ES6
+const Quagga = require('@ericblade/quagga2').default; // Common JS (important: default)
 ```
 
 Currently, the full functionality is only available through the browser. When
 using QuaggaJS within __node__, only file-based decoding is available. See the
 example for [node_examples](#node-example).
-
-### Bower
-
-You can also install QuaggaJS through __bower__:
-
-```console
-> bower install quagga
-```
 
 ### Script-Tag Anno 1998
 
@@ -701,9 +697,16 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 
 ## <a name="sponsors">Sponsors</a>
 
-- [Maintenance Connection Canada (Asset Pro Solutions Inc.](http://maintenanceconnection.ca/)
-
 ## <a name="changelog">Changelog</a>
+
+- Future changelogs will be posted to the github [releases page](https://github.com/ericblade/quagga2/releases)
+
+### 2019-08-13
+- Forked to @ericblade/quagga2
+  - Significantly decrease npm package size by not adding files that were not needed
+  - Carlify iOS support in documentation
+  - Updated typescript typings
+  - drawRect accepts style.lineWidth
 
 ### 2017-06-07
 - Improvements
