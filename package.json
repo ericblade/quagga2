@@ -100,10 +100,33 @@
     "getusermedia",
     "imageprocessing"
   ],
-  "author": "Christoph Oberhofer <ch.oberhofer@gmail.com>",
+  "author": "Eric Blade <blade.eric@gmail.com>",
+  "contributors": [
+    "Christoph Oberhofer <ch.oberhofer@gmail.com>",
+    "Lindsey Simon <elsigh@gmail.com>",
+    "dgreif <dustin.greif@gmail.com>",
+    "David Madner <david.madner@posteo.at>",
+    "Mario Zupan <mzupanmz@gmail.com>",
+    "Edson Alves <edson.alves@oppus>",
+    "Tomáš Hübelbauer <tomas@hubelbauer.net>",
+    "Dan Manastireanu <danmana11@yahoo.com>",
+    "E020873 <nicolas.henry-partner@arcelormittal.com>",
+    "José Pedro Silva <sobreiro.pedro@gmail.com>",
+    "Lasse Rafn <lasserafn@gmail.com>",
+    "Laszlo Radics <laszlo.radics@dpc.hu>",
+    "Martin Tillmann <mtillmann@gmail.com>",
+    "Matthias Jauernig <matthias.jauernig@partner.commerzbank.com>",
+    "Matthias Riegler <matthias@xvzf.tech>",
+    "Pierre-Louis Peeters <pierrelouis.peeters@gmail.com>",
+    "Rudolph Gottesheim <r.gottesheim@midnight-design.at>",
+    "Sean Hussey <sean@seanhussey.com>",
+    "Thomas <tricki@users.noreply.github.com>",
+    "jclarkin <j.r.clarkin@gmail.com>",
+    "kieat <kieat@users.noreply.github.com>"
+  ],
   "license": "MIT",
   "engines": {
-    "node": ">= 4.0"
+    "node": ">= 8.0"
   },
   "dependencies": {
     "get-pixels": "^3.2.3",
