@@ -123,10 +123,10 @@
     "Thomas <tricki@users.noreply.github.com>",
     "jclarkin <j.r.clarkin@gmail.com>",
     "kieat <kieat@users.noreply.github.com>"
-  ]
+  ],
   "license": "MIT",
   "engines": {
-    "node": ">= 4.0"
+    "node": ">= 8.0"
   },
   "dependencies": {
     "get-pixels": "^3.2.3",
