@@ -129,7 +129,7 @@
     "node": ">= 8.0"
   },
   "dependencies": {
-    "get-pixels": "^3.2.3",
+    "get-pixels": "^3.3.2",
     "gl-mat2": "^1.0.0",
     "gl-vec2": "^1.0.0",
     "gl-vec3": "^1.0.3",
