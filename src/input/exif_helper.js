@@ -4,7 +4,7 @@ const ExifTags = {0x0112: "orientation"};
 export const AvailableTags = Object.keys(ExifTags).map(key => ExifTags[key]);
 
 export function findTagsInObjectURL(src, tags = AvailableTags) {
-    if (/^blob\:/i.test(src)) {
+    if (/^blob:/i.test(src)) {
         return objectURLToBlob(src)
             .then(readToBuffer)
             .then(buffer => findTagsInBuffer(buffer, tags));
@@ -13,7 +13,7 @@ export function findTagsInObjectURL(src, tags = AvailableTags) {
 }
 
 export function base64ToArrayBuffer(dataUrl) {
-    const base64 = dataUrl.replace(/^data\:([^\;]+)\;base64,/gmi, ''),
+    const base64 = dataUrl.replace(/^data:([^;]+);base64,/gmi, ''),
         binary = atob(base64),
         len = binary.length,
         buffer = new ArrayBuffer(len),
@@ -79,6 +79,8 @@ export function findTagsInBuffer(file, selectedTags = AvailableTags) {
             offset += 2 + dataView.getUint16(offset + 2);
         }
     }
+
+    return false;
 }
 
 function readEXIFData(file, start, exifTags) {
@@ -135,6 +137,8 @@ function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
             return file.getUint16(entryOffset + 8, !bigEnd);
         }
     }
+
+    return null;
 }
 
 function getStringFromBuffer(buffer, start, length) {
