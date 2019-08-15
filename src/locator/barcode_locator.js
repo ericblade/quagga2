@@ -14,17 +14,9 @@ import ImageDebug from '../common/image_debug';
 import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
-const vec2 = {
-    clone: require('gl-vec2/clone'),
-    dot: require('gl-vec2/dot'),
-    scale: require('gl-vec2/scale'),
-    transformMat2: require('gl-vec2/transformMat2')
-};
-const mat2 = {
-    copy: require('gl-mat2/copy'),
-    create: require('gl-mat2/create'),
-    invert: require('gl-mat2/invert')
-};
+
+import * as vec2 from 'gl-vec2';
+import * as mat2 from 'gl-mat2';
 
 var _config,
     _currentImageWrapper,
@@ -75,9 +67,11 @@ function initBuffers() {
     _skelImageWrapper = new ImageWrapper(_patchSize,
         new Uint8Array(skeletonImageData, _patchSize.x * _patchSize.y * 3, _patchSize.x * _patchSize.y),
         undefined, true);
-    _skeletonizer = skeletonizer((typeof window !== 'undefined') ? window : (typeof self !== 'undefined') ? self : global, {
-        size: _patchSize.x
-    }, skeletonImageData);
+    _skeletonizer = skeletonizer(
+        (typeof window !== 'undefined') ? window : (typeof self !== 'undefined') ? self : global,
+        { size: _patchSize.x },
+        skeletonImageData
+    );
 
     _imageToPatchGrid = new ImageWrapper({
         x: (_currentImageWrapper.size.x / _subImageWrapper.size.x) | 0,
@@ -570,7 +564,7 @@ export default {
         var patchSize,
             width = inputStream.getWidth(),
             height = inputStream.getHeight(),
-            halfSample = config.halfSample ? 0.5 : 1,
+            thisHalfSample = config.halfSample ? 0.5 : 1,
             size,
             area;
 
@@ -584,8 +578,8 @@ export default {
         }
 
         size = {
-            x: Math.floor(width * halfSample),
-            y: Math.floor(height * halfSample)
+            x: Math.floor(width * thisHalfSample),
+            y: Math.floor(height * thisHalfSample)
         };
 
         patchSize = calculatePatchSize(config.patchSize, size);
@@ -593,8 +587,8 @@ export default {
             console.log("Patch-Size: " + JSON.stringify(patchSize));
         }
 
-        inputStream.setWidth(Math.floor(Math.floor(size.x / patchSize.x) * (1 / halfSample) * patchSize.x));
-        inputStream.setHeight(Math.floor(Math.floor(size.y / patchSize.y) * (1 / halfSample) * patchSize.y));
+        inputStream.setWidth(Math.floor(Math.floor(size.x / patchSize.x) * (1 / thisHalfSample) * patchSize.x));
+        inputStream.setHeight(Math.floor(Math.floor(size.y / patchSize.y) * (1 / thisHalfSample) * patchSize.y));
 
         if ((inputStream.getWidth() % patchSize.x) === 0 && (inputStream.getHeight() % patchSize.y) === 0) {
             return true;
