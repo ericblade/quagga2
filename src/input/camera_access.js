@@ -1,12 +1,7 @@
-import {omit, pick} from 'lodash';
-import {getUserMedia, enumerateDevices} from 'mediaDevices';
+import { pick } from 'lodash';
+import { getUserMedia, enumerateDevices } from 'mediaDevices';
 
-const facingMatching = {
-    "user": /front/i,
-    "environment": /back/i
-};
-
-var streamRef;
+let streamRef;
 
 function waitForVideo(video) {
     return new Promise((resolve, reject) => {
@@ -90,12 +85,11 @@ function enumerateVideoDevices() {
 }
 
 function getActiveTrack() {
-    if (streamRef) {
-        const tracks = streamRef.getVideoTracks();
-        if (tracks && tracks.length) {
-            return tracks[0];
-        }
+    if (!streamRef) {
+        return null;
     }
+    const tracks = streamRef.getVideoTracks();
+    return tracks && tracks.length && tracks[0] || null;
 }
 
 export default {
