@@ -26,3 +26,7 @@ README.md
 server.pem
 simple-https-server.py
 webpack.*config*.js
+.travis.yml
+build/
+*.tgz
+.snyx
