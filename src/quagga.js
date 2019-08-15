@@ -58,11 +58,11 @@ function initInputStream(cb) {
         }
         _inputStream = InputStream.createLiveStream(video);
         CameraAccess.request(video, _config.inputStream.constraints)
-        .then(() => {
-            _inputStream.trigger("canrecord");
-        }).catch((err) => {
-            return cb(err);
-        });
+            .then(() => {
+                _inputStream.trigger("canrecord");
+            }).catch((err) => {
+                return cb(err);
+            });
     }
 
     _inputStream.setAttribute("preload", "auto");
@@ -230,8 +230,8 @@ function addResult (result, imageData) {
 
 function hasCodeResult (result) {
     return result && (result.barcodes ?
-      result.barcodes.some(barcode => barcode.codeResult) :
-      result.codeResult);
+        result.barcodes.some(barcode => barcode.codeResult) :
+        result.codeResult);
 }
 
 function publishResult(result, imageData) {
@@ -539,5 +539,5 @@ export default {
     ImageWrapper: ImageWrapper,
     ImageDebug: ImageDebug,
     ResultCollector: ResultCollector,
-    CameraAccess: CameraAccess,
+    CameraAccess: CameraAccess
 };

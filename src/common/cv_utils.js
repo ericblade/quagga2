@@ -1,10 +1,10 @@
 import Cluster2 from './cluster';
 import ArrayHelper from './array_helper';
 const vec2 = {
-    clone: require('gl-vec2/clone'),
+    clone: require('gl-vec2/clone')
 };
 const vec3 = {
-    clone: require('gl-vec3/clone'),
+    clone: require('gl-vec3/clone')
 };
 
 /**
@@ -29,7 +29,7 @@ export function imageRef(x, y) {
         }
     };
     return that;
-};
+}
 
 /**
  * Computes an integral image of a given grayscale image.
@@ -76,7 +76,7 @@ export function computeIntegralImage2(imageWrapper, integralWrapper) {
             posD++;
         }
     }
-};
+}
 
 export function computeIntegralImage(imageWrapper, integralWrapper) {
     var imageData = imageWrapper.data;
@@ -98,7 +98,7 @@ export function computeIntegralImage(imageWrapper, integralWrapper) {
             integralImageData[((v) * width) + u] = sum + integralImageData[(v - 1) * width + u];
         }
     }
-};
+}
 
 export function thresholdImage(imageWrapper, threshold, targetWrapper) {
     if (!targetWrapper) {
@@ -109,7 +109,7 @@ export function thresholdImage(imageWrapper, threshold, targetWrapper) {
     while (length--) {
         targetData[length] = imageData[length] < threshold ? 1 : 0;
     }
-};
+}
 
 export function computeHistogram(imageWrapper, bitsPerPixel) {
     if (!bitsPerPixel) {
@@ -125,7 +125,7 @@ export function computeHistogram(imageWrapper, bitsPerPixel) {
         hist[imageData[length] >> bitShift]++;
     }
     return hist;
-};
+}
 
 export function sharpenLine(line) {
     var i,
@@ -142,7 +142,7 @@ export function sharpenLine(line) {
         center = right;
     }
     return line;
-};
+}
 
 export function determineOtsuThreshold(imageWrapper, bitsPerPixel) {
     if (!bitsPerPixel) {
@@ -192,14 +192,14 @@ export function determineOtsuThreshold(imageWrapper, bitsPerPixel) {
 
     threshold = determineThreshold();
     return threshold << bitShift;
-};
+}
 
 export function otsuThreshold(imageWrapper, targetWrapper) {
     var threshold = determineOtsuThreshold(imageWrapper);
 
     thresholdImage(imageWrapper, threshold, targetWrapper);
     return threshold;
-};
+}
 
 // local thresholding
 export function computeBinaryImage(imageWrapper, integralWrapper, targetWrapper) {
@@ -242,7 +242,7 @@ export function computeBinaryImage(imageWrapper, integralWrapper, targetWrapper)
             targetData[v * width + u] = imageData[v * width + u] > (avg + 5) ? 0 : 1;
         }
     }
-};
+}
 
 export function cluster(points, threshold, property) {
     var i, k, cluster, point, clusters = [];
@@ -271,7 +271,7 @@ export function cluster(points, threshold, property) {
         }
     }
     return clusters;
-};
+}
 
 export const Tracer = {
     trace: function(points, vec) {
@@ -371,7 +371,7 @@ export function dilate(inImageWrapper, outImageWrapper) {
             outImageData[v * width + u] = sum > 0 ? 1 : 0;
         }
     }
-};
+}
 
 export function erode(inImageWrapper, outImageWrapper) {
     var v,
@@ -398,7 +398,7 @@ export function erode(inImageWrapper, outImageWrapper) {
             outImageData[v * width + u] = sum === 5 ? 1 : 0;
         }
     }
-};
+}
 
 export function subtract(aImageWrapper, bImageWrapper, resultImageWrapper) {
     if (!resultImageWrapper) {
@@ -412,7 +412,7 @@ export function subtract(aImageWrapper, bImageWrapper, resultImageWrapper) {
     while (length--) {
         cImageData[length] = aImageData[length] - bImageData[length];
     }
-};
+}
 
 export function bitwiseOr(aImageWrapper, bImageWrapper, resultImageWrapper) {
     if (!resultImageWrapper) {
@@ -426,7 +426,7 @@ export function bitwiseOr(aImageWrapper, bImageWrapper, resultImageWrapper) {
     while (length--) {
         cImageData[length] = aImageData[length] || bImageData[length];
     }
-};
+}
 
 export function countNonZero(imageWrapper) {
     var length = imageWrapper.data.length, data = imageWrapper.data, sum = 0;
@@ -435,7 +435,7 @@ export function countNonZero(imageWrapper) {
         sum += data[length];
     }
     return sum;
-};
+}
 
 export function topGeneric(list, top, scoreFunc) {
     var i, minIdx = 0, min = 0, queue = [], score, hit, pos;
@@ -464,18 +464,18 @@ export function topGeneric(list, top, scoreFunc) {
     }
 
     return queue;
-};
+}
 
 export function grayArrayFromImage(htmlImage, offsetX, ctx, array) {
     ctx.drawImage(htmlImage, offsetX, 0, htmlImage.width, htmlImage.height);
     var ctxData = ctx.getImageData(offsetX, 0, htmlImage.width, htmlImage.height).data;
     computeGray(ctxData, array);
-};
+}
 
 export function grayArrayFromContext(ctx, size, offset, array) {
     var ctxData = ctx.getImageData(offset.x, offset.y, size.x, size.y).data;
     computeGray(ctxData, array);
-};
+}
 
 export function grayAndHalfSampleFromCanvasData(canvasData, size, outArray) {
     var topRowIdx = 0;
@@ -508,7 +508,7 @@ export function grayAndHalfSampleFromCanvasData(canvasData, size, outArray) {
         topRowIdx = topRowIdx + inWidth;
         bottomRowIdx = bottomRowIdx + inWidth;
     }
-};
+}
 
 export function computeGray(imageData, outArray, config) {
     var l = (imageData.length / 4) | 0,
@@ -525,7 +525,7 @@ export function computeGray(imageData, outArray, config) {
                 0.299 * imageData[i * 4 + 0] + 0.587 * imageData[i * 4 + 1] + 0.114 * imageData[i * 4 + 2];
         }
     }
-};
+}
 
 export function loadImageArray(src, callback, canvas) {
     if (!canvas) {
@@ -548,7 +548,7 @@ export function loadImageArray(src, callback, canvas) {
         }, this);
     };
     img.src = src;
-};
+}
 
 /**
  * @param inImg {ImageWrapper} input image to be sampled
@@ -574,7 +574,7 @@ export function halfSample(inImgWrapper, outImgWrapper) {
         topRowIdx = topRowIdx + inWidth;
         bottomRowIdx = bottomRowIdx + inWidth;
     }
-};
+}
 
 export function hsv2rgb(hsv, rgb) {
     var h = hsv[0],
@@ -612,7 +612,7 @@ export function hsv2rgb(hsv, rgb) {
     rgb[1] = ((g + m) * 255) | 0;
     rgb[2] = ((b + m) * 255) | 0;
     return rgb;
-};
+}
 
 export function _computeDivisors(n) {
     var largeDivisors = [],
@@ -628,7 +628,7 @@ export function _computeDivisors(n) {
         }
     }
     return divisors.concat(largeDivisors);
-};
+}
 
 function _computeIntersection(arr1, arr2) {
     var i = 0,
@@ -647,7 +647,7 @@ function _computeIntersection(arr1, arr2) {
         }
     }
     return result;
-};
+}
 
 export function calculatePatchSize(patchSize, imgSize) {
     var divisorsX = _computeDivisors(imgSize.x),
@@ -696,7 +696,7 @@ export function calculatePatchSize(patchSize, imgSize) {
         }
     }
     return optimalPatchSize;
-};
+}
 
 export function _parseCSSDimensionValues(value) {
     var dimension = {
@@ -705,7 +705,7 @@ export function _parseCSSDimensionValues(value) {
     };
 
     return dimension;
-};
+}
 
 export const _dimensionsConverters = {
     top: function(dimension, context) {
@@ -748,4 +748,4 @@ export function computeImageArea(inputWidth, inputHeight, area) {
         sw: parsedArea.right - parsedArea.left,
         sh: parsedArea.bottom - parsedArea.top
     };
-};
+}

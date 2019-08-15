@@ -39,25 +39,25 @@ function waitForVideo(video) {
  */
 function initCamera(video, constraints) {
     return getUserMedia(constraints)
-    .then((stream) => {
-        return new Promise((resolve) => {
-            streamRef = stream;
-            video.setAttribute("autoplay", true);
-            video.setAttribute('muted', true);
-            video.setAttribute('playsinline', true);
-            video.srcObject = stream;
-            video.addEventListener('loadedmetadata', () => {
-                video.play();
-                resolve();
+        .then((stream) => {
+            return new Promise((resolve) => {
+                streamRef = stream;
+                video.setAttribute("autoplay", true);
+                video.setAttribute('muted', true);
+                video.setAttribute('playsinline', true);
+                video.srcObject = stream;
+                video.addEventListener('loadedmetadata', () => {
+                    video.play();
+                    resolve();
+                });
             });
-        });
-    })
-    .then(waitForVideo.bind(null, video));
+        })
+        .then(waitForVideo.bind(null, video));
 }
 
 function deprecatedConstraints(videoConstraints) {
     const normalized = pick(videoConstraints, ["width", "height", "facingMode",
-            "aspectRatio", "deviceId"]);
+        "aspectRatio", "deviceId"]);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined' &&
             videoConstraints.minAspectRatio > 0) {
@@ -86,7 +86,7 @@ export function pickConstraints(videoConstraints) {
 
 function enumerateVideoDevices() {
     return enumerateDevices()
-    .then(devices => devices.filter(device => device.kind === 'videoinput'));
+        .then(devices => devices.filter(device => device.kind === 'videoinput'));
 }
 
 function getActiveTrack() {

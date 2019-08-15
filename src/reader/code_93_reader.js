@@ -71,7 +71,7 @@ Code93Reader.prototype._decode = function() {
     result = result.slice(0, result.length - 2);
     if ((result = self._decodeExtended(result)) === null) {
         return null;
-    };
+    }
 
     return {
         code: result.join(""),

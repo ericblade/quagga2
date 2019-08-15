@@ -6,7 +6,7 @@ module.exports = {
             width: 640,
             height: 480,
             // aspectRatio: 640/480, // optional
-            facingMode: "environment", // or user
+            facingMode: "environment" // or user
             // deviceId: "38745983457387598375983759834"
         },
         area: {

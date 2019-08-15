@@ -2,7 +2,7 @@ import SubImage from './subImage';
 import {hsv2rgb} from '../common/cv_utils';
 import ArrayHelper from '../common/array_helper';
 const vec2 = {
-    clone: require('gl-vec2/clone'),
+    clone: require('gl-vec2/clone')
 };
 
 /**

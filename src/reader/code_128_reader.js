@@ -453,11 +453,11 @@ function calculateCorrection(expected, normalized, indices) {
         sumNormalized = 0,
         sumExpected = 0;
 
-    while(length--) {
+    while (length--) {
         sumExpected += expected[indices[length]];
         sumNormalized += normalized[indices[length]];
     }
-    return sumExpected/sumNormalized;
+    return sumExpected / sumNormalized;
 }
 
 export default Code128Reader;

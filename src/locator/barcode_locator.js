@@ -16,7 +16,7 @@ import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
 const vec2 = {
     clone: require('gl-vec2/clone'),
-    dot:  require('gl-vec2/dot'),
+    dot: require('gl-vec2/dot'),
     scale: require('gl-vec2/scale'),
     transformMat2: require('gl-vec2/transformMat2')
 };
@@ -24,7 +24,7 @@ const mat2 = {
     copy: require('gl-mat2/copy'),
     create: require('gl-mat2/create'),
     invert: require('gl-mat2/invert')
-}
+};
 
 var _config,
     _currentImageWrapper,

@@ -5,7 +5,7 @@ export function enumerateDevices() {
         return navigator.mediaDevices.enumerateDevices();
     }
     return Promise.reject(new Error('enumerateDevices is not defined'));
-};
+}
 
 export function getUserMedia(constraints) {
     if (navigator.mediaDevices

@@ -310,18 +310,18 @@ EANReader.prototype._decode = function() {
         if (!ext) {
             return null;
         }
-        let lastCode = ext.decodedCodes[ext.decodedCodes.length-1],
+        let lastCode = ext.decodedCodes[ext.decodedCodes.length - 1],
             endInfo = {
                 start: lastCode.start + (((lastCode.end - lastCode.start) / 2) | 0),
                 end: lastCode.end
             };
-        if(!self._verifyTrailingWhitespace(endInfo)) {
+        if (!self._verifyTrailingWhitespace(endInfo)) {
             return null;
         }
         resultInfo = {
             supplement: ext,
             code: result.join("") + ext.code
-        }
+        };
     }
 
     return {
@@ -355,7 +355,7 @@ EANReader.prototype._decodeExtensions = function(offset) {
                 end: result.end,
                 codeset: "",
                 decodedCodes: result.decodedCodes
-            }
+            };
         }
     }
     return null;

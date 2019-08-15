@@ -70,13 +70,13 @@ BarcodeReader.prototype._nextSet = function(line, offset) {
 BarcodeReader.prototype._correctBars = function(counter, correction, indices) {
     var length = indices.length,
         tmp = 0;
-    while(length--) {
+    while (length--) {
         tmp = counter[indices[length]] * (1 - ((1 - correction) / 2));
         if (tmp > 1) {
             counter[indices[length]] = tmp;
         }
     }
-}
+};
 
 BarcodeReader.prototype._matchTrace = function(cmpCounter, epsilon) {
     var counter = [],
