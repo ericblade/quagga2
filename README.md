@@ -11,6 +11,7 @@ node functionality.
 - [Browser Support](#browser-support)
 - [Installing](#installing)
 - [Getting Started](#gettingstarted)
+- [Using with React](#usingwithreact)
 - [API](#api)
 - [Configuration](#configobject)
 - [Tips & Tricks](#tipsandtricks)
@@ -99,13 +100,12 @@ The above condition evaluates to:
 
 ## <a name="installing">Installing</a>
 
-QuaggaJS can be installed using __npm__, __bower__, or by including it with
-the __script__ tag.
+Quagga2 can be installed using __npm__, or by including it with the __script__ tag.
 
 ### NPM
 
 ```console
-> npm install @ericblade/quagga2
+> npm install --save @ericblade/quagga2
 ```
 
 And then import it as dependency in your project:
@@ -119,7 +119,7 @@ Currently, the full functionality is only available through the browser. When
 using QuaggaJS within __node__, only file-based decoding is available. See the
 example for [node_examples](#node-example).
 
-### Script-Tag Anno 1998
+### Using with script tag
 
 You can simply include `dist/quagga.min.js` in your project and you are ready
 to go. The script exposes the library on the global namespace under `Quagga`.
@@ -130,6 +130,9 @@ to go. The script exposes the library on the global namespace under `Quagga`.
 For starters, have a look at the [examples][github_examples] to get an idea
 where to go from here.
 
+## <a name="usingwithreact">Using with React</a>
+
+There is a separate [example][reactExample] for using quagga2 with ReactJS
 
 ## <a name="Building">Building</a>
 
@@ -704,7 +707,7 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 ### 2019-08-13
 - Forked to @ericblade/quagga2
   - Significantly decrease npm package size by not adding files that were not needed
-  - Carlify iOS support in documentation
+  - Clarify iOS support in documentation
   - Updated typescript typings
   - drawRect accepts style.lineWidth
 
@@ -926,3 +929,4 @@ introduced to the API.
 [github_examples]: https://serratus.github.io/quaggaJS/examples
 [i2of5_wiki]: https://en.wikipedia.org/wiki/Interleaved_2_of_5
 [enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
+[reactExample]: https://github.com/ericblade/quagga2-react-example
