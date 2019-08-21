@@ -244,7 +244,7 @@ export function computeBinaryImage(imageWrapper, integralWrapper, targetWrapper)
 }
 
 export function cluster(points, threshold, property) {
-    var i, k, cluster, point, clusters = [];
+    var i, k, thisCluster, point, clusters = [];
 
     if (!property) {
         property = "rad";
@@ -253,9 +253,9 @@ export function cluster(points, threshold, property) {
     function addToCluster(newPoint) {
         var found = false;
         for ( k = 0; k < clusters.length; k++) {
-            cluster = clusters[k];
-            if (cluster.fits(newPoint)) {
-                cluster.add(newPoint);
+            thisCluster = clusters[k];
+            if (thisCluster.fits(newPoint)) {
+                thisCluster.add(newPoint);
                 found = true;
             }
         }
@@ -708,24 +708,16 @@ export function _parseCSSDimensionValues(value) {
 
 export const _dimensionsConverters = {
     top: function(dimension, context) {
-        if (dimension.unit === "%") {
-            return Math.floor(context.height * (dimension.value / 100));
-        }
+        return dimension.unit === '%' ? Math.floor(context.height * (dimension.value / 100)) : null;
     },
     right: function(dimension, context) {
-        if (dimension.unit === "%") {
-            return Math.floor(context.width - (context.width * (dimension.value / 100)));
-        }
+        return dimension.unit === '%' ? Math.floor(context.width - (context.width * (dimension.value / 100))) : null;
     },
     bottom: function(dimension, context) {
-        if (dimension.unit === "%") {
-            return Math.floor(context.height - (context.height * (dimension.value / 100)));
-        }
+        return dimension.unit === '%' ? Math.floor(context.height - (context.height * (dimension.value / 100))) : null;
     },
     left: function(dimension, context) {
-        if (dimension.unit === "%") {
-            return Math.floor(context.width * (dimension.value / 100));
-        }
+        return dimension.unit === '%' ? Math.floor(context.width * (dimension.value / 100)) : null;
     }
 };
 

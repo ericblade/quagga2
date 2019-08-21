@@ -2,5 +2,9 @@
     "env": {
         "node": true,
         "mocha": true
+    },
+    "globals": {
+        "should": "readonly",
+        "expect": "readonly"
     }
 }
