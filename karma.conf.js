@@ -24,10 +24,6 @@ module.exports = function(config) {
                         path.resolve('node_modules/')
                     ],
                     loader: 'babel-loader'
-                }, {
-                    test: /\.js$/,
-                    include: path.resolve('src'),
-                    loader: 'babel-istanbul-loader'
                 }]
             },
             resolve: {
