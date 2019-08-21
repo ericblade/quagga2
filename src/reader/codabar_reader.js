@@ -283,6 +283,7 @@ CodabarReader.prototype._findStart = function() {
             };
         }
     }
+    return null;
 };
 
 export default CodabarReader;
