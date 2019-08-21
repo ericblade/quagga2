@@ -98,6 +98,7 @@ UPCEReader.prototype._verifyTrailingWhitespace = function(endInfo) {
             return endInfo;
         }
     }
+    return null;
 };
 
 export default UPCEReader;
