@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "esnext",
+        "allowJs": true,
+        "checkJs": false
+    },
+    "exclude": [
+        "node_modules",
+        "dist",
+        "test",
+        "tasks"
+    ]
+}
