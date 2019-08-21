@@ -120,12 +120,12 @@ var properties = {
         [2, 1, 1, 4, 1, 2],
         [2, 1, 1, 2, 1, 4],
         [2, 1, 1, 2, 3, 2],
-        [2, 3, 3, 1, 1, 1, 2]
+        [2, 3, 3, 1, 1, 1, 2],
     ]},
     SINGLE_CODE_ERROR: {value: 0.64},
     AVG_CODE_ERROR: {value: 0.30},
     FORMAT: {value: "code_128", writeable: false},
-    MODULE_INDICES: {value: {bar: [0, 2, 4], space: [1, 3, 5]}}
+    MODULE_INDICES: {value: {bar: [0, 2, 4], space: [1, 3, 5]}},
 };
 
 Code128Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -145,8 +145,8 @@ Code128Reader.prototype._decodeCode = function(start, correction) {
             end: start,
             correction: {
                 bar: 1,
-                space: 1
-            }
+                space: 1,
+            },
         },
         code,
         error;
@@ -208,8 +208,8 @@ Code128Reader.prototype._findStart = function() {
             end: 0,
             correction: {
                 bar: 1,
-                space: 1
-            }
+                space: 1,
+            },
         },
         code,
         error,
@@ -284,8 +284,8 @@ Code128Reader.prototype._decode = function() {
         end: startInfo.end,
         correction: {
             bar: startInfo.correction.bar,
-            space: startInfo.correction.space
-        }
+            space: startInfo.correction.space,
+        },
     };
     decodedCodes.push(code);
     checksum = code.code;
@@ -430,7 +430,7 @@ Code128Reader.prototype._decode = function() {
         codeset: codeset,
         startInfo: startInfo,
         decodedCodes: decodedCodes,
-        endInfo: code
+        endInfo: code,
     };
 };
 

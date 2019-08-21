@@ -19,12 +19,12 @@ var _inputStream,
     _canvasContainer = {
         ctx: {
             image: null,
-            overlay: null
+            overlay: null,
         },
         dom: {
             image: null,
-            overlay: null
-        }
+            overlay: null,
+        },
     },
     _inputImageWrapper,
     _boxSize,
@@ -139,7 +139,7 @@ function initBuffers(imageWrapper) {
     } else {
         _inputImageWrapper = new ImageWrapper({
             x: _inputStream.getWidth(),
-            y: _inputStream.getHeight()
+            y: _inputStream.getHeight(),
         });
     }
 
@@ -150,7 +150,7 @@ function initBuffers(imageWrapper) {
         vec2.clone([0, 0]),
         vec2.clone([0, _inputImageWrapper.size.y]),
         vec2.clone([_inputImageWrapper.size.x, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, 0])
+        vec2.clone([_inputImageWrapper.size.x, 0]),
     ];
     BarcodeLocator.init(_inputImageWrapper, _config.locator);
 }
@@ -284,7 +284,7 @@ function update() {
                 availableWorker.busy = true;
                 availableWorker.worker.postMessage({
                     cmd: 'process',
-                    imageData: availableWorker.imageData
+                    imageData: availableWorker.imageData,
                 }, [availableWorker.imageData.buffer]);
             } else {
                 locateAndDecode();
@@ -325,7 +325,7 @@ function initWorker(cb) {
         workerThread = {
             worker: undefined,
             imageData: new Uint8Array(_inputStream.getWidth() * _inputStream.getHeight()),
-            busy: true
+            busy: true,
         };
 
     blobURL = generateWorkerBlob();
@@ -355,7 +355,7 @@ function initWorker(cb) {
         cmd: 'init',
         size: {x: _inputStream.getWidth(), y: _inputStream.getHeight()},
         imageData: workerThread.imageData,
-        config: configForWorker(_config)
+        config: configForWorker(_config),
     }, [workerThread.imageData.buffer]);
 }
 
@@ -364,8 +364,8 @@ function configForWorker(config) {
         ...config,
         inputStream: {
             ...config.inputStream,
-            target: null
-        }
+            target: null,
+        },
     };
 }
 
@@ -386,7 +386,7 @@ function workerInterface(factory) {
             config.numOfWorkers = 0;
             imageWrapper = new Quagga.ImageWrapper({
                 x: e.data.size.x,
-                y: e.data.size.y
+                y: e.data.size.y,
             }, new Uint8Array(e.data.imageData));
             Quagga.init(config, ready, imageWrapper);
             Quagga.onProcessed(onProcessed);
@@ -402,7 +402,7 @@ function workerInterface(factory) {
         self.postMessage({
             'event': 'processed',
             imageData: imageWrapper.data,
-            result: result
+            result: result,
         }, [imageWrapper.data.buffer]);
     }
 
@@ -523,12 +523,12 @@ export default {
                 type: "ImageStream",
                 sequence: false,
                 size: 800,
-                src: config.src
+                src: config.src,
             },
             numOfWorkers: (ENV.development && config.debug) ? 0 : 1,
             locator: {
-                halfSample: false
-            }
+                halfSample: false,
+            },
         }, config);
         this.init(config, () => {
             Events.once("processed", (result) => {
@@ -541,5 +541,5 @@ export default {
     ImageWrapper: ImageWrapper,
     ImageDebug: ImageDebug,
     ResultCollector: ResultCollector,
-    CameraAccess: CameraAccess
+    CameraAccess: CameraAccess,
 };

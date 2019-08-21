@@ -35,12 +35,12 @@ var N = 1,
             [N, W, W, N, N],
             [N, N, N, W, W],
             [W, N, N, W, N],
-            [N, W, N, W, N]
+            [N, W, N, W, N],
         ]},
         SINGLE_CODE_ERROR: {value: 0.78, writable: true},
         AVG_CODE_ERROR: {value: 0.38, writable: true},
         MAX_CORRECTION_FACTOR: {value: 5},
-        FORMAT: {value: "i2of5"}
+        FORMAT: {value: "i2of5"},
     };
 
 I2of5Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -81,7 +81,7 @@ I2of5Reader.prototype._findPattern = function(pattern, offset, isWhite, tryHarde
             error: Number.MAX_VALUE,
             code: -1,
             start: 0,
-            end: 0
+            end: 0,
         },
         error,
         j,
@@ -219,7 +219,7 @@ I2of5Reader.prototype._decodeCode = function(counter) {
             error: Number.MAX_VALUE,
             code: -1,
             start: 0,
-            end: 0
+            end: 0,
         };
 
     for (code = 0; code < self.CODE_PATTERN.length; code++) {
@@ -304,7 +304,7 @@ I2of5Reader.prototype._decode = function() {
         start: startInfo.start,
         end: endInfo.end,
         startInfo: startInfo,
-        decodedCodes: decodedCodes
+        decodedCodes: decodedCodes,
     };
 };
 
@@ -313,8 +313,8 @@ I2of5Reader.CONFIG_KEYS = {
         'type': 'boolean',
         'default': false,
         'description': 'If true, the reader tries to normalize the' +
-        'width-difference between bars and spaces'
-    }
+        'width-difference between bars and spaces',
+    },
 };
 
 export default I2of5Reader;

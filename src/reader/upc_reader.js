@@ -5,7 +5,7 @@ function UPCReader(opts, supplements) {
 }
 
 var properties = {
-    FORMAT: {value: "upc_a", writeable: false}
+    FORMAT: {value: "upc_a", writeable: false},
 };
 
 UPCReader.prototype = Object.create(EANReader.prototype, properties);

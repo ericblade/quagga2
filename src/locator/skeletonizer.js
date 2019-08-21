@@ -199,7 +199,7 @@ function Skeletonizer(stdlib, foreign, buffer) {
         } while (!done);
     }
     return {
-        skeletonize: skeletonize
+        skeletonize: skeletonize,
     };
 }
 /* @preserve ASM END */

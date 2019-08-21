@@ -11,17 +11,17 @@ var Rasterizer = {
             firstVertex: null,
             insideContours: null,
             nextpeer: null,
-            prevpeer: null
+            prevpeer: null,
         };
     },
     CONTOUR_DIR: {
         CW_DIR: 0,
         CCW_DIR: 1,
-        UNKNOWN_DIR: 2
+        UNKNOWN_DIR: 2,
     },
     DIR: {
         OUTSIDE_EDGE: -32767,
-        INSIDE_EDGE: -32766
+        INSIDE_EDGE: -32766,
     },
     create: function(imageWrapper, labelWrapper) {
         var imageData = imageWrapper.data,
@@ -130,7 +130,7 @@ var Rasterizer = {
                 }
                 return {
                     cc: cc,
-                    count: connectedCount
+                    count: connectedCount,
                 };
             },
             debug: {
@@ -186,10 +186,10 @@ var Rasterizer = {
                         } while (p !== q.firstVertex);
                         ctx.stroke();
                     }
-                }
-            }
+                },
+            },
         };
-    }
+    },
 };
 
 export default Rasterizer;

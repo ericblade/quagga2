@@ -37,5 +37,5 @@ export default {
         }
         ctx.putImageData(canvasData, 0, 0);
         return true;
-    }
+    },
 };

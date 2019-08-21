@@ -7,7 +7,7 @@ import {
     topGeneric,
     imageRef,
     halfSample,
-    computeImageArea
+    computeImageArea,
 } from '../common/cv_utils';
 import ArrayHelper from '../common/array_helper';
 import ImageDebug from '../common/image_debug';
@@ -30,11 +30,11 @@ var _config,
     _patchSize,
     _canvasContainer = {
         ctx: {
-            binary: null
+            binary: null,
         },
         dom: {
-            binary: null
-        }
+            binary: null,
+        },
     },
     _numPatches = {x: 0, y: 0},
     _inputImageWrapper,
@@ -46,7 +46,7 @@ function initBuffers() {
     if (_config.halfSample) {
         _currentImageWrapper = new ImageWrapper({
             x: _inputImageWrapper.size.x / 2 | 0,
-            y: _inputImageWrapper.size.y / 2 | 0
+            y: _inputImageWrapper.size.y / 2 | 0,
         });
     } else {
         _currentImageWrapper = _inputImageWrapper;
@@ -75,7 +75,7 @@ function initBuffers() {
 
     _imageToPatchGrid = new ImageWrapper({
         x: (_currentImageWrapper.size.x / _subImageWrapper.size.x) | 0,
-        y: (_currentImageWrapper.size.y / _subImageWrapper.size.y) | 0
+        y: (_currentImageWrapper.size.y / _subImageWrapper.size.y) | 0,
     }, undefined, Array, true);
     _patchGrid = new ImageWrapper(_imageToPatchGrid.size, undefined, undefined, true);
     _patchLabelGrid = new ImageWrapper(_imageToPatchGrid.size, undefined, Int32Array, true);
@@ -274,7 +274,7 @@ function findBiggestConnectedAreas(maxLabel){
     labelHist = labelHist.map(function(val, idx) {
         return {
             val: val,
-            label: idx + 1
+            label: idx + 1,
         };
     });
 
@@ -405,17 +405,17 @@ function describePatch(moments, patchPos, x, y) {
                     index: patchPos[1] * _numPatches.x + patchPos[0],
                     pos: {
                         x: x,
-                        y: y
+                        y: y,
                     },
                     box: [
                         vec2.clone([x, y]),
                         vec2.clone([x + _subImageWrapper.size.x, y]),
                         vec2.clone([x + _subImageWrapper.size.x, y + _subImageWrapper.size.y]),
-                        vec2.clone([x, y + _subImageWrapper.size.y])
+                        vec2.clone([x, y + _subImageWrapper.size.y]),
                     ],
                     moments: matchingMoments,
                     rad: avg,
-                    vec: vec2.clone([Math.cos(avg), Math.sin(avg)])
+                    vec: vec2.clone([Math.cos(avg), Math.sin(avg)]),
                 };
                 patchesFound.push(patch);
             }
@@ -455,7 +455,7 @@ function rasterizeAngularSimilarity(patchesFound) {
             dir,
             current = {
                 x: currentIdx % _patchLabelGrid.size.x,
-                y: (currentIdx / _patchLabelGrid.size.x) | 0
+                y: (currentIdx / _patchLabelGrid.size.x) | 0,
             },
             similarity;
 
@@ -579,7 +579,7 @@ export default {
 
         size = {
             x: Math.floor(width * thisHalfSample),
-            y: Math.floor(height * thisHalfSample)
+            y: Math.floor(height * thisHalfSample),
         };
 
         patchSize = calculatePatchSize(config.patchSize, size);
@@ -597,5 +597,5 @@ export default {
         throw new Error("Image dimensions do not comply with the current settings: Width (" +
             width + " )and height (" + height +
             ") must a multiple of " + patchSize.x);
-    }
+    },
 };

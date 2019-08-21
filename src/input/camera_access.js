@@ -69,7 +69,7 @@ function deprecatedConstraints(videoConstraints) {
 export function pickConstraints(videoConstraints) {
     const normalizedConstraints = {
         audio: false,
-        video: deprecatedConstraints(videoConstraints)
+        video: deprecatedConstraints(videoConstraints),
     };
 
     if (normalizedConstraints.video.deviceId
@@ -109,5 +109,5 @@ export default {
         const track = getActiveTrack();
         return track ? track.label : '';
     },
-    getActiveTrack
+    getActiveTrack,
 };

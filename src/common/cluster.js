@@ -9,7 +9,7 @@ export default {
         var points = [],
             center = {
                 rad: 0,
-                vec: vec2.clone([0, 0])
+                vec: vec2.clone([0, 0]),
             },
             pointMap = {};
 
@@ -54,14 +54,14 @@ export default {
             },
             getCenter: function() {
                 return center;
-            }
+            },
         };
     },
     createPoint: function(newPoint, id, property) {
         return {
             rad: newPoint[property],
             point: newPoint,
-            id: id
+            id: id,
         };
-    }
+    },
 };

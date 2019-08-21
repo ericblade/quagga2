@@ -42,12 +42,12 @@ var properties = {
         [4, 1, 1, 1],
         [2, 1, 3, 1],
         [3, 1, 2, 1],
-        [2, 1, 1, 3]
+        [2, 1, 1, 3],
     ]},
     CODE_FREQUENCY: {value: [0, 11, 13, 14, 19, 25, 28, 21, 22, 26]},
     SINGLE_CODE_ERROR: {value: 0.70},
     AVG_CODE_ERROR: {value: 0.48},
-    FORMAT: {value: "ean_13", writeable: false}
+    FORMAT: {value: "ean_13", writeable: false},
 };
 
 EANReader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -64,7 +64,7 @@ EANReader.prototype._decodeCode = function(start, coderange) {
             error: Number.MAX_VALUE,
             code: -1,
             start: start,
-            end: start
+            end: start,
         },
         code,
         error;
@@ -109,7 +109,7 @@ EANReader.prototype._findPattern = function(pattern, offset, isWhite, tryHarder,
             error: Number.MAX_VALUE,
             code: -1,
             start: 0,
-            end: 0
+            end: 0,
         },
         error,
         j,
@@ -287,7 +287,7 @@ EANReader.prototype._decode = function() {
     code = {
         code: startInfo.code,
         start: startInfo.start,
-        end: startInfo.end
+        end: startInfo.end,
     };
     decodedCodes.push(code);
     code = self._decodePayload(code, result, decodedCodes);
@@ -314,14 +314,14 @@ EANReader.prototype._decode = function() {
         let lastCode = ext.decodedCodes[ext.decodedCodes.length - 1],
             endInfo = {
                 start: lastCode.start + (((lastCode.end - lastCode.start) / 2) | 0),
-                end: lastCode.end
+                end: lastCode.end,
             };
         if (!self._verifyTrailingWhitespace(endInfo)) {
             return null;
         }
         resultInfo = {
             supplement: ext,
-            code: result.join("") + ext.code
+            code: result.join("") + ext.code,
         };
     }
 
@@ -332,7 +332,7 @@ EANReader.prototype._decode = function() {
         codeset: "",
         startInfo: startInfo,
         decodedCodes: decodedCodes,
-        ...resultInfo
+        ...resultInfo,
     };
 };
 
@@ -355,7 +355,7 @@ EANReader.prototype._decodeExtensions = function(offset) {
                 startInfo,
                 end: result.end,
                 codeset: "",
-                decodedCodes: result.decodedCodes
+                decodedCodes: result.decodedCodes,
             };
         }
     }
@@ -379,8 +379,8 @@ EANReader.CONFIG_KEYS = {
     supplements: {
         'type': 'arrayOf(string)',
         'default': [],
-        'description': 'Allowed extensions to be decoded (2 and/or 5)'
-    }
+        'description': 'Allowed extensions to be decoded (2 and/or 5)',
+    },
 };
 
 export default (EANReader);

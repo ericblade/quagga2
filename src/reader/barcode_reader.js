@@ -88,7 +88,7 @@ BarcodeReader.prototype._matchTrace = function(cmpCounter, epsilon) {
         bestMatch = {
             error: Number.MAX_VALUE,
             code: -1,
-            start: 0
+            start: 0,
         },
         error;
 
@@ -226,18 +226,18 @@ BarcodeReader.prototype._toCounters = function(start, counter) {
 
 Object.defineProperty(BarcodeReader.prototype, "FORMAT", {
     value: 'unknown',
-    writeable: false
+    writeable: false,
 });
 
 BarcodeReader.DIRECTION = {
     FORWARD: 1,
-    REVERSE: -1
+    REVERSE: -1,
 };
 
 BarcodeReader.Exception = {
     StartNotFoundException: "Start-Info was not found!",
     CodeNotFoundException: "Code could not be found!",
-    PatternNotFoundException: "Pattern could not be found!"
+    PatternNotFoundException: "Pattern could not be found!",
 };
 
 BarcodeReader.CONFIG_KEYS = {};

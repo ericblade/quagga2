@@ -5,7 +5,7 @@ function EAN5Reader() {
 }
 
 var properties = {
-    FORMAT: {value: "ean_5", writeable: false}
+    FORMAT: {value: "ean_5", writeable: false},
 };
 
 const CHECK_DIGIT_ENCODINGS = [24, 20, 18, 17, 12, 6, 3, 10, 9, 5];
@@ -49,7 +49,7 @@ EAN5Reader.prototype.decode = function(row, start) {
     return {
         code: result.join(""),
         decodedCodes,
-        end: code.end
+        end: code.end,
     };
 };
 

@@ -27,7 +27,7 @@ const READERS = {
     upc_e_reader: UPCEReader,
     i2of5_reader: I2of5Reader,
     '2of5_reader': TwoOfFiveReader,
-    code_93_reader: Code93Reader
+    code_93_reader: Code93Reader,
 };
 export default {
     create: function(config, inputImageWrapper) {
@@ -35,13 +35,13 @@ export default {
                 ctx: {
                     frequency: null,
                     pattern: null,
-                    overlay: null
+                    overlay: null,
                 },
                 dom: {
                     frequency: null,
                     pattern: null,
-                    overlay: null
-                }
+                    overlay: null,
+                },
             },
             _barcodeReaders = [];
 
@@ -114,10 +114,10 @@ export default {
                 var i,
                     vis = [{
                         node: _canvas.dom.frequency,
-                        prop: config.debug.showFrequency
+                        prop: config.debug.showFrequency,
                     }, {
                         node: _canvas.dom.pattern,
-                        prop: config.debug.showPattern
+                        prop: config.debug.showPattern,
                     }];
 
                 for (i = 0; i < vis.length; i++) {
@@ -139,7 +139,7 @@ export default {
             function extendLine(amount) {
                 var extension = {
                     y: amount * Math.sin(angle),
-                    x: amount * Math.cos(angle)
+                    x: amount * Math.cos(angle),
                 };
 
                 line[0].y -= extension.y;
@@ -161,10 +161,10 @@ export default {
         function getLine(box) {
             return [{
                 x: (box[1][0] - box[0][0]) / 2 + box[0][0],
-                y: (box[1][1] - box[0][1]) / 2 + box[0][1]
+                y: (box[1][1] - box[0][1]) / 2 + box[0][1],
             }, {
                 x: (box[3][0] - box[2][0]) / 2 + box[2][0],
-                y: (box[3][1] - box[2][1]) / 2 + box[2][1]
+                y: (box[3][1] - box[2][1]) / 2 + box[2][1],
             }];
         }
 
@@ -192,7 +192,7 @@ export default {
             }
             return {
                 codeResult: result,
-                barcodeLine: barcodeLine
+                barcodeLine: barcodeLine,
             };
         }
 
@@ -218,7 +218,7 @@ export default {
                 dir = sideLength / slices * i * (i % 2 === 0 ? -1 : 1);
                 extension = {
                     y: dir * xdir,
-                    x: dir * ydir
+                    x: dir * ydir,
                 };
                 line[0].y += extension.x;
                 line[0].x -= extension.y;
@@ -281,7 +281,7 @@ export default {
                 line: line,
                 angle: lineAngle,
                 pattern: result.barcodeLine.line,
-                threshold: result.barcodeLine.threshold
+                threshold: result.barcodeLine.threshold,
             };
         }
 
@@ -311,7 +311,7 @@ export default {
                 config.readers = readers;
                 _barcodeReaders.length = 0;
                 initReaders();
-            }
+            },
         };
-    }
+    },
 };

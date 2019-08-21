@@ -4,7 +4,7 @@ export default (function() {
     function getEvent(eventName) {
         if (!events[eventName]) {
             events[eventName] = {
-                subscribers: []
+                subscribers: [],
             };
         }
         return events[eventName];
@@ -30,7 +30,7 @@ export default (function() {
         if ( typeof callback === "function") {
             subscription = {
                 callback: callback,
-                async: async
+                async: async,
             };
         } else {
             subscription = callback;
@@ -71,7 +71,7 @@ export default (function() {
             subscribe(event, {
                 callback: callback,
                 async: async,
-                once: true
+                once: true,
             });
         },
         unsubscribe: function(eventName, callback) {
@@ -89,6 +89,6 @@ export default (function() {
             } else {
                 clearEvents();
             }
-        }
+        },
     };
 })();

@@ -5,7 +5,7 @@ function EAN8Reader(opts, supplements) {
 }
 
 var properties = {
-    FORMAT: {value: "ean_8", writeable: false}
+    FORMAT: {value: "ean_8", writeable: false},
 };
 
 EAN8Reader.prototype = Object.create(EANReader.prototype, properties);

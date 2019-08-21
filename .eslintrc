@@ -14,7 +14,7 @@
     },
     "rules": {
         "camelcase": "off",
-        "comma-dangle": "error",
+        "comma-dangle": [ "error", "always-multiline" ],
         "curly": "error",
         "eqeqeq": "error",
         "guard-for-in": "error",
@@ -35,7 +35,7 @@
         "wrap-iife": "off",
         // STYLE
         "brace-style": ["error", "1tbs"],
-        "comma-spacing": ["error", {"before": false, "after": true}],
+        "comma-spacing": ["error", { "before": false, "after": true }],
         "comma-style": ["error", "last"],
         "consistent-return": "error",
         "consistent-this": ["warn", "self"],

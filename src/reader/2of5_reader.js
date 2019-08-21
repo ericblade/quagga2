@@ -20,11 +20,11 @@ var N = 1,
             [N, W, W, N, N],
             [N, N, N, W, W],
             [W, N, N, W, N],
-            [N, W, N, W, N]
+            [N, W, N, W, N],
         ]},
         SINGLE_CODE_ERROR: {value: 0.78, writable: true},
         AVG_CODE_ERROR: {value: 0.30, writable: true},
-        FORMAT: {value: "2of5"}
+        FORMAT: {value: "2of5"},
     };
 
 const startPatternLength = properties.START_PATTERN.value.reduce((sum, val) => sum + val, 0);
@@ -41,7 +41,7 @@ TwoOfFiveReader.prototype._findPattern = function(pattern, offset, isWhite, tryH
             error: Number.MAX_VALUE,
             code: -1,
             start: 0,
-            end: 0
+            end: 0,
         },
         error,
         j,
@@ -165,7 +165,7 @@ TwoOfFiveReader.prototype._decodeCode = function(counter) {
             error: Number.MAX_VALUE,
             code: -1,
             start: 0,
-            end: 0
+            end: 0,
         };
 
     for (code = 0; code < self.CODE_PATTERN.length; code++) {
@@ -246,7 +246,7 @@ TwoOfFiveReader.prototype._decode = function() {
         start: startInfo.start,
         end: endInfo.end,
         startInfo: startInfo,
-        decodedCodes: decodedCodes
+        decodedCodes: decodedCodes,
     };
 };
 

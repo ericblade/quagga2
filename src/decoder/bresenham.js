@@ -3,8 +3,8 @@ var Bresenham = {};
 var Slope = {
     DIR: {
         UP: 1,
-        DOWN: -1
-    }
+        DOWN: -1,
+    },
 };
 /**
  * Scans a line of the given image from point p1 to p2 and returns a result object containing
@@ -81,7 +81,7 @@ Bresenham.getBarcodeLine = function(imageWrapper, p1, p2) {
     return {
         line: line,
         min: min,
-        max: max
+        max: max,
     };
 };
 
@@ -109,7 +109,7 @@ Bresenham.toBinaryLine = function(result) {
     currentDir = line[0] > center ? Slope.DIR.UP : Slope.DIR.DOWN;
     extrema.push({
         pos: 0,
-        val: line[0]
+        val: line[0],
     });
     for ( i = 0; i < line.length - 2; i++) {
         slope = (line[i + 1] - line[i]);
@@ -125,14 +125,14 @@ Bresenham.toBinaryLine = function(result) {
         if (currentDir !== dir) {
             extrema.push({
                 pos: i,
-                val: line[i]
+                val: line[i],
             });
             currentDir = dir;
         }
     }
     extrema.push({
         pos: line.length,
-        val: line[line.length - 1]
+        val: line[line.length - 1],
     });
 
     for ( j = extrema[0].pos; j < extrema[1].pos; j++) {
@@ -154,7 +154,7 @@ Bresenham.toBinaryLine = function(result) {
 
     return {
         line: line,
-        threshold: threshold
+        threshold: threshold,
     };
 };
 
@@ -188,7 +188,7 @@ Bresenham.debug = {
                 ctx.fillRect(i, 0, 1, 100);
             }
         }
-    }
+    },
 };
 
 export default Bresenham;

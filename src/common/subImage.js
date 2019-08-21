@@ -10,7 +10,7 @@ function SubImage(from, size, I) {
     if (!I) {
         I = {
             data: null,
-            size: size
+            size: size,
         };
     }
     this.data = I.data;

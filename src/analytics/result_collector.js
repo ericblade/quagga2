@@ -51,7 +51,7 @@ export default {
             },
             getResults: function() {
                 return results;
-            }
+            },
         };
-    }
+    },
 };

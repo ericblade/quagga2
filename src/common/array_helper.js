@@ -75,5 +75,5 @@ export default {
             sum += arr[length];
         }
         return sum;
-    }
+    },
 };

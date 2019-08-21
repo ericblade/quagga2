@@ -137,7 +137,7 @@ ImageWrapper.prototype.getSafe = function(x, y) {
     if (!this.indexMapping) {
         this.indexMapping = {
             x: [],
-            y: []
+            y: [],
         };
         for (i = 0; i < this.size.x; i++) {
             this.indexMapping.x[i] = i;
@@ -236,7 +236,7 @@ ImageWrapper.prototype.moments = function(labelcount) {
             m02: 0,
             m20: 0,
             theta: 0,
-            rad: 0
+            rad: 0,
         };
     }
 

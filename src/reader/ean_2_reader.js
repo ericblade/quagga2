@@ -5,7 +5,7 @@ function EAN2Reader() {
 }
 
 var properties = {
-    FORMAT: {value: "ean_2", writeable: false}
+    FORMAT: {value: "ean_2", writeable: false},
 };
 
 EAN2Reader.prototype = Object.create(EANReader.prototype, properties);
@@ -43,7 +43,7 @@ EAN2Reader.prototype.decode = function(row, start) {
     return {
         code: result.join(""),
         decodedCodes,
-        end: code.end
+        end: code.end,
     };
 };
 

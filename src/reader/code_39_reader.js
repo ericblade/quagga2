@@ -11,10 +11,10 @@ var properties = {
         79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 45, 46, 32, 42, 36, 47, 43, 37]},
     CHARACTER_ENCODINGS: {value: [0x034, 0x121, 0x061, 0x160, 0x031, 0x130, 0x070, 0x025, 0x124, 0x064, 0x109, 0x049,
         0x148, 0x019, 0x118, 0x058, 0x00D, 0x10C, 0x04C, 0x01C, 0x103, 0x043, 0x142, 0x013, 0x112, 0x052, 0x007, 0x106,
-        0x046, 0x016, 0x181, 0x0C1, 0x1C0, 0x091, 0x190, 0x0D0, 0x085, 0x184, 0x0C4, 0x094, 0x0A8, 0x0A2, 0x08A, 0x02A
+        0x046, 0x016, 0x181, 0x0C1, 0x1C0, 0x091, 0x190, 0x0D0, 0x085, 0x184, 0x0C4, 0x094, 0x0A8, 0x0A2, 0x08A, 0x02A,
     ]},
     ASTERISK: {value: 0x094},
-    FORMAT: {value: "code_39", writeable: false}
+    FORMAT: {value: "code_39", writeable: false},
 };
 
 Code39Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -65,7 +65,7 @@ Code39Reader.prototype._decode = function() {
         start: start.start,
         end: nextStart,
         startInfo: start,
-        decodedCodes: result
+        decodedCodes: result,
     };
 };
 
@@ -163,7 +163,7 @@ Code39Reader.prototype._findStart = function() {
                     if (self._matchRange(whiteSpaceMustStart, patternStart, 0)) {
                         return {
                             start: patternStart,
-                            end: i
+                            end: i,
                         };
                     }
                 }

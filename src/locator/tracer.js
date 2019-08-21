@@ -40,7 +40,7 @@ var Tracer = {
                 x: x,
                 y: y,
                 next: null,
-                prev: null
+                prev: null,
             };
         }
 
@@ -52,7 +52,7 @@ var Tracer = {
                 current = {
                     cx: sx,
                     cy: sy,
-                    dir: 0
+                    dir: 0,
                 };
 
             if (trace(current, color, label, edgelabel)) {
@@ -93,9 +93,9 @@ var Tracer = {
             },
             contourTracing: function(sy, sx, label, color, edgelabel) {
                 return contourTracing(sy, sx, label, color, edgelabel);
-            }
+            },
         };
-    }
+    },
 };
 
 export default (Tracer);

@@ -1,7 +1,7 @@
 import {
     imageRef,
     grayAndHalfSampleFromCanvasData,
-    computeGray
+    computeGray,
 } from '../common/cv_utils';
 
 const TO_RADIANS = Math.PI / 180;
@@ -46,7 +46,7 @@ FrameGrabber.create = function(inputStream, canvas) {
             size: _size,
             topRight: topRight,
             videoSize: _video_size,
-            canvasSize: _canvasSize
+            canvasSize: _canvasSize,
         }));
     }
 

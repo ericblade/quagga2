@@ -6,7 +6,7 @@ function Code39VINReader() {
 
 var patterns = {
     IOQ: /[IOQ]/g,
-    AZ09: /[A-Z0-9]{17}/
+    AZ09: /[A-Z0-9]{17}/,
 };
 
 Code39VINReader.prototype = Object.create(Code39Reader.prototype);

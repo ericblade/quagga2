@@ -14,7 +14,7 @@ var properties = {
     MIN_ENCODED_CHARS: {value: 4},
     MAX_ACCEPTABLE: {value: 2.0},
     PADDING: {value: 1.5},
-    FORMAT: {value: "codabar", writeable: false}
+    FORMAT: {value: "codabar", writeable: false},
 };
 
 CodabarReader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -74,7 +74,7 @@ CodabarReader.prototype._decode = function() {
         start: start.start,
         end: end,
         startInfo: start,
-        decodedCodes: result
+        decodedCodes: result,
     };
 };
 
@@ -105,12 +105,12 @@ CodabarReader.prototype._thresholdResultPattern = function(result, startCounter)
         categorization = {
             space: {
                 narrow: { size: 0, counts: 0, min: 0, max: Number.MAX_VALUE},
-                wide: {size: 0, counts: 0, min: 0, max: Number.MAX_VALUE}
+                wide: {size: 0, counts: 0, min: 0, max: Number.MAX_VALUE},
             },
             bar: {
                 narrow: { size: 0, counts: 0, min: 0, max: Number.MAX_VALUE},
-                wide: { size: 0, counts: 0, min: 0, max: Number.MAX_VALUE}
-            }
+                wide: { size: 0, counts: 0, min: 0, max: Number.MAX_VALUE},
+            },
         },
         kind,
         cat,
@@ -279,7 +279,7 @@ CodabarReader.prototype._findStart = function() {
                 start: start,
                 end: end,
                 startCounter: i,
-                endCounter: i + 8
+                endCounter: i + 8,
             };
         }
     }

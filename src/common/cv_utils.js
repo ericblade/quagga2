@@ -25,7 +25,7 @@ export function imageRef(x, y) {
             this.x = this.x > 0.0 ? Math.floor(this.x + 0.5) : Math.floor(this.x - 0.5);
             this.y = this.y > 0.0 ? Math.floor(this.y + 0.5) : Math.floor(this.y - 0.5);
             return this;
-        }
+        },
     };
     return that;
 }
@@ -297,12 +297,12 @@ export const Tracer = {
             if (forward) {
                 predictedPos = {
                     x: from.x + vec[0],
-                    y: from.y + vec[1]
+                    y: from.y + vec[1],
                 };
             } else {
                 predictedPos = {
                     x: from.x - vec[0],
-                    y: from.y - vec[1]
+                    y: from.y - vec[1],
                 };
             }
 
@@ -339,7 +339,7 @@ export const Tracer = {
             }
         }
         return result;
-    }
+    },
 };
 
 export const DILATE = 1;
@@ -442,7 +442,7 @@ export function topGeneric(list, top, scoreFunc) {
     for ( i = 0; i < top; i++) {
         queue[i] = {
             score: 0,
-            item: null
+            item: null,
         };
     }
 
@@ -543,7 +543,7 @@ export function loadImageArray(src, callback, canvas) {
         computeGray(data, array);
         this.callback(array, {
             x: this.width,
-            y: this.height
+            y: this.height,
         }, this);
     };
     img.src = src;
@@ -659,7 +659,7 @@ export function calculatePatchSize(patchSize, imgSize) {
             "small": 4,
             "medium": 3,
             "large": 2,
-            "x-large": 1
+            "x-large": 1,
         },
         nrOfPatchesIdx = nrOfPatchesMap[patchSize] || nrOfPatchesMap.medium,
         nrOfPatches = nrOfPatchesList[nrOfPatchesIdx],
@@ -700,7 +700,7 @@ export function calculatePatchSize(patchSize, imgSize) {
 export function _parseCSSDimensionValues(value) {
     var dimension = {
         value: parseFloat(value),
-        unit: value.indexOf("%") === value.length - 1 ? "%" : "%"
+        unit: value.indexOf("%") === value.length - 1 ? "%" : "%",
     };
 
     return dimension;
@@ -718,7 +718,7 @@ export const _dimensionsConverters = {
     },
     left: function(dimension, context) {
         return dimension.unit === '%' ? Math.floor(context.width * (dimension.value / 100)) : null;
-    }
+    },
 };
 
 export function computeImageArea(inputWidth, inputHeight, area) {
@@ -737,6 +737,6 @@ export function computeImageArea(inputWidth, inputHeight, area) {
         sx: parsedArea.left,
         sy: parsedArea.top,
         sw: parsedArea.right - parsedArea.left,
-        sh: parsedArea.bottom - parsedArea.top
+        sh: parsedArea.bottom - parsedArea.top,
     };
 }
