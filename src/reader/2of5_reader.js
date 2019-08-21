@@ -99,7 +99,7 @@ TwoOfFiveReader.prototype._findStart = function() {
     var self = this,
         leadingWhitespaceStart,
         offset = self._nextSet(self._row),
-        startInfo,
+        startInfo = null,
         narrowBarWidth = 1;
 
     while (!startInfo) {
@@ -117,6 +117,7 @@ TwoOfFiveReader.prototype._findStart = function() {
         offset = startInfo.end;
         startInfo = null;
     }
+    return startInfo;
 };
 
 TwoOfFiveReader.prototype._verifyTrailingWhitespace = function(endInfo) {
@@ -156,10 +157,7 @@ TwoOfFiveReader.prototype._findEnd = function() {
 };
 
 TwoOfFiveReader.prototype._decodeCode = function(counter) {
-    var j,
-        self = this,
-        sum = 0,
-        normalized,
+    var self = this,
         error,
         epsilon = self.AVG_CODE_ERROR,
         code,
@@ -170,9 +168,6 @@ TwoOfFiveReader.prototype._decodeCode = function(counter) {
             end: 0
         };
 
-    for ( j = 0; j < counter.length; j++) {
-        sum += counter[j];
-    }
     for (code = 0; code < self.CODE_PATTERN.length; code++) {
         error = self._matchPattern(counter, self.CODE_PATTERN[code]);
         if (error < bestMatch.error) {
@@ -183,6 +178,7 @@ TwoOfFiveReader.prototype._decodeCode = function(counter) {
     if (bestMatch.error < epsilon) {
         return bestMatch;
     }
+    return null;
 };
 
 TwoOfFiveReader.prototype._decodePayload = function(counters, result, decodedCodes) {
