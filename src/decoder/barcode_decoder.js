@@ -305,12 +305,7 @@ export default {
                         return result;
                     }
                 }
-
-                if (multiple) {
-                    return {
-                        barcodes
-                    };
-                }
+                return { barcodes };
             },
             setReaders: function(readers) {
                 config.readers = readers;
