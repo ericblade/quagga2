@@ -224,7 +224,7 @@ BarcodeReader.prototype._toCounters = function(start, counter) {
     return counter;
 };
 
-Object.defineProperty(BarcodeReader.prototype, "FORMAT", {
+Object.defineProperty(BarcodeReader.prototype, 'FORMAT', {
     value: 'unknown',
     writeable: false,
 });
@@ -235,9 +235,9 @@ BarcodeReader.DIRECTION = {
 };
 
 BarcodeReader.Exception = {
-    StartNotFoundException: "Start-Info was not found!",
-    CodeNotFoundException: "Code could not be found!",
-    PatternNotFoundException: "Pattern could not be found!",
+    StartNotFoundException: 'Start-Info was not found!',
+    CodeNotFoundException: 'Code could not be found!',
+    PatternNotFoundException: 'Pattern could not be found!',
 };
 
 BarcodeReader.CONFIG_KEYS = {};

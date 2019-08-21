@@ -9,13 +9,13 @@ const TO_RADIANS = Math.PI / 180;
 function adjustCanvasSize(canvas, targetSize) {
     if (canvas.width !== targetSize.x) {
         if (ENV.development) {
-            console.log("WARNING: canvas-size needs to be adjusted");
+            console.log('WARNING: canvas-size needs to be adjusted');
         }
         canvas.width = targetSize.x;
     }
     if (canvas.height !== targetSize.y) {
         if (ENV.development) {
-            console.log("WARNING: canvas-size needs to be adjusted");
+            console.log('WARNING: canvas-size needs to be adjusted');
         }
         canvas.height = targetSize.y;
     }
@@ -36,13 +36,13 @@ FrameGrabber.create = function(inputStream, canvas) {
         _ctx = null,
         _data = null;
 
-    _canvas = canvas ? canvas : document.createElement("canvas");
+    _canvas = canvas ? canvas : document.createElement('canvas');
     _canvas.width = _canvasSize.x;
     _canvas.height = _canvasSize.y;
-    _ctx = _canvas.getContext("2d");
+    _ctx = _canvas.getContext('2d');
     _data = new Uint8Array(_size.x * _size.y);
     if (ENV.development) {
-        console.log("FrameGrabber", JSON.stringify({
+        console.log('FrameGrabber', JSON.stringify({
             size: _size,
             topRight: topRight,
             videoSize: _video_size,

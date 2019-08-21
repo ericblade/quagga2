@@ -24,7 +24,7 @@ var N = 1,
         ]},
         SINGLE_CODE_ERROR: {value: 0.78, writable: true},
         AVG_CODE_ERROR: {value: 0.30, writable: true},
-        FORMAT: {value: "2of5"},
+        FORMAT: {value: '2of5'},
     };
 
 const startPatternLength = properties.START_PATTERN.value.reduce((sum, val) => sum + val, 0);
@@ -198,7 +198,7 @@ TwoOfFiveReader.prototype._decodePayload = function(counters, result, decodedCod
         if (!code) {
             return null;
         }
-        result.push(code.code + "");
+        result.push(code.code + '');
         decodedCodes.push(code);
     }
     return code;
@@ -242,7 +242,7 @@ TwoOfFiveReader.prototype._decode = function() {
 
     decodedCodes.push(endInfo);
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: startInfo.start,
         end: endInfo.end,
         startInfo: startInfo,

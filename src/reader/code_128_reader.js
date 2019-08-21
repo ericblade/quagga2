@@ -124,7 +124,7 @@ var properties = {
     ]},
     SINGLE_CODE_ERROR: {value: 0.64},
     AVG_CODE_ERROR: {value: 0.30},
-    FORMAT: {value: "code_128", writeable: false},
+    FORMAT: {value: 'code_128', writeable: false},
     MODULE_INDICES: {value: {bar: [0, 2, 4], space: [1, 3, 5]}},
 };
 
@@ -372,7 +372,7 @@ Code128Reader.prototype._decode = function() {
                 break;
             case self.CODE_C:
                 if (code.code < 100) {
-                    result.push(code.code < 10 ? "0" + code.code : code.code);
+                    result.push(code.code < 10 ? '0' + code.code : code.code);
                 } else {
                     if (code.code !== self.STOP_CODE) {
                         removeLastCharacter = false;
@@ -424,7 +424,7 @@ Code128Reader.prototype._decode = function() {
 
 
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: startInfo.start,
         end: code.end,
         codeset: codeset,

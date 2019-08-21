@@ -164,12 +164,12 @@ Bresenham.toBinaryLine = function(result) {
 Bresenham.debug = {
     printFrequency: function(line, canvas) {
         var i,
-            ctx = canvas.getContext("2d");
+            ctx = canvas.getContext('2d');
         canvas.width = line.length;
         canvas.height = 256;
 
         ctx.beginPath();
-        ctx.strokeStyle = "blue";
+        ctx.strokeStyle = 'blue';
         for ( i = 0; i < line.length; i++) {
             ctx.moveTo(i, 255);
             ctx.lineTo(i, 255 - line[i]);
@@ -179,10 +179,10 @@ Bresenham.debug = {
     },
 
     printPattern: function(line, canvas) {
-        var ctx = canvas.getContext("2d"), i;
+        var ctx = canvas.getContext('2d'), i;
 
         canvas.width = line.length;
-        ctx.fillColor = "black";
+        ctx.fillColor = 'black';
         for ( i = 0; i < line.length; i++) {
             if (line[i] === 1) {
                 ctx.fillRect(i, 0, 1, 100);

@@ -20,8 +20,8 @@ function passesFilter(codeResult, filter) {
 
 export default {
     create: function(config) {
-        var canvas = document.createElement("canvas"),
-            ctx = canvas.getContext("2d"),
+        var canvas = document.createElement('canvas'),
+            ctx = canvas.getContext('2d'),
             results = [],
             capacity = config.capacity || 20,
             capture = config.capture === true;

@@ -40,7 +40,7 @@ var N = 1,
         SINGLE_CODE_ERROR: {value: 0.78, writable: true},
         AVG_CODE_ERROR: {value: 0.38, writable: true},
         MAX_CORRECTION_FACTOR: {value: 5},
-        FORMAT: {value: "i2of5"},
+        FORMAT: {value: 'i2of5'},
     };
 
 I2of5Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -254,7 +254,7 @@ I2of5Reader.prototype._decodePayload = function(counters, result, decodedCodes) 
             return null;
         }
         for (i = 0; i < codes.length; i++) {
-            result.push(codes[i].code + "");
+            result.push(codes[i].code + '');
             decodedCodes.push(codes[i]);
         }
     }
@@ -300,7 +300,7 @@ I2of5Reader.prototype._decode = function() {
 
     decodedCodes.push(endInfo);
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: startInfo.start,
         end: endInfo.end,
         startInfo: startInfo,

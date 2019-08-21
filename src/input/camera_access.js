@@ -11,7 +11,7 @@ function waitForVideo(video) {
             if (attempts > 0) {
                 if (video.videoWidth > 10 && video.videoHeight > 10) {
                     if (ENV.development) {
-                        console.log(video.videoWidth + "px x " + video.videoHeight + "px");
+                        console.log(video.videoWidth + 'px x ' + video.videoHeight + 'px');
                     }
                     resolve();
                 } else {
@@ -37,7 +37,7 @@ function initCamera(video, constraints) {
         .then((stream) => {
             return new Promise((resolve) => {
                 streamRef = stream;
-                video.setAttribute("autoplay", true);
+                video.setAttribute('autoplay', true);
                 video.setAttribute('muted', true);
                 video.setAttribute('playsinline', true);
                 video.srcObject = stream;
@@ -51,17 +51,17 @@ function initCamera(video, constraints) {
 }
 
 function deprecatedConstraints(videoConstraints) {
-    const normalized = pick(videoConstraints, ["width", "height", "facingMode",
-        "aspectRatio", "deviceId"]);
+    const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
+        'aspectRatio', 'deviceId']);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined' &&
             videoConstraints.minAspectRatio > 0) {
         normalized.aspectRatio = videoConstraints.minAspectRatio;
-        console.log("WARNING: Constraint 'minAspectRatio' is deprecated; Use 'aspectRatio' instead");
+        console.log('WARNING: Constraint \'minAspectRatio\' is deprecated; Use \'aspectRatio\' instead');
     }
     if (typeof videoConstraints.facing !== 'undefined') {
         normalized.facingMode = videoConstraints.facing;
-        console.log("WARNING: Constraint 'facing' is deprecated. Use 'facingMode' instead'");
+        console.log('WARNING: Constraint \'facing\' is deprecated. Use \'facingMode\' instead\'');
     }
     return normalized;
 }

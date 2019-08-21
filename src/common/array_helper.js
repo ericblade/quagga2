@@ -28,9 +28,9 @@ export default {
             for ( j = 0; j < arr[i].length; j++) {
                 row[j] = arr[i][j];
             }
-            rows[i] = "[" + row.join(",") + "]";
+            rows[i] = '[' + row.join(',') + ']';
         }
-        return "[" + rows.join(",\r\n") + "]";
+        return '[' + rows.join(',\r\n') + ']';
     },
 
     /**

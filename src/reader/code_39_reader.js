@@ -6,7 +6,7 @@ function Code39Reader() {
 }
 
 var properties = {
-    ALPHABETH_STRING: {value: "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%"},
+    ALPHABETH_STRING: {value: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%'},
     ALPHABET: {value: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78,
         79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 45, 46, 32, 42, 36, 47, 43, 37]},
     CHARACTER_ENCODINGS: {value: [0x034, 0x121, 0x061, 0x160, 0x031, 0x130, 0x070, 0x025, 0x124, 0x064, 0x109, 0x049,
@@ -14,7 +14,7 @@ var properties = {
         0x046, 0x016, 0x181, 0x0C1, 0x1C0, 0x091, 0x190, 0x0D0, 0x085, 0x184, 0x0C4, 0x094, 0x0A8, 0x0A2, 0x08A, 0x02A,
     ]},
     ASTERISK: {value: 0x094},
-    FORMAT: {value: "code_39", writeable: false},
+    FORMAT: {value: 'code_39', writeable: false},
 };
 
 Code39Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -61,7 +61,7 @@ Code39Reader.prototype._decode = function() {
     }
 
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: start.start,
         end: nextStart,
         startInfo: start,

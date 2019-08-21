@@ -41,32 +41,32 @@ function initializeData(imageWrapper) {
 
 function initInputStream(cb) {
     var video;
-    if (_config.inputStream.type === "VideoStream") {
-        video = document.createElement("video");
+    if (_config.inputStream.type === 'VideoStream') {
+        video = document.createElement('video');
         _inputStream = InputStream.createVideoStream(video);
-    } else if (_config.inputStream.type === "ImageStream") {
+    } else if (_config.inputStream.type === 'ImageStream') {
         _inputStream = InputStream.createImageStream();
-    } else if (_config.inputStream.type === "LiveStream") {
+    } else if (_config.inputStream.type === 'LiveStream') {
         var $viewport = getViewPort();
         if ($viewport) {
-            video = $viewport.querySelector("video");
+            video = $viewport.querySelector('video');
             if (!video) {
-                video = document.createElement("video");
+                video = document.createElement('video');
                 $viewport.appendChild(video);
             }
         }
         _inputStream = InputStream.createLiveStream(video);
         CameraAccess.request(video, _config.inputStream.constraints)
             .then(() => {
-                _inputStream.trigger("canrecord");
+                _inputStream.trigger('canrecord');
             }).catch((err) => {
                 return cb(err);
             });
     }
 
-    _inputStream.setAttribute("preload", "auto");
+    _inputStream.setAttribute('preload', 'auto');
     _inputStream.setInputStream(_config.inputStream);
-    _inputStream.addEventListener("canrecord", canRecord.bind(undefined, cb));
+    _inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 }
 
 function getViewPort() {
@@ -100,34 +100,34 @@ function ready(cb){
 }
 
 function initCanvas() {
-    if (typeof document !== "undefined") {
+    if (typeof document !== 'undefined') {
         var $viewport = getViewPort();
-        _canvasContainer.dom.image = document.querySelector("canvas.imgBuffer");
+        _canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
         if (!_canvasContainer.dom.image) {
-            _canvasContainer.dom.image = document.createElement("canvas");
-            _canvasContainer.dom.image.className = "imgBuffer";
-            if ($viewport && _config.inputStream.type === "ImageStream") {
+            _canvasContainer.dom.image = document.createElement('canvas');
+            _canvasContainer.dom.image.className = 'imgBuffer';
+            if ($viewport && _config.inputStream.type === 'ImageStream') {
                 $viewport.appendChild(_canvasContainer.dom.image);
             }
         }
-        _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext("2d");
+        _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext('2d');
         _canvasContainer.dom.image.width = _inputStream.getCanvasSize().x;
         _canvasContainer.dom.image.height = _inputStream.getCanvasSize().y;
 
-        _canvasContainer.dom.overlay = document.querySelector("canvas.drawingBuffer");
+        _canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
         if (!_canvasContainer.dom.overlay) {
-            _canvasContainer.dom.overlay = document.createElement("canvas");
-            _canvasContainer.dom.overlay.className = "drawingBuffer";
+            _canvasContainer.dom.overlay = document.createElement('canvas');
+            _canvasContainer.dom.overlay.className = 'drawingBuffer';
             if ($viewport) {
                 $viewport.appendChild(_canvasContainer.dom.overlay);
             }
-            var clearFix = document.createElement("br");
-            clearFix.setAttribute("clear", "all");
+            var clearFix = document.createElement('br');
+            clearFix.setAttribute('clear', 'all');
             if ($viewport) {
                 $viewport.appendChild(clearFix);
             }
         }
-        _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext("2d");
+        _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
         _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
         _canvasContainer.dom.overlay.height = _inputStream.getCanvasSize().y;
     }
@@ -242,9 +242,9 @@ function publishResult(result, imageData) {
         resultToPublish = result.barcodes || result;
     }
 
-    Events.publish("processed", resultToPublish);
+    Events.publish('processed', resultToPublish);
     if (hasCodeResult(result)) {
-        Events.publish("detected", resultToPublish);
+        Events.publish('detected', resultToPublish);
     }
 }
 
@@ -313,7 +313,7 @@ function startContinuousUpdate() {
 }
 
 function start() {
-    if (_onUIThread && _config.inputStream.type === "LiveStream") {
+    if (_onUIThread && _config.inputStream.type === 'LiveStream') {
         startContinuousUpdate();
     } else {
         update();
@@ -337,7 +337,7 @@ function initWorker(cb) {
             workerThread.busy = false;
             workerThread.imageData = new Uint8Array(e.data.imageData);
             if (ENV.development) {
-                console.log("Worker initialized");
+                console.log('Worker initialized');
             }
             cb(workerThread);
         } else if (e.data.event === 'processed') {
@@ -346,7 +346,7 @@ function initWorker(cb) {
             publishResult(e.data.result, workerThread.imageData);
         } else if (e.data.event === 'error') {
             if (ENV.development) {
-                console.log("Worker error: " + e.data.message);
+                console.log('Worker error: ' + e.data.message);
             }
         }
     };
@@ -448,7 +448,7 @@ function adjustWorkerPool(capacity, cb) {
         workersToTerminate.forEach(function(workerThread) {
             workerThread.worker.terminate();
             if (ENV.development) {
-                console.log("Worker terminated!");
+                console.log('Worker terminated!');
             }
         });
         _workerPool = _workerPool.slice(0, increaseBy);
@@ -488,7 +488,7 @@ export default {
     stop: function() {
         _stopped = true;
         adjustWorkerPool(0);
-        if (_config.inputStream.type === "LiveStream") {
+        if (_config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
             _inputStream.clearEventHandlers();
         }
@@ -497,16 +497,16 @@ export default {
         _stopped = true;
     },
     onDetected: function(callback) {
-        Events.subscribe("detected", callback);
+        Events.subscribe('detected', callback);
     },
     offDetected: function(callback) {
-        Events.unsubscribe("detected", callback);
+        Events.unsubscribe('detected', callback);
     },
     onProcessed: function(callback) {
-        Events.subscribe("processed", callback);
+        Events.subscribe('processed', callback);
     },
     offProcessed: function(callback) {
-        Events.unsubscribe("processed", callback);
+        Events.unsubscribe('processed', callback);
     },
     setReaders: function(readers) {
         setReaders(readers);
@@ -520,7 +520,7 @@ export default {
     decodeSingle: function(config, resultCallback) {
         config = merge({
             inputStream: {
-                type: "ImageStream",
+                type: 'ImageStream',
                 sequence: false,
                 size: 800,
                 src: config.src,
@@ -531,7 +531,7 @@ export default {
             },
         }, config);
         this.init(config, () => {
-            Events.once("processed", (result) => {
+            Events.once('processed', (result) => {
                 this.stop();
                 resultCallback.call(null, result);
             }, true);

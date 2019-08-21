@@ -1,7 +1,7 @@
 /* @preserve ASM BEGIN */
 /* eslint-disable eqeqeq*/
 function Skeletonizer(stdlib, foreign, buffer) {
-    "use asm";
+    'use asm';
 
     var images = new stdlib.Uint8Array(buffer),
         size = foreign.size | 0,

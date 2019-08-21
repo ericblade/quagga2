@@ -47,7 +47,7 @@ var properties = {
     CODE_FREQUENCY: {value: [0, 11, 13, 14, 19, 25, 28, 21, 22, 26]},
     SINGLE_CODE_ERROR: {value: 0.70},
     AVG_CODE_ERROR: {value: 0.48},
-    FORMAT: {value: "ean_13", writeable: false},
+    FORMAT: {value: 'ean_13', writeable: false},
 };
 
 EANReader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -321,15 +321,15 @@ EANReader.prototype._decode = function() {
         }
         resultInfo = {
             supplement: ext,
-            code: result.join("") + ext.code,
+            code: result.join('') + ext.code,
         };
     }
 
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: startInfo.start,
         end: code.end,
-        codeset: "",
+        codeset: '',
         startInfo: startInfo,
         decodedCodes: decodedCodes,
         ...resultInfo,
@@ -354,7 +354,7 @@ EANReader.prototype._decodeExtensions = function(offset) {
                 start,
                 startInfo,
                 end: result.end,
-                codeset: "",
+                codeset: '',
                 decodedCodes: result.decodedCodes,
             };
         }

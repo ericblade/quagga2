@@ -6,7 +6,7 @@ function CodabarReader() {
 }
 
 var properties = {
-    ALPHABETH_STRING: {value: "0123456789-$:/.+ABCD"},
+    ALPHABETH_STRING: {value: '0123456789-$:/.+ABCD'},
     ALPHABET: {value: [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 45, 36, 58, 47, 46, 43, 65, 66, 67, 68]},
     CHARACTER_ENCODINGS: {value: [0x003, 0x006, 0x009, 0x060, 0x012, 0x042, 0x021, 0x024, 0x030, 0x048, 0x00c, 0x018,
         0x045, 0x051, 0x054, 0x015, 0x01A, 0x029, 0x00B, 0x00E]},
@@ -14,7 +14,7 @@ var properties = {
     MIN_ENCODED_CHARS: {value: 4},
     MAX_ACCEPTABLE: {value: 2.0},
     PADDING: {value: 1.5},
-    FORMAT: {value: "codabar", writeable: false},
+    FORMAT: {value: 'codabar', writeable: false},
 };
 
 CodabarReader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -70,7 +70,7 @@ CodabarReader.prototype._decode = function() {
     end = start.start + self._sumCounters(start.startCounter, nextStart - 8);
 
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: start.start,
         end: end,
         startInfo: start,
@@ -131,7 +131,7 @@ CodabarReader.prototype._thresholdResultPattern = function(result, startCounter)
         pos += 8;
     }
 
-    ["space", "bar"].forEach(function(key) {
+    ['space', 'bar'].forEach(function(key) {
         var newkind = categorization[key];
         newkind.wide.min =
             Math.floor((newkind.narrow.size / newkind.narrow.counts + newkind.wide.size / newkind.wide.counts) / 2);

@@ -5,7 +5,7 @@ function EAN2Reader() {
 }
 
 var properties = {
-    FORMAT: {value: "ean_2", writeable: false},
+    FORMAT: {value: 'ean_2', writeable: false},
 };
 
 EAN2Reader.prototype = Object.create(EANReader.prototype, properties);
@@ -37,11 +37,11 @@ EAN2Reader.prototype.decode = function(row, start) {
         }
     }
 
-    if (result.length !== 2 || (parseInt(result.join("")) % 4) !== codeFrequency) {
+    if (result.length !== 2 || (parseInt(result.join('')) % 4) !== codeFrequency) {
         return null;
     }
     return {
-        code: result.join(""),
+        code: result.join(''),
         decodedCodes,
         end: code.end,
     };

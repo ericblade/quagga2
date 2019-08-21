@@ -13,7 +13,7 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
     } else {
         for ( i = 0; i < htmlImagesSrcArray.length; i++) {
             num = (offset + i);
-            htmlImagesSrcArray[i] = directory + "image-" + ("00" + num).slice(-3) + ".jpg";
+            htmlImagesSrcArray[i] = directory + 'image-' + ('00' + num).slice(-3) + '.jpg';
         }
     }
     htmlImagesArray.notLoaded = [];
@@ -26,7 +26,7 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
             if (notloadedImgs[x] === loadedImg) {
                 notloadedImgs.splice(x, 1);
                 for (var y = 0; y < htmlImagesSrcArray.length; y++) {
-                    var imgName = htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf("/"));
+                    var imgName = htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf('/'));
                     if (loadedImg.src.lastIndexOf(imgName) !== -1) {
                         htmlImagesArray[y] = {img: loadedImg};
                         break;
@@ -37,7 +37,7 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
         }
         if (notloadedImgs.length === 0) {
             if (ENV.development) {
-                console.log("Images loaded");
+                console.log('Images loaded');
             }
             if (sequence === false) {
                 findTagsInObjectURL(directory, ['orientation'])

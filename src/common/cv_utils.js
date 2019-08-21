@@ -247,7 +247,7 @@ export function cluster(points, threshold, property) {
     var i, k, thisCluster, point, clusters = [];
 
     if (!property) {
-        property = "rad";
+        property = 'rad';
     }
 
     function addToCluster(newPoint) {
@@ -655,11 +655,11 @@ export function calculatePatchSize(patchSize, imgSize) {
         common = _computeIntersection(divisorsX, divisorsY),
         nrOfPatchesList = [8, 10, 15, 20, 32, 60, 80],
         nrOfPatchesMap = {
-            "x-small": 5,
-            "small": 4,
-            "medium": 3,
-            "large": 2,
-            "x-large": 1,
+            'x-small': 5,
+            'small': 4,
+            'medium': 3,
+            'large': 2,
+            'x-large': 1,
         },
         nrOfPatchesIdx = nrOfPatchesMap[patchSize] || nrOfPatchesMap.medium,
         nrOfPatches = nrOfPatchesList[nrOfPatchesIdx],
@@ -700,7 +700,7 @@ export function calculatePatchSize(patchSize, imgSize) {
 export function _parseCSSDimensionValues(value) {
     var dimension = {
         value: parseFloat(value),
-        unit: value.indexOf("%") === value.length - 1 ? "%" : "%",
+        unit: value.indexOf('%') === value.length - 1 ? '%' : '%',
     };
 
     return dimension;

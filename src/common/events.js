@@ -27,7 +27,7 @@ export default (function() {
     function subscribe(event, callback, async) {
         var subscription;
 
-        if ( typeof callback === "function") {
+        if ( typeof callback === 'function') {
             subscription = {
                 callback: callback,
                 async: async,
@@ -35,7 +35,7 @@ export default (function() {
         } else {
             subscription = callback;
             if (!subscription.callback) {
-                throw "Callback was not specified on options";
+                throw 'Callback was not specified on options';
             }
         }
 

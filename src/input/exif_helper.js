@@ -1,6 +1,6 @@
 // Scraped from https://github.com/exif-js/exif-js
 
-const ExifTags = {0x0112: "orientation"};
+const ExifTags = {0x0112: 'orientation'};
 export const AvailableTags = Object.keys(ExifTags).map(key => ExifTags[key]);
 
 export function findTagsInObjectURL(src, tags = AvailableTags) {
@@ -38,8 +38,8 @@ function readToBuffer(blob) {
 function objectURLToBlob(url) {
     return new Promise((resolve, reject) => {
         const http = new XMLHttpRequest();
-        http.open("GET", url, true);
-        http.responseType = "blob";
+        http.open('GET', url, true);
+        http.responseType = 'blob';
         http.onreadystatechange = function () {
             if (http.readyState === XMLHttpRequest.DONE && (http.status === 200 || http.status === 0)) {
                 resolve(this.response);
@@ -84,7 +84,7 @@ export function findTagsInBuffer(file, selectedTags = AvailableTags) {
 }
 
 function readEXIFData(file, start, exifTags) {
-    if (getStringFromBuffer(file, start, 4) !== "Exif") {
+    if (getStringFromBuffer(file, start, 4) !== 'Exif') {
         return false;
     }
 
@@ -142,7 +142,7 @@ function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
 }
 
 function getStringFromBuffer(buffer, start, length) {
-    let outstr = "";
+    let outstr = '';
     for (let n = start; n < start + length; n++) {
         outstr += String.fromCharCode(buffer.getUint8(n));
     }

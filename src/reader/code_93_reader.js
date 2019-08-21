@@ -5,7 +5,7 @@ function Code93Reader() {
     BarcodeReader.call(this);
 }
 
-const ALPHABETH_STRING = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd*";
+const ALPHABETH_STRING = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd*';
 
 var properties = {
     ALPHABETH_STRING: {value: ALPHABETH_STRING},
@@ -18,7 +18,7 @@ var properties = {
         0x16E, 0x176, 0x1AE, 0x126, 0x1DA, 0x1D6, 0x132, 0x15E,
     ]},
     ASTERISK: {value: 0x15E},
-    FORMAT: {value: "code_93", writeable: false},
+    FORMAT: {value: 'code_93', writeable: false},
 };
 
 Code93Reader.prototype = Object.create(BarcodeReader.prototype, properties);
@@ -74,7 +74,7 @@ Code93Reader.prototype._decode = function() {
     }
 
     return {
-        code: result.join(""),
+        code: result.join(''),
         start: start.start,
         end: nextStart,
         startInfo: start,

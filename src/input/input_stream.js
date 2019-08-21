@@ -74,7 +74,7 @@ InputStream.createVideoStream = function(video) {
     };
 
     that.setCurrentTime = function(time) {
-        if (_config.type !== "LiveStream") {
+        if (_config.type !== 'LiveStream') {
             video.currentTime = time;
         }
     };
@@ -141,7 +141,7 @@ InputStream.createVideoStream = function(video) {
 };
 
 InputStream.createLiveStream = function(video) {
-    video.setAttribute("autoplay", true);
+    video.setAttribute('autoplay', true);
     var that = InputStream.createVideoStream(video);
 
     that.ended = function() {
@@ -200,7 +200,7 @@ InputStream.createImageStream = function() {
             loaded = true;
             frameIdx = 0;
             setTimeout(function() {
-                publishEvent("canrecord", []);
+                publishEvent('canrecord', []);
             }, 0);
         }, offset, size, _config.sequence);
     }
@@ -317,7 +317,7 @@ InputStream.createImageStream = function() {
             } else {
                 setTimeout(function() {
                     ended = true;
-                    publishEvent("ended", []);
+                    publishEvent('ended', []);
                 }, 0);
             }
         }

@@ -51,30 +51,30 @@ export default {
 
         function initCanvas() {
             if (ENV.development && typeof document !== 'undefined') {
-                var $debug = document.querySelector("#debug.detection");
-                _canvas.dom.frequency = document.querySelector("canvas.frequency");
+                var $debug = document.querySelector('#debug.detection');
+                _canvas.dom.frequency = document.querySelector('canvas.frequency');
                 if (!_canvas.dom.frequency) {
-                    _canvas.dom.frequency = document.createElement("canvas");
-                    _canvas.dom.frequency.className = "frequency";
+                    _canvas.dom.frequency = document.createElement('canvas');
+                    _canvas.dom.frequency.className = 'frequency';
                     if ($debug) {
                         $debug.appendChild(_canvas.dom.frequency);
                     }
                 }
-                _canvas.ctx.frequency = _canvas.dom.frequency.getContext("2d");
+                _canvas.ctx.frequency = _canvas.dom.frequency.getContext('2d');
 
-                _canvas.dom.pattern = document.querySelector("canvas.patternBuffer");
+                _canvas.dom.pattern = document.querySelector('canvas.patternBuffer');
                 if (!_canvas.dom.pattern) {
-                    _canvas.dom.pattern = document.createElement("canvas");
-                    _canvas.dom.pattern.className = "patternBuffer";
+                    _canvas.dom.pattern = document.createElement('canvas');
+                    _canvas.dom.pattern.className = 'patternBuffer';
                     if ($debug) {
                         $debug.appendChild(_canvas.dom.pattern);
                     }
                 }
-                _canvas.ctx.pattern = _canvas.dom.pattern.getContext("2d");
+                _canvas.ctx.pattern = _canvas.dom.pattern.getContext('2d');
 
-                _canvas.dom.overlay = document.querySelector("canvas.drawingBuffer");
+                _canvas.dom.overlay = document.querySelector('canvas.drawingBuffer');
                 if (_canvas.dom.overlay) {
-                    _canvas.ctx.overlay = _canvas.dom.overlay.getContext("2d");
+                    _canvas.ctx.overlay = _canvas.dom.overlay.getContext('2d');
                 }
             }
         }
@@ -92,7 +92,7 @@ export default {
                     reader = readerConfig;
                 }
                 if (ENV.development) {
-                    console.log("Before registering reader: ", reader);
+                    console.log('Before registering reader: ', reader);
                 }
                 if (configuration.supplements) {
                     supplements = configuration
@@ -103,7 +103,7 @@ export default {
                 _barcodeReaders.push(new READERS[reader](configuration, supplements));
             });
             if (ENV.development) {
-                console.log("Registered Readers: " + _barcodeReaders
+                console.log('Registered Readers: ' + _barcodeReaders
                     .map((reader) => JSON.stringify({format: reader.FORMAT, config: reader.config}))
                     .join(', '));
             }
@@ -122,9 +122,9 @@ export default {
 
                 for (i = 0; i < vis.length; i++) {
                     if (vis[i].prop === true) {
-                        vis[i].node.style.display = "block";
+                        vis[i].node.style.display = 'block';
                     } else {
-                        vis[i].node.style.display = "none";
+                        vis[i].node.style.display = 'none';
                     }
                 }
             }
@@ -251,7 +251,7 @@ export default {
 
             if (ENV.development) {
                 if (config.debug.drawBoundingBox && ctx) {
-                    ImageDebug.drawPath(box, {x: 0, y: 1}, ctx, {color: "blue", lineWidth: 2});
+                    ImageDebug.drawPath(box, {x: 0, y: 1}, ctx, {color: 'blue', lineWidth: 2});
                 }
             }
 

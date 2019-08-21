@@ -85,12 +85,12 @@ function initCanvas() {
     if (_config.useWorker || typeof document === 'undefined') {
         return;
     }
-    _canvasContainer.dom.binary = document.createElement("canvas");
-    _canvasContainer.dom.binary.className = "binaryBuffer";
+    _canvasContainer.dom.binary = document.createElement('canvas');
+    _canvasContainer.dom.binary.className = 'binaryBuffer';
     if (ENV.development && _config.debug.showCanvas === true) {
-        document.querySelector("#debug").appendChild(_canvasContainer.dom.binary);
+        document.querySelector('#debug').appendChild(_canvasContainer.dom.binary);
     }
-    _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext("2d");
+    _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext('2d');
     _canvasContainer.dom.binary.width = _binaryImageWrapper.size.x;
     _canvasContainer.dom.binary.height = _binaryImageWrapper.size.y;
 }
@@ -119,7 +119,7 @@ function boxFromPatches(patches) {
         patch = patches[i];
         overAvg += patch.rad;
         if (ENV.development && _config.debug.showPatches) {
-            ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary, {color: "red"});
+            ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary, {color: 'red'});
         }
     }
 
@@ -243,7 +243,7 @@ function findPatches() {
         for ( i = 0; i < patchesFound.length; i++) {
             patch = patchesFound[i];
             ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary,
-                {color: "#99ff00", lineWidth: 2});
+                {color: '#99ff00', lineWidth: 2});
         }
     }
 
@@ -324,7 +324,7 @@ function findBoxes(topLabels, maxLabel) {
                     hsv[0] = (topLabels[i].label / (maxLabel + 1)) * 360;
                     hsv2rgb(hsv, rgb);
                     ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary,
-                        {color: "rgb(" + rgb.join(",") + ")", lineWidth: 2});
+                        {color: 'rgb(' + rgb.join(',') + ')', lineWidth: 2});
                 }
             }
         }
@@ -511,7 +511,7 @@ function rasterizeAngularSimilarity(patchesFound) {
                 hsv[0] = (_patchLabelGrid.data[j] / (label + 1)) * 360;
                 hsv2rgb(hsv, rgb);
                 ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary,
-                    {color: "rgb(" + rgb.join(",") + ")", lineWidth: 2});
+                    {color: 'rgb(' + rgb.join(',') + ')', lineWidth: 2});
             }
         }
     }
@@ -584,7 +584,7 @@ export default {
 
         patchSize = calculatePatchSize(config.patchSize, size);
         if (ENV.development) {
-            console.log("Patch-Size: " + JSON.stringify(patchSize));
+            console.log('Patch-Size: ' + JSON.stringify(patchSize));
         }
 
         inputStream.setWidth(Math.floor(Math.floor(size.x / patchSize.x) * (1 / thisHalfSample) * patchSize.x));
@@ -594,8 +594,8 @@ export default {
             return true;
         }
 
-        throw new Error("Image dimensions do not comply with the current settings: Width (" +
-            width + " )and height (" + height +
-            ") must a multiple of " + patchSize.x);
+        throw new Error('Image dimensions do not comply with the current settings: Width (' +
+            width + ' )and height (' + height +
+            ') must a multiple of ' + patchSize.x);
     },
 };

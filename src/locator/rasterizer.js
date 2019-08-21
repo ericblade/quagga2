@@ -135,14 +135,14 @@ var Rasterizer = {
             },
             debug: {
                 drawContour: function(canvas, firstContour) {
-                    var ctx = canvas.getContext("2d"),
+                    var ctx = canvas.getContext('2d'),
                         pq = firstContour,
                         iq,
                         q,
                         p;
 
-                    ctx.strokeStyle = "red";
-                    ctx.fillStyle = "red";
+                    ctx.strokeStyle = 'red';
+                    ctx.fillStyle = 'red';
                     ctx.lineWidth = 1;
 
                     if (pq !== null) {
@@ -167,13 +167,13 @@ var Rasterizer = {
 
                         switch (q.dir) {
                         case Rasterizer.CONTOUR_DIR.CW_DIR:
-                            ctx.strokeStyle = "red";
+                            ctx.strokeStyle = 'red';
                             break;
                         case Rasterizer.CONTOUR_DIR.CCW_DIR:
-                            ctx.strokeStyle = "blue";
+                            ctx.strokeStyle = 'blue';
                             break;
                         case Rasterizer.CONTOUR_DIR.UNKNOWN_DIR:
-                            ctx.strokeStyle = "green";
+                            ctx.strokeStyle = 'green';
                             break;
                         }
 
