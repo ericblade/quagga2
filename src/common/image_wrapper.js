@@ -1,9 +1,8 @@
 import SubImage from './subImage';
-import {hsv2rgb} from '../common/cv_utils';
+import { hsv2rgb } from '../common/cv_utils';
 import ArrayHelper from '../common/array_helper';
-const vec2 = {
-    clone: require('gl-vec2/clone')
-};
+import { clone } from 'gl-vec2';
+const vec2 = { clone };
 
 /**
  * Represents a basic image combining the data and size.

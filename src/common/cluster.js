@@ -1,7 +1,5 @@
-const vec2 = {
-    clone: require('gl-vec2/clone'),
-    dot: require('gl-vec2/dot')
-};
+import { clone, dot } from 'gl-vec2';
+const vec2 = { clone, dot };
 
 /**
  * Creates a cluster for grouping similar orientations of datapoints

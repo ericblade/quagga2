@@ -9,10 +9,9 @@ import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
 import InputStream from 'input_stream';
 import FrameGrabber from 'frame_grabber';
-import {merge} from 'lodash';
-const vec2 = {
-    clone: require('gl-vec2/clone')
-};
+import { merge } from 'lodash';
+import { clone } from 'gl-vec2';
+const vec2 = { clone };
 
 var _inputStream,
     _framegrabber,

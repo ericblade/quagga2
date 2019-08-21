@@ -1,11 +1,10 @@
 import Cluster2 from './cluster';
 import ArrayHelper from './array_helper';
-const vec2 = {
-    clone: require('gl-vec2/clone')
-};
-const vec3 = {
-    clone: require('gl-vec3/clone')
-};
+import { clone as v2clone } from 'gl-vec2';
+import { clone as v3clone } from 'gl-vec3';
+
+const vec2 = { clone: v2clone };
+const vec3 = { clone: v3clone };
 
 /**
  * @param x x-coordinate
