@@ -1,5 +1,3 @@
-import ImageWrapper from '../common/image_wrapper';
-
 var Bresenham = {};
 
 var Slope = {
@@ -33,14 +31,12 @@ Bresenham.getBarcodeLine = function(imageWrapper, p1, p2) {
         line = [],
         imageData = imageWrapper.data,
         width = imageWrapper.size.x,
-        sum = 0,
         val,
         min = 255,
         max = 0;
 
     function read(a, b) {
         val = imageData[b * width + a];
-        sum += val;
         min = val < min ? val : min;
         max = val > max ? val : max;
         line.push(val);
