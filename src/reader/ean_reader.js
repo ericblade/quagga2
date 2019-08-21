@@ -192,6 +192,7 @@ EANReader.prototype._findStart = function() {
         offset = startInfo.end;
         startInfo = null;
     }
+    return null;
 };
 
 EANReader.prototype._verifyTrailingWhitespace = function(endInfo) {
