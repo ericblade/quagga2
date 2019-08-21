@@ -86,7 +86,6 @@ I2of5Reader.prototype._findPattern = function(pattern, offset, isWhite, tryHarde
         error,
         j,
         sum,
-        normalized,
         epsilon = self.AVG_CODE_ERROR;
 
     isWhite = isWhite || false;
@@ -158,6 +157,7 @@ I2of5Reader.prototype._findStart = function() {
         offset = startInfo.end;
         startInfo = null;
     }
+    return null;
 };
 
 I2of5Reader.prototype._verifyTrailingWhitespace = function(endInfo) {
@@ -211,10 +211,7 @@ I2of5Reader.prototype._decodePair = function(counterPair) {
 };
 
 I2of5Reader.prototype._decodeCode = function(counter) {
-    var j,
-        self = this,
-        sum = 0,
-        normalized,
+    var self = this,
         error,
         epsilon = self.AVG_CODE_ERROR,
         code,
@@ -225,9 +222,6 @@ I2of5Reader.prototype._decodeCode = function(counter) {
             end: 0
         };
 
-    for ( j = 0; j < counter.length; j++) {
-        sum += counter[j];
-    }
     for (code = 0; code < self.CODE_PATTERN.length; code++) {
         error = self._matchPattern(counter, self.CODE_PATTERN[code]);
         if (error < bestMatch.error) {
@@ -238,6 +232,7 @@ I2of5Reader.prototype._decodeCode = function(counter) {
     if (bestMatch.error < epsilon) {
         return bestMatch;
     }
+    return null;
 };
 
 I2of5Reader.prototype._decodePayload = function(counters, result, decodedCodes) {
