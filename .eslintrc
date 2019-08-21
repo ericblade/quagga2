@@ -32,7 +32,7 @@
         "no-use-before-define": "warn",
         "quotes": [ "error", "single" ],
         "strict": "off",
-        "wrap-iife": "off",
+        "wrap-iife": [ "error", "outside" ],
         // STYLE
         "brace-style": ["error", "1tbs"],
         "comma-spacing": ["error", { "before": false, "after": true }],

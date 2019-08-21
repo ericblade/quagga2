@@ -13,7 +13,7 @@ if (typeof window !== 'undefined') {
             function (/* function FrameRequestCallback */ callback) {
                 window.setTimeout(callback, 1000 / 60);
             };
-    })();
+    }());
 }
 Math.imul = Math.imul || function(a, b) {
     var ah = (a >>> 16) & 0xffff,
