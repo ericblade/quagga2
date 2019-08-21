@@ -339,7 +339,7 @@ function initWorker(cb) {
             if (ENV.development) {
                 console.log("Worker initialized");
             }
-            return cb(workerThread);
+            cb(workerThread);
         } else if (e.data.event === 'processed') {
             workerThread.imageData = new Uint8Array(e.data.imageData);
             workerThread.busy = false;
@@ -441,10 +441,9 @@ function setReaders(readers) {
 
 function adjustWorkerPool(capacity, cb) {
     const increaseBy = capacity - _workerPool.length;
-    if (increaseBy === 0) {
-        return cb && cb();
-    }
-    if (increaseBy < 0) {
+    if (increaseBy === 0 && cb) {
+        cb();
+    } else if (increaseBy < 0) {
         const workersToTerminate = _workerPool.slice(increaseBy);
         workersToTerminate.forEach(function(workerThread) {
             workerThread.worker.terminate();
@@ -453,17 +452,19 @@ function adjustWorkerPool(capacity, cb) {
             }
         });
         _workerPool = _workerPool.slice(0, increaseBy);
-        return cb && cb();
+        if (cb) {
+            cb();
+        }
     } else {
+        const workerInitialized = (workerThread) => {
+            _workerPool.push(workerThread);
+            if (_workerPool.length >= capacity && cb) {
+                cb();
+            }
+        };
+
         for (var i = 0; i < increaseBy; i++) {
             initWorker(workerInitialized);
-        }
-
-        function workerInitialized(workerThread) {
-            _workerPool.push(workerThread);
-            if (_workerPool.length >= capacity){
-                cb && cb();
-            }
         }
     }
 }
@@ -474,7 +475,9 @@ export default {
         if (imageWrapper) {
             _onUIThread = false;
             initializeData(imageWrapper);
-            return cb();
+            if (cb) {
+                cb();
+            }
         } else {
             initInputStream(cb);
         }
