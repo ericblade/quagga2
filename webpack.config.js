@@ -4,38 +4,38 @@ var webpack = require('webpack'),
 
 module.exports = {
     entry: [
-        './src/quagga.js'
+        './src/quagga.js',
     ],
     devtool: 'inline-source-map',
     module: {
         loaders: [{
             test: /\.jsx?$/,
             exclude: /node_modules/,
-            loader: 'babel-loader'
-        }]
+            loader: 'babel-loader',
+        }],
     },
     resolve: {
         modules: [
             path.resolve('./src/input/'),
             path.resolve('./src/common/'),
-            'node_modules'
-        ]
+            'node_modules',
+        ],
     },
     output: {
         path: __dirname + '/dist',
         publicPath: '/',
-        filename: 'quagga.js'
+        filename: 'quagga.js',
     },
     devServer: {
         contentBase: './',
-        hot: true
+        hot: true,
     },
     plugins: [
         new MyUmdPlugin({
-            library: 'Quagga'
+            library: 'Quagga',
         }),
         new webpack.DefinePlugin({
-            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV))
-        })
-    ]
+            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
+        }),
+    ],
 };
