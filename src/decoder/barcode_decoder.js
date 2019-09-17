@@ -186,7 +186,7 @@ export default {
             }
 
             for ( i = 0; i < _barcodeReaders.length && result === null; i++) {
-                result = _barcodeReaders[i].decodePattern(barcodeLine.line);
+                result = _barcodeReaders[i].decodePattern(barcodeLine.line, inputImageWrapper);
             }
             if (result === null){
                 return null;
