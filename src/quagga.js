@@ -13,6 +13,9 @@ import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
 const vec2 = { clone };
 
+// export BarcodeReader for external plugins
+export { default as BarcodeReader } from './reader/barcode_reader';
+
 var _inputStream,
     _framegrabber,
     _stopped,
@@ -370,7 +373,6 @@ function configForWorker(config) {
 }
 
 function workerInterface(factory) {
-    /* eslint-disable no-undef*/
     if (factory) {
         var Quagga = factory().default;
         if (!Quagga) {
@@ -380,24 +382,6 @@ function workerInterface(factory) {
     }
     var imageWrapper;
 
-    self.onmessage = function(e) {
-        if (e.data.cmd === 'init') {
-            var config = e.data.config;
-            config.numOfWorkers = 0;
-            imageWrapper = new Quagga.ImageWrapper({
-                x: e.data.size.x,
-                y: e.data.size.y,
-            }, new Uint8Array(e.data.imageData));
-            Quagga.init(config, ready, imageWrapper);
-            Quagga.onProcessed(onProcessed);
-        } else if (e.data.cmd === 'process') {
-            imageWrapper.data = new Uint8Array(e.data.imageData);
-            Quagga.start();
-        } else if (e.data.cmd === 'setReaders') {
-            Quagga.setReaders(e.data.readers);
-        }
-    };
-
     function onProcessed(result) {
         self.postMessage({
             'event': 'processed',
@@ -406,11 +390,32 @@ function workerInterface(factory) {
         }, [imageWrapper.data.buffer]);
     }
 
-    function ready() { // eslint-disable-line
-        self.postMessage({'event': 'initialized', imageData: imageWrapper.data}, [imageWrapper.data.buffer]);
+    function workerInterfaceReady() {
+        self.postMessage({
+            'event': 'initialized',
+            imageData: imageWrapper.data,
+        }, [imageWrapper.data.buffer]);
     }
 
-    /* eslint-enable */
+    self.onmessage = function(e) {
+        if (e.data.cmd === 'init') {
+            var config = e.data.config;
+            config.numOfWorkers = 0;
+            imageWrapper = new Quagga.ImageWrapper({
+                x: e.data.size.x,
+                y: e.data.size.y,
+            }, new Uint8Array(e.data.imageData));
+            Quagga.init(config, workerInterfaceReady, imageWrapper);
+            Quagga.onProcessed(onProcessed);
+        } else if (e.data.cmd === 'process') {
+            imageWrapper.data = new Uint8Array(e.data.imageData);
+            Quagga.start();
+        } else if (e.data.cmd === 'setReaders') {
+            Quagga.setReaders(e.data.readers);
+        } else if (e.data.cmd === 'registerReader') {
+            Quagga.registerReader(e.data.name, e.data.reader);
+        }
+    };
 }
 
 function generateWorkerBlob() {
@@ -435,6 +440,16 @@ function setReaders(readers) {
     } else if (_onUIThread && _workerPool.length > 0) {
         _workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
+        });
+    }
+}
+
+function registerReader(name, reader) {
+    if (_decoder) {
+        _decoder.registerReader(name, reader);
+    } else if (_onUIThread && _workerPool.length > 0) {
+        _workerPool.forEach(function(workerThread) {
+            workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
         });
     }
 }
@@ -510,6 +525,9 @@ export default {
     },
     setReaders: function(readers) {
         setReaders(readers);
+    },
+    registerReader: function(name, reader) {
+        registerReader(name, reader);
     },
     registerResultCollector: function(resultCollector) {
         if (resultCollector && typeof resultCollector.addResult === 'function') {

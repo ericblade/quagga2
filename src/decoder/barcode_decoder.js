@@ -29,6 +29,7 @@ const READERS = {
     '2of5_reader': TwoOfFiveReader,
     code_93_reader: Code93Reader,
 };
+
 export default {
     create: function(config, inputImageWrapper) {
         var _canvas = {
@@ -306,6 +307,12 @@ export default {
                     }
                 }
                 return { barcodes };
+            },
+            registerReader: function(name, reader) {
+                if (READERS[name]) {
+                    throw new Error('cannot register existing reader', name);
+                }
+                READERS[name] = reader;
             },
             setReaders: function(readers) {
                 config.readers = readers;
