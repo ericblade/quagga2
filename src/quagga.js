@@ -548,6 +548,11 @@ export default {
                 halfSample: false,
             },
         }, config);
+        // workers require Worker and Blob support presently, so if no Blob or Worker then set
+        // workers to 0.
+        if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
+            config.numOfWorkers = 0;
+        }
         this.init(config, () => {
             Events.once('processed', (result) => {
                 this.stop();
