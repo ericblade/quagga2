@@ -30,6 +30,10 @@ const READERS = {
     code_93_reader: Code93Reader,
 };
 
+export const registerReader = (name, reader) => {
+    READERS[name] = reader;
+};
+
 export default {
     create: function(config, inputImageWrapper) {
         var _canvas = {

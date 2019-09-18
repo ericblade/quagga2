@@ -445,6 +445,9 @@ function setReaders(readers) {
 }
 
 function registerReader(name, reader) {
+    // load it to the module
+    BarcodeDecoder.registerReader(name, reader);
+    // then make sure any running instances of decoder and workers know about it
     if (_decoder) {
         _decoder.registerReader(name, reader);
     } else if (_onUIThread && _workerPool.length > 0) {
