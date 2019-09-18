@@ -262,7 +262,8 @@ function locateAndDecode() {
         result.boxes = boxes;
         publishResult(result, _inputImageWrapper.data);
     } else {
-        publishResult();
+        result = _decoder.decodeFromImage(_inputImageWrapper);
+        publishResult(result, _inputImageWrapper.data);
     }
 }
 
