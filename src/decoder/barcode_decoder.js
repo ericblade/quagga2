@@ -29,7 +29,11 @@ const READERS = {
     '2of5_reader': TwoOfFiveReader,
     code_93_reader: Code93Reader,
 };
+
 export default {
+    registerReader: (name, reader) => {
+        READERS[name] = reader;
+    },
     create: function(config, inputImageWrapper) {
         var _canvas = {
                 ctx: {
@@ -236,6 +240,13 @@ export default {
                 Math.pow(Math.abs(line[1].x - line[0].x), 2));
         }
 
+        function decodeFromImage(imageWrapper) {
+            let result = null;
+            for (let i = 0; i < _barcodeReaders.length && result === null; i++) {
+                result = _barcodeReaders[i].decodeImage ? _barcodeReaders[i].decodeImage(imageWrapper) : null;
+            }
+            return result;
+        }
         /**
          * With the help of the configured readers (Code128 or EAN) this function tries to detect a
          * valid barcode pattern within the given area.
@@ -306,6 +317,16 @@ export default {
                     }
                 }
                 return { barcodes };
+            },
+            decodeFromImage: function(inputImageWrapper) {
+                const result = decodeFromImage(inputImageWrapper);
+                return result;
+            },
+            registerReader: function(name, reader) {
+                if (READERS[name]) {
+                    throw new Error('cannot register existing reader', name);
+                }
+                READERS[name] = reader;
             },
             setReaders: function(readers) {
                 config.readers = readers;

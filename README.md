@@ -12,6 +12,7 @@ node functionality.
 - [Installing](#installing)
 - [Getting Started](#gettingstarted)
 - [Using with React](#usingwithreact)
+- [Using External Readers](#usingexternalreaders)
 - [API](#api)
 - [Configuration](#configobject)
 - [Tips & Tricks](#tipsandtricks)
@@ -133,6 +134,16 @@ where to go from here.
 ## <a name="usingwithreact">Using with React</a>
 
 There is a separate [example][reactExample] for using quagga2 with ReactJS
+
+## <a name="usingwithexternalreaders">Using with External Readers</a>
+
+New in Quagga2 is the ability to specify external reader modules. Please see [quagga2-reader-qr](https://github.com/ericblade/quagga2-reader-qr). This repository includes a sample external reader that can
+read complete images, and decode QR codes.  A test script is included to demonstrate how to use an
+external reader in your project.
+
+Quagga2 exports the BarcodeReader prototype, which should also allow you to create new barcode 
+reader implementations using the base BarcodeReader implementation inside Quagga2.  The QR reader
+does not make use of this functionality, as QR is not picked up as a barcode in BarcodeReader.
 
 ## <a name="Building">Building</a>
 
