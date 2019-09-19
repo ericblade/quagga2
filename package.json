@@ -50,9 +50,9 @@
   "scripts": {
     "test": "npx cross-env BABEL_ENV=commonjs grunt test",
     "integrationtest": "grunt integrationtest",
-    "build:dev": "npx cross-env BUILD_ENV=development webpack",
-    "build:prod": "npx cross-env BUILD_ENV=production webpack --config webpack.config.min.js && npx grunt uglyasm",
-    "build:node": "npx cross-env BABEL_ENV=commonjs BUILD_ENV=node webpack --config webpack.node.config.js",
+    "build:dev": "npx cross-env BUILD_ENV=development webpack --config configs/webpack.config.js",
+    "build:prod": "npx cross-env BUILD_ENV=production webpack --config configs/webpack.config.min.js && npx grunt uglyasm",
+    "build:node": "npx cross-env BABEL_ENV=commonjs BUILD_ENV=node webpack --config configs/webpack.node.config.js",
     "build": "npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",

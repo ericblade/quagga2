@@ -35,7 +35,7 @@ module.exports = function(config) {
             },
             plugins: [
                 new webpack.DefinePlugin({
-                    ENV: require(path.join(__dirname, './env/production'))
+                    ENV: require(path.join(__dirname, './configs/env/production'))
                 })
             ]
         },

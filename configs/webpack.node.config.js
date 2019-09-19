@@ -25,5 +25,5 @@ module.exports.plugins = [
         ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV))
     })
 ];
-module.exports.output.path = __dirname + '/lib';
+module.exports.output.path = __dirname + '/../lib';
 module.exports.output.filename = 'quagga.js';
