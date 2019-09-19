@@ -1,5 +1,5 @@
 var webpack = require('webpack'),
-    MyUmdPlugin = require('./plugins/umd'),
+    MyUmdPlugin = require('./webpack-plugins/umd'),
     path = require('path');
 
 module.exports = {
@@ -22,7 +22,7 @@ module.exports = {
         ],
     },
     output: {
-        path: __dirname + '/dist',
+        path: __dirname + '/../dist',
         publicPath: '/',
         filename: 'quagga.js',
     },
