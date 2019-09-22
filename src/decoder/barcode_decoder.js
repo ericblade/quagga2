@@ -104,7 +104,13 @@ export default {
                             return new READERS[supplement]();
                         });
                 }
-                _barcodeReaders.push(new READERS[reader](configuration, supplements));
+                try {
+                    const readerObj = new READERS[reader](configuration, supplements);
+                    _barcodeReaders.push(readerObj);
+                } catch (err) {
+                    console.error('* Error constructing reader ', reader, err);
+                    throw err;
+                }
             });
             if (ENV.development) {
                 console.log('Registered Readers: ' + _barcodeReaders
