@@ -21,11 +21,12 @@ tasks/
 Gruntfile.js
 karma-integration.conf.js
 karma.conf.js
-README.md
 server.pem
 simple-https-server.py
 webpack.*config*.js
 .travis.yml
 build/
 *.tgz
-.snyx
+.snyk
+configs/*
+.github/*
