@@ -3,7 +3,7 @@ quagga2
 
 [![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Greenkeeper badge](https://badges.greenkeeper.io/ericblade/quagga2.svg)](https://greenkeeper.io/)
 
-This is a fork of the original QuaggaJS library, that will be maintained until such time as the 
+This is a fork of the original QuaggaJS library, that will be maintained until such time as the
 original author and maintainer returns, or it has been completely replaced by built-in browser and
 node functionality.
 
@@ -141,7 +141,7 @@ New in Quagga2 is the ability to specify external reader modules. Please see [qu
 read complete images, and decode QR codes.  A test script is included to demonstrate how to use an
 external reader in your project.
 
-Quagga2 exports the BarcodeReader prototype, which should also allow you to create new barcode 
+Quagga2 exports the BarcodeReader prototype, which should also allow you to create new barcode
 reader implementations using the base BarcodeReader implementation inside Quagga2.  The QR reader
 does not make use of this functionality, as QR is not picked up as a barcode in BarcodeReader.
 
@@ -160,6 +160,22 @@ Additionally, a `quagga.map` source-map is placed alongside these files. This
 file is only valid for the non-uglified version `quagga.js` because the
 minified version is altered after compression and does not align with the map
 file any more.
+
+## <a name="WorkingWithDev">Working with a development version from another project</a>
+
+If you are working on a project that includes quagga, but you need to use a development version of
+quagga, then you can run from the quagga directory:
+
+```
+npm install && npm run build && npm link
+```
+then from the other project directory that needs this quagga, do
+```
+npm link @ericblade/quagga2
+```
+When linking is successful, all future runs of 'npm run build' will update the version that is
+linked in the project.  When combined with an application using webpack-dev-server or some other
+hot-reload system, you can do very rapid iteration this way.
 
 ### Node
 
