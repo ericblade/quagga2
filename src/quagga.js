@@ -252,18 +252,19 @@ function publishResult(result, imageData) {
 }
 
 function locateAndDecode() {
-    var result,
-        boxes;
+    const boxes = getBoundingBoxes();
 
-    boxes = getBoundingBoxes();
     if (boxes) {
-        result = _decoder.decodeFromBoundingBoxes(boxes);
-        result = result || {};
-        result.boxes = boxes;
-        publishResult(result, _inputImageWrapper.data);
+        const decodeResult = _decoder.decodeFromBoundingBoxes(boxes) || {};
+        decodeResult.boxes = boxes;
+        publishResult(decodeResult, _inputImageWrapper.data);
     } else {
-        result = _decoder.decodeFromImage(_inputImageWrapper);
-        publishResult(result, _inputImageWrapper.data);
+        const imageResult = _decoder.decodeFromImage(_inputImageWrapper);
+        if (imageResult) {
+            publishResult(imageResult, _inputImageWrapper.data);
+        } else {
+            publishResult();
+        }
     }
 }
 

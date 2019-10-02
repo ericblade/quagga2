@@ -322,7 +322,12 @@ export default {
                         return result;
                     }
                 }
-                return { barcodes };
+
+                if (multiple) {
+                    return {
+                        barcodes
+                    };
+                }
             },
             decodeFromImage: function(inputImageWrapper) {
                 const result = decodeFromImage(inputImageWrapper);
