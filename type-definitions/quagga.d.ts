@@ -2,7 +2,7 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
-declare module "quagga" {
+declare module '@ericblade/quagga2' {
     var Quagga: QuaggaJSStatic;
     export default Quagga;
 }
@@ -323,7 +323,7 @@ interface QuaggaJSConfigObject {
          * @default "LiveStream"
          */
         type?: string;
-		
+
 		target?: HTMLElement,
 
         constraints?: QuaggaJSConstraints;
