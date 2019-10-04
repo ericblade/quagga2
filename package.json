@@ -117,7 +117,7 @@
     "lodash": "^4.17.15",
     "ndarray": "^1.0.18",
     "ndarray-linear-interpolate": "^1.0.0",
-    "snyk": "^1.221.0"
+    "snyk": "~1.229.0"
   },
   "snyk": true,
   "greenkeeper": {
