@@ -2,12 +2,12 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
-declare module '@ericblade/quagga2' {
-    var Quagga: QuaggaJSStatic;
-    export default Quagga;
-}
 
-interface QuaggaJSStatic {
+declare const Quagga: QuaggaJSStatic;
+export default Quagga;
+
+
+export interface QuaggaJSStatic {
     /**
      * This method initializes the library for a given
      * configuration config (see below) and invokes the callback when Quagga is
@@ -118,7 +118,7 @@ interface QuaggaJSStatic {
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
-interface QuaggaJSCameraAccess {
+export interface QuaggaJSCameraAccess {
     request(video: HTMLVideoElement, videoConstraints: QuaggaJSConstraints): Promise<void>;
 
     release(): void;
@@ -133,7 +133,7 @@ interface QuaggaJSCameraAccess {
 /**
  * Called whenever an item is detected or a process step has been completed.
  */
-interface QuaggaJSResultCallbackFunction {
+export interface QuaggaJSResultCallbackFunction {
     (
         data: QuaggaJSResultObject
     ): void;
@@ -145,7 +145,7 @@ interface QuaggaJSResultCallbackFunction {
  * defines the y.
  * typical values 0, 1, 'x', 'y'
  */
-interface QuaggaJSDebugDrawPath {
+export interface QuaggaJSDebugDrawPath {
     (
         path: any[],
         def: QuaggaJSxyDef,
@@ -157,7 +157,7 @@ interface QuaggaJSDebugDrawPath {
 /**
  * Called to draw debugging Rectangle
  */
-interface QuaggaJSDebugDrawRect {
+export interface QuaggaJSDebugDrawRect {
     (
         pos: any[],
         size: QuaggaJSRectSize,
@@ -171,7 +171,7 @@ interface QuaggaJSDebugDrawRect {
  * another array is the x or y value.
  * typical values 0, 1, 'x', 'y'
  */
-interface QuaggaJSxyDef {
+export interface QuaggaJSxyDef {
     x: any;
     y: any;
 }
@@ -179,7 +179,7 @@ interface QuaggaJSxyDef {
 /**
  * an object with an x and a y value
  */
-interface QuaggaJSxy {
+export interface QuaggaJSxy {
     x: number;
     y: number;
 }
@@ -189,7 +189,7 @@ interface QuaggaJSxy {
  * Used for giving a htiml canvas context.strokeRect function it's x, y, width
  * and height values.
  */
-interface QuaggaJSRectSize {
+export interface QuaggaJSRectSize {
     pos: QuaggaJSxy;
     size: QuaggaJSxy;
 }
@@ -199,7 +199,7 @@ interface QuaggaJSRectSize {
  * pattern (see defintions for context.strokeStyle. But is most commonly a
  * colour.
  */
-interface QuaggaJSStyle {
+export interface QuaggaJSStyle {
     color: string;
 
     /* http://www.w3schools.com/tags/canvas_linewidth.asp */
@@ -209,7 +209,7 @@ interface QuaggaJSStyle {
 /**
  * Pass when creating a ResultCollector
  */
-interface QuaggaJSResultCollector {
+export interface QuaggaJSResultCollector {
     /**
      * keep track of the image producing this result
      */
@@ -245,7 +245,7 @@ interface QuaggaJSResultCollector {
 /**
  * used for ResultCollector blacklists and filters
  */
-interface QuaggaJSCodeResult {
+export interface QuaggaJSCodeResult {
     code?: string;
     format?: string;
 }
@@ -253,7 +253,7 @@ interface QuaggaJSCodeResult {
 /**
  * Called to filter which Results to collect in ResultCollector
  */
-interface QuaggaJSResultCollectorFilterFunction {
+export interface QuaggaJSResultCollectorFilterFunction {
     (
         data: QuaggaJSCodeResult
     ): boolean;
@@ -265,7 +265,7 @@ interface QuaggaJSResultCollectorFilterFunction {
  * information. Depending on the success, some fields may be undefined or just
  * empty.
  */
-interface QuaggaJSResultObject {
+export interface QuaggaJSResultObject {
     codeResult: QuaggaJSResultObject_CodeResult;
     line: {
         x: number;
@@ -277,7 +277,7 @@ interface QuaggaJSResultObject {
     boxes: number[][][];
 }
 
-interface QuaggaJSResultObject_CodeResult {
+export interface QuaggaJSResultObject_CodeResult {
     code: string;
     start: number;
     end: number;
@@ -305,7 +305,7 @@ interface QuaggaJSResultObject_CodeResult {
     format: string;
 }
 
-interface QuaggaJSConfigObject {
+export interface QuaggaJSConfigObject {
     /**
      * The image path to load from, or a data url
      * Ex: '/test/fixtures/code_128/image-001.jpg'
@@ -324,7 +324,7 @@ interface QuaggaJSConfigObject {
          */
         type?: string;
 
-		target?: HTMLElement,
+        target?: HTMLElement,
 
         constraints?: QuaggaJSConstraints;
 
@@ -492,7 +492,7 @@ interface QuaggaJSConfigObject {
     };
 }
 
-interface QuaggaJSConstraints {
+export interface QuaggaJSConstraints {
     /**
      * @default 640
      */
@@ -522,7 +522,7 @@ interface QuaggaJSConstraints {
 /**
  * Used for extending a reader with supplements (ex: EAN-2, EAN-5)
  */
-interface QuaggaJSReaderConfig {
+export interface QuaggaJSReaderConfig {
     format: string;
     config: {
         supplements: string[];
