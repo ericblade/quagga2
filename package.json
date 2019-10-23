@@ -56,8 +56,7 @@
     "build": "npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
-    "snyk-protect": "npx snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "snyk-protect": "npx snyk protect"
   },
   "repository": {
     "type": "git",
