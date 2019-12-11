@@ -279,40 +279,35 @@ ImageWrapper.prototype.moments = function(labelcount) {
     return result;
 };
 
+ImageWrapper.prototype.getAsRGBA = function(scale = 1.0) {
+    const ret = new Uint8ClampedArray(4 * this.size.x * this.size.y);
+    for (let y = 0; y < this.size.y; y++) {
+        for (let x = 0; x < this.size.x; x++) {
+            const pixel = y * this.size.x + x;
+            const current = this.get(x, y) * scale;
+            ret[pixel * 4 + 0] = current;
+            ret[pixel * 4 + 1] = current;
+            ret[pixel * 4 + 2] = current;
+            ret[pixel * 4 + 3] = 255;
+        }
+    }
+    return ret;
+};
+
 /**
  * Displays the {ImageWrapper} in a given canvas
  * @param canvas {Canvas} The canvas element to write to
  * @param scale {Number} Scale which is applied to each pixel-value
  */
-ImageWrapper.prototype.show = function(canvas, scale) {
-    var ctx,
-        frame,
-        data,
-        current,
-        pixel,
-        x,
-        y;
+ImageWrapper.prototype.show = function(canvas, scale = 1.0) {
+    const ctx = canvas.getContext('2d');
+    const frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
+    const data = this.getAsRGBA(scale);
 
-    if (!scale) {
-        scale = 1.0;
-    }
-    ctx = canvas.getContext('2d');
     canvas.width = this.size.x;
     canvas.height = this.size.y;
-    frame = ctx.getImageData(0, 0, canvas.width, canvas.height);
-    data = frame.data;
-    current = 0;
-    for (y = 0; y < this.size.y; y++) {
-        for (x = 0; x < this.size.x; x++) {
-            pixel = y * this.size.x + x;
-            current = this.get(x, y) * scale;
-            data[pixel * 4 + 0] = current;
-            data[pixel * 4 + 1] = current;
-            data[pixel * 4 + 2] = current;
-            data[pixel * 4 + 3] = 255;
-        }
-    }
-    //frame.data = data;
+
+    frame.data = data;
     ctx.putImageData(frame, 0, 0);
 };
 
@@ -334,6 +329,7 @@ ImageWrapper.prototype.overlay = function(canvas, scale, from) {
     var frame = ctx.getImageData(from.x, from.y, this.size.x, this.size.y);
     var data = frame.data;
     var length = this.data.length;
+    // TODO: clearly, this section differs from getAsRGBA, but how/why?
     while (length--) {
         hsv[0] = this.data[length] * scale;
         result = hsv[0] <= 0 ? whiteRgb : hsv[0] >= 360 ? blackRgb : hsv2rgb(hsv, rgb);
