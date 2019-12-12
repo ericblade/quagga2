@@ -109,6 +109,7 @@ export interface QuaggaJSStatic {
     ResultCollector: QuaggaJSResultCollector;
     registerResultCollector(resultCollector: QuaggaJSResultCollector): void;
     setReaders(readers: (QuaggaJSReaderConfig | string)[]): void;
+    registerReader(name: string, reader: object): void;
 
     /**
      * In contrast to the calls described
@@ -540,7 +541,9 @@ export interface QuaggaJSConstraints {
     /**
      * In cases where height/width does not suffice
      */
-    aspectRatio?: number
+    aspectRatio?: number;
+    minAspectRatio?: number;
+    maxAspectRatio?: number;
 
     /**
      * @default "environment"
