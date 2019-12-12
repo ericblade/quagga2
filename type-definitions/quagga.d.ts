@@ -6,6 +6,40 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
+type XYSize = {
+    x: number,
+    y: number,
+};
+
+export class SubImage {
+    constructor(from: XYSize, size: XYSize, I: ImageWrapper);
+    show(canvas: HTMLCanvasElement, scale: number): void;
+    get(x: number, y: number): number;
+    updateData(image: ImageWrapper): void;
+    updateFrom(from: XYSize): SubImage;
+}
+
+export class ImageWrapper {
+    size: XYSize;
+    data: Array<number>;
+    indexMapping: Array<number>;
+    // TODO: i don't think "Array<number>" is right here for data, but not sure what it should be
+    constructor(size: XYSize, data?: Array<number>, ArrayType?: boolean, initialize?: boolean);
+    inImageWithBorder(imgRef: XYSize, border: number): SubImage;
+    subImage(from: XYSize, size: XYSize): SubImage;
+    subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): SubImage;
+    copyTo(imageWrapper: ImageWrapper): void;
+    get(x: number, y: number): number;
+    getSafe(x: number, y: number): number;
+    set(x: number, y: number, value: number): ImageWrapper;
+    zeroBorder(): void;
+    invert(): void;
+    convolve(): void;
+    moments(labelcount: number): Array<number>;
+    getAsRGBA(scale?: number): Uint8ClampedArray;
+    show(canvas: HTMLCanvasElement, scale?: number): void;
+    overlay(canvas: HTMLCanvasElement, scale: number, from: XYSize): void;
+}
 
 export interface QuaggaJSStatic {
     /**
@@ -22,7 +56,7 @@ export interface QuaggaJSStatic {
     init(
         config: QuaggaJSConfigObject,
         callback: (err: any) => void,
-        imageWrapper: any
+        imageWrapper: ImageWrapper,
     ): void;
 
     /**
@@ -94,7 +128,7 @@ export interface QuaggaJSStatic {
         drawPath: QuaggaJSDebugDrawPath;
         drawRect: QuaggaJSDebugDrawRect;
     };
-    ImageWrapper: any;
+    ImageWrapper: ImageWrapper;
 
     /**
      * an object Quagga uses for drawing and processing, useful for calling code
