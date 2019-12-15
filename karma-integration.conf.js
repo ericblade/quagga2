@@ -10,34 +10,34 @@ module.exports = function(config) {
             './node_modules/es6-promise/dist/es6-promise.auto.js',
             'test/test-main-integration.js',
             {pattern: 'test/integration/**/*.js', included: false},
-            {pattern: 'test/fixtures/**/*.*', included: false}
+            {pattern: 'test/fixtures/**/*.*', included: false},
         ],
         preprocessors: {
-            'test/test-main-integration.js': ['webpack']
+            'test/test-main-integration.js': ['webpack'],
         },
         webpack: {
             entry: [
-                './src/quagga.js'
+                './src/quagga.js',
             ],
             module: {
                 rules: [{
                     test: /\.jsx?$/,
                     exclude: /node_modules/,
-                    loader: 'babel-loader'
-                }]
+                    loader: 'babel-loader',
+                }],
             },
             resolve: {
                 modules: [
                     path.resolve('./src/input/'),
                     path.resolve('./src/common/'),
-                    'node_modules'
-                ]
+                    'node_modules',
+                ],
             },
             plugins: [
                 new webpack.DefinePlugin({
-                    ENV: require(path.join(__dirname, './configs/env/production'))
-                })
-            ]
+                    ENV: require(path.join(__dirname, './configs/env/production')),
+                }),
+            ],
         },
         plugins: [
             'karma-phantomjs-launcher',
@@ -45,7 +45,7 @@ module.exports = function(config) {
             'karma-chai',
             'karma-sinon',
             'karma-sinon-chai',
-            require('karma-webpack')
+            require('karma-webpack'),
         ],
         reporters: ['progress'],
         port: 9876,
@@ -53,6 +53,6 @@ module.exports = function(config) {
         logLevel: config.LOG_INFO, // LOG_DEBUG
         autoWatch: true,
         browsers: ['PhantomJS'],
-        singleRun: true
+        singleRun: true,
     });
 };

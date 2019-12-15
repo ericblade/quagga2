@@ -9,36 +9,36 @@ module.exports = function(config) {
         files: [
             './node_modules/es6-promise/dist/es6-promise.auto.js',
             'test/test-main.js',
-            {pattern: 'test/spec/**/*.js', included: false}
+            {pattern: 'test/spec/**/*.js', included: false},
         ],
         preprocessors: {
-            'test/test-main.js': ['webpack']
+            'test/test-main.js': ['webpack'],
         },
         webpack: {
             entry: [
-                './src/quagga.js'
+                './src/quagga.js',
             ],
             module: {
                 rules: [{
                     test: /\.jsx?$/,
                     exclude: [
-                        path.resolve('node_modules/')
+                        path.resolve('node_modules/'),
                     ],
-                    loader: 'babel-loader'
-                }]
+                    loader: 'babel-loader',
+                }],
             },
             resolve: {
                 modules: [
                     path.resolve('./src/input/'),
                     path.resolve('./test/mocks/'),
-                    'node_modules'
-                ]
+                    'node_modules',
+                ],
             },
             plugins: [
                 new webpack.DefinePlugin({
-                    ENV: require(path.join(__dirname, './configs/env/production'))
-                })
-            ]
+                    ENV: require(path.join(__dirname, './configs/env/production')),
+                }),
+            ],
         },
         plugins: [
             'karma-phantomjs-launcher',
@@ -48,7 +48,7 @@ module.exports = function(config) {
             'karma-sinon',
             'karma-sinon-chai',
             'karma-source-map-support',
-            require('karma-webpack')
+            require('karma-webpack'),
         ],
         reporters: ['progress', 'coverage'],
         port: 9876,
@@ -59,7 +59,7 @@ module.exports = function(config) {
         singleRun: true,
         coverageReporter: {
             type: 'html',
-            dir: 'coverage/'
-        }
+            dir: 'coverage/',
+        },
     });
 };
