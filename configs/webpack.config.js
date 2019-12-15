@@ -7,11 +7,17 @@ module.exports = {
     ],
     devtool: 'inline-source-map',
     module: {
-        rules: [{
-            test: /\.jsx?$/,
-            exclude: /node_modules/,
-            loader: 'babel-loader',
-        }],
+        rules: [
+            {
+                test: /\.(t|j)sx?$/,
+                use: { loader: 'awesome-typescript-loader' },
+            },
+            {
+                enforce: 'pre',
+                test: /\.js$/,
+                loader: 'source-map-loader',
+            },
+        ],
     },
     resolve: {
         modules: [
