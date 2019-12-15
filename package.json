@@ -35,13 +35,14 @@
     "karma-sinon": "^1.0.4",
     "karma-sinon-chai": "^2.0.2",
     "karma-source-map-support": "^1.1.0",
-    "karma-webpack": "^1.8.1",
+    "karma-webpack": "^2.0.13",
     "lolex": "^5.0.0",
     "mocha": "^2.3.2",
     "phantomjs": "^2.1.7",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
-    "webpack": "^2.7.0",
+    "typescript": "^3.7.3",
+    "webpack": "^3.12.0",
     "webpack-sources": "^1.4.3"
   },
   "directories": {
