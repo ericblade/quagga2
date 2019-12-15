@@ -1,5 +1,4 @@
 var webpack = require('webpack'),
-    MyUmdPlugin = require('./webpack-plugins/umd'),
     path = require('path');
 
 module.exports = {
@@ -8,7 +7,7 @@ module.exports = {
     ],
     devtool: 'inline-source-map',
     module: {
-        loaders: [{
+        rules: [{
             test: /\.jsx?$/,
             exclude: /node_modules/,
             loader: 'babel-loader',
@@ -24,6 +23,8 @@ module.exports = {
     output: {
         path: __dirname + '/../dist',
         publicPath: '/',
+        libraryTarget: 'umd',
+        library: 'quagga',
         filename: 'quagga.js',
     },
     devServer: {
@@ -31,11 +32,12 @@ module.exports = {
         hot: true,
     },
     plugins: [
-        new MyUmdPlugin({
-            library: 'Quagga',
-        }),
         new webpack.DefinePlugin({
             ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
         }),
     ],
+    optimization: {
+        minimize: false,
+    },
+    mode: 'production',
 };
