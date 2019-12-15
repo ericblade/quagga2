@@ -13,6 +13,7 @@
     "@babel/preset-env": "^7.5.5",
     "@babel/preset-typescript": "^7.3.3",
     "async": "^1.4.2",
+    "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-istanbul": "^5.2.0",
@@ -41,6 +42,8 @@
     "phantomjs": "^2.1.7",
     "sinon": "^2.1.0",
     "sinon-chai": "^2.8.0",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.7.3",
     "webpack": "^4.41.2",
     "webpack-sources": "^1.4.3"
   },
