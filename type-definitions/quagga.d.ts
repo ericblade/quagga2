@@ -119,8 +119,8 @@ export interface QuaggaJSStatic {
      */
     decodeSingle(
         config: QuaggaJSConfigObject,
-        resultCallback: QuaggaJSResultCallbackFunction
-    ): void;
+        resultCallback?: QuaggaJSResultCallbackFunction
+    ): Promise<QuaggaJSResultObject>;
 
     /**
      * Constructs used for debugging purposes

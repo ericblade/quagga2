@@ -558,12 +558,21 @@ export default {
         if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
             config.numOfWorkers = 0;
         }
-        this.init(config, () => {
-            Events.once('processed', (result) => {
-                this.stop();
-                resultCallback.call(null, result);
-            }, true);
-            start();
+        return new Promise((resolve, reject) => {
+            try {
+                this.init(config, () => {
+                    Events.once('processed', (result) => {
+                        this.stop();
+                        if (resultCallback) {
+                            resultCallback.call(null, result);
+                        }
+                        resolve(result);
+                    }, true);
+                    start();
+                });
+            } catch (err) {
+                reject(err);
+            }
         });
     },
     ImageWrapper: ImageWrapper,
