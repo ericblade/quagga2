@@ -19,7 +19,7 @@ module.exports = function(config) {
                 './src/quagga.js'
             ],
             module: {
-                loaders: [{
+                rules: [{
                     test: /\.jsx?$/,
                     exclude: /node_modules/,
                     loader: 'babel-loader'

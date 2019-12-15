@@ -18,7 +18,7 @@ module.exports = function(config) {
                 './src/quagga.js'
             ],
             module: {
-                loaders: [{
+                rules: [{
                     test: /\.jsx?$/,
                     exclude: [
                         path.resolve('node_modules/')
