@@ -3,6 +3,7 @@ var webpack = require('webpack');
 
 module.exports = function(config) {
     config.set({
+        mode: 'production',
         basePath: '',
         frameworks: ['source-map-support', 'mocha', 'chai', 'sinon', 'sinon-chai'],
         files: [

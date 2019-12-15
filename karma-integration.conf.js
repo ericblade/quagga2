@@ -3,6 +3,7 @@ var webpack = require('webpack');
 
 module.exports = function(config) {
     config.set({
+        mode: 'production',
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
         files: [
