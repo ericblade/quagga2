@@ -65,6 +65,8 @@ describe('decodeSingle', function () {
         });
     }
 
+    // TODO: write a test that tests Promise return/resolve
+
     describe('EAN', function() {
         var config = generateConfig(),
             testSet = [
