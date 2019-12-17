@@ -8,7 +8,12 @@
         "types": [ "mocha", "chai", "sinon", "sinon-chai", "es6-promise" ],
         "strictNullChecks": false,
         "typeRoots": [
-            "../node_modules/@types"
+            "../node_modules/@types",
+            "../type-definitions"
         ]
-    }
+    },
+    "include": [
+        ".",
+        "../src"
+    ]
 }
