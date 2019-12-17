@@ -3,6 +3,7 @@
 import ResultCollector from '../../src/analytics/result_collector';
 import ImageDebug from '../../src/common/image_debug';
 import { XYSize, QuaggaJSResultCollector, QuaggaJSCodeResult } from '../../type-definitions/quagga';
+import { describe, beforeEach, afterEach, it } from 'mocha';
 import { expect } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
 
