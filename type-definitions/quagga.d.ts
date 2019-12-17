@@ -11,7 +11,7 @@ export type XYSize = {
     y: number,
 };
 
-export type ImageData = Array<Number>;
+export type QuaggaImageData = Array<Number>;
 
 export class SubImage {
     constructor(from: XYSize, size: XYSize, I: ImageWrapper);

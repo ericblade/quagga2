@@ -1,4 +1,5 @@
 import ArrayHelper from '../../src/common/array_helper';
+import sinon from 'sinon';
 
 describe('init', function() {
     it('initializes an array with the given value', function() {
@@ -9,12 +10,13 @@ describe('init', function() {
 });
 
 describe('shuffle', function() {
+    let MathStub;
     before(function() {
-        sinon.stub(Math, 'random').returns(0.5);
+        MathStub = sinon.stub(Math, 'random').returns(0.5);
     });
 
     after(function() {
-        sinon.restore(Math);
+        MathStub.restore(Math);
     });
     it('shuffles the content of an array', function() {
         var input = [1, 2, 3];
@@ -25,7 +27,7 @@ describe('shuffle', function() {
 describe('toPointList', function() {
     it('converts an Array to a List of points', function() {
         var input = [[1, 2], [2, 2], [3, 2]];
-        expect(ArrayHelper.toPointList(input)).to.equal("[[1,2],\r\n[2,2],\r\n[3,2]]");
+        expect(ArrayHelper.toPointList(input)).to.equal('[[1,2],\r\n[2,2],\r\n[3,2]]');
     });
 });
 

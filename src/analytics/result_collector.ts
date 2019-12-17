@@ -1,5 +1,5 @@
 import ImageDebug from '../common/image_debug';
-import { QuaggaJSCodeResult, QuaggaJSResultCollector, QuaggaJSResultCollectorFilterFunction, XYSize, QuaggaJSResultObject } from '../../type-definitions/quagga';
+import { QuaggaJSCodeResult, QuaggaJSResultCollector, QuaggaJSResultCollectorFilterFunction, XYSize, QuaggaImageData } from '../../type-definitions/quagga';
 
 function contains(codeResult: QuaggaJSCodeResult, list: Array<QuaggaJSCodeResult> | undefined) {
     if (list) {
@@ -35,7 +35,7 @@ export default {
         }
 
         return {
-            addResult: function(data: ImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult) {
+            addResult: function(data: QuaggaImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult) {
                 const result: any = { }; // this is 'any' to avoid having to construct a whole QuaggaJSCodeResult :|
                 if (matchesConstraints(codeResult)) {
                     capacity--;

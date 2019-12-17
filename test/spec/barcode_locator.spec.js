@@ -1,6 +1,7 @@
 import BarcodeLocator from '../../src/locator/barcode_locator';
 import Config from '../../src/config/config';
 import {merge} from 'lodash';
+import sinon from 'sinon';
 
 describe('checkImageConstraints', function() {
     var config,
@@ -10,7 +11,7 @@ describe('checkImageConstraints', function() {
 
     beforeEach(function() {
         imageSize = {
-            x: 640, y: 480
+            x: 640, y: 480,
         };
         config = merge({}, Config);
         inputStream = {
@@ -26,16 +27,16 @@ describe('checkImageConstraints', function() {
             setCanvasSize: function() {},
             getConfig: function() {
                 return streamConfig;
-            }
+            },
         };
-        sinon.stub(inputStream, "setWidth", function(width) {
+        sinon.stub(inputStream, 'setWidth').callsFake((width) => {
             imageSize.x = width;
         });
-        sinon.stub(inputStream, "setHeight", function(height) {
+        sinon.stub(inputStream, 'setHeight').callsFake((height) => {
             imageSize.y = height;
         });
-        sinon.stub(inputStream, "setTopRight");
-        sinon.stub(inputStream, "setCanvasSize");
+        sinon.stub(inputStream, 'setTopRight');
+        sinon.stub(inputStream, 'setCanvasSize');
     });
 
     afterEach(function() {
@@ -70,25 +71,25 @@ describe('checkImageConstraints', function() {
         expect(inputStream.getWidth()).to.be.equal(expected.x);
     });
 
-    it("should take the defined area into account", function() {
+    it('should take the defined area into account', function() {
         var expectedSize = {
                 x: 420,
-                y: 315
+                y: 315,
             },
             expectedTopRight = {
                 x: 115,
-                y: 52
+                y: 52,
             },
             expectedCanvasSize = {
                 x: 640,
-                y: 480
+                y: 480,
             };
 
         streamConfig.area = {
-            top: "11%",
-            right: "15%",
-            bottom: "20%",
-            left: "18%"
+            top: '11%',
+            right: '15%',
+            bottom: '20%',
+            left: '18%',
         };
 
         config.locator.halfSample = false;
@@ -99,25 +100,25 @@ describe('checkImageConstraints', function() {
         expect(inputStream.setCanvasSize.getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
     });
 
-    it("should return the original size if set to full image", function() {
+    it('should return the original size if set to full image', function() {
         var expectedSize = {
                 x: 640,
-                y: 480
+                y: 480,
             },
             expectedTopRight = {
                 x: 0,
-                y: 0
+                y: 0,
             },
             expectedCanvasSize = {
                 x: 640,
-                y: 480
+                y: 480,
             };
 
         streamConfig.area = {
-            top: "0%",
-            right: "0%",
-            bottom: "0%",
-            left: "0%"
+            top: '0%',
+            right: '0%',
+            bottom: '0%',
+            left: '0%',
         };
 
         config.locator.halfSample = false;
