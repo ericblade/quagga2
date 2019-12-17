@@ -11,9 +11,9 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.5.5",
     "@babel/plugin-transform-runtime": "^7.5.5",
     "@babel/preset-env": "^7.5.5",
-    "@babel/preset-typescript": "^7.3.3",
+    "@babel/preset-typescript": "^7.7.4",
+    "@types/react": "^16.9.16",
     "async": "^1.4.2",
-    "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
     "babel-plugin-istanbul": "^5.2.0",
@@ -51,12 +51,13 @@
     "doc": "doc"
   },
   "scripts": {
-    "test": "npx cross-env BABEL_ENV=commonjs grunt test",
+    "check-types": "tsc",
+    "test": "npx grunt test",
     "integrationtest": "grunt integrationtest",
     "build:dev": "npx cross-env BUILD_ENV=development webpack --config configs/webpack.config.js",
-    "build:prod": "npx cross-env BUILD_ENV=production webpack --config configs/webpack.config.min.js && npx grunt uglyasm",
+    "build:prod": "npx cross-env BUILD_ENV=production webpack --config configs/webpack.config.min.js",
     "build:node": "npx cross-env BABEL_ENV=commonjs BUILD_ENV=node webpack --config configs/webpack.node.config.js",
-    "build": "npm run build:dev && npm run build:prod && npm run build:node",
+    "build": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
     "snyk-protect": "npx snyk protect",
@@ -113,6 +114,7 @@
     "node": ">= 8.0"
   },
   "dependencies": {
+    "@babel/plugin-proposal-nullish-coalescing-operator": "^7.7.4",
     "@babel/runtime": "^7.5.5",
     "get-pixels": "^3.3.2",
     "gl-mat2": "^1.0.0",

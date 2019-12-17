@@ -1,11 +1,13 @@
 {
   "presets": [
-    "@babel/env"
+    "@babel/env",
+    "@babel/typescript"
   ],
   "plugins": [
     "@babel/proposal-class-properties",
     "@babel/proposal-object-rest-spread",
-    "@babel/transform-runtime"
+    "@babel/transform-runtime",
+    "@babel/plugin-proposal-nullish-coalescing-operator"
   ],
   "env": {
     "node": {

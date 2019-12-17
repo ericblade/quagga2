@@ -10,11 +10,11 @@ module.exports = {
         rules: [
             {
                 test: /\.(t|j)sx?$/,
-                use: { loader: 'awesome-typescript-loader' },
+                use: { loader: 'babel-loader' },
             },
             {
                 enforce: 'pre',
-                test: /\.js$/,
+                test: /\.(t|j)sx?$/,
                 loader: 'source-map-loader',
             },
         ],

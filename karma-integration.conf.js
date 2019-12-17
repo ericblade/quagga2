@@ -3,7 +3,6 @@ var webpack = require('webpack');
 
 module.exports = function(config) {
     config.set({
-        mode: 'production',
         basePath: '',
         frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
         files: [
@@ -16,17 +15,20 @@ module.exports = function(config) {
             'test/test-main-integration.js': ['webpack'],
         },
         webpack: {
+            mode: 'production',
             entry: [
                 './src/quagga.js',
             ],
             module: {
-                rules: [{
-                    test: /\.jsx?$/,
-                    exclude: /node_modules/,
-                    loader: 'babel-loader',
-                }],
+                rules: [
+                    {
+                        test: /\.(t|j)sx?$/,
+                        loader: 'babel-loader',
+                    },
+                ],
             },
             resolve: {
+                extensions: ['.ts', '.tsx', '.js', '.jsx'],
                 modules: [
                     path.resolve('./src/input/'),
                     path.resolve('./src/common/'),
