@@ -5,7 +5,7 @@ import BarcodeDecoder from './decoder/barcode_decoder';
 import Events from './common/events';
 import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
-import ResultCollector from './analytics/result_collector';
+import ResultCollector from './analytics/result_collector.ts';
 import Config from './config/config';
 import InputStream from 'input_stream';
 import FrameGrabber from 'frame_grabber';

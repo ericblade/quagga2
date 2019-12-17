@@ -6,10 +6,12 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
-type XYSize = {
+export type XYSize = {
     x: number,
     y: number,
 };
+
+export type ImageData = Array<Number>;
 
 export class SubImage {
     constructor(from: XYSize, size: XYSize, I: ImageWrapper);
@@ -259,7 +261,7 @@ export interface QuaggaJSResultCollector {
      * a list of codes that should not be recorded. This is effectively a list
      * of filters that return false.
      */
-    blacklist?: QuaggaJSCodeResult;
+    blacklist?: Array<QuaggaJSCodeResult>;
 
     /**
      * passed a QuaggaJSCodeResult, return true if you want this to be stored,
@@ -310,6 +312,7 @@ export interface QuaggaJSResultObject {
     pattern: number[];
     box: number[][];
     boxes: number[][][];
+    frame?: string;
 }
 
 export interface QuaggaJSResultObject_CodeResult {

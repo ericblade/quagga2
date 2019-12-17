@@ -1,4 +1,4 @@
-import ResultCollector from '../../src/analytics/result_collector';
+import ResultCollector from '../../src/analytics/result_collector.ts';
 import ImageDebug from '../../src/common/image_debug';
 
 var canvasMock,

@@ -1,6 +1,7 @@
 import ImageDebug from '../common/image_debug';
+import { QuaggaJSCodeResult, QuaggaJSResultCollector, QuaggaJSResultCollectorFilterFunction, XYSize, QuaggaJSResultObject } from '../../type-definitions/quagga';
 
-function contains(codeResult, list) {
+function contains(codeResult: QuaggaJSCodeResult, list: Array<QuaggaJSCodeResult> | undefined) {
     if (list) {
         return list.some(function (item) {
             return Object.keys(item).every(function (key) {
@@ -11,7 +12,7 @@ function contains(codeResult, list) {
     return false;
 }
 
-function passesFilter(codeResult, filter) {
+function passesFilter(codeResult: QuaggaJSCodeResult, filter: QuaggaJSResultCollectorFilterFunction | undefined) {
     if (typeof filter === 'function') {
         return filter(codeResult);
     }
@@ -19,14 +20,14 @@ function passesFilter(codeResult, filter) {
 }
 
 export default {
-    create: function(config) {
-        var canvas = document.createElement('canvas'),
-            ctx = canvas.getContext('2d'),
-            results = [],
-            capacity = config.capacity || 20,
-            capture = config.capture === true;
+    create: function(config: QuaggaJSResultCollector) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const results:Array<QuaggaJSCodeResult> = [];
+        let capacity = config.capacity ?? 20;
+        const capture = config.capture === true;
 
-        function matchesConstraints(codeResult) {
+        function matchesConstraints(codeResult: QuaggaJSCodeResult) {
             return capacity
                 && codeResult
                 && !contains(codeResult, config.blacklist)
@@ -34,9 +35,8 @@ export default {
         }
 
         return {
-            addResult: function(data, imageSize, codeResult) {
-                var result = {};
-
+            addResult: function(data: ImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult) {
+                const result: any = { }; // this is 'any' to avoid having to construct a whole QuaggaJSCodeResult :|
                 if (matchesConstraints(codeResult)) {
                     capacity--;
                     result.codeResult = codeResult;
