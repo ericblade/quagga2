@@ -1,4 +1,5 @@
 import ArrayHelper from '../../src/common/array_helper';
+import { expect } from 'chai';
 import sinon from 'sinon';
 
 describe('init', function() {
@@ -10,13 +11,13 @@ describe('init', function() {
 });
 
 describe('shuffle', function() {
-    let MathStub;
+    let MathStub: sinon.SinonStub;
     before(function() {
-        MathStub = sinon.stub(Math, 'random').returns(0.5);
+        MathStub = sinon.stub(Math as any, 'random').returns(0.5); // TODO: remove as any, and fix this type def issue
     });
 
     after(function() {
-        MathStub.restore(Math);
+        MathStub.restore();
     });
     it('shuffles the content of an array', function() {
         var input = [1, 2, 3];

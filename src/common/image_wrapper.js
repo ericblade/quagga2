@@ -1,6 +1,6 @@
 import SubImage from './subImage';
 import { hsv2rgb } from '../common/cv_utils';
-import ArrayHelper from '../common/array_helper';
+import ArrayHelper from '../common/array_helper.ts';
 import { clone } from 'gl-vec2';
 const vec2 = { clone };
 

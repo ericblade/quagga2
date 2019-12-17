@@ -1,4 +1,4 @@
-import ArrayHelper from '../common/array_helper';
+import ArrayHelper from '../common/array_helper.ts';
 
 function BarcodeReader(config, supplements) {
     this._row = [];
