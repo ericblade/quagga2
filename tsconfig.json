@@ -27,6 +27,6 @@
         "checkJs": false
     },
     "include": [
-        "src/**/*"
+        "./src/**/*"
     ]
 }

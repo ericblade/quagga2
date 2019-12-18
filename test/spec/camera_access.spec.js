@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import CameraAccess, {pickConstraints} from '../../src/input/camera_access';
-import {setStream, getConstraints, setSupported} from 'mediaDevices';
+import {setStream, getConstraints, setSupported, enumerateDevices, getUserMedia} from 'mediaDevices';
 import sinon from 'sinon';
 
 var originalURL,
@@ -9,6 +9,7 @@ var originalURL,
     stream;
 
 describe('camera_access', () => {
+    let mediaDevicesStubbed = false;
     beforeEach(function() {
         var tracks = [{
             stop: function() {},
@@ -43,12 +44,23 @@ describe('camera_access', () => {
         sinon.stub(video, 'addEventListener').callsFake(function(event, cb) {
             cb();
         });
+        if (!navigator.mediaDevices) {
+            mediaDevicesStubbed = true;
+            navigator.mediaDevices = {
+                enumerateDevices,
+                getUserMedia,
+            };
+        }
         sinon.stub(video, 'play');
     });
 
     afterEach(function() {
         window.URL = originalURL;
         window.MediaStreamTrack = originalMediaStreamTrack;
+        if (mediaDevicesStubbed) {
+            mediaDevicesStubbed = false;
+            delete navigator.mediaDevices;
+        }
     });
 
     describe('success', function() {

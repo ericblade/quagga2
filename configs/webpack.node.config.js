@@ -3,14 +3,6 @@ var webpack = require('webpack'),
 
 module.exports = require('./webpack.config.js');
 
-module.exports.resolve = {
-    modules: [
-        path.resolve('./lib/'),
-        path.resolve('./src/common/'),
-        'node_modules',
-    ],
-};
-
 module.exports.externals = [
     'get-pixels',
     'gl-matrix',

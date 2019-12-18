@@ -2,7 +2,6 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
-
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
@@ -156,7 +155,7 @@ export interface QuaggaJSStatic {
  * Used for accessing information about the active stream track and available video devices.
  */
 export interface QuaggaJSCameraAccess {
-    request(video: HTMLVideoElement, videoConstraints: QuaggaJSConstraints): Promise<void>;
+    request(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<void>;
 
     release(): void;
 
@@ -364,7 +363,7 @@ export interface QuaggaJSConfigObject {
 
         target?: HTMLElement,
 
-        constraints?: QuaggaJSConstraints;
+        constraints?: MediaTrackConstraints;
 
         /**
          * defines rectangle of the detection/localization area. Useful when you
@@ -530,41 +529,18 @@ export interface QuaggaJSConfigObject {
     };
 }
 
-export interface QuaggaJSConstraints {
-    /**
-     * @default 640
-     */
-    width?: number;
-
-    /**
-     * @default 480
-     */
-    height?: number;
-
-    /**
-     * In cases where height/width does not suffice
-     */
-    aspectRatio?: number;
-    minAspectRatio?: number;
-    maxAspectRatio?: number;
-
-    /**
-     * @default "environment"
-     */
-    facingMode?: string;
-
-    /**
-     * Explicitly set the camera to the user's choice
-     */
-    deviceId?: string
-}
-
-/**
- * Used for extending a reader with supplements (ex: EAN-2, EAN-5)
- */
 export interface QuaggaJSReaderConfig {
     format: string;
     config: {
         supplements: string[];
     }
+}
+
+export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
+    minAspectRatio?: number;
+    facing?: string;
+}
+
+export interface QuaggaBuildEnvironment {
+    development?: boolean;
 }
