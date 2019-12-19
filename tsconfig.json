@@ -1,6 +1,7 @@
 {
     "compilerOptions": {
-        "noImplicitAny": false /* Raise error on expressions and declarations with an implied 'any' type. */,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true/* Raise error on expressions and declarations with an implied 'any' type. */,
         "allowSyntheticDefaultImports": true /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */,
         "sourceMap": true /* Generates corresponding '.map' file. */,
         "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
@@ -14,7 +15,7 @@
         "declaration": false /* Generates corresponding '.d.ts' file. */,
         "removeComments": true /* Do not emit comments to output. */,
         "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
-        "noUnusedLocals": false /* Report errors on unused locals. */,
+        "noUnusedLocals": true /* Report errors on unused locals. */,
         "strict": true /* Enable all strict type-checking options. */,
         "outDir": "dist" /* Redirect output structure to the directory. */,
         "baseUrl": "src" /* Base directory to resolve non-absolute module names. */,

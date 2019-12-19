@@ -10,7 +10,7 @@ export type XYSize = {
     y: number,
 };
 
-export type QuaggaImageData = Array<Number>;
+export type QuaggaImageData = Array<number>;
 
 export class SubImage {
     constructor(from: XYSize, size: XYSize, I: ImageWrapper);
@@ -207,6 +207,7 @@ export interface QuaggaJSDebugDrawRect {
  * another array is the x or y value.
  * typical values 0, 1, 'x', 'y'
  */
+// TODO: remove QuaggaJSxyDef from global type-defs (it's only used in image_debug, i think, which has a local definition)
 export interface QuaggaJSxyDef {
     x: any;
     y: any;
