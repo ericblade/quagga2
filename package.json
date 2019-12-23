@@ -15,7 +15,7 @@
     "async": "^1.4.2",
     "babel-loader": "^8.0.6",
     "babel-plugin-add-module-exports": "^1.0.2",
-    "babel-plugin-istanbul": "^5.2.0",
+    "babel-plugin-istanbul": "^6.0.0",
     "chai": "^4.2.0",
     "core-js": "^2.4.1",
     "cross-env": "^6.0.0",
