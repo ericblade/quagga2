@@ -4,7 +4,7 @@ import sinon from 'sinon';
 
 describe('init', function() {
     it('initializes an array with the given value', function() {
-        var input = [0, 0, 0];
+        const input = [0, 0, 0];
         ArrayHelper.init(input, 5);
         expect(input).to.deep.equal([5, 5, 5]);
     });

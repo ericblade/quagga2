@@ -3,17 +3,14 @@
 // TODO: Most all of these functions can be redone with Array#reduce
 
 export default {
-    init: function(arr: Array<any>, val: any) {
-        let l = arr.length;
-        while (l--) {
-            arr[l] = val;
-        }
+    init: function(arr: Array<number>, val: number) {
+        arr.fill(val);
     },
 
     /**
      * Shuffles the content of an array
      */
-    shuffle: function(arr: Array<any>) {
+    shuffle: function(arr: Array<number>) {
         let i = arr.length - 1;
         for (i; i >= 0; i--) {
             const j = Math.floor(Math.random() * i);
@@ -24,16 +21,13 @@ export default {
         return arr;
     },
 
-    toPointList: function(arr: Array<any>) {
-        const rows:Array<string> = [];
-        for (let i = 0; i < arr.length; i++) {
-            let row:Array<any> = [];
-            for (let j = 0; j < arr[i].length; j++) {
-                row[j] = arr[i][j];
-            }
-            rows[i] = '[' + row.join(',') + ']';
-        }
-        return '[' + rows.join(',\r\n') + ']';
+    toPointList: function(arr: Array<Array<number>>) {
+        const rows = arr.reduce((p, n) => {
+            const row = `[${n.join(',')}]`;
+            p.push(row);
+            return p;
+        }, [] as Array<string>);
+        return `[${rows.join(',\r\n')}]`;
     },
 
     /**
