@@ -4,7 +4,11 @@
 
 export default {
     init: function(arr: Array<number>, val: number) {
-        arr.fill(val);
+        // arr.fill(val);
+        let l = arr.length;
+        while (l--) {
+            arr[l] = val;
+        }
     },
 
     /**
