@@ -544,4 +544,5 @@ export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstrain
 
 export interface QuaggaBuildEnvironment {
     development?: boolean;
+    node?: boolean;
 }

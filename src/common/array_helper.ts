@@ -33,13 +33,13 @@ export default {
     /**
      * returns the elements which's score is bigger than the threshold
      */
-    threshold: function(arr: Array<any>, threshold: number, scoreFunc: ((score: number) => number)) {
-        const queue:Array<any> = [];
-        for (let i = 0; i < arr.length; i++) {
-            if (scoreFunc.apply(arr, [arr[i]]) >= threshold) {
-                queue.push(arr[i]);
+    threshold: function(arr: Array<number>, threshold: number, scoreFunc: ((score: number) => number)) {
+        const queue = arr.reduce((prev: Array<number>, next) => {
+            if (scoreFunc.apply(arr, [next]) >= threshold) {
+                prev.push(next);
             }
-        }
+            return prev;
+        }, []);
         return queue;
     },
 

@@ -1,19 +1,45 @@
 import BarcodeLocator from '../../src/locator/barcode_locator';
-import Config from '../../src/config/config';
+import QuaggaConfig from '../../src/config/config';
 import {merge} from 'lodash';
-import sinon from 'sinon';
+import sinon, {SinonSpy} from 'sinon';
+import { expect } from 'chai';
+import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
+
+declare interface AreaConfig {
+    area: {
+        top: string,
+        right: string,
+        bottom: string,
+        left: string,
+    }
+};
 
 describe('checkImageConstraints', function() {
-    var config,
-        inputStream,
-        imageSize,
-        streamConfig = {};
+    let config: QuaggaJSConfigObject;
+    let imageSize = { x: 0, y: 0 };
+    let inputStream = {
+        getWidth: function() {
+            return imageSize.x;
+        },
+        getHeight: function() {
+            return imageSize.y;
+        },
+        setWidth: function(width: number) {},
+        setHeight: function(height: number) {},
+        setTopRight: function() {},
+        setCanvasSize: function() {},
+        getConfig: function() {
+            return streamConfig;
+        },
+    };
+
+    let streamConfig: AreaConfig | {} = { };
 
     beforeEach(function() {
         imageSize = {
             x: 640, y: 480,
         };
-        config = merge({}, Config);
+        config = merge({}, QuaggaConfig);
         inputStream = {
             getWidth: function() {
                 return imageSize.x;
@@ -40,13 +66,16 @@ describe('checkImageConstraints', function() {
     });
 
     afterEach(function() {
-        inputStream.setWidth.restore();
-        inputStream.setHeight.restore();
+        ((inputStream.setWidth) as SinonSpy).restore();
+        ((inputStream.setHeight) as SinonSpy).restore();
     });
 
     it('should not adjust the image-size if not needed', function() {
+        console.warn('* image size=', JSON.stringify(imageSize));
         var expected = {x: imageSize.x, y: imageSize.y};
+        console.warn('* inputStream before=', inputStream.getWidth(), inputStream.getHeight());
         BarcodeLocator.checkImageConstraints(inputStream, config.locator);
+        console.warn('* inputStream after=', inputStream.getWidth(), inputStream.getHeight());
         expect(inputStream.getWidth()).to.be.equal(expected.x);
         expect(inputStream.getHeight()).to.be.equal(expected.y);
     });
@@ -96,8 +125,8 @@ describe('checkImageConstraints', function() {
         BarcodeLocator.checkImageConstraints(inputStream, config.locator);
         expect(inputStream.getHeight()).to.be.equal(expectedSize.y);
         expect(inputStream.getWidth()).to.be.equal(expectedSize.x);
-        expect(inputStream.setTopRight.getCall(0).args[0]).to.deep.equal(expectedTopRight);
-        expect(inputStream.setCanvasSize.getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
+        expect(((inputStream.setTopRight) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedTopRight);
+        expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
     });
 
     it('should return the original size if set to full image', function() {
@@ -125,7 +154,7 @@ describe('checkImageConstraints', function() {
         BarcodeLocator.checkImageConstraints(inputStream, config.locator);
         expect(inputStream.getHeight()).to.be.equal(expectedSize.y);
         expect(inputStream.getWidth()).to.be.equal(expectedSize.x);
-        expect(inputStream.setTopRight.getCall(0).args[0]).to.deep.equal(expectedTopRight);
-        expect(inputStream.setCanvasSize.getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
+        expect(((inputStream.setTopRight) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedTopRight);
+        expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
     });
 });
