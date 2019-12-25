@@ -2,6 +2,9 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
+import { SubImage } from '../src/common/subImage';
+export { SubImage };
+
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
@@ -11,14 +14,6 @@ export type XYSize = {
 };
 
 export type QuaggaImageData = Array<number>;
-
-export class SubImage {
-    constructor(from: XYSize, size: XYSize, I: ImageWrapper);
-    show(canvas: HTMLCanvasElement, scale: number): void;
-    get(x: number, y: number): number;
-    updateData(image: ImageWrapper): void;
-    updateFrom(from: XYSize): SubImage;
-}
 
 export class ImageWrapper {
     size: XYSize;
