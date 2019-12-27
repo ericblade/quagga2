@@ -2,8 +2,9 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
-import { SubImage } from '../src/common/subImage';
-export { SubImage };
+import SubImage from '../src/common/subImage';
+import ImageWrapper from '../src/common/image_wrapper';
+export { SubImage, ImageWrapper };
 
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
@@ -14,28 +15,6 @@ export type XYSize = {
 };
 
 export type QuaggaImageData = Array<number>;
-
-export class ImageWrapper {
-    size: XYSize;
-    data: Array<number>;
-    indexMapping: Array<number>;
-    // TODO: i don't think "Array<number>" is right here for data, but not sure what it should be
-    constructor(size: XYSize, data?: Array<number>, ArrayType?: boolean, initialize?: boolean);
-    inImageWithBorder(imgRef: XYSize, border: number): SubImage;
-    subImage(from: XYSize, size: XYSize): SubImage;
-    subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): SubImage;
-    copyTo(imageWrapper: ImageWrapper): void;
-    get(x: number, y: number): number;
-    getSafe(x: number, y: number): number;
-    set(x: number, y: number, value: number): ImageWrapper;
-    zeroBorder(): void;
-    invert(): void;
-    convolve(): void;
-    moments(labelcount: number): Array<number>;
-    getAsRGBA(scale?: number): Uint8ClampedArray;
-    show(canvas: HTMLCanvasElement, scale?: number): void;
-    overlay(canvas: HTMLCanvasElement, scale: number, from: XYSize): void;
-}
 
 export interface QuaggaJSStatic {
     /**
@@ -541,3 +520,25 @@ export interface QuaggaBuildEnvironment {
     development?: boolean;
     node?: boolean;
 }
+
+export type TypedArrayConstructor =
+    Int8ArrayConstructor
+    | Uint8ArrayConstructor
+    | Uint8ClampedArrayConstructor
+    | Int16ArrayConstructor
+    | Uint16ArrayConstructor
+    | Int32ArrayConstructor
+    | Uint32ArrayConstructor
+    | Float32ArrayConstructor
+    | Float64ArrayConstructor;
+
+export type TypedArray =
+    Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array;

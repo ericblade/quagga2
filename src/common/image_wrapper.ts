@@ -1,4 +1,3 @@
-import SubImage from './subImage';
 import { hsv2rgb } from './cv_utils';
 import ArrayHelper from '../common/array_helper';
 import { clone } from 'gl-vec2';
@@ -18,7 +17,7 @@ declare interface moment {
 }
 
 class ImageWrapper {
-    data: TypedArray;
+    data: TypedArray | Array<number>;
     size: XYSize;
     indexMapping?: {
         x: Array<number>,
@@ -27,12 +26,15 @@ class ImageWrapper {
 
     // Represents a basic image combining the data and size. In addition, some methods for
     // manipulation are contained within.
-    constructor(size: XYSize, data?: ArrayLike<any>, ArrayType: TypedArrayConstructor = Uint8Array, initialize?: boolean) {
-        const inData = data ? ArrayType.from(data) : new ArrayType(size.x * size.y);
-        if (initialize) {
-            ArrayHelper.init(inData, 0);
+    constructor(size: XYSize, data?: TypedArray | Array<number>, ArrayType: TypedArrayConstructor | ArrayConstructor = Uint8Array, initialize?: boolean) {
+        if (!data) {
+            this.data = new (ArrayType)(size.x * size.y);
+            if (initialize) {
+                ArrayHelper.init(this.data, 0);
+            }
+        } else {
+            this.data = data;
         }
-        this.data = inData;
         this.size = size;
     }
 
@@ -42,29 +44,6 @@ class ImageWrapper {
             && (imgRef.y >= border)
             && (imgRef.x < (this.size.x - border))
             && (imgRef.y < (this.size.y - border));
-    }
-
-    // Performs bilinear sampling, returns sampled value from the x,y coordinate
-    sample(inImg: ImageWrapper, x: number, y: number) {
-        var lx = Math.floor(x);
-        var ly = Math.floor(y);
-        var w = inImg.size.x;
-        var base = ly * inImg.size.x + lx;
-        var a = inImg.data[base + 0];
-        var b = inImg.data[base + 1];
-        var c = inImg.data[base + w];
-        var d = inImg.data[base + w + 1];
-        var e = a - b;
-        x -= lx;
-        y -= ly;
-
-        var result = Math.floor(x * (y * (e - c + d) - e) + y * (c - a) + a);
-        return result;
-    }
-
-    // Create a SubImage from the current image
-    subImage(from: XYSize, size: XYSize) {
-        return new SubImage(from, size, this);
     }
 
     // Copy from the top-left from location of this image to the ImageWrapper provided, up to the
@@ -83,16 +62,6 @@ class ImageWrapper {
         // ImageWrapper.UpdateFrom()
         // that might take a provided data and size, and make sure there's no invalid indexMapping
         // hanging around, and such.
-    }
-
-    // make a deep copy of this ImageWrapper into the new imageWrapper
-    copyTo(imageWrapper: ImageWrapper) {
-        let l = this.data.length;
-        while (l--) {
-            imageWrapper.data[length] = this.data[length];
-        }
-        // imageWrapper.size = { ...this.size };
-        // TODO: ImageWrapper.UpdateFrom()
     }
 
     // Retrieve a grayscale value at the given pixel position of the image
@@ -142,34 +111,6 @@ class ImageWrapper {
         return this;
     }
 
-    // Inverts a binary image in place
-    invert() {
-        let l = this.data.length;
-        while (l--) {
-            this.data[length] = this.data[length] ? 0 : 1;
-        }
-        delete this.indexMapping;
-        return this;
-    }
-
-    // Convolve
-    convolve(kernel: ArrayLike<any>) {
-        const kSize = (kernel.length / 2) | 0;
-        let accu = 0;
-        for(let y = 0; y < this.size.y; y++) {
-            for(let x = 0; x < this.size.x; x++) {
-                accu = 0;
-                for(let ky = -kSize; ky <= kSize; ky++) {
-                    for (let kx = -kSize; kx <= kSize; kx++) {
-                        accu += kernel[ky + kSize][kx + kSize] * this.getSafe(x + kx, y + ky);
-                    }
-                }
-                this.data[y * this.size.x + x] = accu;
-            }
-        }
-        return this;
-    }
-
     // TODO: this function is entirely too large for me to reason out right at this moment that i'm handling
     // all the rest of it, so this is a verbatim copy of the javascript source, with only tweaks
     // necessary to get it to run, no thought put into it yet.
@@ -190,7 +131,7 @@ class ImageWrapper {
             x_,
             y_,
             tmp,
-            result: Array<any> = [],
+            result: Array<moment> = [],
             PI = Math.PI,
             PI_4 = PI / 4;
 

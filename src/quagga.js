@@ -556,6 +556,7 @@ export default {
         // workers require Worker and Blob support presently, so if no Blob or Worker then set
         // workers to 0.
         if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
+            console.warn('* no Worker and/or Blob support - forcing numOfWorkers to 0');
             config.numOfWorkers = 0;
         }
         return new Promise((resolve, reject) => {

@@ -11,6 +11,4 @@ const QuaggaConfig: QuaggaJSConfigObject = ENV.development
         ? NodeConfig
         : ProdConfig;
 
-console.warn('* QuaggaConfig=', JSON.stringify(QuaggaConfig));
-
 export default QuaggaConfig;

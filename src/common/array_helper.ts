@@ -1,9 +1,7 @@
-// TODO: it seems these are intended to be used on Numbers, we should probably see if that's the
-// case by switching all the Array<any> to Array<Number> and see what happens.
-// TODO: Most all of these functions can be redone with Array#reduce
+import { TypedArray } from "../../type-definitions/quagga";
 
 export default {
-    init: function(arr: Array<number>, val: number) {
+    init: function(arr: TypedArray | Array<any>, val: any) {
         // arr.fill(val);
         let l = arr.length;
         while (l--) {
