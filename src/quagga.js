@@ -541,6 +541,22 @@ export default {
     },
     canvas: _canvasContainer,
     decodeSingle: function(config, resultCallback) {
+        if (this.inDecodeSingle) {
+            console.warn('* running multiple decodes in serial');
+            // force multiple calls to decodeSingle to run in serial, because presently
+            // simultaneous running breaks things.
+            if (resultCallback) {
+                setTimeout(() => this.decodeSingle(config, resultCallback), 300);
+            } else {
+                return new Promise((resolve) => {
+                    setTimeout(() => this.decodeSingle(config, (res) => {
+                        resolve(res);
+                    }, 300));
+                });
+            }
+            return null;
+        }
+        this.inDecodeSingle = true;
         config = merge({
             inputStream: {
                 type: 'ImageStream',
@@ -568,10 +584,12 @@ export default {
                             resultCallback.call(null, result);
                         }
                         resolve(result);
+                        this.inDecodeSingle = false;
                     }, true);
                     start();
                 });
             } catch (err) {
+                this.inDecodeSingle = false;
                 reject(err);
             }
         });

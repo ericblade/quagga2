@@ -325,7 +325,7 @@ export default {
 
                 if (multiple) {
                     return {
-                        barcodes
+                        barcodes,
                     };
                 }
             },
