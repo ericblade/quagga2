@@ -25,7 +25,7 @@ describe('decodeSingle', function () {
         };
     }
 
-    this.timeout(10000);
+    this.timeout(20000);
 
     function _runTestSet(testSet, config, formatOverride) {
         var readers = config.decoder.readers.slice(),
@@ -362,7 +362,7 @@ describe('decodeSingle', function () {
     });
 
     describe('2of5', function() {
-        var config = config = {
+        var config = {
                 inputStream: {
                     size: 800,
                     singleChannel: false,
@@ -399,7 +399,7 @@ describe('decodeSingle', function () {
     });
 
     describe('code_93', function() {
-        var config = config = {
+        var config = {
                 inputStream: {
                     size: 800,
                     singleChannel: false,
