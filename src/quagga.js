@@ -3,12 +3,12 @@ import ImageWrapper from './common/image_wrapper';
 import BarcodeLocator from './locator/barcode_locator';
 import BarcodeDecoder from './decoder/barcode_decoder';
 import Events from './common/events';
-import CameraAccess from './input/camera_access';
-import ImageDebug from './common/image_debug';
-import ResultCollector from './analytics/result_collector';
+import CameraAccess from './input/camera_access.ts';
+import ImageDebug from './common/image_debug.ts';
+import ResultCollector from './analytics/result_collector.ts';
 import Config from './config/config';
-import InputStream from 'input_stream';
-import FrameGrabber from 'frame_grabber';
+import InputStream from './input/input_stream';
+import FrameGrabber from './input/frame_grabber';
 import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
 const vec2 = { clone };
@@ -556,6 +556,7 @@ export default {
         // workers require Worker and Blob support presently, so if no Blob or Worker then set
         // workers to 0.
         if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
+            console.warn('* no Worker and/or Blob support - forcing numOfWorkers to 0');
             config.numOfWorkers = 0;
         }
         return new Promise((resolve, reject) => {

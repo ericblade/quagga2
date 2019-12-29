@@ -1,7 +1,23 @@
-export default (function() {
-    var events = {};
+type EventName = string;
 
-    function getEvent(eventName) {
+declare interface EventData {
+    subscribers: Array<any>,
+};
+
+declare interface Events {
+    [key: string]: EventData,
+};
+
+declare interface Subscription {
+    async?: boolean,
+    callback: Function,
+    once?: boolean,
+};
+
+export default (function() {
+    let events: Events = {};
+
+    function getEvent(eventName: EventName) {
         if (!events[eventName]) {
             events[eventName] = {
                 subscribers: [],
@@ -14,7 +30,7 @@ export default (function() {
         events = {};
     }
 
-    function publishSubscription(subscription, data) {
+    function publishSubscription(subscription: Subscription, data: any) {
         if (subscription.async) {
             setTimeout(function() {
                 subscription.callback(data);
@@ -24,8 +40,8 @@ export default (function() {
         }
     }
 
-    function subscribe(event, callback, async) {
-        var subscription;
+    function subscribe(event: EventName, callback: Function | Subscription, async?: boolean) {
+        let subscription;
 
         if ( typeof callback === 'function') {
             subscription = {
@@ -43,10 +59,10 @@ export default (function() {
     }
 
     return {
-        subscribe: function(event, callback, async) {
+        subscribe: function(event: EventName, callback: Function | Subscription, async?: boolean) {
             return subscribe(event, callback, async);
         },
-        publish: function(eventName, data) {
+        publish: function(eventName: EventName, data: any) {
             var event = getEvent(eventName),
                 subscribers = event.subscribers;
 
@@ -67,14 +83,14 @@ export default (function() {
                 publishSubscription(subscriber, data);
             });
         },
-        once: function(event, callback, async) {
+        once: function(event: EventName, callback: Function, async: boolean) {
             subscribe(event, {
                 callback: callback,
                 async: async,
                 once: true,
             });
         },
-        unsubscribe: function(eventName, callback) {
+        unsubscribe: function(eventName: EventName, callback: Function | Subscription) {
             var event;
 
             if (eventName) {

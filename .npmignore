@@ -10,7 +10,6 @@ _includes/
 .idea/
 doc/
 src/
-tasks/
 .gitignore
 *.BACKUP.*
 *.BASE.*

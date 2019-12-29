@@ -1,34 +1,36 @@
+/* eslint-disable no-unused-expressions */
 import CameraAccess, {pickConstraints} from '../../src/input/camera_access';
-import {setDevices, setStream, getConstraints, setSupported} from 'mediaDevices';
+import {setStream, getConstraints, setSupported, enumerateDevices, getUserMedia} from 'mediaDevices';
+import sinon from 'sinon';
 
 var originalURL,
     originalMediaStreamTrack,
     video,
-    stream,
-    devices = [];
+    stream;
 
-describe("camera_access", () => {
+describe('camera_access', () => {
+    let mediaDevicesStubbed = false;
     beforeEach(function() {
         var tracks = [{
-            stop: function() {}
+            stop: function() {},
         }];
 
         originalURL = window.URL;
         originalMediaStreamTrack = window.MediaStreamTrack;
         window.MediaStreamTrack = {};
         window.URL = {
-            createObjectURL(stream) {
-                return stream;
-            }
+            createObjectURL(newStream) {
+                return newStream;
+            },
         };
 
         stream = {
             getVideoTracks: function() {
                 return tracks;
-            }
+            },
         };
         setStream(stream);
-        sinon.spy(tracks[0], "stop");
+        sinon.spy(tracks[0], 'stop');
 
         video = {
             srcObject: null,
@@ -37,61 +39,72 @@ describe("camera_access", () => {
             setAttribute: sinon.spy(),
             play: function() {},
             videoWidth: 320,
-            videoHeight: 480
+            videoHeight: 480,
         };
-        sinon.stub(video, "addEventListener", function(event, cb) {
+        sinon.stub(video, 'addEventListener').callsFake(function(event, cb) {
             cb();
         });
-        sinon.stub(video, "play");
+        if (!navigator.mediaDevices) {
+            mediaDevicesStubbed = true;
+            navigator.mediaDevices = {
+                enumerateDevices,
+                getUserMedia,
+            };
+        }
+        sinon.stub(video, 'play');
     });
 
     afterEach(function() {
         window.URL = originalURL;
         window.MediaStreamTrack = originalMediaStreamTrack;
+        if (mediaDevicesStubbed) {
+            mediaDevicesStubbed = false;
+            delete navigator.mediaDevices;
+        }
     });
 
     describe('success', function() {
         describe('request', function () {
             it('should request the camera', function (done) {
                 CameraAccess.request(video, {})
-                .then(function () {
-                    expect(video.srcObject).to.deep.equal(stream);
-                    done();
-                })
+                    .then(function () {
+                        expect(video.srcObject).to.deep.equal(stream);
+                        done();
+                    });
             });
 
-            it("should allow deprecated constraints to be used", (done) => {
+            it('should allow deprecated constraints to be used', (done) => {
                 CameraAccess.request(video, {
                     width: 320,
                     height: 240,
-                    facing: "user",
+                    facing: 'user',
                     minAspectRatio: 2,
-                    maxAspectRatio: 100
+                    maxAspectRatio: 100,
                 })
-                .then(function () {
-                    const constraints = getConstraints();
-                    expect(constraints.video.width).to.equal(320);
-                    expect(constraints.video.height).to.equal(240);
-                    expect(constraints.video.facingMode).to.equal("user");
-                    expect(constraints.video.aspectRatio).to.equal(2);
-                    expect(constraints.video.facing).not.to.be.defined;
-                    expect(constraints.video.minAspectRatio).not.to.be.defined;
-                    expect(constraints.video.maxAspectRatio).not.to.be.defined;
-                    done();
-                })
+                    .then(function () {
+                        const constraints = getConstraints();
+                        expect(constraints.video.width).to.equal(320);
+                        expect(constraints.video.height).to.equal(240);
+                        expect(constraints.video.facingMode).to.equal('user');
+                        expect(constraints.video.aspectRatio).to.equal(2);
+                        expect(constraints.video.facing).not.to.be.defined;
+                        expect(constraints.video.minAspectRatio).not.to.be.defined;
+                        expect(constraints.video.maxAspectRatio).not.to.be.defined;
+                        done();
+                    });
             });
         });
 
         describe('release', function () {
             it('should release the camera', function (done) {
                 CameraAccess.request(video, {})
-                .then(function () {
-                    expect(video.srcObject).to.deep.equal(stream);
-                    CameraAccess.release();
-                    expect(video.srcObject.getVideoTracks()).to.have.length(1);
-                    expect(video.srcObject.getVideoTracks()[0].stop.calledOnce).to.equal(true);
-                    done();
-                });
+                    .then(function () {
+                        expect(video.srcObject).to.deep.equal(stream);
+                        CameraAccess.release();
+                        expect(video.srcObject.getVideoTracks()).to.have.length(1);
+                        expect(video.srcObject.getVideoTracks()[0].stop.calledOnce).to.equal(true);
+                        done();
+                    });
             });
         });
     });
@@ -105,53 +118,53 @@ describe("camera_access", () => {
             setSupported(true);
         });
 
-        describe("permission denied", function(){
+        describe('permission denied', function(){
             it('should throw if getUserMedia not available', function(done) {
                 CameraAccess.request(video, {})
-                .catch(function (err) {
-                    expect(err).to.be.defined;
-                    done();
-                });
+                    .catch(function (err) {
+                        expect(err).to.be.defined;
+                        done();
+                    });
             });
         });
 
-        describe("not available", function(){
+        describe('not available', function(){
             var originalGetUserMedia;
 
             it('should throw if getUserMedia not available', function(done) {
                 CameraAccess.request(video, {})
-                .catch((err) => {
-                    expect(err).to.be.defined;
-                    done();
-                });
+                    .catch((err) => {
+                        expect(err).to.be.defined;
+                        done();
+                    });
             });
         });
 
-        describe("pickConstraints", () => {
-            it("should return the given constraints if no facingMode is defined", (done) => {
+        describe('pickConstraints', () => {
+            it('should return the given constraints if no facingMode is defined', (done) => {
                 const givenConstraints = {width: 180};
                 return pickConstraints(givenConstraints).then((actualConstraints) => {
                     expect(actualConstraints.video).to.deep.equal(givenConstraints);
                     done();
                 })
-                .catch((err) => {
-                    expect(err).to.equal(null);
-                    console.log(err);
-                    done();
-                });
+                    .catch((err) => {
+                        expect(err).to.equal(null);
+                        console.log(err);
+                        done();
+                    });
             });
 
-            it("should return the given constraints if deviceId is defined", (done) => {
-                const givenConstraints = {width: 180, deviceId: "4343"};
+            it('should return the given constraints if deviceId is defined', (done) => {
+                const givenConstraints = {width: 180, deviceId: '4343'};
                 return pickConstraints(givenConstraints).then((actualConstraints) => {
                     expect(actualConstraints.video).to.deep.equal(givenConstraints);
                     done();
                 })
-                .catch((err) => {
-                    expect(err).to.equal(null);
-                    console.log(err);
-                    done();
-                });
+                    .catch((err) => {
+                        expect(err).to.equal(null);
+                        console.log(err);
+                        done();
+                    });
             });
         });
     });

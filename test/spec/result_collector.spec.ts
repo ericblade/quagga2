@@ -1,10 +1,22 @@
+/// <reference path="mocha">
+
 import ResultCollector from '../../src/analytics/result_collector';
 import ImageDebug from '../../src/common/image_debug';
+import { XYSize, QuaggaJSResultCollector, QuaggaJSCodeResult } from '../../type-definitions/quagga';
+// import { describe, beforeEach, afterEach, it } from 'mocha';
+import { expect } from 'chai';
+import sinon, { SinonSpy } from 'sinon';
 
-var canvasMock,
-    imageSize,
-    config;
+interface MockCanvas {
+    getContext(): {};
+    toDataURL: sinon.SinonSpy;
+    width: number;
+    height: number;
+}
 
+let canvasMock: MockCanvas;
+let imageSize: XYSize;
+let config: QuaggaJSResultCollector;
 
 describe("resultCollector", () => {
     beforeEach(function() {
@@ -25,33 +37,34 @@ describe("resultCollector", () => {
             width: 0,
             height: 0
         };
-        sinon.stub(document, "createElement", function(type) {
-            if (type === "canvas") {
-                return canvasMock;
+        sinon.stub(document, 'createElement').callsFake((type) => {
+            if (type === 'canvas') {
+                return canvasMock as unknown as HTMLElement; // forcing type, eh
             }
+            return undefined as unknown as HTMLElement;
         });
     });
 
     afterEach(function() {
-        document.createElement.restore();
+        (document.createElement as SinonSpy).restore();
     });
 
 
     describe('create', function () {
         it("should return a new collector", function() {
             ResultCollector.create(config);
-            expect(document.createElement.calledOnce).to.be.equal(true);
-            expect(document.createElement.getCall(0).args[0]).to.equal("canvas");
+            expect( (document.createElement as SinonSpy).calledOnce).to.be.equal(true);
+            expect( (document.createElement as SinonSpy).getCall(0).args[0]).to.equal("canvas");
         });
     });
 
     describe('addResult', function() {
         beforeEach(function() {
-            sinon.stub(ImageDebug, "drawImage", function() {});
+            sinon.stub(ImageDebug, 'drawImage').callsFake(() => { return true; });
         });
 
         afterEach(function() {
-            ImageDebug.drawImage.restore();
+            (ImageDebug.drawImage as SinonSpy).restore();
         });
 
         it("should not add result if capacity is full", function(){
@@ -63,18 +76,17 @@ describe("resultCollector", () => {
             expect(collector.getResults()).to.have.length(1);
         });
 
-        it("should only add results which match constraints", function(){
-            var collector = ResultCollector.create(config),
-                results;
+        it("should only add results which match constraints", function() {
+            const collector = ResultCollector.create(config);
 
             collector.addResult([], imageSize, {code: "423423443", format: "ean_13"});
             collector.addResult([], imageSize, {code: "3574660239843", format: "ean_13"});
             collector.addResult([], imageSize, {code: "3574660239843", format: "code_128"});
 
-            results = collector.getResults();
+            const results = collector.getResults();
             expect(results).to.have.length(2);
 
-            results.forEach(function(result) {
+            results.forEach(function(result: QuaggaJSCodeResult) {
                 expect(result).not.to.deep.equal(config.blacklist[0]);
             });
         });

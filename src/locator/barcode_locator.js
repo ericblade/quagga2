@@ -9,8 +9,8 @@ import {
     halfSample,
     computeImageArea,
 } from '../common/cv_utils';
-import ArrayHelper from '../common/array_helper';
-import ImageDebug from '../common/image_debug';
+import ArrayHelper from '../common/array_helper.ts';
+import ImageDebug from '../common/image_debug.ts';
 import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';

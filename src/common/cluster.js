@@ -1,3 +1,6 @@
+// TODO: cluster.js and cv_utils.js are pretty tightly intertwined, making for a complex conversion
+// into typescript. be warned. :-)
+
 import { clone, dot } from 'gl-vec2';
 const vec2 = { clone, dot };
 

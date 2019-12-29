@@ -1,5 +1,5 @@
 import Cluster2 from './cluster';
-import ArrayHelper from './array_helper';
+import ArrayHelper from './array_helper.ts';
 import { clone as v2clone } from 'gl-vec2';
 import { clone as v3clone } from 'gl-vec3';
 

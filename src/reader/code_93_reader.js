@@ -1,5 +1,5 @@
 import BarcodeReader from './barcode_reader';
-import ArrayHelper from '../common/array_helper';
+import ArrayHelper from '../common/array_helper.ts';
 
 function Code93Reader() {
     BarcodeReader.call(this);

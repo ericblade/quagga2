@@ -2,44 +2,19 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
+import SubImage from '../src/common/subImage';
+import ImageWrapper from '../src/common/image_wrapper';
+export { SubImage, ImageWrapper };
 
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
-type XYSize = {
+export type XYSize = {
     x: number,
     y: number,
 };
 
-export class SubImage {
-    constructor(from: XYSize, size: XYSize, I: ImageWrapper);
-    show(canvas: HTMLCanvasElement, scale: number): void;
-    get(x: number, y: number): number;
-    updateData(image: ImageWrapper): void;
-    updateFrom(from: XYSize): SubImage;
-}
-
-export class ImageWrapper {
-    size: XYSize;
-    data: Array<number>;
-    indexMapping: Array<number>;
-    // TODO: i don't think "Array<number>" is right here for data, but not sure what it should be
-    constructor(size: XYSize, data?: Array<number>, ArrayType?: boolean, initialize?: boolean);
-    inImageWithBorder(imgRef: XYSize, border: number): SubImage;
-    subImage(from: XYSize, size: XYSize): SubImage;
-    subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): SubImage;
-    copyTo(imageWrapper: ImageWrapper): void;
-    get(x: number, y: number): number;
-    getSafe(x: number, y: number): number;
-    set(x: number, y: number, value: number): ImageWrapper;
-    zeroBorder(): void;
-    invert(): void;
-    convolve(): void;
-    moments(labelcount: number): Array<number>;
-    getAsRGBA(scale?: number): Uint8ClampedArray;
-    show(canvas: HTMLCanvasElement, scale?: number): void;
-    overlay(canvas: HTMLCanvasElement, scale: number, from: XYSize): void;
-}
+export type QuaggaImageData = Array<number>;
 
 export interface QuaggaJSStatic {
     /**
@@ -154,7 +129,7 @@ export interface QuaggaJSStatic {
  * Used for accessing information about the active stream track and available video devices.
  */
 export interface QuaggaJSCameraAccess {
-    request(video: HTMLVideoElement, videoConstraints: QuaggaJSConstraints): Promise<void>;
+    request(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<void>;
 
     release(): void;
 
@@ -206,6 +181,7 @@ export interface QuaggaJSDebugDrawRect {
  * another array is the x or y value.
  * typical values 0, 1, 'x', 'y'
  */
+// TODO: remove QuaggaJSxyDef from global type-defs (it's only used in image_debug, i think, which has a local definition)
 export interface QuaggaJSxyDef {
     x: any;
     y: any;
@@ -259,7 +235,7 @@ export interface QuaggaJSResultCollector {
      * a list of codes that should not be recorded. This is effectively a list
      * of filters that return false.
      */
-    blacklist?: QuaggaJSCodeResult;
+    blacklist?: Array<QuaggaJSCodeResult>;
 
     /**
      * passed a QuaggaJSCodeResult, return true if you want this to be stored,
@@ -310,6 +286,7 @@ export interface QuaggaJSResultObject {
     pattern: number[];
     box: number[][];
     boxes: number[][][];
+    frame?: string;
 }
 
 export interface QuaggaJSResultObject_CodeResult {
@@ -361,7 +338,7 @@ export interface QuaggaJSConfigObject {
 
         target?: HTMLElement,
 
-        constraints?: QuaggaJSConstraints;
+        constraints?: MediaTrackConstraints;
 
         /**
          * defines rectangle of the detection/localization area. Useful when you
@@ -527,41 +504,41 @@ export interface QuaggaJSConfigObject {
     };
 }
 
-export interface QuaggaJSConstraints {
-    /**
-     * @default 640
-     */
-    width?: number;
-
-    /**
-     * @default 480
-     */
-    height?: number;
-
-    /**
-     * In cases where height/width does not suffice
-     */
-    aspectRatio?: number;
-    minAspectRatio?: number;
-    maxAspectRatio?: number;
-
-    /**
-     * @default "environment"
-     */
-    facingMode?: string;
-
-    /**
-     * Explicitly set the camera to the user's choice
-     */
-    deviceId?: string
-}
-
-/**
- * Used for extending a reader with supplements (ex: EAN-2, EAN-5)
- */
 export interface QuaggaJSReaderConfig {
     format: string;
     config: {
         supplements: string[];
     }
 }
+
+export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
+    minAspectRatio?: number;
+    facing?: string;
+}
+
+export interface QuaggaBuildEnvironment {
+    development?: boolean;
+    node?: boolean;
+}
+
+export type TypedArrayConstructor =
+    Int8ArrayConstructor
+    | Uint8ArrayConstructor
+    | Uint8ClampedArrayConstructor
+    | Int16ArrayConstructor
+    | Uint16ArrayConstructor
+    | Int32ArrayConstructor
+    | Uint32ArrayConstructor
+    | Float32ArrayConstructor
+    | Float64ArrayConstructor;
+
+export type TypedArray =
+    Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array;

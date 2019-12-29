@@ -1,20 +1,23 @@
 import ArrayHelper from '../../src/common/array_helper';
+import { expect } from 'chai';
+import sinon from 'sinon';
 
 describe('init', function() {
     it('initializes an array with the given value', function() {
-        var input = [0, 0, 0];
+        const input = [0, 0, 0];
         ArrayHelper.init(input, 5);
         expect(input).to.deep.equal([5, 5, 5]);
     });
 });
 
 describe('shuffle', function() {
+    let MathStub: sinon.SinonStub;
     before(function() {
-        sinon.stub(Math, 'random').returns(0.5);
+        MathStub = sinon.stub(Math as any, 'random').returns(0.5); // TODO: remove as any, and fix this type def issue
     });
 
     after(function() {
-        sinon.restore(Math);
+        MathStub.restore();
     });
     it('shuffles the content of an array', function() {
         var input = [1, 2, 3];
@@ -25,7 +28,7 @@ describe('shuffle', function() {
 describe('toPointList', function() {
     it('converts an Array to a List of points', function() {
         var input = [[1, 2], [2, 2], [3, 2]];
-        expect(ArrayHelper.toPointList(input)).to.equal("[[1,2],\r\n[2,2],\r\n[3,2]]");
+        expect(ArrayHelper.toPointList(input)).to.equal('[[1,2],\r\n[2,2],\r\n[3,2]]');
     });
 });
 

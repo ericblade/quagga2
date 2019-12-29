@@ -4,12 +4,12 @@ module.exports = function(grunt) {
         pkg: grunt.file.readJSON('package.json'),
         karma: {
             unit: {
-                configFile: 'karma.conf.js'
+                configFile: 'karma.conf.js',
             },
             integration: {
-                configFile: 'karma-integration.conf.js'
-            }
-        }
+                configFile: 'karma-integration.conf.js',
+            },
+        },
     });
 
     grunt.loadNpmTasks('grunt-karma');

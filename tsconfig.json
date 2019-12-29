@@ -1,13 +1,34 @@
 {
     "compilerOptions": {
-        "target": "esnext",
-        "allowJs": true,
+        "noEmit": true,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitAny": true/* Raise error on expressions and declarations with an implied 'any' type. */,
+        "allowSyntheticDefaultImports": true /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */,
+        "sourceMap": true /* Generates corresponding '.map' file. */,
+        "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
+        "jsx": "react" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
+        "types": [
+            "react"
+        ] /* Type declaration files to be included in compilation. */,
+        "module": "esNext" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
+        "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,
+        "experimentalDecorators": true /* Enables experimental support for ES7 decorators. */,
+        "declaration": false /* Generates corresponding '.d.ts' file. */,
+        "removeComments": true /* Do not emit comments to output. */,
+        "noImplicitReturns": true /* Report error when not all code paths in function return a value. */,
+        "noUnusedLocals": true /* Report errors on unused locals. */,
+        "strict": true /* Enable all strict type-checking options. */,
+        "outDir": "dist" /* Redirect output structure to the directory. */,
+        "baseUrl": "src" /* Base directory to resolve non-absolute module names. */,
+        "typeRoots": [
+            "./type-definitions",
+            "node_modules/@types"
+        ] /* List of folders to include type definitions from. */,
+        "strictNullChecks": true /* Enable strict null checks. */,
+        "allowJs": true /* Allow javascript files to be compiled. */,
         "checkJs": false
     },
-    "exclude": [
-        "node_modules",
-        "dist",
-        "test",
-        "tasks"
+    "include": [
+        "./src/**/*"
     ]
 }
