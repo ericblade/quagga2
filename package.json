@@ -50,10 +50,10 @@
     "mocha": "^2.3.2",
     "phantomjs": "^2.1.7",
     "sinon": "5.1.1",
-    "sinon-chai": "^3.3.0",
+    "sinon-chai": "^3.4.0",
     "source-map-loader": "^0.2.4",
     "typescript": "^3.7.4",
-    "webpack": "^4.41.4",
+    "webpack": "^4.41.5",
     "webpack-cli": "^3.3.10",
     "webpack-sources": "^1.4.3"
   },
