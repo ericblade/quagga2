@@ -63,10 +63,10 @@ class BarcodeReader {
     }
     _matchTrace(cmpCounter, epsilon) {
         var counter = [], i, self = this, offset = self._nextSet(self._row), isWhite = !self._row[offset], counterPos = 0, bestMatch = {
-            error: Number.MAX_VALUE,
-            code: -1,
-            start: 0,
-        }, error;
+                error: Number.MAX_VALUE,
+                code: -1,
+                start: 0,
+            }, error;
         if (cmpCounter) {
             for (i = 0; i < cmpCounter.length; i++) {
                 counter.push(0);
@@ -74,8 +74,7 @@ class BarcodeReader {
             for (i = offset; i < self._row.length; i++) {
                 if (self._row[i] ^ isWhite) {
                     counter[counterPos]++;
-                }
-                else {
+                } else {
                     if (counterPos === counter.length - 1) {
                         error = self._matchPattern(counter, cmpCounter);
                         if (error < epsilon) {
@@ -83,26 +82,22 @@ class BarcodeReader {
                             bestMatch.end = i;
                             bestMatch.counter = counter;
                             return bestMatch;
-                        }
-                        else {
+                        } else {
                             return null;
                         }
-                    }
-                    else {
+                    } else {
                         counterPos++;
                     }
                     counter[counterPos] = 1;
                     isWhite = !isWhite;
                 }
             }
-        }
-        else {
+        } else {
             counter.push(0);
             for (i = offset; i < self._row.length; i++) {
                 if (self._row[i] ^ isWhite) {
                     counter[counterPos]++;
-                }
-                else {
+                } else {
                     counterPos++;
                     counter.push(0);
                     counter[counterPos] = 1;
@@ -128,8 +123,7 @@ class BarcodeReader {
                 result.start = self._row.length - result.start;
                 result.end = self._row.length - result.end;
             }
-        }
-        else {
+        } else {
             result.direction = BarcodeReader.DIRECTION.FORWARD;
         }
         if (result) {
@@ -156,8 +150,7 @@ class BarcodeReader {
         for (i = offset; i < end; i++) {
             if (self._row[i] ^ isWhite) {
                 counters[counterPos]++;
-            }
-            else {
+            } else {
                 counterPos++;
                 counters[counterPos] = 1;
                 isWhite = !isWhite;
@@ -171,13 +164,11 @@ class BarcodeReader {
         for (i = start; i < end; i++) {
             if (self._row[i] ^ isWhite) {
                 counter[counterPos]++;
-            }
-            else {
+            } else {
                 counterPos++;
                 if (counterPos === numCounters) {
                     break;
-                }
-                else {
+                } else {
                     counter[counterPos] = 1;
                     isWhite = !isWhite;
                 }

@@ -70,7 +70,7 @@ function initBuffers() {
     _skeletonizer = skeletonizer(
         (typeof window !== 'undefined') ? window : (typeof self !== 'undefined') ? self : global,
         { size: _patchSize.x },
-        skeletonImageData
+        skeletonImageData,
     );
 
     _imageToPatchGrid = new ImageWrapper({
