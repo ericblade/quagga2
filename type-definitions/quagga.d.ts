@@ -2,12 +2,66 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
-import SubImage from '../src/common/subImage';
-import ImageWrapper from '../src/common/image_wrapper';
-export { SubImage, ImageWrapper };
+// import SubImage from '../src/common/subImage';
+// import ImageWrapper from '../src/common/image_wrapper';
+// export { SubImage, ImageWrapper };
 
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
+
+// TODO: fill this in from cv_utils#imageRef
+export type ImageRef = {
+    x: number,
+    y: number,
+}
+
+export type SparseImageWrapper = { data: TypedArray | Array<number> | null, size: ImageRef };
+
+export interface WrapperIndexMapping {
+    x: Array<number>;
+    y: Array<number>;
+}
+export interface moment {
+    m00: number,
+    m01: number,
+    m10: number,
+    m11: number,
+    m02: number,
+    m20: number,
+    theta: number,
+    rad: number,
+    vec?: Array<number>
+}
+
+export interface ImageWrapper {
+    data: TypedArray | Array<number>;
+    size: XYSize;
+    indexMapping?: WrapperIndexMapping;
+    constructor(size: XYSize, data?: TypedArray | Array<number>, ArrayType?: TypedArrayConstructor | ArrayConstructor, initialize?: boolean): ImageWrapper;
+    inImageWithBorder(imgRef: ImageRef, border: number): boolean;
+    subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): ImageWrapper;
+    get(x: number, y: number): number;
+    getSafe(x: number, y: number): number;
+    set(x: number, y: number, value: number): ImageWrapper;
+    zeroBorder(): ImageWrapper;
+    moments(labelcount: any): Array<moment>;
+    getAsRGBA(scale?: number): Uint8ClampedArray;
+    show(canvas: HTMLCanvasElement, scale?: number): void;
+    overlay(canvas: HTMLCanvasElement, scale: number, from: XYSize): void;
+}
+
+export interface SubImage {
+    I: ImageWrapper | SparseImageWrapper;
+    data: ImageWrapper['data'];
+    originalSize: ImageRef;
+    from: ImageRef;
+    size: ImageRef;
+    constructor(from: ImageRef, size: ImageRef, I: SparseImageWrapper): SubImage;
+    get(x: number, y: number): number;
+    show(canvas: HTMLCanvasElement, scale: number): void;
+    updateData(image: ImageWrapper): void;
+    updateFrom(from: ImageRef): void;
+}
 
 export type XYSize = {
     x: number,

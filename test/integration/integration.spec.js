@@ -98,7 +98,7 @@ describe('decodeSingle', function () {
         });
     }
 
-    describe.only('Simultaneous calls to decodeSingle return correct results', () => {
+    describe('Simultaneous calls to decodeSingle return correct results', () => {
         const config = generateConfig();
         const testSet = [
             {'name': 'image-001.jpg', 'result': '3574660239843'},

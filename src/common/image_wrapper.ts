@@ -1,28 +1,13 @@
 import { hsv2rgb } from './cv_utils';
 import ArrayHelper from '../common/array_helper';
 import { clone } from 'gl-vec2';
-import { XYSize, TypedArrayConstructor, TypedArray } from '../../type-definitions/quagga';
+import { moment, XYSize, TypedArrayConstructor, TypedArray, WrapperIndexMapping } from '../../type-definitions/quagga';
 const vec2 = { clone };
-
-declare interface moment {
-    m00: number,
-    m01: number,
-    m10: number,
-    m11: number,
-    m02: number,
-    m20: number,
-    theta: number,
-    rad: number,
-    vec?: Array<number>
-}
 
 class ImageWrapper {
     data: TypedArray | Array<number>;
     size: XYSize;
-    indexMapping?: {
-        x: Array<number>,
-        y: Array<number>,
-    };
+    indexMapping?: WrapperIndexMapping;
 
     // Represents a basic image combining the data and size. In addition, some methods for
     // manipulation are contained within.

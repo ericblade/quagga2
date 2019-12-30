@@ -1,14 +1,8 @@
 import ImageWrapper from './image_wrapper';
-
-type ImageRef = {
-    x: number,
-    y: number,
-};
-
-type SparseImageWrapper = ImageWrapper | { data: null, size: ImageRef };
+import { ImageRef, SparseImageWrapper } from '../../type-definitions/quagga.d'
 
 export class SubImage {
-    I: SparseImageWrapper;
+    I: ImageWrapper | SparseImageWrapper;
     data: ImageWrapper['data'];
     originalSize: ImageRef;
     from: ImageRef;
