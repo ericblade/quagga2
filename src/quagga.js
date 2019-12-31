@@ -579,12 +579,12 @@ export default {
             try {
                 this.init(config, () => {
                     Events.once('processed', (result) => {
+                        this.inDecodeSingle = false;
                         this.stop();
                         if (resultCallback) {
                             resultCallback.call(null, result);
                         }
                         resolve(result);
-                        this.inDecodeSingle = false;
                     }, true);
                     start();
                 });
