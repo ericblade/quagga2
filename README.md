@@ -360,6 +360,10 @@ high-level properties:
 
 ### numOfWorkers
 
+NOTE: As of quagga2 v0.0.13, numOfWorkers has been *disabled*.  The library needs a major restructuring
+to properly handle Worker threads, and that restructuring is on-going at the moment, to solve other
+problems as well.  It will be re-enabled in the future.
+
 QuaggaJS supports web-workers out of the box and runs with `4` workers in its
 default configuration. The number should align with the number of cores
 available in your targeted devices.

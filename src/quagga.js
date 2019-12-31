@@ -569,6 +569,11 @@ export default {
                 halfSample: false,
             },
         }, config);
+        // TODO: restructure worker support so that it will work with typescript using worker-loader
+        // https://webpack.js.org/loaders/worker-loader/
+        if (config.numOfWorkers > 0) {
+            config.numOfWorkers = 0;
+        }
         // workers require Worker and Blob support presently, so if no Blob or Worker then set
         // workers to 0.
         if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
