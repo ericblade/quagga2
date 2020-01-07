@@ -492,6 +492,10 @@ function adjustWorkerPool(capacity, cb) {
 export default {
     init: function(config, cb, imageWrapper) {
         _config = merge({}, Config, config);
+        // TODO: pending restructure in Issue #105, we are temp disabling workers
+        if (_config.numOfWorkers > 0) {
+            _config.numOfWorkers = 0;
+        }
         if (imageWrapper) {
             _onUIThread = false;
             initializeData(imageWrapper);
