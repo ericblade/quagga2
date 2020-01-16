@@ -11,7 +11,7 @@ module.exports.externals = [
     'ndarray-linear-interpolate',
 ];
 module.exports.output.libraryTarget = 'commonjs';
-module.exports.output.library = 'Quagga';
+module.exports.output.library = undefined;
 module.exports.plugins = [
     new webpack.DefinePlugin({
         ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
