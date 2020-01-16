@@ -10,7 +10,7 @@ module.exports.externals = [
     'ndarray',
     'ndarray-linear-interpolate',
 ];
-module.exports.output.libraryTarget = 'umd';
+module.exports.output.libraryTarget = 'commonjs';
 module.exports.output.library = 'Quagga';
 module.exports.plugins = [
     new webpack.DefinePlugin({

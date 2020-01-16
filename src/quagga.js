@@ -2,6 +2,7 @@ import TypeDefs from './common/typedefs'; // eslint-disable-line no-unused-vars
 import ImageWrapper from './common/image_wrapper';
 import BarcodeLocator from './locator/barcode_locator';
 import BarcodeDecoder from './decoder/barcode_decoder';
+import BarcodeReader from './reader/barcode_reader';
 import Events from './common/events';
 import CameraAccess from './input/camera_access.ts';
 import ImageDebug from './common/image_debug.ts';
@@ -13,8 +14,8 @@ import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
 const vec2 = { clone };
 
-// export BarcodeReader for external plugins
-export { default as BarcodeReader } from './reader/barcode_reader';
+// export BarcodeReader and other utilities for external plugins
+export { BarcodeReader, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
 
 var _inputStream,
     _framegrabber,
@@ -607,4 +608,5 @@ export default {
     ImageDebug: ImageDebug,
     ResultCollector: ResultCollector,
     CameraAccess: CameraAccess,
+    BarcodeReader,
 };
