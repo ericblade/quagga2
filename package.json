@@ -1,6 +1,6 @@
 {
   "name": "@ericblade/quagga2",
-  "version": "0.0.16",
+  "version": "0.0.17",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
   "types": "type-definitions/quagga.d.ts",
@@ -117,7 +117,7 @@
     "Thomas <tricki@users.noreply.github.com>",
     "jclarkin <j.r.clarkin@gmail.com>",
     "kieat <kieat@users.noreply.github.com>",
-    "Esteban Morales <red_bandit_11@hotmail.com>", 
+    "Esteban Morales <red_bandit_11@hotmail.com>",
     "Ward Lootens <wardlootens@gmail.com>"
   ],
   "license": "MIT",
