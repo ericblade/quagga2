@@ -30,7 +30,8 @@ module.exports = {
         path: __dirname + '/../dist',
         publicPath: '/',
         libraryTarget: 'umd',
-        library: 'quagga',
+        libraryExport: 'default',
+        library: 'Quagga',
         filename: 'quagga.js',
     },
     devServer: {
