@@ -513,7 +513,7 @@ export default {
     stop: function() {
         _stopped = true;
         adjustWorkerPool(0);
-        if (_config.inputStream.type === 'LiveStream') {
+        if (_config.inputStream && _config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
             _inputStream.clearEventHandlers();
         }
