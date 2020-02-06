@@ -390,7 +390,7 @@ export interface QuaggaJSConfigObject {
          */
         type?: string;
 
-        target?: HTMLElement,
+        target?: HTMLElement | string,
 
         constraints?: MediaTrackConstraints;
 
