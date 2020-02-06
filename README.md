@@ -627,6 +627,14 @@ Quagga.decodeSingle({
 
 A growing collection of tips & tricks to improve the various aspects of Quagga.
 
+### Working with Cordova / PhoneGap?
+
+If you're having issues getting a mobile device to run Quagga using Cordova, you might try the code
+here: https://github.com/serratus/quaggaJS/issues/94#issuecomment-571478711
+````let permissions = cordova.plugins.permissions; permissions.checkPermission(permissions.CAMERA,
+(res) => { if (!res.hasPermission) { permissions.requestPermission(permissions.CAMERA, open());````
+Thanks, @chrisrodriguezmbww !
+
 ### Barcodes too small?
 
 Barcodes too far away from the camera, or a lens too close to the object
@@ -646,7 +654,7 @@ You can read more about those `capabilities` in
 Dark environments usually result in noisy images and therefore mess with the
 recognition logic.
 
-Since Chrome 59 you can turn on/off the __Torch__ of our device and vastly
+Since Chrome 59 you can turn on/off the __Torch__ of your device and vastly
 improve the quality of the images. Head over to the
 [web-cam demo](https://serratus.github.io/quaggaJS/examples/live_w_locator.html)
 and check out the __Torch__ feature.
