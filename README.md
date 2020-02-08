@@ -258,12 +258,12 @@ is the same as in `onDetected` and contains the result `data` object.
 ### Quagga.offProcessed(handler)
 
 In case the `onProcessed` event is no longer relevant, `offProcessed` removes
-the given `handler` from the event-queue.
+the given `handler` from the event-queue. When no handler is passed, all handlers are removed.
 
 ### Quagga.offDetected(handler)
 
 In case the `onDetected` event is no longer relevant, `offDetected` removes
-the given `handler` from the event-queue.
+the given `handler` from the event-queue. When no handler is passed, all handlers are removed.
 
 ## <a name="resultobject">The result object</a>
 

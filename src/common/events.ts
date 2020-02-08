@@ -90,7 +90,7 @@ export default (function() {
                 once: true,
             });
         },
-        unsubscribe: function(eventName: EventName, callback: Function | Subscription) {
+        unsubscribe: function(eventName: EventName, callback?: Function | Subscription) {
             var event;
 
             if (eventName) {

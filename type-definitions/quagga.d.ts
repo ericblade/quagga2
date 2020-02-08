@@ -120,7 +120,7 @@ export interface QuaggaJSStatic {
     /**
      * Removes a callback that was previously registered with @see onProcessed
      */
-    offProcessed(callback: QuaggaJSResultCallbackFunction): void;
+    offProcessed(callback?: QuaggaJSResultCallbackFunction): void;
 
     /**
      * Registers a callback(data) function which is triggered whenever a
@@ -133,7 +133,7 @@ export interface QuaggaJSStatic {
     /**
      * Removes a callback that was previously registered with @see onDetected
      */
-    offDetected(callback: QuaggaJSResultCallbackFunction): void;
+    offDetected(callback?: QuaggaJSResultCallbackFunction): void;
 
     ResultCollector: QuaggaJSResultCollector;
     registerResultCollector(resultCollector: QuaggaJSResultCollector): void;
