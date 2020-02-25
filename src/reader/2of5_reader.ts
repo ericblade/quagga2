@@ -31,6 +31,7 @@ const startPatternLength = properties.START_PATTERN.value.reduce((sum, val) => s
 
 TwoOfFiveReader.prototype = Object.create(BarcodeReader.prototype, properties);
 TwoOfFiveReader.prototype.constructor = TwoOfFiveReader;
+TwoOfFiveReader.prototype.FORMAT = '2of5';
 
 TwoOfFiveReader.prototype._findPattern = function(pattern, offset, isWhite, tryHarder) {
     var counter = [],
