@@ -24,43 +24,37 @@ class NewTwoOfFiveReader extends BarcodeReader {
     SINGLE_CODE_ERROR = 0.78;
     AVG_CODE_ERROR = 0.30;
 
-    _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite: boolean, tryHarder: boolean): BarcodeInfo | null {
-        var counter = [],
-            self = this,
-            i,
-            counterPos = 0,
-            bestMatch = {
-                error: Number.MAX_VALUE,
-                code: -1,
-                start: 0,
-                end: 0,
-            },
-            error,
-            j,
-            sum,
-            epsilon = self.AVG_CODE_ERROR;
-
-        isWhite = isWhite || false;
-        tryHarder = tryHarder || false;
+    _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite: boolean = false, tryHarder: boolean = false): BarcodeInfo | null {
+        let counter = [];
+        let counterPos = 0;
+        let bestMatch = {
+            error: Number.MAX_VALUE,
+            code: -1,
+            start: 0,
+            end: 0,
+        };
+        let sum = 0;
+        let error = 0;
+        let epsilon = this.AVG_CODE_ERROR;
 
         if (!offset) {
-            offset = self._nextSet(self._row);
+            offset = this._nextSet(this._row);
         }
 
-        for (i = 0; i < pattern.length; i++) {
+        for (let i = 0; i < pattern.length; i++) {
             counter[i] = 0;
         }
 
-        for (i = offset; i < self._row.length; i++) {
-            if (self._row[i] ^ (isWhite ? 1 : 0)) {
+        for (let i = offset; i < this._row.length; i++) {
+            if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
             } else {
                 if (counterPos === counter.length - 1) {
                     sum = 0;
-                    for (j = 0; j < counter.length; j++) {
+                    for (let j = 0; j < counter.length; j++) {
                         sum += counter[j];
                     }
-                    error = self._matchPattern(counter, pattern);
+                    error = this._matchPattern(counter, pattern);
                     if (error < epsilon) {
                         bestMatch.error = error;
                         bestMatch.start = i - sum;
@@ -68,7 +62,7 @@ class NewTwoOfFiveReader extends BarcodeReader {
                         return bestMatch;
                     }
                     if (tryHarder) {
-                        for (j = 0; j < counter.length - 2; j++) {
+                        for (let j = 0; j < counter.length - 2; j++) {
                             counter[j] = counter[j + 2];
                         }
                         counter[counter.length - 2] = 0;
@@ -85,24 +79,23 @@ class NewTwoOfFiveReader extends BarcodeReader {
             }
         }
         return null;
-
     }
+
     _findStart() {
-        var self = this,
-            leadingWhitespaceStart,
-            offset = self._nextSet(self._row),
-            startInfo = null,
-            narrowBarWidth = 1;
+        let startInfo = null;
+        let offset = this._nextSet(this._row);
+        let narrowBarWidth = 1;
+        let leadingWhitespaceStart = 0;
 
         while (!startInfo) {
-            startInfo = self._findPattern(START_PATTERN, offset, false, true);
+            startInfo = this._findPattern(START_PATTERN, offset, false, true);
             if (!startInfo) {
                 return null;
             }
             narrowBarWidth = Math.floor((startInfo.end - startInfo.start) / START_PATTERN_LENGTH);
             leadingWhitespaceStart = startInfo.start - narrowBarWidth * 5;
             if (leadingWhitespaceStart >= 0) {
-                if (self._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
+                if (this._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
                     return startInfo;
                 }
             }
@@ -123,26 +116,22 @@ class NewTwoOfFiveReader extends BarcodeReader {
     }
 
     _findEnd() {
-        var self = this,
-            endInfo,
-            tmp,
-            offset;
-
-        self._row.reverse();
-        offset = self._nextSet(self._row);
-        endInfo = self._findPattern(STOP_PATTERN, offset, false, true);
-        self._row.reverse();
+        // TODO: reverse, followed by some calcs, followed by another reverse? really?
+        this._row.reverse();
+        const offset = this._nextSet(this._row);
+        const endInfo = this._findPattern(STOP_PATTERN, offset, false, true);
+        this._row.reverse();
 
         if (endInfo === null) {
             return null;
         }
 
         // reverse numbers
-        tmp = endInfo.start;
-        endInfo.start = self._row.length - endInfo.end;
-        endInfo.end = self._row.length - tmp;
+        const tmp = endInfo.start;
+        endInfo.start = this._row.length - endInfo.end;
+        endInfo.end = this._row.length - tmp;
 
-        return endInfo !== null ? self._verifyTrailingWhitespace(endInfo) : null;
+        return endInfo !== null ? this._verifyTrailingWhitespace(endInfo) : null;
     }
 
     _verifyCounterLength(counters: Array<number>) {
@@ -150,18 +139,16 @@ class NewTwoOfFiveReader extends BarcodeReader {
     };
 
     _decodeCode(counter: ReadonlyArray<number>) {
-        var error,
-            epsilon = this.AVG_CODE_ERROR,
-            code,
-            bestMatch = {
+        const epsilon = this.AVG_CODE_ERROR;
+        const bestMatch = {
                 error: Number.MAX_VALUE,
                 code: -1,
                 start: 0,
                 end: 0,
             };
 
-        for (code = 0; code < CODE_PATTERN.length; code++) {
-            error = this._matchPattern(counter, CODE_PATTERN[code]);
+        for (let code = 0; code < CODE_PATTERN.length; code++) {
+            const error = this._matchPattern(counter, CODE_PATTERN[code]);
             if (error < bestMatch.error) {
                 bestMatch.code = code;
                 bestMatch.error = error;
@@ -174,14 +161,13 @@ class NewTwoOfFiveReader extends BarcodeReader {
     };
 
     _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo>) {
-        var i,
-            pos = 0,
-            counterLength = counters.length,
-            counter = [0, 0, 0, 0, 0],
-            code;
+        let pos = 0;
+        const counterLength = counters.length;
+        const counter = [0, 0, 0, 0, 0];
+        let code: BarcodeInfo | null = null;
 
         while (pos < counterLength) {
-            for (i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 counter[i] = counters[pos] * this.barSpaceRatio[0];
                 pos += 2;
             }
@@ -197,29 +183,25 @@ class NewTwoOfFiveReader extends BarcodeReader {
 
 
     _decode(row?: Array<number>, start?: number): Barcode | null {
-        var startInfo,
-            endInfo,
-            code,
-            result: Array<string> = [],
-            decodedCodes = [],
-            counters;
-
-        startInfo = this._findStart();
+        const startInfo = this._findStart();
         if (!startInfo) {
             return null;
         }
-        decodedCodes.push(startInfo);
 
-        endInfo = this._findEnd();
+        const endInfo = this._findEnd();
         if (!endInfo) {
             return null;
         }
 
-        counters = this._fillCounters(startInfo.end, endInfo.start, false);
+        const counters = this._fillCounters(startInfo.end, endInfo.start, false);
         if (!this._verifyCounterLength(counters)) {
             return null;
         }
-        code = this._decodePayload(counters, result, decodedCodes);
+        let decodedCodes = [];
+        decodedCodes.push(startInfo);
+
+        let result: Array<string> = [];
+        const code = this._decodePayload(counters, result, decodedCodes);
         if (!code) {
             return null;
         }
@@ -236,7 +218,6 @@ class NewTwoOfFiveReader extends BarcodeReader {
             decodedCodes: decodedCodes,
             format: this.FORMAT,
         };
-
     }
 }
 
