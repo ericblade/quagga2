@@ -20,26 +20,26 @@ export interface BarcodeCorrection {
 
 export interface BarcodeInfo {
     code: number,
-    correction: BarcodeCorrection,
+    correction?: BarcodeCorrection,
     end: number,
-    endCounter: number,
+    endCounter?: number,
     error: number,
     start: number,
-    startCounter: number,
+    startCounter?: number,
 };
 
 export interface Barcode {
     code: string,
-    codeset: number,
-    correction: BarcodeCorrection,
+    codeset?: number,
+    correction?: BarcodeCorrection,
     decodedCodes?: Array<string | BarcodeInfo>,
-    direction: BarcodeDirection,
+    direction?: BarcodeDirection,
     end: number,
-    endInfo: BarcodeInfo,
+    endInfo?: BarcodeInfo,
     format: BarcodeFormat,
     start: number,
     startInfo: BarcodeInfo,
-    supplement: Barcode,
+    supplement?: Barcode,
 };
 
 export abstract class BarcodeReader {
@@ -50,7 +50,7 @@ export abstract class BarcodeReader {
     FORMAT = 'unknown';
     CONFIG_KEYS = {};
 
-    abstract _decode(row?: Array<number>, start?: number): Barcode;
+    abstract _decode(row?: Array<number>, start?: number): Barcode | null;
     static get Exception() {
         return {
             StartNotFoundException: 'Start-Info was not found!',
