@@ -65,7 +65,7 @@ export default {
         return max;
     },
 
-    sum: function(arr: Array<any>) {
+    sum: function(arr: Array<any> | TypedArray): number {
         let length = arr.length;
         let sum = 0;
 
