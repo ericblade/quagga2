@@ -1,4 +1,4 @@
-import BarcodeReader, { Barcode, BarcodeInfo } from './barcode_reader';
+import BarcodeReader, { Barcode, BarcodeInfo, BarcodePosition } from './barcode_reader';
 
 const N = 1;
 const W = 3;
@@ -182,7 +182,7 @@ class NewTwoOfFiveReader extends BarcodeReader {
     };
 
 
-    _decode(row?: Array<number>, start?: number): Barcode | null {
+    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
         const startInfo = this._findStart();
         if (!startInfo) {
             return null;
