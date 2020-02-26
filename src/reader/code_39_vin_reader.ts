@@ -1,51 +1,52 @@
 import Code39Reader from './code_39_reader';
+import { BarcodePosition, Barcode } from './barcode_reader';
+import { QuaggaBuildEnvironment } from '../../type-definitions/quagga';
 
-function Code39VINReader() {
-    Code39Reader.call(this);
-}
-
-var patterns = {
+const patterns = {
     IOQ: /[IOQ]/g,
     AZ09: /[A-Z0-9]{17}/,
 };
 
-Code39VINReader.prototype = Object.create(Code39Reader.prototype);
-Code39VINReader.prototype.constructor = Code39VINReader;
+declare var ENV: QuaggaBuildEnvironment; // webpack injects ENV
 
-// Cribbed from:
-// https://github.com/zxing/zxing/blob/master/core/src/main/java/com/google/zxing/client/result/VINResultParser.java
-Code39VINReader.prototype._decode = function() {
-    var result = Code39Reader.prototype._decode.apply(this);
-    if (!result) {
-        return null;
+class Code39VINReader extends Code39Reader {
+    FORMAT = 'code_39_vin';
+
+    // TODO (this was todo in original repo)
+    _checkChecksum(code: string) {
+        return !!code;
     }
 
-    var code = result.code;
-
-    if (!code) {
-        return null;
-    }
-
-    code = code.replace(patterns.IOQ, '');
-
-    if (!code.match(patterns.AZ09)) {
-        if (ENV.development) {
-            console.log('Failed AZ09 pattern code:', code);
+    // Cribbed from:
+    // https://github.com/zxing/zxing/blob/master/core/src/main/java/com/google/zxing/client/result/VINResultParser.java
+    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+        const result = super._decode(row, start);
+        if (!result) {
+            return null;
         }
-        return null;
-    }
 
-    if (!this._checkChecksum(code)) {
-        return null;
-    }
+        var code = result.code;
 
-    result.code = code;
-    return result;
-};
+        if (!code) {
+            return null;
+        }
 
-Code39VINReader.prototype._checkChecksum = function(code) {
-    // TODO
-    return !!code;
-};
+        code = code.replace(patterns.IOQ, '');
+
+        if (!code.match(patterns.AZ09)) {
+            if (ENV.development) {
+                console.log('Failed AZ09 pattern code:', code);
+            }
+            return null;
+        }
+
+        if (!this._checkChecksum(code)) {
+            return null;
+        }
+
+        result.code = code;
+        return result;
+    };
+}
 
 export default Code39VINReader;
