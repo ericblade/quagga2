@@ -143,27 +143,25 @@ actual decoding process because knowing the orientation and the rough area limit
 ## Barcode Decoder
 
 
-
-
-[teaser_image]: http://barcode.oberhofer.us/doc/img/teaser.png
-[binary_image]: http://barcode.oberhofer.us/doc/img/binary.png
-[skeleton_image]: http://barcode.oberhofer.us/doc/img/skeleton.png
+[teaser_image]: https://www.oberhofer.co/content/images/2014/11//teaser.png
+[binary_image]: https://www.oberhofer.co/content/images/2014/11//binary.png
+[skeleton_image]: https://www.oberhofer.co/content/images/2014/11//skeleton.png
 [otsu_wiki]: http://en.wikipedia.org/wiki/Otsu%27s_method
 [douglas_05]: http://www.icics.org/2005/download/P0840.pdf
 [skeleton_wiki]: http://en.wikipedia.org/wiki/Morphological_skeleton
 [labeling_wiki]: http://en.wikipedia.org/wiki/Connected-component_labeling
 [labeling_codeproject]: http://www.codeproject.com/Tips/407172/Connected-Component-Labeling-and-Vectorization
 [labeling_paper]: http://www.iis.sinica.edu.tw/papers/fchang/1362-F.pdf
-[component_labeling_image]: http://barcode.oberhofer.us/doc/img/component-labeling.png
-[component_labeling_lines_image]: http://barcode.oberhofer.us/doc/img/component-labeling-line.png
-[component_labeling_text_image]: http://barcode.oberhofer.us/doc/img/component-labeling-text.png
+[component_labeling_image]: https://www.oberhofer.co/content/images/2014/11//component-labeling.png
+[component_labeling_lines_image]: https://www.oberhofer.co/content/images/2014/11//component-labeling-line.png
+[component_labeling_text_image]: https://www.oberhofer.co/content/images/2014/11//component-labeling-text.png
 [math_theta]: http://www.sciweavers.org/tex2img.php?eq=%5CTheta%20%3D%20%5Cfrac%7B1%7D%7B2%7D%20%5Carctan%20%5Cleft%28%20%5Cfrac%7B2%5Cmu%27_%7B11%7D%7D%7B%5Cmu%27_%7B20%7D%20-%20%5Cmu%27_%7B02%7D%7D%20%5Cright%29&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0
 [math_mu]: http://www.sciweavers.org/tex2img.php?eq=%5Cmu%27_%7B11%7D%20%3D%20M_%7B11%7D%2FM_%7B00%7D%20-%20%5Cbar%7Bx%7D%5Cbar%7By%7D%20%5C%5C%0A%5Cmu%27_%7B02%7D%20%3D%20M_%7B02%7D%2FM_%7B00%7D%20-%20%5Cbar%7By%7D%5E2%20%5C%5C%0A%5Cmu%27_%7B20%7D%20%3D%20M_%7B20%7D%2FM_%7B00%7D%20-%20%5Cbar%7Bx%7D%5E2&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0
 [math_x_y_bar]: http://www.sciweavers.org/tex2img.php?eq=%5Cbar%7Bx%7D%20%3D%20M_%7B10%7D%2FM_%7B00%7D%20%5C%5C%0A%5Cbar%7By%7D%20%3D%20M_%7B01%7D%2FM_%7B00%7D&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0
 [math_m]: http://www.sciweavers.org/tex2img.php?eq=M_%7B00%7D%20%3D%20%5Csum_x%20%5Csum_y%20I%28x%2Cy%29%20%5C%5C%0AM_%7B10%7D%20%3D%20%5Csum_x%20%5Csum_y%20x%20I%28x%2Cy%29%20%5C%5C%0AM_%7B01%7D%20%3D%20%5Csum_x%20%5Csum_y%20y%20I%28x%2Cy%29%20%5C%5C%0AM_%7B11%7D%20%3D%20%5Csum_x%20%5Csum_y%20xy%20I%28x%2Cy%29%20%5C%5C%0AM_%7B20%7D%20%3D%20%5Csum_x%20%5Csum_y%20x%5E2%20I%28x%2Cy%29%20%5C%5C%0AM_%7B02%7D%20%3D%20%5Csum_x%20%5Csum_y%20y%5E2%20I%28x%2Cy%29&bc=Transparent&fc=Black&im=png&fs=12&ff=arev&edit=0
 [central_image_moments_wiki]: http://en.wikipedia.org/wiki/Image_moment#Central_moments
-[found_patches_image]: http://barcode.oberhofer.us/doc/img/patches_found.png
-[connected_patch_labels]: http://barcode.oberhofer.us/doc/img/connected-patch-labels.png
-[remaining_patch_labels]: http://barcode.oberhofer.us/doc/img/remaining-patch-labels.png
-[transformed_patches]: http://barcode.oberhofer.us/doc/img/bb-rotated.png
-[bounding_box_skeleton]: http://barcode.oberhofer.us/doc/img/bb-binary.png
+[found_patches_image]: https://www.oberhofer.co/content/images/2014/11//patches_found.png
+[connected_patch_labels]: https://www.oberhofer.co/content/images/2014/11//connected-patch-labels.png
+[remaining_patch_labels]: https://www.oberhofer.co/content/images/2014/11//remaining-patch-labels.png
+[transformed_patches]: https://www.oberhofer.co/content/images/2014/11//bb-rotated.png
+[bounding_box_skeleton]: https://www.oberhofer.co/content/images/2014/11//bb-binary.png
