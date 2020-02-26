@@ -1,5 +1,5 @@
 
-## <a name="changelog">Changelog</a>
+# Changelog
 
 - Future changelogs will be posted to the github [releases page](https://github.com/ericblade/quagga2/releases)
 
