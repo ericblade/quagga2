@@ -53,9 +53,13 @@ describe('decodeSingle', function () {
                 config.readers = readers;
                 Quagga.decodeSingle(config, function(result) {
                     console.log('Decoding', sample.name);
+                    console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                     expect(result).to.be.an('Object');
+                    console.warn('* Expect codeResult to be an object');
                     expect(result.codeResult).to.be.an('Object');
+                    console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
                     expect(result.codeResult.code).to.equal(sample.result);
+                    console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
                     expect(result.codeResult.format).to.equal(sample.format);
                     callback();
                 });

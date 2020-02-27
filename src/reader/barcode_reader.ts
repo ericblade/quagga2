@@ -52,8 +52,11 @@ export abstract class BarcodeReader {
     SINGLE_CODE_ERROR = 0;
     FORMAT: BarcodeFormat = 'unknown';
     CONFIG_KEYS = {};
+    // TODO: should add ALPHABETH_STRING, ALPHABET, CHARACTER_ENCODINGS to base class, if they
+    // are useful in most readers.
 
     abstract _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
     static get Exception() {
         return {
             StartNotFoundException: 'Start-Info was not found!',
@@ -177,7 +180,7 @@ export abstract class BarcodeReader {
         return counters;
     }
 
-    _toCounters(start: number, counters: Uint16Array) {
+    _toCounters(start: number, counters: Uint16Array | Array<number>) {
         const numCounters = counters.length;
         const end = this._row.length;
         let isWhite = !this._row[start];
