@@ -125,11 +125,6 @@ function initCanvas() {
             if ($viewport) {
                 $viewport.appendChild(_canvasContainer.dom.overlay);
             }
-            var clearFix = document.createElement('br');
-            clearFix.setAttribute('clear', 'all');
-            if ($viewport) {
-                $viewport.appendChild(clearFix);
-            }
         }
         _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
         _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
