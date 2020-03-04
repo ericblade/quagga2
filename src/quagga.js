@@ -15,7 +15,7 @@ import { clone } from 'gl-vec2';
 const vec2 = { clone };
 
 // export BarcodeReader and other utilities for external plugins
-export { BarcodeReader, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
+export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
 
 var _inputStream,
     _framegrabber,
