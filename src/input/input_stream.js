@@ -1,3 +1,4 @@
+import NodeInputStream from './input_stream_node';
 import ImageLoader from './image_loader';
 
 var InputStream = {};
@@ -328,3 +329,4 @@ InputStream.createImageStream = function() {
 };
 
 export default InputStream;
+export { NodeInputStream };

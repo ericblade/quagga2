@@ -1,3 +1,5 @@
+import NodeFrameGrabber from './frame_grabber_node';
+
 import {
     imageRef,
     grayAndHalfSampleFromCanvasData,
@@ -120,3 +122,4 @@ FrameGrabber.create = function(inputStream, canvas) {
 };
 
 export default FrameGrabber;
+export { NodeFrameGrabber };
