@@ -28,14 +28,14 @@ export interface BarcodePosition {
 export interface BarcodeInfo extends BarcodePosition {
     code: number,
     correction?: BarcodeCorrection,
-    error: number,
+    error?: number,
 };
 
 export interface Barcode {
     code: string,
     codeset?: number,
     correction?: BarcodeCorrection,
-    decodedCodes?: Array<string | BarcodeInfo>,
+    decodedCodes?: Array<string | BarcodeInfo | BarcodePosition>,
     direction?: BarcodeDirection,
     end: number,
     endInfo?: BarcodePosition,
@@ -47,15 +47,15 @@ export interface Barcode {
 
 export abstract class BarcodeReader {
     _row: Array<number> = [];
-    config = {};
+    config: BarcodeReaderConfig = {};
     supplements: Array<BarcodeReader> = [];
     SINGLE_CODE_ERROR = 0;
     FORMAT: BarcodeFormat = 'unknown';
-    CONFIG_KEYS = {};
+    CONFIG_KEYS: BarcodeReaderConfig = {};
     // TODO: should add ALPHABETH_STRING, ALPHABET, CHARACTER_ENCODINGS to base class, if they
     // are useful in most readers.
 
-    abstract _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+    abstract _decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
 
     static get Exception() {
         return {

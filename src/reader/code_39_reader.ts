@@ -118,7 +118,7 @@ class Code39Reader extends BarcodeReader {
         return false;
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | null): Barcode | null {
+    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         let counters = new Uint16Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
         const result: Array<string> = [];
         start = this._findStart();

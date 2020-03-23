@@ -217,7 +217,7 @@ class NewCodabarReader extends BarcodeReader {
         return true;
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | null): Barcode | null {
+    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
 
         this._counters = this._fillCounters();
         start = this._findStart();

@@ -1,45 +1,43 @@
 import EANReader from './ean_reader';
+import { BarcodeInfo } from './barcode_reader';
 
-function EAN8Reader(opts, supplements) {
-    EANReader.call(this, opts, supplements);
+class EAN8Reader extends EANReader {
+    FORMAT = 'ean_8';
+    _decodePayload(inCode: BarcodeInfo, result: Array<number>, decodedCodes: Array<BarcodeInfo>) {
+        var i,
+            self = this;
+        let outCode: BarcodeInfo | null = inCode;
+
+        for ( i = 0; i < 4; i++) {
+            outCode = self._decodeCode(outCode.end, self.CODE_G_START);
+            if (!outCode) {
+                return null;
+            }
+            result.push(outCode.code);
+            decodedCodes.push(outCode);
+        }
+
+        if (!outCode) {
+            return null;
+        }
+        const pattern = self._findPattern(self.MIDDLE_PATTERN, outCode.end, true, false);
+        if (pattern === null) {
+            return null;
+        }
+        let newCode: BarcodeInfo | null = { ...pattern, ...outCode };
+        decodedCodes.push(newCode);
+
+        for ( i = 0; i < 4; i++) {
+            newCode = self._decodeCode(newCode.end, self.CODE_G_START);
+            if (!newCode) {
+                return null;
+            }
+            decodedCodes.push(newCode);
+            result.push(newCode.code);
+        }
+
+        return inCode;
+    };
 }
-
-var properties = {
-    FORMAT: {value: 'ean_8', writeable: false},
-};
-
-EAN8Reader.prototype = Object.create(EANReader.prototype, properties);
-EAN8Reader.prototype.constructor = EAN8Reader;
-
-EAN8Reader.prototype._decodePayload = function(code, result, decodedCodes) {
-    var i,
-        self = this;
-
-    for ( i = 0; i < 4; i++) {
-        code = self._decodeCode(code.end, self.CODE_G_START);
-        if (!code) {
-            return null;
-        }
-        result.push(code.code);
-        decodedCodes.push(code);
-    }
-
-    code = self._findPattern(self.MIDDLE_PATTERN, code.end, true, false);
-    if (code === null) {
-        return null;
-    }
-    decodedCodes.push(code);
-
-    for ( i = 0; i < 4; i++) {
-        code = self._decodeCode(code.end, self.CODE_G_START);
-        if (!code) {
-            return null;
-        }
-        decodedCodes.push(code);
-        result.push(code.code);
-    }
-
-    return code;
-};
 
 export default EAN8Reader;

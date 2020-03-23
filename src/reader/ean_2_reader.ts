@@ -3,8 +3,15 @@ import { BarcodeInfo, BarcodePosition, Barcode } from './barcode_reader';
 
 class EAN2Reader extends EANReader {
     FORMAT = 'ean_2';
+    _row = new Array<number>();
     _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+        if (!row) {
+            return null;
+        }
         this._row = row;
+        if (typeof start === 'number') {
+            return null;
+        }
         let offset = start ? start.start : 0;
         let end = this._row.length;
         const decodedCodes: Array<BarcodeInfo> = [];

@@ -177,7 +177,7 @@ class Code93Reader extends BarcodeReader {
             && this._matchCheckChar(charArray, charArray.length - 1, 15);
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | null): Barcode | null {
+    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         start = this._findStart();
         if (!start) {
             return null;
