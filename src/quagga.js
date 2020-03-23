@@ -8,11 +8,14 @@ import CameraAccess from './input/camera_access.ts';
 import ImageDebug from './common/image_debug.ts';
 import ResultCollector from './analytics/result_collector.ts';
 import Config from './config/config';
-import InputStream from './input/input_stream';
-import FrameGrabber from './input/frame_grabber';
+import BrowserInputStream, { NodeInputStream } from './input/input_stream';
+import BrowserFrameGrabber, { NodeFrameGrabber } from './input/frame_grabber';
 import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
 const vec2 = { clone };
+
+const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
+const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserFrameGrabber;
 
 // export BarcodeReader and other utilities for external plugins
 export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
