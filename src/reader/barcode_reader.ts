@@ -23,12 +23,12 @@ export interface BarcodePosition {
     startCounter?: number,
     end: number,
     endCounter?: number,
+    error?: number,
 };
 
 export interface BarcodeInfo extends BarcodePosition {
     code: number,
     correction?: BarcodeCorrection,
-    error?: number,
 };
 
 export interface Barcode {
@@ -134,11 +134,14 @@ export abstract class BarcodeReader {
     }
 
     decodePattern(pattern: Array<number>) {
+        console.warn('* decodePattern', pattern);
         this._row = pattern;
         let result = this._decode();
+        console.warn('* first result=', result);
         if (result === null) {
             this._row.reverse();
             result = this._decode();
+            console.warn('* reversed result=', result);
             if (result) {
                 result.direction = BarcodeDirection.Reverse;
                 result.start = this._row.length - result.start;
@@ -150,6 +153,7 @@ export abstract class BarcodeReader {
         if (result) {
             result.format = this.FORMAT;
         }
+        console.warn('* returning', result);
         return result;
     }
 
