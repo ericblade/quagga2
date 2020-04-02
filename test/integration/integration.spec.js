@@ -261,6 +261,22 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config, 'code_128_reader');
     });
 
+    describe.only('Code32', function() {
+        const config = generateConfig();
+        const testSet = [
+            { name: 'image-001.jpeg', result: '???' },
+            { name: 'image-002.jpeg', result: '???' },
+            { name: 'image-003.jpeg', result: '???' },
+            { name: 'image-004.jpeg', result: '???' },
+        ];
+        testSet.forEach(function(sample) {
+            sample.format = 'code_32';
+        });
+        config.decoder.readers = ['code_32_reader'];
+        console.warn('* runTestSet');
+        _runTestSet(testSet, config);
+    });
+
     describe('Code39', function() {
         var config = generateConfig(),
             testSet = [
