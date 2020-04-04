@@ -59,6 +59,7 @@ class EANReader extends BarcodeReader {
             } else {
                 if (counterPos === counter.length - 1) {
                     const error = this._matchPattern(counter, pattern);
+                    console.warn('* matchPattern', error, counter, pattern);
                     if (error < epsilon && bestMatch.error && error < bestMatch.error) {
                         found = true;
                         bestMatch.error = error;
