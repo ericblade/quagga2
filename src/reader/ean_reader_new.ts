@@ -35,6 +35,7 @@ const AVG_CODE_ERROR = 0.48;
 
 class EANReader extends BarcodeReader {
     FORMAT = 'ean_13';
+    SINGLE_CODE_ERROR = 0.70;
     constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         super(merge({ supplements: [] }, config), supplements);
     }
@@ -46,6 +47,7 @@ class EANReader extends BarcodeReader {
             end: 0
         };
         const epsilon = AVG_CODE_ERROR;
+        console.warn('* findPattern', pattern, offset, isWhite, tryHarder, epsilon);
         let counterPos = 0;
         if (!offset) {
             offset = this._nextSet(this._row);
@@ -78,11 +80,17 @@ class EANReader extends BarcodeReader {
                 isWhite = !isWhite;
             }
         }
+        if (found) {
+            console.warn('* return bestMatch', JSON.stringify(bestMatch));
+        } else {
+            console.warn('* return null');
+        }
         return found ? bestMatch : null;
     }
 
     // TODO: findPattern and decodeCode appear to share quite similar code, can it be reduced?
     _decodeCode(start: number, coderange?: number): BarcodeInfo | null {
+        console.warn('* decodeCode', start, coderange);
         const counter = [0, 0, 0, 0];
         const offset = start;
         const bestMatch: BarcodeInfo = {
@@ -121,16 +129,22 @@ class EANReader extends BarcodeReader {
                 isWhite = isWhite ? 0 : 1;
             }
         }
+        if (found) {
+            console.warn('* return bestMatch', JSON.stringify(bestMatch));
+        } else {
+            console.warn('* return null');
+        }
         return found ? bestMatch : null;
     }
 
     protected _findStart(): BarcodePosition | null {
+        console.warn('* findStart');
         let offset = this._nextSet(this._row);
         let startInfo: BarcodePosition | null = null;
 
         while (!startInfo) {
             startInfo = this._findPattern(START_PATTERN, offset, false, true);
-
+            console.warn('* startInfo=', JSON.stringify(startInfo));
             if (!startInfo) {
                 return null;
             }
@@ -139,6 +153,7 @@ class EANReader extends BarcodeReader {
 
             if (leadingWhitespaceStart >= 0) {
                 if (this._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
+                    console.warn('* returning startInfo');
                     return startInfo;
                 }
             }
@@ -146,25 +161,32 @@ class EANReader extends BarcodeReader {
             offset = startInfo.end;
             startInfo = null;
         }
+        console.warn('* returning null');
         return null;
     }
 
     private _calculateFirstDigit(codeFrequency: number): number | null {
+        console.warn('* calculateFirstDigit', codeFrequency);
         for (let i = 0; i < CODE_FREQUENCY.length; i++) {
             if (codeFrequency === CODE_FREQUENCY[i]) {
+                console.warn('* returning', i);
                 return i;
             }
         }
+        console.warn('* return null');
         return null;
     }
 
     protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null {
+        console.warn('* decodePayload', inCode, result, decodedCodes);
         let outCode: BarcodeInfo | BarcodePosition | null = { ...inCode };
         let codeFrequency = 0x0;
 
         for (let i = 0; i < 6; i++) {
             outCode = this._decodeCode(outCode.end);
+            console.warn('* decodeCode=', outCode);
             if (!outCode) {
+                console.warn('* return null');
                 return null;
             }
             if ((outCode as BarcodeInfo).code >= CODE_G_START) {
@@ -178,16 +200,19 @@ class EANReader extends BarcodeReader {
         }
 
         const firstDigit = this._calculateFirstDigit(codeFrequency);
-
+        console.warn('* firstDigit=', firstDigit);
         if (firstDigit === null) {
+            console.warn('* return null');
             return null;
         }
 
         result.unshift(firstDigit);
 
         let middlePattern = this._findPattern(MIDDLE_PATTERN, outCode.end, true, false);
+        console.warn('* findPattern=', JSON.stringify(middlePattern));
 
         if (middlePattern === null || !middlePattern.end) {
+            console.warn('* return null');
             return null;
         }
 
@@ -195,8 +220,10 @@ class EANReader extends BarcodeReader {
 
         for (let i = 0; i < 6; i++) {
             middlePattern = this._decodeCode(middlePattern!.end, CODE_G_START);
+            console.warn('* decodeCode=', JSON.stringify(middlePattern));
 
             if (!middlePattern) {
+                console.warn('* return null');
                 return null;
             }
 
@@ -204,22 +231,28 @@ class EANReader extends BarcodeReader {
             result.push((middlePattern as BarcodeInfo).code);
         }
 
+        console.warn('* end code=', JSON.stringify(middlePattern));
+        console.warn('* end result=', JSON.stringify(result));
+        console.warn('* end decodedCodes=', decodedCodes);
         return middlePattern as BarcodeInfo;
     }
 
     protected _verifyTrailingWhitespace(endInfo: BarcodePosition): BarcodePosition | null {
+        console.warn('* verifyTrailingWhitespace', JSON.stringify(endInfo));
         const trailingWhitespaceEnd = endInfo.end + (endInfo.end - endInfo.start);
 
         if (trailingWhitespaceEnd < this._row.length) {
             if (this._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
+                console.warn('* returning', JSON.stringify(endInfo));
                 return endInfo;
             }
         }
-
+        console.warn('* return null');
         return null;
     }
 
     protected _findEnd(offset: number, isWhite: boolean): BarcodePosition | null {
+        console.warn('* findEnd', offset, isWhite);
         const endInfo = this._findPattern(STOP_PATTERN, offset, isWhite, false);
 
         return endInfo !== null ? this._verifyTrailingWhitespace(endInfo) : null;
