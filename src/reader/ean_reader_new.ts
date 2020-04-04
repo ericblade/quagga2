@@ -54,6 +54,7 @@ class EANReader extends BarcodeReader {
         }
         let found = false;
         for (let i = offset; i < this._row.length; i++) {
+            console.warn(`* loop i=${offset} len=${this._row.length} isWhite=${isWhite} counterPos=${counterPos}`);
             if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos] += 1;
             } else {
