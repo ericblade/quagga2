@@ -115,21 +115,22 @@ describe('decodeSingle', function () {
 
     // TODO: write a test that tests Promise return/resolve
 
-    describe.only('EAN', function() {
+    describe('EAN', function() {
         var config = generateConfig(),
             testSet = [
                 {'name': 'image-001.jpg', 'result': '3574660239843'},
-                // {'name': 'image-002.jpg', 'result': '8032754490297'},
-                // {'name': 'image-003.jpg', 'result': '4006209700068'},
-                // {'name': 'image-004.jpg', 'result': '9002233139084'},
-                // {'name': 'image-005.jpg', 'result': '8004030044005'},
-                // {'name': 'image-006.jpg', 'result': '4003626011159'},
-                // {'name': 'image-007.jpg', 'result': '2111220009686'},
-                // {'name': 'image-008.jpg', 'result': '9000275609022'},
-                // {'name': 'image-009.jpg', 'result': '9004593978587'},
-                // {'name': 'image-010.jpg', 'result': '9002244845578'},
+                {'name': 'image-002.jpg', 'result': '8032754490297'},
+                {'name': 'image-003.jpg', 'result': '4006209700068'},
+                {'name': 'image-004.jpg', 'result': '9002233139084'},
+                {'name': 'image-005.jpg', 'result': '8004030044005'},
+                {'name': 'image-006.jpg', 'result': '4003626011159'},
+                {'name': 'image-007.jpg', 'result': '2111220009686'},
+                {'name': 'image-008.jpg', 'result': '9000275609022'},
+                {'name': 'image-009.jpg', 'result': '9004593978587'},
+                {'name': 'image-010.jpg', 'result': '9002244845578'},
             ];
 
+        console.warn('* test config=', JSON.stringify(config));
         testSet.forEach(function(sample) {
             sample.format = 'ean_13';
         });
@@ -139,6 +140,11 @@ describe('decodeSingle', function () {
     });
 
     describe('EAN-extended', function() {
+        // TODO: Somehow, the supplements config below is being run with the EAN test above, which shouldn't
+        // need it, but apparently doesn't decode right without it anyway.  Serious wtf'ing here.
+        // I don't understand why, but skipping this test causes 2 tests above to pass, even though
+        // i should only be running one test.  Not skipping this causes only 1 test above to pass.
+        // VERY CONFUSING.
         var config = {
                 inputStream: {
                     size: 800,

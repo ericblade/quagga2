@@ -1,4 +1,4 @@
-import EANReader from './ean_reader';
+import EANReader from './ean_reader_new';
 
 function EAN2Reader() {
     EANReader.call(this);

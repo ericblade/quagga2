@@ -134,14 +134,15 @@ export abstract class BarcodeReader {
     }
 
     decodePattern(pattern: Array<number>) {
-        console.warn('* decodePattern', pattern);
+        // console.warn('* decodePattern', pattern);
         this._row = pattern;
+        // console.warn('* decodePattern calling decode', typeof this, this.constructor, this.FORMAT, JSON.stringify(this));
         let result = this._decode();
-        console.warn('* first result=', result);
+        // console.warn('* first result=', result);
         if (result === null) {
             this._row.reverse();
             result = this._decode();
-            console.warn('* reversed result=', result);
+            // console.warn('* reversed result=', result);
             if (result) {
                 result.direction = BarcodeDirection.Reverse;
                 result.start = this._row.length - result.start;
@@ -153,7 +154,7 @@ export abstract class BarcodeReader {
         if (result) {
             result.format = this.FORMAT;
         }
-        console.warn('* returning', result);
+        // console.warn('* returning', result);
         return result;
     }
 
