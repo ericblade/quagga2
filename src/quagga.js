@@ -16,6 +16,7 @@ import { clone } from 'gl-vec2';
 import setupInputStream from './quagga/setupInputStream.ts';
 import _getViewPort from './quagga/getViewPort.ts';
 import _initBuffers from './quagga/initBuffers.ts';
+import _initCanvas from './quagga/initCanvas';
 
 const vec2 = { clone };
 
@@ -64,6 +65,28 @@ function getViewPort() {
     return _getViewPort(target);
 }
 
+function ready(cb) {
+    _inputStream.play();
+    cb();
+}
+
+function initCanvas() {
+    _initCanvas(getViewPort(), _canvasContainer, _config.inputStream.type, _inputStream);
+}
+
+function canRecord(cb) {
+    BarcodeLocator.checkImageConstraints(_inputStream, _config.locator);
+    initCanvas(_config);
+    _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
+
+    adjustWorkerPool(_config.numOfWorkers, function () {
+        if (_config.numOfWorkers === 0) {
+            initializeData();
+        }
+        ready(cb);
+    });
+}
+
 function initInputStream(cb) {
     const { type: inputType, constraints } = _config.inputStream;
     const { video, inputStream } = setupInputStream(inputType, getViewPort(), InputStream);
@@ -79,53 +102,6 @@ function initInputStream(cb) {
     inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 
     _inputStream = inputStream;
-}
-
-function canRecord(cb) {
-    BarcodeLocator.checkImageConstraints(_inputStream, _config.locator);
-    initCanvas(_config);
-    _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
-
-    adjustWorkerPool(_config.numOfWorkers, function() {
-        if (_config.numOfWorkers === 0) {
-            initializeData();
-        }
-        ready(cb);
-    });
-}
-
-function ready(cb){
-    _inputStream.play();
-    cb();
-}
-
-function initCanvas() {
-    if (typeof document !== 'undefined') {
-        var $viewport = getViewPort();
-        _canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
-        if (!_canvasContainer.dom.image) {
-            _canvasContainer.dom.image = document.createElement('canvas');
-            _canvasContainer.dom.image.className = 'imgBuffer';
-            if ($viewport && _config.inputStream.type === 'ImageStream') {
-                $viewport.appendChild(_canvasContainer.dom.image);
-            }
-        }
-        _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext('2d');
-        _canvasContainer.dom.image.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.image.height = _inputStream.getCanvasSize().y;
-
-        _canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
-        if (!_canvasContainer.dom.overlay) {
-            _canvasContainer.dom.overlay = document.createElement('canvas');
-            _canvasContainer.dom.overlay.className = 'drawingBuffer';
-            if ($viewport) {
-                $viewport.appendChild(_canvasContainer.dom.overlay);
-            }
-        }
-        _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
-        _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.overlay.height = _inputStream.getCanvasSize().y;
-    }
 }
 
 function getBoundingBoxes() {
