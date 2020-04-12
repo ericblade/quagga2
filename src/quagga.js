@@ -17,6 +17,7 @@ import setupInputStream from './quagga/setupInputStream.ts';
 import _getViewPort from './quagga/getViewPort.ts';
 import _initBuffers from './quagga/initBuffers.ts';
 import _initCanvas from './quagga/initCanvas';
+import { moveBox, moveLine } from './quagga/transform';
 
 const vec2 = { clone };
 
@@ -117,49 +118,30 @@ function getBoundingBoxes() {
 }
 
 function transformResult(result) {
-    var topRight = _inputStream.getTopRight(),
-        xOffset = topRight.x,
-        yOffset = topRight.y,
-        i;
+    const topRight = _inputStream.getTopRight();
+    const xOffset = topRight.x;
+    const yOffset = topRight.y;
 
     if (xOffset === 0 && yOffset === 0) {
         return;
     }
 
     if (result.barcodes) {
-        for (i = 0; i < result.barcodes.length; i++) {
-            transformResult(result.barcodes[i]);
-        }
+        result.barcodes.forEach((barcode) => transformResult(barcode));
     }
 
     if (result.line && result.line.length === 2) {
-        moveLine(result.line);
+        moveLine(result.line, xOffset, yOffset);
     }
 
     if (result.box) {
-        moveBox(result.box);
+        moveBox(result.box, xOffset, yOffset);
     }
 
     if (result.boxes && result.boxes.length > 0) {
-        for (i = 0; i < result.boxes.length; i++) {
-            moveBox(result.boxes[i]);
+        for (let i = 0; i < result.boxes.length; i++) {
+            moveBox(result.boxes[i], xOffset, yOffset);
         }
-    }
-
-    function moveBox(box) {
-        var corner = box.length;
-
-        while (corner--) {
-            box[corner][0] += xOffset;
-            box[corner][1] += yOffset;
-        }
-    }
-
-    function moveLine(line) {
-        line[0].x += xOffset;
-        line[0].y += yOffset;
-        line[1].x += xOffset;
-        line[1].y += yOffset;
     }
 }
 
