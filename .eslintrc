@@ -42,7 +42,7 @@
         "dot-notation": "error",
         "eol-last": "error",
         "func-call-spacing": [ "error", "never" ],
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
         "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
         "keyword-spacing": [ "error", { "after": true }],
         "max-len" : ["warn", 120],
