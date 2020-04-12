@@ -5,7 +5,6 @@ import { merge } from 'lodash';
 const CODE_G_START = 10;
 export { CODE_G_START };
 const START_PATTERN = [1, 1, 1];
-const STOP_PATTERN = [1, 1, 1];
 const MIDDLE_PATTERN = [1, 1, 1, 1, 1];
 export { MIDDLE_PATTERN };
 const EXTENSION_START_PATTERN = [1, 1, 2];
@@ -38,6 +37,8 @@ const AVG_CODE_ERROR = 0.48;
 class EANReader extends BarcodeReader {
     FORMAT = 'ean_13';
     SINGLE_CODE_ERROR = 0.70;
+    STOP_PATTERN = [1, 1, 1];
+
     constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         super(merge({ supplements: [] }, config), supplements);
     }
@@ -278,7 +279,7 @@ class EANReader extends BarcodeReader {
 
     protected _findEnd(offset: number, isWhite: boolean): BarcodePosition | null {
         // console.warn('* findEnd', offset, isWhite);
-        const endInfo = this._findPattern(STOP_PATTERN, offset, isWhite, false);
+        const endInfo = this._findPattern(this.STOP_PATTERN, offset, isWhite, false);
 
         return endInfo !== null ? this._verifyTrailingWhitespace(endInfo) : null;
     }

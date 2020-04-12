@@ -130,7 +130,6 @@ describe('decodeSingle', function () {
                 {'name': 'image-010.jpg', 'result': '9002244845578'},
             ];
 
-        console.warn('* test config=', JSON.stringify(config));
         testSet.forEach(function(sample) {
             sample.format = 'ean_13';
         });
@@ -139,6 +138,8 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config);
     });
 
+    // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
+    // difference between a supplement and a separate reader?  is it just semantic?
     describe('EAN-extended', function() {
         // TODO: Somehow, the supplements config below is being run with the EAN test above, which shouldn't
         // need it, but apparently doesn't decode right without it anyway.  Serious wtf'ing here.
@@ -160,7 +161,8 @@ describe('decodeSingle', function () {
                         format: 'ean_reader',
                         config: {
                             supplements: [
-                                'ean_5_reader', 'ean_2_reader',
+                                'ean_5_reader',
+                                'ean_2_reader',
                             ],
                         },
                     }],
@@ -169,9 +171,9 @@ describe('decodeSingle', function () {
                 src: null,
             },
             testSet = [
-                // {"name": "image-001.jpg", "result": "900437801102701"},
+                // // {"name": "image-001.jpg", "result": "900437801102701"},
                 {'name': 'image-002.jpg', 'result': '419871600890101'},
-                // {"name": "image-003.jpg", "result": "419871600890101"},
+                // // {"name": "image-003.jpg", "result": "419871600890101"},
                 {'name': 'image-004.jpg', 'result': '978054466825652495'},
                 {'name': 'image-005.jpg', 'result': '419664190890712'},
                 // {"name": "image-006.jpg", "result": "412056690699101"},
