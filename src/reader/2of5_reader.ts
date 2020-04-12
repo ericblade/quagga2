@@ -18,7 +18,7 @@ const CODE_PATTERN = [
 ];
 const START_PATTERN_LENGTH = START_PATTERN.reduce((sum, val) => sum + val, 0);
 
-class NewTwoOfFiveReader extends BarcodeReader {
+class TwoOfFiveReader extends BarcodeReader {
     barSpaceRatio = [1, 1];
     FORMAT = '2of5';
     SINGLE_CODE_ERROR = 0.78;
@@ -221,4 +221,4 @@ class NewTwoOfFiveReader extends BarcodeReader {
     }
 }
 
-export default NewTwoOfFiveReader;
+export default TwoOfFiveReader;

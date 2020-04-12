@@ -37,7 +37,7 @@ const AVG_CODE_ERROR = 0.48;
 class EANReader extends BarcodeReader {
     FORMAT = 'ean_13';
     SINGLE_CODE_ERROR = 0.70;
-    STOP_PATTERN = [1, 1, 1];
+    STOP_PATTERN = [1, 1, 1]; // TODO: does this need to be in the class?
 
     constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         super(merge({ supplements: [] }, config), supplements);
@@ -129,18 +129,6 @@ class EANReader extends BarcodeReader {
                             bestMatch.code = code;
                             bestMatch.error = error;
                         }
-                        // const error = this._matchPattern(counter, CODE_PATTERN[code]);
-                        // if (error < epsilon && bestMatch.error && error < bestMatch.error) {
-                        //     found = true;
-                        //     bestMatch.code = code;
-                        //     bestMatch.error = error;
-                        //     bestMatch.end = i;
-                        //     console.warn('* return bestMatch', JSON.stringify(bestMatch));
-                        //     return bestMatch;
-                        // }
-                        // if (bestMatch && bestMatch.error && bestMatch.error > AVG_CODE_ERROR) {
-                        //     return null;
-                        // }
                     }
                     if (bestMatch.error! > epsilon) {
                         // console.warn('* return null');
@@ -154,11 +142,6 @@ class EANReader extends BarcodeReader {
                 counter[counterPos] = 1;
                 isWhite = !isWhite;
             }
-        }
-        if (found) {
-            // console.warn('* return bestMatch', JSON.stringify(bestMatch));
-        } else {
-            // console.warn('* return null');
         }
         return found ? bestMatch : null;
     }
@@ -349,7 +332,6 @@ class EANReader extends BarcodeReader {
         }
 
         let code: BarcodePosition | BarcodeInfo | null = {
-            // code: startInfo.code,
             start: startInfo.start,
             end: startInfo.end
         };

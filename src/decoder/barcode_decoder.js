@@ -2,7 +2,7 @@ import Bresenham from './bresenham';
 import ImageDebug from '../common/image_debug.ts';
 import Code128Reader from '../reader/code_128_reader';
 // import EANReader from '../reader/ean_reader';
-import EANReader from '../reader/ean_reader_new';
+import EANReader from '../reader/ean_reader';
 import Code39Reader from '../reader/code_39_reader';
 import Code39VINReader from '../reader/code_39_vin_reader';
 import CodabarReader from '../reader/codabar_reader';

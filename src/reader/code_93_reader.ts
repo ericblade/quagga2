@@ -11,10 +11,9 @@ const CHARACTER_ENCODINGS = new Uint16Array([
     0x16E, 0x176, 0x1AE, 0x126, 0x1DA, 0x1D6, 0x132, 0x15E,
 ]);
 const ASTERISK = 0x15E;
-const FORMAT = 'code_93';
 
 class Code93Reader extends BarcodeReader {
-    FORMAT = FORMAT;
+    FORMAT = 'code_93';
     _patternToChar(pattern: number) {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
             if (CHARACTER_ENCODINGS[i] === pattern) {
@@ -26,11 +25,8 @@ class Code93Reader extends BarcodeReader {
 
     _toPattern(counters: Uint16Array) {
         const numCounters = counters.length;
+        const sum = counters.reduce((prev, next) => prev + next, 0);
         let pattern = 0;
-        let sum = 0;
-        for (let i = 0; i < numCounters; i++) {
-            sum += counters[i];
-        }
 
         for (let i = 0; i < numCounters; i++) {
             let normalized = Math.round(counters[i] * 9 / sum);
@@ -45,7 +41,6 @@ class Code93Reader extends BarcodeReader {
                 pattern <<= normalized;
             }
         }
-
         return pattern;
     };
 
@@ -218,7 +213,7 @@ class Code93Reader extends BarcodeReader {
         }
 
         result = result.slice(0, result.length - 2);
-        // TODO: Eric really hates assigning inside an if ugliness, but it's pretty elegant here.
+        // yes, this is an assign inside an if.
         if ((result = this._decodeExtended(result)) === null) {
             return null;
         }
@@ -229,7 +224,7 @@ class Code93Reader extends BarcodeReader {
             end: nextStart,
             startInfo: start,
             decodedCodes: result,
-            format: FORMAT,
+            format: this.FORMAT,
         };
 
     }

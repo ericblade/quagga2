@@ -1,18 +1,18 @@
-import BarcodeReader, { BarcodePosition, Barcode, BarcodeFormat } from './barcode_reader';
+import BarcodeReader, { BarcodePosition, Barcode } from './barcode_reader';
 import ArrayHelper from '../common/array_helper';
 
 const ALPHABETH_STRING = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%';
 const ALPHABET = new Uint16Array([...ALPHABETH_STRING].map(char => char.charCodeAt(0)));
-const CHARACTER_ENCODINGS = new Uint16Array(
-    [0x034, 0x121, 0x061, 0x160, 0x031, 0x130, 0x070, 0x025, 0x124, 0x064, 0x109, 0x049,
-        0x148, 0x019, 0x118, 0x058, 0x00D, 0x10C, 0x04C, 0x01C, 0x103, 0x043, 0x142, 0x013, 0x112, 0x052, 0x007, 0x106,
-        0x046, 0x016, 0x181, 0x0C1, 0x1C0, 0x091, 0x190, 0x0D0, 0x085, 0x184, 0x0C4, 0x094, 0x0A8, 0x0A2, 0x08A, 0x02A,
-    ]);
+const CHARACTER_ENCODINGS = new Uint16Array([
+    0x034, 0x121, 0x061, 0x160, 0x031, 0x130, 0x070, 0x025, 0x124, 0x064, 0x109, 0x049,
+    0x148, 0x019, 0x118, 0x058, 0x00D, 0x10C, 0x04C, 0x01C, 0x103, 0x043, 0x142, 0x013, 0x112, 0x052, 0x007, 0x106,
+    0x046, 0x016, 0x181, 0x0C1, 0x1C0, 0x091, 0x190, 0x0D0, 0x085, 0x184, 0x0C4, 0x094, 0x0A8, 0x0A2, 0x08A, 0x02A,
+]);
 const ASTERISK = 0x094;
-const FORMAT = 'code_39';
 
 class Code39Reader extends BarcodeReader {
-    FORMAT: BarcodeFormat = FORMAT;
+    FORMAT = 'code_39';
+
     _findStart() {
         const offset = this._nextSet(this._row);
         let patternStart = offset;
@@ -58,10 +58,9 @@ class Code39Reader extends BarcodeReader {
         let maxNarrowWidth = 0;
         let numWideBars = numCounters;
         let wideBarWidth = 0;
-        const self = this;
 
         while (numWideBars > 3) {
-            maxNarrowWidth = self._findNextWidth(counters, maxNarrowWidth);
+            maxNarrowWidth = this._findNextWidth(counters, maxNarrowWidth);
             numWideBars = 0;
             let pattern = 0;
             for (let i = 0; i < numCounters; i++) {
@@ -161,7 +160,7 @@ class Code39Reader extends BarcodeReader {
             end: nextStart,
             startInfo: start,
             decodedCodes: result,
-            format: FORMAT as BarcodeFormat,
+            format: this.FORMAT,
         };
 
     }

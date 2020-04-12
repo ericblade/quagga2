@@ -1,15 +1,13 @@
-import EANReader, { CODE_G_START, MIDDLE_PATTERN } from './ean_reader_new';
+import EANReader, { CODE_G_START, MIDDLE_PATTERN } from './ean_reader';
 import { BarcodePosition, BarcodeInfo } from './barcode_reader';
 
 class EAN8Reader extends EANReader {
     FORMAT = 'ean_8';
     protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null {
         let code: BarcodeInfo | BarcodePosition | null = inCode;
-        var i,
-            self = this;
 
-        for ( i = 0; i < 4; i++) {
-            code = self._decodeCode(code.end, CODE_G_START);
+        for (let i = 0; i < 4; i++) {
+            code = this._decodeCode(code.end, CODE_G_START);
             if (!code) {
                 return null;
             }
@@ -17,14 +15,14 @@ class EAN8Reader extends EANReader {
             decodedCodes.push(code);
         }
 
-        code = self._findPattern(MIDDLE_PATTERN, code.end, true, false);
+        code = this._findPattern(MIDDLE_PATTERN, code.end, true, false);
         if (code === null) {
             return null;
         }
         decodedCodes.push(code);
 
-        for ( i = 0; i < 4; i++) {
-            code = self._decodeCode(code.end, CODE_G_START);
+        for (let i = 0; i < 4; i++) {
+            code = this._decodeCode(code.end, CODE_G_START);
             if (!code) {
                 return null;
             }

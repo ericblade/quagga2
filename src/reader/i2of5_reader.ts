@@ -1,3 +1,5 @@
+// TODO: i2of5_reader and 2of5_reader share very similar code, make use of that
+
 import BarcodeReader, { BarcodeReaderConfig, BarcodeInfo, BarcodePosition, Barcode } from './barcode_reader';
 import {merge} from 'lodash';
 
@@ -38,14 +40,13 @@ class I2of5Reader extends BarcodeReader {
 
     _matchPattern(counter: Array<number>, code: ReadonlyArray<number>) {
         if (this.config.normalizeBarSpaceWidth) {
-            var i,
-                counterSum = [0, 0],
-                codeSum = [0, 0],
-                correction = [0, 0],
-                correctionRatio = this.MAX_CORRECTION_FACTOR,
-                correctionRatioInverse = 1 / correctionRatio;
+            const counterSum = [0, 0];
+            const codeSum = [0, 0];
+            const correction = [0, 0];
+            const correctionRatio = this.MAX_CORRECTION_FACTOR;
+            const correctionRatioInverse = 1 / correctionRatio;
 
-            for (i = 0; i < counter.length; i++) {
+            for (let i = 0; i < counter.length; i++) {
                 counterSum[i % 2] += counter[i];
                 codeSum[i % 2] += code[i];
             }
@@ -55,7 +56,7 @@ class I2of5Reader extends BarcodeReader {
             correction[0] = Math.max(Math.min(correction[0], correctionRatio), correctionRatioInverse);
             correction[1] = Math.max(Math.min(correction[1], correctionRatio), correctionRatioInverse);
             this.barSpaceRatio = correction;
-            for (i = 0; i < counter.length; i++) {
+            for (let i = 0; i < counter.length; i++) {
                 counter[i] *= this.barSpaceRatio[i % 2];
             }
         }
@@ -63,42 +64,31 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _findPattern(pattern: ReadonlyArray<number>, offset?: number, isWhite: boolean = false, tryHarder: boolean = false): BarcodeInfo | null {
-        var counter = [],
-            self = this,
-            i,
-            counterPos = 0,
-            bestMatch = {
-                error: Number.MAX_VALUE,
-                code: -1,
-                start: 0,
-                end: 0,
-            },
-            error,
-            j,
-            sum,
-            epsilon = self.AVG_CODE_ERROR;
+        const counter = new Array<number>(pattern.length).fill(0);
+        let counterPos = 0;
+        const bestMatch = {
+            error: Number.MAX_VALUE,
+            code: -1,
+            start: 0,
+            end: 0,
+        };
+
+        const epsilon = this.AVG_CODE_ERROR;
 
         isWhite = isWhite || false;
         tryHarder = tryHarder || false;
 
         if (!offset) {
-            offset = self._nextSet(self._row);
+            offset = this._nextSet(this._row);
         }
 
-        for ( i = 0; i < pattern.length; i++) {
-            counter[i] = 0;
-        }
-
-        for ( i = offset; i < self._row.length; i++) {
-            if (self._row[i] ^ (isWhite ? 1 : 0)) {
+        for (let i = offset; i < this._row.length; i++) {
+            if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
             } else {
                 if (counterPos === counter.length - 1) {
-                    sum = 0;
-                    for ( j = 0; j < counter.length; j++) {
-                        sum += counter[j];
-                    }
-                    error = self._matchPattern(counter, pattern);
+                    const sum = counter.reduce((prev, next) => prev + next, 0);
+                    const error = this._matchPattern(counter, pattern);
                     if (error < epsilon) {
                         bestMatch.error = error;
                         bestMatch.start = i - sum;
@@ -106,7 +96,7 @@ class I2of5Reader extends BarcodeReader {
                         return bestMatch;
                     }
                     if (tryHarder) {
-                        for (j = 0; j < counter.length - 2; j++) {
+                        for (let j = 0; j < counter.length - 2; j++) {
                             counter[j] = counter[j + 2];
                         }
                         counter[counter.length - 2] = 0;
@@ -126,21 +116,20 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _findStart() {
-        var self = this,
-            leadingWhitespaceStart,
-            offset = self._nextSet(self._row),
-            startInfo,
-            narrowBarWidth = 1;
+        let leadingWhitespaceStart = 0;
+        let offset = this._nextSet(this._row);
+        let startInfo: BarcodePosition | null = null;
+        let narrowBarWidth = 1;
 
         while (!startInfo) {
-            startInfo = self._findPattern(self.START_PATTERN, offset, false, true);
+            startInfo = this._findPattern(this.START_PATTERN, offset, false, true);
             if (!startInfo) {
                 return null;
             }
             narrowBarWidth = Math.floor((startInfo.end - startInfo.start) / 4);
             leadingWhitespaceStart = startInfo.start - narrowBarWidth * 10;
             if (leadingWhitespaceStart >= 0) {
-                if (self._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
+                if (this._matchRange(leadingWhitespaceStart, startInfo.start, 0)) {
                     return startInfo;
                 }
             }
@@ -151,12 +140,9 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _verifyTrailingWhitespace(endInfo: BarcodePosition) {
-        var self = this,
-            trailingWhitespaceEnd;
-
-        trailingWhitespaceEnd = endInfo.end + ((endInfo.end - endInfo.start) / 2);
-        if (trailingWhitespaceEnd < self._row.length) {
-            if (self._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
+        const trailingWhitespaceEnd = endInfo.end + ((endInfo.end - endInfo.start) / 2);
+        if (trailingWhitespaceEnd < this._row.length) {
+            if (this._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
                 return endInfo;
             }
         }
@@ -164,34 +150,27 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _findEnd() {
-        var self = this,
-            endInfo,
-            tmp;
-
-        self._row.reverse();
-        endInfo = self._findPattern(self.STOP_PATTERN);
-        self._row.reverse();
+        this._row.reverse();
+        const endInfo = this._findPattern(this.STOP_PATTERN);
+        this._row.reverse();
 
         if (endInfo === null) {
             return null;
         }
 
         // reverse numbers
-        tmp = endInfo.start;
-        endInfo.start = self._row.length - endInfo.end;
-        endInfo.end = self._row.length - tmp;
+        const tmp = endInfo.start;
+        endInfo.start = this._row.length - endInfo.end;
+        endInfo.end = this._row.length - tmp;
 
-        return endInfo !== null ? self._verifyTrailingWhitespace(endInfo) : null;
+        return endInfo !== null ? this._verifyTrailingWhitespace(endInfo) : null;
     };
 
     _decodePair(counterPair: Array<Array<number>>) {
-        var i,
-            code,
-            codes = [],
-            self = this;
+        const codes: Array<BarcodeInfo> = [];
 
-        for (i = 0; i < counterPair.length; i++) {
-            code = self._decodeCode(counterPair[i]);
+        for (let i = 0; i < counterPair.length; i++) {
+            const code = this._decodeCode(counterPair[i]);
             if (!code) {
                 return null;
             }
@@ -201,19 +180,17 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _decodeCode(counter: Array<number>): BarcodeInfo | null {
-        var self = this,
-            error,
-            epsilon = self.AVG_CODE_ERROR,
-            code,
-            bestMatch = {
-                error: Number.MAX_VALUE,
-                code: -1,
-                start: 0,
-                end: 0,
-            };
+        const epsilon = this.AVG_CODE_ERROR;
 
-        for (code = 0; code < self.CODE_PATTERN.length; code++) {
-            error = self._matchPattern(counter, self.CODE_PATTERN[code]);
+        const bestMatch = {
+            error: Number.MAX_VALUE,
+            code: -1,
+            start: 0,
+            end: 0,
+        };
+
+        for (let code = 0; code < this.CODE_PATTERN.length; code++) {
+            const error = this._matchPattern(counter, this.CODE_PATTERN[code]);
             if (error < bestMatch.error) {
                 bestMatch.code = code;
                 bestMatch.error = error;
@@ -226,24 +203,22 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo | BarcodePosition>) {
-        var i,
-            self = this,
-            pos = 0,
-            counterLength = counters.length,
-            counterPair = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]],
-            codes;
+        let pos = 0;
+        const counterLength = counters.length;
+        const counterPair = [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0]];
+        let codes: BarcodeInfo[] | null = null;
 
         while (pos < counterLength) {
-            for (i = 0; i < 5; i++) {
+            for (let i = 0; i < 5; i++) {
                 counterPair[0][i] = counters[pos] * this.barSpaceRatio[0];
                 counterPair[1][i] = counters[pos + 1] * this.barSpaceRatio[1];
                 pos += 2;
             }
-            codes = self._decodePair(counterPair);
+            codes = this._decodePair(counterPair);
             if (!codes) {
                 return null;
             }
-            for (i = 0; i < codes.length; i++) {
+            for (let i = 0; i < codes.length; i++) {
                 result.push(codes[i].code + '');
                 decodedCodes.push(codes[i]);
             }
@@ -256,30 +231,25 @@ class I2of5Reader extends BarcodeReader {
     };
 
     _decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null {
-        var startInfo,
-            endInfo,
-            self = this,
-            code,
-            result = new Array<string>(),
-            decodedCodes = new Array<BarcodePosition>(),
-            counters;
+        var result = new Array<string>();
+        var decodedCodes = new Array<BarcodePosition>();
 
-        startInfo = self._findStart();
+        const startInfo = this._findStart();
         if (!startInfo) {
             return null;
         }
         decodedCodes.push(startInfo);
 
-        endInfo = self._findEnd();
+        const endInfo = this._findEnd();
         if (!endInfo) {
             return null;
         }
 
-        counters = self._fillCounters(startInfo.end, endInfo.start, false);
-        if (!self._verifyCounterLength(counters)) {
+        const counters = this._fillCounters(startInfo.end, endInfo.start, false);
+        if (!this._verifyCounterLength(counters)) {
             return null;
         }
-        code = self._decodePayload(counters, result, decodedCodes);
+        const code = this._decodePayload(counters, result, decodedCodes);
         if (!code) {
             return null;
         }

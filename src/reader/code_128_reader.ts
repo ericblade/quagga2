@@ -124,50 +124,46 @@ class Code128Reader extends BarcodeReader {
     MODULE_INDICES = { bar: [0, 2, 4], space: [1, 3, 5] };
 
     _decodeCode(start: number, correction?: BarcodeCorrection) {
-        var counter = [0, 0, 0, 0, 0, 0],
-            i,
-            self = this,
-            offset = start,
-            isWhite = !self._row[offset],
-            counterPos = 0,
-            bestMatch = {
-                error: Number.MAX_VALUE,
-                code: -1,
-                start: start,
-                end: start,
-                correction: {
-                    bar: 1,
-                    space: 1,
-                },
+        const bestMatch = {
+            error: Number.MAX_VALUE,
+            code: -1,
+            start: start,
+            end: start,
+            correction: {
+                bar: 1,
+                space: 1,
             },
-            code,
-            error;
+        };
+        let counter = [0, 0, 0, 0, 0, 0];
+        const offset = start;
+        let isWhite = !this._row[offset];
+        let counterPos = 0;
 
-        for ( i = offset; i < self._row.length; i++) {
-            if (self._row[i] ^ (isWhite ? 1 : 0)) {
+        for (let i = offset; i < this._row.length; i++) {
+            if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
             } else {
                 if (counterPos === counter.length - 1) {
                     if (correction) {
-                        self._correct(counter, correction);
+                        this._correct(counter, correction);
                     }
-                    for (code = 0; code < self.CODE_PATTERN.length; code++) {
-                        error = self._matchPattern(counter, self.CODE_PATTERN[code]);
+                    for (let code = 0; code < this.CODE_PATTERN.length; code++) {
+                        const error = this._matchPattern(counter, this.CODE_PATTERN[code]);
                         if (error < bestMatch.error) {
                             bestMatch.code = code;
                             bestMatch.error = error;
                         }
                     }
                     bestMatch.end = i;
-                    if (bestMatch.code === -1 || bestMatch.error > self.AVG_CODE_ERROR) {
+                    if (bestMatch.code === -1 || bestMatch.error > this.AVG_CODE_ERROR) {
                         return null;
                     }
-                    if (self.CODE_PATTERN[bestMatch.code]) {
+                    if (this.CODE_PATTERN[bestMatch.code]) {
                         bestMatch.correction.bar = this.calculateCorrection(
-                            self.CODE_PATTERN[bestMatch.code], counter,
+                            this.CODE_PATTERN[bestMatch.code], counter,
                             this.MODULE_INDICES.bar);
                         bestMatch.correction.space = this.calculateCorrection(
-                            self.CODE_PATTERN[bestMatch.code], counter,
+                            this.CODE_PATTERN[bestMatch.code], counter,
                             this.MODULE_INDICES.space);
                     }
                     return bestMatch;
@@ -186,57 +182,49 @@ class Code128Reader extends BarcodeReader {
         this._correctBars(counter, correction.space, this.MODULE_INDICES.space);
     };
 
+    // TODO: _findStart and decodeCode share similar code, can we re-use some?
     _findStart() {
-        var counter = [0, 0, 0, 0, 0, 0],
-            i,
-            self = this,
-            offset = self._nextSet(self._row),
-            isWhite = false,
-            counterPos = 0,
-            bestMatch = {
-                error: Number.MAX_VALUE,
-                code: -1,
-                start: 0,
-                end: 0,
-                correction: {
-                    bar: 1,
-                    space: 1,
-                },
+        const counter = [0, 0, 0, 0, 0, 0];
+        const offset = this._nextSet(this._row);
+        const bestMatch = {
+            error: Number.MAX_VALUE,
+            code: -1,
+            start: 0,
+            end: 0,
+            correction: {
+                bar: 1,
+                space: 1,
             },
-            code,
-            error,
-            j,
-            sum;
+        };
+        let isWhite = false;
+        let counterPos = 0;
 
-        for ( i = offset; i < self._row.length; i++) {
-            if (self._row[i] ^ (isWhite ? 1 : 0)) {
+        for (let i = offset; i < this._row.length; i++) {
+            if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
             } else {
                 if (counterPos === counter.length - 1) {
-                    sum = 0;
-                    for ( j = 0; j < counter.length; j++) {
-                        sum += counter[j];
-                    }
-                    for (code = self.START_CODE_A; code <= self.START_CODE_C; code++) {
-                        error = self._matchPattern(counter, self.CODE_PATTERN[code]);
+                    const sum = counter.reduce((prev, next) => prev + next, 0);
+                    for (let code = this.START_CODE_A; code <= this.START_CODE_C; code++) {
+                        const error = this._matchPattern(counter, this.CODE_PATTERN[code]);
                         if (error < bestMatch.error) {
                             bestMatch.code = code;
                             bestMatch.error = error;
                         }
                     }
-                    if (bestMatch.error < self.AVG_CODE_ERROR) {
+                    if (bestMatch.error < this.AVG_CODE_ERROR) {
                         bestMatch.start = i - sum;
                         bestMatch.end = i;
                         bestMatch.correction.bar = this.calculateCorrection(
-                            self.CODE_PATTERN[bestMatch.code], counter,
+                            this.CODE_PATTERN[bestMatch.code], counter,
                             this.MODULE_INDICES.bar);
                         bestMatch.correction.space = this.calculateCorrection(
-                            self.CODE_PATTERN[bestMatch.code], counter,
+                            this.CODE_PATTERN[bestMatch.code], counter,
                             this.MODULE_INDICES.space);
                         return bestMatch;
                     }
 
-                    for ( j = 0; j < 4; j++) {
+                    for (let j = 0; j < 4; j++) {
                         counter[j] = counter[j + 2];
                     }
                     counter[4] = 0;
@@ -257,17 +245,17 @@ class Code128Reader extends BarcodeReader {
         if (startInfo === null) {
             return null;
         }
-        var self = this,
-            done = false,
-            result = [],
-            multiplier = 0,
-            checksum = 0,
-            codeset,
-            rawResult = [],
-            decodedCodes = [],
-            shiftNext = false,
-            unshift,
-            removeLastCharacter = true;
+        // var self = this,
+        //     done = false,
+        //     result = [],
+        //     multiplier = 0,
+        //     checksum = 0,
+        //     codeset,
+        //     rawResult = [],
+        //     decodedCodes = [],
+        //     shiftNext = false,
+        //     unshift,
+        //     removeLastCharacter = true;
 
         let code: BarcodeInfo | null = {
             code: startInfo.code,
@@ -278,32 +266,39 @@ class Code128Reader extends BarcodeReader {
                 space: startInfo.correction.space,
             },
         };
+        const decodedCodes = [];
         decodedCodes.push(code);
-        checksum = code.code;
-        switch (code.code) {
-        case self.START_CODE_A:
-            codeset = self.CODE_A;
-            break;
-        case self.START_CODE_B:
-            codeset = self.CODE_B;
-            break;
-        case self.START_CODE_C:
-            codeset = self.CODE_C;
-            break;
-        default:
-            return null;
-        }
+        let checksum = code.code;
+        let codeset = ((c: number) => {
+            switch (c) {
+                case this.START_CODE_A:
+                    return this.CODE_A;
+                case this.START_CODE_B:
+                    return this.CODE_B;
+                case this.START_CODE_C:
+                    return this.CODE_C;
+                default:
+                    return null;
+            }
+        })(code.code);
+        let done = false;
+        let shiftNext = false;
+        let unshift = shiftNext;
+        let removeLastCharacter = true;
+        let multiplier = 0;
+        let rawResult: Array<number> = [];
+        let result: Array<string | number> = []; // TODO: i think this should be string only, but it creates problems if it is
 
         while (!done) {
             unshift = shiftNext;
             shiftNext = false;
-            code = self._decodeCode(code!.end, code!.correction);
+            code = this._decodeCode(code!.end, code!.correction);
             if (code !== null) {
-                if (code.code !== self.STOP_CODE) {
+                if (code.code !== this.STOP_CODE) {
                     removeLastCharacter = true;
                 }
 
-                if (code.code !== self.STOP_CODE) {
+                if (code.code !== this.STOP_CODE) {
                     rawResult.push(code.code);
                     multiplier++;
                     checksum += multiplier * code.code;
@@ -311,71 +306,71 @@ class Code128Reader extends BarcodeReader {
                 decodedCodes.push(code);
 
                 switch (codeset) {
-                case self.CODE_A:
+                case this.CODE_A:
                     if (code.code < 64) {
                         result.push(String.fromCharCode(32 + code.code));
                     } else if (code.code < 96) {
                         result.push(String.fromCharCode(code.code - 64));
                     } else {
-                        if (code.code !== self.STOP_CODE) {
+                        if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
                         switch (code.code) {
-                        case self.CODE_SHIFT:
+                        case this.CODE_SHIFT:
                             shiftNext = true;
-                            codeset = self.CODE_B;
+                            codeset = this.CODE_B;
                             break;
-                        case self.CODE_B:
-                            codeset = self.CODE_B;
+                        case this.CODE_B:
+                            codeset = this.CODE_B;
                             break;
-                        case self.CODE_C:
-                            codeset = self.CODE_C;
+                        case this.CODE_C:
+                            codeset = this.CODE_C;
                             break;
-                        case self.STOP_CODE:
+                        case this.STOP_CODE:
                             done = true;
                             break;
                         }
                     }
                     break;
-                case self.CODE_B:
+                case this.CODE_B:
                     if (code.code < 96) {
                         result.push(String.fromCharCode(32 + code.code));
                     } else {
-                        if (code.code !== self.STOP_CODE) {
+                        if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
                         switch (code.code) {
-                        case self.CODE_SHIFT:
-                            shiftNext = true;
-                            codeset = self.CODE_A;
-                            break;
-                        case self.CODE_A:
-                            codeset = self.CODE_A;
-                            break;
-                        case self.CODE_C:
-                            codeset = self.CODE_C;
-                            break;
-                        case self.STOP_CODE:
-                            done = true;
-                            break;
+                            case this.CODE_SHIFT:
+                                shiftNext = true;
+                                codeset = this.CODE_A;
+                                break;
+                            case this.CODE_A:
+                                codeset = this.CODE_A;
+                                break;
+                            case this.CODE_C:
+                                codeset = this.CODE_C;
+                                break;
+                            case this.STOP_CODE:
+                                done = true;
+                                break;
                         }
                     }
                     break;
-                case self.CODE_C:
+                case this.CODE_C:
                     if (code.code < 100) {
                         result.push(code.code < 10 ? '0' + code.code : code.code);
                     } else {
-                        if (code.code !== self.STOP_CODE) {
+                        if (code.code !== this.STOP_CODE) {
                             removeLastCharacter = false;
                         }
                         switch (code.code) {
-                        case self.CODE_A:
-                            codeset = self.CODE_A;
+                        case this.CODE_A:
+                            codeset = this.CODE_A;
                             break;
-                        case self.CODE_B:
-                            codeset = self.CODE_B;
+                        case this.CODE_B:
+                            codeset = this.CODE_B;
                             break;
-                        case self.STOP_CODE:
+                        case this.STOP_CODE:
                             done = true;
                             break;
                         }
@@ -386,7 +381,7 @@ class Code128Reader extends BarcodeReader {
                 done = true;
             }
             if (unshift) {
-                codeset = codeset === self.CODE_A ? self.CODE_B : self.CODE_A;
+                codeset = codeset === this.CODE_A ? this.CODE_B : this.CODE_A;
             }
         }
 
@@ -394,8 +389,8 @@ class Code128Reader extends BarcodeReader {
             return null;
         }
 
-        code.end = self._nextUnset(self._row, code.end);
-        if (!self._verifyTrailingWhitespace(code)){
+        code.end = this._nextUnset(this._row, code.end);
+        if (!this._verifyTrailingWhitespace(code)){
             return null;
         }
 
@@ -418,7 +413,7 @@ class Code128Reader extends BarcodeReader {
             code: result.join(''),
             start: startInfo.start,
             end: code.end,
-            codeset: codeset,
+            codeset: codeset as number,
             startInfo: startInfo,
             decodedCodes: decodedCodes,
             endInfo: code,

@@ -95,18 +95,15 @@ class NewCodabarReader extends BarcodeReader {
     };
 
     _findStart(): BarcodePosition | null {
-        var self = this,
-            i,
-            pattern,
-            start = self._nextUnset(self._row),
-            end;
+        let start = this._nextUnset(this._row);
+        let end = start;
 
-        for (i = 1; i < this._counters.length; i++) {
-            pattern = self._toPattern(i);
-            if (pattern !== -1 && self._isStartEnd(pattern)) {
+        for (let i = 1; i < this._counters.length; i++) {
+            const pattern = this._toPattern(i);
+            if (pattern !== -1 && this._isStartEnd(pattern)) {
                 // TODO: Look for whitespace ahead
-                start += self._sumCounters(0, i);
-                end = start + self._sumCounters(i, i + 8);
+                start += this._sumCounters(0, i);
+                end = start + this._sumCounters(i, i + 8);
                 return {
                     start: start,
                     end: end,
