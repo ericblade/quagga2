@@ -15,6 +15,7 @@ import { clone } from 'gl-vec2';
 
 import setupInputStream from './quagga/setupInputStream.ts';
 import _getViewPort from './quagga/getViewPort.ts';
+import _initBuffers from './quagga/initBuffers.ts';
 
 const vec2 = { clone };
 
@@ -47,6 +48,12 @@ let _onUIThread = true;
 let _resultCollector;
 let _config = {};
 
+function initBuffers(imageWrapper) {
+    const { inputImageWrapper, boxSize } = _initBuffers(_inputStream, imageWrapper, _config.locator);
+    _inputImageWrapper = inputImageWrapper;
+    _boxSize = boxSize;
+}
+
 function initializeData(imageWrapper) {
     initBuffers(imageWrapper);
     _decoder = BarcodeDecoder.create(_config.decoder, _inputImageWrapper);
@@ -58,7 +65,6 @@ function getViewPort() {
 }
 
 function initInputStream(cb) {
-    console.warn('* initInputStream config=', JSON.stringify(_config));
     const { type: inputType, constraints } = _config.inputStream;
     const { video, inputStream } = setupInputStream(inputType, getViewPort(), InputStream);
 
@@ -120,28 +126,6 @@ function initCanvas() {
         _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
         _canvasContainer.dom.overlay.height = _inputStream.getCanvasSize().y;
     }
-}
-
-function initBuffers(imageWrapper) {
-    if (imageWrapper) {
-        _inputImageWrapper = imageWrapper;
-    } else {
-        _inputImageWrapper = new ImageWrapper({
-            x: _inputStream.getWidth(),
-            y: _inputStream.getHeight(),
-        });
-    }
-
-    if (ENV.development) {
-        console.log(_inputImageWrapper.size);
-    }
-    _boxSize = [
-        vec2.clone([0, 0]),
-        vec2.clone([0, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, 0]),
-    ];
-    BarcodeLocator.init(_inputImageWrapper, _config.locator);
 }
 
 function getBoundingBoxes() {
