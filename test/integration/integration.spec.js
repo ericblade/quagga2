@@ -53,9 +53,13 @@ describe('decodeSingle', function () {
                 config.readers = readers;
                 Quagga.decodeSingle(config, function(result) {
                     console.log('Decoding', sample.name);
+                    console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                     expect(result).to.be.an('Object');
+                    console.warn('* Expect codeResult to be an object');
                     expect(result.codeResult).to.be.an('Object');
+                    console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
                     expect(result.codeResult.code).to.equal(sample.result);
+                    console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
                     expect(result.codeResult.format).to.equal(sample.format);
                     callback();
                 });
@@ -134,7 +138,14 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config);
     });
 
+    // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
+    // difference between a supplement and a separate reader?  is it just semantic?
     describe('EAN-extended', function() {
+        // TODO: Somehow, the supplements config below is being run with the EAN test above, which shouldn't
+        // need it, but apparently doesn't decode right without it anyway.  Serious wtf'ing here.
+        // I don't understand why, but skipping this test causes 2 tests above to pass, even though
+        // i should only be running one test.  Not skipping this causes only 1 test above to pass.
+        // VERY CONFUSING.
         var config = {
                 inputStream: {
                     size: 800,
@@ -150,7 +161,8 @@ describe('decodeSingle', function () {
                         format: 'ean_reader',
                         config: {
                             supplements: [
-                                'ean_5_reader', 'ean_2_reader',
+                                'ean_5_reader',
+                                'ean_2_reader',
                             ],
                         },
                     }],
@@ -159,9 +171,9 @@ describe('decodeSingle', function () {
                 src: null,
             },
             testSet = [
-                // {"name": "image-001.jpg", "result": "900437801102701"},
+                // // {"name": "image-001.jpg", "result": "900437801102701"},
                 {'name': 'image-002.jpg', 'result': '419871600890101'},
-                // {"name": "image-003.jpg", "result": "419871600890101"},
+                // // {"name": "image-003.jpg", "result": "419871600890101"},
                 {'name': 'image-004.jpg', 'result': '978054466825652495'},
                 {'name': 'image-005.jpg', 'result': '419664190890712'},
                 // {"name": "image-006.jpg", "result": "412056690699101"},
