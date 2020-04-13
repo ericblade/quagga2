@@ -1,4 +1,5 @@
 import { QuaggaJSConfigObject } from "../type-definitions/quagga";
+import ImageWrapper from "common/image_wrapper";
 
 export class QuaggaContext {
   constructor(
@@ -9,4 +10,6 @@ export class QuaggaContext {
   public inputStream: any;
 
   public framegrabber: any;
+
+  public inputImageWrapper?: ImageWrapper;
 }

@@ -34,16 +34,15 @@ var  _stopped,
             overlay: null,
         },
     },
-    _inputImageWrapper,
     _boxSize,
     _decoder,
     _workerPool = [],
     _onUIThread = true,
     _resultCollector;
 
-function initializeData(imageWrapper) {
+function initializeData(imageWrapper: ImageWrapper) {
     initBuffers(imageWrapper);
-    _decoder = BarcodeDecoder.create(_context.config.decoder, _inputImageWrapper);
+    _decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
 }
 
 function initInputStream(cb) {
@@ -136,26 +135,26 @@ function initCanvas() {
     }
 }
 
-function initBuffers(imageWrapper) {
+function initBuffers(imageWrapper: ImageWrapper) {
     if (imageWrapper) {
-        _inputImageWrapper = imageWrapper;
+        _context.inputImageWrapper = imageWrapper;
     } else {
-        _inputImageWrapper = new ImageWrapper({
+        _context.inputImageWrapper = new ImageWrapper({
             x: _context.inputStream.getWidth(),
             y: _context.inputStream.getHeight(),
         });
     }
 
     if (ENV.development) {
-        console.log(_inputImageWrapper.size);
+        console.log(_context.inputImageWrapper.size);
     }
     _boxSize = [
         vec2.clone([0, 0]),
-        vec2.clone([0, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, 0]),
+        vec2.clone([0, _context.inputImageWrapper.size.y]),
+        vec2.clone([_context.inputImageWrapper.size.x, _context.inputImageWrapper.size.y]),
+        vec2.clone([_context.inputImageWrapper.size.x, 0]),
     ];
-    BarcodeLocator.init(_inputImageWrapper, _context.config.locator);
+    BarcodeLocator.init(_context.inputImageWrapper, _context.config.locator);
 }
 
 function getBoundingBoxes() {
@@ -257,11 +256,11 @@ function locateAndDecode() {
     if (boxes) {
         const decodeResult = _decoder.decodeFromBoundingBoxes(boxes) || {};
         decodeResult.boxes = boxes;
-        publishResult(decodeResult, _inputImageWrapper.data);
+        publishResult(decodeResult, _context.inputImageWrapper.data);
     } else {
-        const imageResult = _decoder.decodeFromImage(_inputImageWrapper);
+        const imageResult = _decoder.decodeFromImage(_context.inputImageWrapper);
         if (imageResult) {
-            publishResult(imageResult, _inputImageWrapper.data);
+            publishResult(imageResult, _context.inputImageWrapper.data);
         } else {
             publishResult();
         }
@@ -282,7 +281,7 @@ function update() {
                 return; // all workers are busy
             }
         } else {
-            _context.framegrabber.attachData(_inputImageWrapper.data);
+            _context.framegrabber.attachData(_context.inputImageWrapper.data);
         }
         if (_context.framegrabber.grab()) {
             if (availableWorker) {
