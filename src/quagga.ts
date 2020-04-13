@@ -23,8 +23,7 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 
 var _context: QuaggaContext;
 
-var  _stopped,
-    _canvasContainer = {
+var _canvasContainer = {
         ctx: {
             image: null,
             overlay: null,
@@ -303,10 +302,10 @@ function startContinuousUpdate() {
     var next = null,
         delay = 1000 / (_context.config.frequency || 60);
 
-    _stopped = false;
+    _context.stopped = false;
     (function frame(timestamp) {
         next = next || timestamp;
-        if (!_stopped) {
+        if (!_context.stopped) {
             if (timestamp >= next) {
                 next += delay;
                 update();
@@ -509,7 +508,7 @@ export default {
         start();
     },
     stop: function() {
-        _stopped = true;
+        _context.stopped = true;
         adjustWorkerPool(0);
         if (_context.config.inputStream && _context.config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
@@ -517,7 +516,7 @@ export default {
         }
     },
     pause: function() {
-        _stopped = true;
+        _context.stopped = true;
     },
     onDetected: function(callback) {
         Events.subscribe('detected', callback);

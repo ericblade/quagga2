@@ -12,4 +12,6 @@ export class QuaggaContext {
   public framegrabber: any;
 
   public inputImageWrapper?: ImageWrapper;
+
+  public stopped: boolean = false;
 }
