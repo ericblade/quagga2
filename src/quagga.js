@@ -18,6 +18,7 @@ import _getViewPort from './quagga/getViewPort.ts';
 import _initBuffers from './quagga/initBuffers.ts';
 import _initCanvas from './quagga/initCanvas';
 import { moveBox, moveLine } from './quagga/transform';
+import * as QWorkers from './quagga/qworker.ts';
 
 const vec2 = { clone };
 
@@ -45,7 +46,6 @@ const _canvasContainer = {
 let _inputImageWrapper;
 let _boxSize;
 let _decoder;
-let _workerPool = [];
 let _onUIThread = true;
 let _resultCollector;
 let _config = {};
@@ -80,7 +80,7 @@ function canRecord(cb) {
     initCanvas(_config);
     _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
 
-    adjustWorkerPool(_config.numOfWorkers, function () {
+    QWorkers.adjustWorkerPool(_config.numOfWorkers, _config, _inputStream, function () {
         if (_config.numOfWorkers === 0) {
             initializeData();
         }
@@ -145,7 +145,7 @@ function transformResult(result) {
     }
 }
 
-function addResult (result, imageData) {
+function addResult(result, imageData) {
     if (!imageData || !_resultCollector) {
         return;
     }
@@ -158,7 +158,7 @@ function addResult (result, imageData) {
     }
 }
 
-function hasCodeResult (result) {
+function hasCodeResult(result) {
     return result && (result.barcodes ?
         result.barcodes.some(barcode => barcode.codeResult) :
         result.codeResult);
@@ -181,7 +181,6 @@ function publishResult(result, imageData) {
 
 function locateAndDecode() {
     const boxes = getBoundingBoxes();
-
     if (boxes) {
         const decodeResult = _decoder.decodeFromBoundingBoxes(boxes) || {};
         decodeResult.boxes = boxes;
@@ -191,39 +190,25 @@ function locateAndDecode() {
         if (imageResult) {
             publishResult(imageResult, _inputImageWrapper.data);
         } else {
-            publishResult();
+            publishResult({ codeResult: { code: null } });
         }
     }
 }
 
 function update() {
-    var availableWorker;
-
     if (_onUIThread) {
-        if (_workerPool.length > 0) {
-            availableWorker = _workerPool.filter(function(workerThread) {
-                return !workerThread.busy;
-            })[0];
-            if (availableWorker) {
-                _framegrabber.attachData(availableWorker.imageData);
-            } else {
-                return; // all workers are busy
-            }
-        } else {
+        const workersUpdated = QWorkers.updateWorkers(_framegrabber);
+        if (!workersUpdated) {
             _framegrabber.attachData(_inputImageWrapper.data);
-        }
-        if (_framegrabber.grab()) {
-            if (availableWorker) {
-                availableWorker.busy = true;
-                availableWorker.worker.postMessage({
-                    cmd: 'process',
-                    imageData: availableWorker.imageData,
-                }, [availableWorker.imageData.buffer]);
-            } else {
-                locateAndDecode();
+            if (_framegrabber.grab()) {
+                if (!workersUpdated) {
+                    locateAndDecode();
+                }
             }
         }
     } else {
+        _framegrabber.attachData(_inputImageWrapper.data);
+        _framegrabber.grab();
         locateAndDecode();
     }
 }
@@ -253,125 +238,11 @@ function start() {
     }
 }
 
-function initWorker(cb) {
-    var blobURL,
-        workerThread = {
-            worker: undefined,
-            imageData: new Uint8Array(_inputStream.getWidth() * _inputStream.getHeight()),
-            busy: true,
-        };
-
-    blobURL = generateWorkerBlob();
-    workerThread.worker = new Worker(blobURL);
-
-    workerThread.worker.onmessage = function(e) {
-        if (e.data.event === 'initialized') {
-            URL.revokeObjectURL(blobURL);
-            workerThread.busy = false;
-            workerThread.imageData = new Uint8Array(e.data.imageData);
-            if (ENV.development) {
-                console.log('Worker initialized');
-            }
-            cb(workerThread);
-        } else if (e.data.event === 'processed') {
-            workerThread.imageData = new Uint8Array(e.data.imageData);
-            workerThread.busy = false;
-            publishResult(e.data.result, workerThread.imageData);
-        } else if (e.data.event === 'error') {
-            if (ENV.development) {
-                console.log('Worker error: ' + e.data.message);
-            }
-        }
-    };
-
-    workerThread.worker.postMessage({
-        cmd: 'init',
-        size: {x: _inputStream.getWidth(), y: _inputStream.getHeight()},
-        imageData: workerThread.imageData,
-        config: configForWorker(_config),
-    }, [workerThread.imageData.buffer]);
-}
-
-function configForWorker(config) {
-    return {
-        ...config,
-        inputStream: {
-            ...config.inputStream,
-            target: null,
-        },
-    };
-}
-
-function workerInterface(factory) {
-    if (factory) {
-        var Quagga = factory().default;
-        if (!Quagga) {
-            self.postMessage({'event': 'error', message: 'Quagga could not be created'});
-            return;
-        }
-    }
-    var imageWrapper;
-
-    function onProcessed(result) {
-        self.postMessage({
-            'event': 'processed',
-            imageData: imageWrapper.data,
-            result: result,
-        }, [imageWrapper.data.buffer]);
-    }
-
-    function workerInterfaceReady() {
-        self.postMessage({
-            'event': 'initialized',
-            imageData: imageWrapper.data,
-        }, [imageWrapper.data.buffer]);
-    }
-
-    self.onmessage = function(e) {
-        if (e.data.cmd === 'init') {
-            var config = e.data.config;
-            config.numOfWorkers = 0;
-            imageWrapper = new Quagga.ImageWrapper({
-                x: e.data.size.x,
-                y: e.data.size.y,
-            }, new Uint8Array(e.data.imageData));
-            Quagga.init(config, workerInterfaceReady, imageWrapper);
-            Quagga.onProcessed(onProcessed);
-        } else if (e.data.cmd === 'process') {
-            imageWrapper.data = new Uint8Array(e.data.imageData);
-            Quagga.start();
-        } else if (e.data.cmd === 'setReaders') {
-            Quagga.setReaders(e.data.readers);
-        } else if (e.data.cmd === 'registerReader') {
-            Quagga.registerReader(e.data.name, e.data.reader);
-        }
-    };
-}
-
-function generateWorkerBlob() {
-    var blob,
-        factorySource;
-
-    /* jshint ignore:start */
-    if (typeof __factorySource__ !== 'undefined') {
-        factorySource = __factorySource__; // eslint-disable-line no-undef
-    }
-    /* jshint ignore:end */
-
-    blob = new Blob(['(' + workerInterface.toString() + ')(' + factorySource + ');'],
-        {type: 'text/javascript'});
-
-    return window.URL.createObjectURL(blob);
-}
-
 function setReaders(readers) {
     if (_decoder) {
         _decoder.setReaders(readers);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
-            workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
-        });
     }
+    QWorkers.setReaders(readers);
 }
 
 function registerReader(name, reader) {
@@ -380,45 +251,12 @@ function registerReader(name, reader) {
     // then make sure any running instances of decoder and workers know about it
     if (_decoder) {
         _decoder.registerReader(name, reader);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
-            workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
-        });
     }
-}
-
-function adjustWorkerPool(capacity, cb) {
-    const increaseBy = capacity - _workerPool.length;
-    if (increaseBy === 0 && cb) {
-        cb();
-    } else if (increaseBy < 0) {
-        const workersToTerminate = _workerPool.slice(increaseBy);
-        workersToTerminate.forEach(function(workerThread) {
-            workerThread.worker.terminate();
-            if (ENV.development) {
-                console.log('Worker terminated!');
-            }
-        });
-        _workerPool = _workerPool.slice(0, increaseBy);
-        if (cb) {
-            cb();
-        }
-    } else {
-        const workerInitialized = (workerThread) => {
-            _workerPool.push(workerThread);
-            if (_workerPool.length >= capacity && cb) {
-                cb();
-            }
-        };
-
-        for (var i = 0; i < increaseBy; i++) {
-            initWorker(workerInitialized);
-        }
-    }
+    QWorkers.registerReader(name, reader);
 }
 
 export default {
-    init: function(config, cb, imageWrapper) {
+    init: function (config, cb, imageWrapper) {
         _config = merge({}, Config, config);
         // TODO: pending restructure in Issue #105, we are temp disabling workers
         if (_config.numOfWorkers > 0) {
@@ -434,47 +272,46 @@ export default {
             initInputStream(cb);
         }
     },
-    start: function() {
+    start: function () {
         start();
     },
-    stop: function() {
+    stop: function () {
         _stopped = true;
-        adjustWorkerPool(0);
+        QWorkers.adjustWorkerPool(0);
         if (_config.inputStream && _config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
             _inputStream.clearEventHandlers();
         }
     },
-    pause: function() {
+    pause: function () {
         _stopped = true;
     },
-    onDetected: function(callback) {
+    onDetected: function (callback) {
         Events.subscribe('detected', callback);
     },
-    offDetected: function(callback) {
+    offDetected: function (callback) {
         Events.unsubscribe('detected', callback);
     },
-    onProcessed: function(callback) {
+    onProcessed: function (callback) {
         Events.subscribe('processed', callback);
     },
-    offProcessed: function(callback) {
+    offProcessed: function (callback) {
         Events.unsubscribe('processed', callback);
     },
-    setReaders: function(readers) {
+    setReaders: function (readers) {
         setReaders(readers);
     },
-    registerReader: function(name, reader) {
+    registerReader: function (name, reader) {
         registerReader(name, reader);
     },
-    registerResultCollector: function(resultCollector) {
+    registerResultCollector: function (resultCollector) {
         if (resultCollector && typeof resultCollector.addResult === 'function') {
             _resultCollector = resultCollector;
         }
     },
     canvas: _canvasContainer,
-    decodeSingle: function(config, resultCallback) {
+    decodeSingle: function (config, resultCallback) {
         if (this.inDecodeSingle) {
-            console.warn('* running multiple decodes in serial');
             // force multiple calls to decodeSingle to run in serial, because presently
             // simultaneous running breaks things.
             if (resultCallback) {
@@ -531,9 +368,9 @@ export default {
             }
         });
     },
-    ImageWrapper: ImageWrapper,
-    ImageDebug: ImageDebug,
-    ResultCollector: ResultCollector,
-    CameraAccess: CameraAccess,
+    ImageWrapper,
+    ImageDebug,
+    ResultCollector,
+    CameraAccess,
     BarcodeReader,
 };

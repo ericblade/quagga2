@@ -97,6 +97,11 @@ describe('decodeSingle', function () {
             const results = await Promise.all(promises).catch((err) => { console.warn('*** Error in test', err); throw(err); });
             const testResults = testSet.map(x => x.result);
             results.forEach((r, index) => {
+                console.warn(`* expect r to be an object ${r}`);
+                expect(r).to.be.an('object');
+                console.warn(`* expect r.codeResult to be an object ${r.codeResult}`);
+                expect(r.codeResult).to.be.an('object');
+                console.warn(`* expect r.codeResult.code to equal ${r.codeResult.code} ${testResults[index]}`);
                 expect(r.codeResult.code).to.equal(testResults[index]);
             });
         });
