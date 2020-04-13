@@ -23,8 +23,7 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 
 var _context: QuaggaContext;
 
-var _inputStream,
-    _framegrabber,
+var _framegrabber,
     _stopped,
     _canvasContainer = {
         ctx: {
@@ -53,9 +52,9 @@ function initInputStream(cb) {
 
     if (_context.config.inputStream.type === 'VideoStream') {
         video = document.createElement('video');
-        _inputStream = InputStream.createVideoStream(video);
+        _context.inputStream = InputStream.createVideoStream(video);
     } else if (_context.config.inputStream.type === 'ImageStream') {
-        _inputStream = InputStream.createImageStream();
+        _context.inputStream = InputStream.createImageStream();
     } else if (_context.config.inputStream.type === 'LiveStream') {
         var $viewport = getViewPort();
         if ($viewport) {
@@ -65,18 +64,18 @@ function initInputStream(cb) {
                 $viewport.appendChild(video);
             }
         }
-        _inputStream = InputStream.createLiveStream(video);
+        _context.inputStream = InputStream.createLiveStream(video);
         CameraAccess.request(video, _context.config.inputStream.constraints)
             .then(() => {
-                _inputStream.trigger('canrecord');
+                _context.inputStream.trigger('canrecord');
             }).catch((err) => {
                 return cb(err);
             });
     }
 
-    _inputStream.setAttribute('preload', 'auto');
-    _inputStream.setInputStream(_context.config.inputStream);
-    _inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
+    _context.inputStream.setAttribute('preload', 'auto');
+    _context.inputStream.setInputStream(_context.config.inputStream);
+    _context.inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 }
 
 function getViewPort() {
@@ -92,9 +91,9 @@ function getViewPort() {
 }
 
 function canRecord(cb) {
-    BarcodeLocator.checkImageConstraints(_inputStream, _context.config.locator);
+    BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
     initCanvas(_context.config);
-    _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
+    _framegrabber = FrameGrabber.create(_context.inputStream, _canvasContainer.dom.image);
 
     adjustWorkerPool(_context.config.numOfWorkers, function() {
         if (_context.config.numOfWorkers === 0) {
@@ -105,7 +104,7 @@ function canRecord(cb) {
 }
 
 function ready(cb){
-    _inputStream.play();
+    _context.inputStream.play();
     cb();
 }
 
@@ -121,8 +120,8 @@ function initCanvas() {
             }
         }
         _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext('2d');
-        _canvasContainer.dom.image.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.image.height = _inputStream.getCanvasSize().y;
+        _canvasContainer.dom.image.width = _context.inputStream.getCanvasSize().x;
+        _canvasContainer.dom.image.height = _context.inputStream.getCanvasSize().y;
 
         _canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
         if (!_canvasContainer.dom.overlay) {
@@ -133,8 +132,8 @@ function initCanvas() {
             }
         }
         _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
-        _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.overlay.height = _inputStream.getCanvasSize().y;
+        _canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
+        _canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
     }
 }
 
@@ -143,8 +142,8 @@ function initBuffers(imageWrapper) {
         _inputImageWrapper = imageWrapper;
     } else {
         _inputImageWrapper = new ImageWrapper({
-            x: _inputStream.getWidth(),
-            y: _inputStream.getHeight(),
+            x: _context.inputStream.getWidth(),
+            y: _context.inputStream.getHeight(),
         });
     }
 
@@ -173,7 +172,7 @@ function getBoundingBoxes() {
 }
 
 function transformResult(result) {
-    var topRight = _inputStream.getTopRight(),
+    var topRight = _context.inputStream.getTopRight(),
         xOffset = topRight.x,
         yOffset = topRight.y,
         i;
@@ -228,7 +227,7 @@ function addResult (result, imageData) {
         result.barcodes.filter(barcode => barcode.codeResult)
             .forEach(barcode => addResult(barcode, imageData));
     } else if (result.codeResult) {
-        _resultCollector.addResult(imageData, _inputStream.getCanvasSize(), result.codeResult);
+        _resultCollector.addResult(imageData, _context.inputStream.getCanvasSize(), result.codeResult);
     }
 }
 
@@ -331,7 +330,7 @@ function initWorker(cb) {
     var blobURL,
         workerThread = {
             worker: undefined,
-            imageData: new Uint8Array(_inputStream.getWidth() * _inputStream.getHeight()),
+            imageData: new Uint8Array(_context.inputStream.getWidth() * _context.inputStream.getHeight()),
             busy: true,
         };
 
@@ -360,7 +359,7 @@ function initWorker(cb) {
 
     workerThread.worker.postMessage({
         cmd: 'init',
-        size: {x: _inputStream.getWidth(), y: _inputStream.getHeight()},
+        size: {x: _context.inputStream.getWidth(), y: _context.inputStream.getHeight()},
         imageData: workerThread.imageData,
         config: configForWorker(_context.config),
     }, [workerThread.imageData.buffer]);
@@ -516,7 +515,7 @@ export default {
         adjustWorkerPool(0);
         if (_context.config.inputStream && _context.config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
-            _inputStream.clearEventHandlers();
+            _context.inputStream.clearEventHandlers();
         }
     },
     pause: function() {
