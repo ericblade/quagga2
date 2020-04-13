@@ -7,4 +7,6 @@ export class QuaggaContext {
   }
 
   public inputStream: any;
+
+  public framegrabber: any;
 }

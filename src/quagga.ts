@@ -23,8 +23,7 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 
 var _context: QuaggaContext;
 
-var _framegrabber,
-    _stopped,
+var  _stopped,
     _canvasContainer = {
         ctx: {
             image: null,
@@ -93,7 +92,7 @@ function getViewPort() {
 function canRecord(cb) {
     BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
     initCanvas(_context.config);
-    _framegrabber = FrameGrabber.create(_context.inputStream, _canvasContainer.dom.image);
+    _context.framegrabber = FrameGrabber.create(_context.inputStream, _canvasContainer.dom.image);
 
     adjustWorkerPool(_context.config.numOfWorkers, function() {
         if (_context.config.numOfWorkers === 0) {
@@ -278,14 +277,14 @@ function update() {
                 return !workerThread.busy;
             })[0];
             if (availableWorker) {
-                _framegrabber.attachData(availableWorker.imageData);
+                _context.framegrabber.attachData(availableWorker.imageData);
             } else {
                 return; // all workers are busy
             }
         } else {
-            _framegrabber.attachData(_inputImageWrapper.data);
+            _context.framegrabber.attachData(_inputImageWrapper.data);
         }
-        if (_framegrabber.grab()) {
+        if (_context.framegrabber.grab()) {
             if (availableWorker) {
                 availableWorker.busy = true;
                 availableWorker.worker.postMessage({
