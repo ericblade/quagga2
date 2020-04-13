@@ -12,6 +12,7 @@ import BrowserInputStream, { NodeInputStream } from './input/input_stream';
 import BrowserFrameGrabber, { NodeFrameGrabber } from './input/frame_grabber';
 import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
+import { QuaggaContext } from './QuaggaContext';
 const vec2 = { clone };
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -19,6 +20,8 @@ const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserF
 
 // export BarcodeReader and other utilities for external plugins
 export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
+
+var _context: QuaggaContext;
 
 var _inputStream,
     _framegrabber,
@@ -38,22 +41,22 @@ var _inputStream,
     _decoder,
     _workerPool = [],
     _onUIThread = true,
-    _resultCollector,
-    _config = {};
+    _resultCollector;
 
 function initializeData(imageWrapper) {
     initBuffers(imageWrapper);
-    _decoder = BarcodeDecoder.create(_config.decoder, _inputImageWrapper);
+    _decoder = BarcodeDecoder.create(_context.config.decoder, _inputImageWrapper);
 }
 
 function initInputStream(cb) {
     var video;
-    if (_config.inputStream.type === 'VideoStream') {
+
+    if (_context.config.inputStream.type === 'VideoStream') {
         video = document.createElement('video');
         _inputStream = InputStream.createVideoStream(video);
-    } else if (_config.inputStream.type === 'ImageStream') {
+    } else if (_context.config.inputStream.type === 'ImageStream') {
         _inputStream = InputStream.createImageStream();
-    } else if (_config.inputStream.type === 'LiveStream') {
+    } else if (_context.config.inputStream.type === 'LiveStream') {
         var $viewport = getViewPort();
         if ($viewport) {
             video = $viewport.querySelector('video');
@@ -63,7 +66,7 @@ function initInputStream(cb) {
             }
         }
         _inputStream = InputStream.createLiveStream(video);
-        CameraAccess.request(video, _config.inputStream.constraints)
+        CameraAccess.request(video, _context.config.inputStream.constraints)
             .then(() => {
                 _inputStream.trigger('canrecord');
             }).catch((err) => {
@@ -72,12 +75,12 @@ function initInputStream(cb) {
     }
 
     _inputStream.setAttribute('preload', 'auto');
-    _inputStream.setInputStream(_config.inputStream);
+    _inputStream.setInputStream(_context.config.inputStream);
     _inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 }
 
 function getViewPort() {
-    var target = _config.inputStream.target;
+    var target = _context.config.inputStream.target;
     // Check if target is already a DOM element
     if (target && target.nodeName && target.nodeType === 1) {
         return target;
@@ -89,12 +92,12 @@ function getViewPort() {
 }
 
 function canRecord(cb) {
-    BarcodeLocator.checkImageConstraints(_inputStream, _config.locator);
-    initCanvas(_config);
+    BarcodeLocator.checkImageConstraints(_inputStream, _context.config.locator);
+    initCanvas(_context.config);
     _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
 
-    adjustWorkerPool(_config.numOfWorkers, function() {
-        if (_config.numOfWorkers === 0) {
+    adjustWorkerPool(_context.config.numOfWorkers, function() {
+        if (_context.config.numOfWorkers === 0) {
             initializeData();
         }
         ready(cb);
@@ -113,7 +116,7 @@ function initCanvas() {
         if (!_canvasContainer.dom.image) {
             _canvasContainer.dom.image = document.createElement('canvas');
             _canvasContainer.dom.image.className = 'imgBuffer';
-            if ($viewport && _config.inputStream.type === 'ImageStream') {
+            if ($viewport && _context.config.inputStream.type === 'ImageStream') {
                 $viewport.appendChild(_canvasContainer.dom.image);
             }
         }
@@ -154,11 +157,11 @@ function initBuffers(imageWrapper) {
         vec2.clone([_inputImageWrapper.size.x, _inputImageWrapper.size.y]),
         vec2.clone([_inputImageWrapper.size.x, 0]),
     ];
-    BarcodeLocator.init(_inputImageWrapper, _config.locator);
+    BarcodeLocator.init(_inputImageWrapper, _context.config.locator);
 }
 
 function getBoundingBoxes() {
-    if (_config.locate) {
+    if (_context.config.locate) {
         return BarcodeLocator.locate();
     } else {
         return [[
@@ -301,7 +304,7 @@ function update() {
 
 function startContinuousUpdate() {
     var next = null,
-        delay = 1000 / (_config.frequency || 60);
+        delay = 1000 / (_context.config.frequency || 60);
 
     _stopped = false;
     (function frame(timestamp) {
@@ -317,7 +320,7 @@ function startContinuousUpdate() {
 }
 
 function start() {
-    if (_onUIThread && _config.inputStream.type === 'LiveStream') {
+    if (_onUIThread && _context.config.inputStream.type === 'LiveStream') {
         startContinuousUpdate();
     } else {
         update();
@@ -359,7 +362,7 @@ function initWorker(cb) {
         cmd: 'init',
         size: {x: _inputStream.getWidth(), y: _inputStream.getHeight()},
         imageData: workerThread.imageData,
-        config: configForWorker(_config),
+        config: configForWorker(_context.config),
     }, [workerThread.imageData.buffer]);
 }
 
@@ -490,10 +493,10 @@ function adjustWorkerPool(capacity, cb) {
 
 export default {
     init: function(config, cb, imageWrapper) {
-        _config = merge({}, Config, config);
+        _context =new QuaggaContext(merge({}, Config, config));
         // TODO: pending restructure in Issue #105, we are temp disabling workers
-        if (_config.numOfWorkers > 0) {
-            _config.numOfWorkers = 0;
+        if (_context.config.numOfWorkers > 0) {
+            _context.config.numOfWorkers = 0;
         }
         if (imageWrapper) {
             _onUIThread = false;
@@ -511,7 +514,7 @@ export default {
     stop: function() {
         _stopped = true;
         adjustWorkerPool(0);
-        if (_config.inputStream && _config.inputStream.type === 'LiveStream') {
+        if (_context.config.inputStream && _context.config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
             _inputStream.clearEventHandlers();
         }
