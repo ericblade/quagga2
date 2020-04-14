@@ -16,6 +16,7 @@ import { QuaggaContext } from './QuaggaContext';
 
 import setupInputStream from './quagga/setupInputStream.ts';
 import _getViewPort from './quagga/getViewPort.ts';
+import _initBuffers from './quagga/initBuffers.ts';
 
 const vec2 = { clone };
 
@@ -26,6 +27,12 @@ const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserF
 export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
 
 const _context = new QuaggaContext();
+
+function initBuffers(imageWrapper) {
+    const { inputImageWrapper, boxSize } = _initBuffers(_inputStream, imageWrapper, _config.locator);
+    _inputImageWrapper = inputImageWrapper;
+    _boxSize = boxSize;
+}
 
 function initializeData(imageWrapper) {
     initBuffers(imageWrapper);
@@ -100,28 +107,6 @@ function initCanvas() {
         _context.canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
         _context.canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
     }
-}
-
-function initBuffers(imageWrapper) {
-    if (imageWrapper) {
-        _context.inputImageWrapper = imageWrapper;
-    } else {
-        _context.inputImageWrapper = new ImageWrapper({
-            x: _context.inputStream.getWidth(),
-            y: _context.inputStream.getHeight(),
-        });
-    }
-
-    if (ENV.development) {
-        console.log(_context.inputImageWrapper.size);
-    }
-    _context.boxSize = [
-        vec2.clone([0, 0]),
-        vec2.clone([0, _context.inputImageWrapper.size.y]),
-        vec2.clone([_context.inputImageWrapper.size.x, _context.inputImageWrapper.size.y]),
-        vec2.clone([_context.inputImageWrapper.size.x, 0]),
-    ];
-    BarcodeLocator.init(_context.inputImageWrapper, _context.config.locator);
 }
 
 function getBoundingBoxes() {
