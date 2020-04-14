@@ -32,8 +32,7 @@ var _canvasContainer = {
             image: null,
             overlay: null,
         },
-    },
-    _onUIThread = true;
+    };
 
 function initializeData(imageWrapper: ImageWrapper) {
     initBuffers(imageWrapper);
@@ -233,7 +232,7 @@ function hasCodeResult (result) {
 function publishResult(result, imageData) {
     let resultToPublish = result;
 
-    if (result && _onUIThread) {
+    if (result && _context.onUIThread) {
         transformResult(result);
         addResult(result, imageData);
         resultToPublish = result.barcodes || result;
@@ -265,7 +264,7 @@ function locateAndDecode() {
 function update() {
     var availableWorker;
 
-    if (_onUIThread) {
+    if (_context.onUIThread) {
         if (_context.workerPool.length > 0) {
             availableWorker = _context.workerPool.filter(function(workerThread) {
                 return !workerThread.busy;
@@ -312,7 +311,7 @@ function startContinuousUpdate() {
 }
 
 function start() {
-    if (_onUIThread && _context.config.inputStream.type === 'LiveStream') {
+    if (_context.onUIThread && _context.config.inputStream.type === 'LiveStream') {
         startContinuousUpdate();
     } else {
         update();
@@ -433,7 +432,7 @@ function generateWorkerBlob() {
 function setReaders(readers) {
     if (_context.decoder) {
         _context.decoder.setReaders(readers);
-    } else if (_onUIThread && _context.workerPool.length > 0) {
+    } else if (_context.onUIThread && _context.workerPool.length > 0) {
         _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
         });
@@ -446,7 +445,7 @@ function registerReader(name, reader) {
     // then make sure any running instances of decoder and workers know about it
     if (_context.decoder) {
         _context.decoder.registerReader(name, reader);
-    } else if (_onUIThread && _context.workerPool.length > 0) {
+    } else if (_context.onUIThread && _context.workerPool.length > 0) {
         _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
         });
@@ -491,7 +490,7 @@ export default {
             _context.config.numOfWorkers = 0;
         }
         if (imageWrapper) {
-            _onUIThread = false;
+            _context.onUIThread = false;
             initializeData(imageWrapper);
             if (cb) {
                 cb();

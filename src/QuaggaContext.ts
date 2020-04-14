@@ -19,4 +19,6 @@ export class QuaggaContext {
   public decoder: any;
 
   public workerPool: any[] = [];
+
+  public onUIThread = true;
 }
