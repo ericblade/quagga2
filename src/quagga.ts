@@ -33,7 +33,6 @@ var _canvasContainer = {
             overlay: null,
         },
     },
-    _workerPool = [],
     _onUIThread = true;
 
 function initializeData(imageWrapper: ImageWrapper) {
@@ -267,8 +266,8 @@ function update() {
     var availableWorker;
 
     if (_onUIThread) {
-        if (_workerPool.length > 0) {
-            availableWorker = _workerPool.filter(function(workerThread) {
+        if (_context.workerPool.length > 0) {
+            availableWorker = _context.workerPool.filter(function(workerThread) {
                 return !workerThread.busy;
             })[0];
             if (availableWorker) {
@@ -434,8 +433,8 @@ function generateWorkerBlob() {
 function setReaders(readers) {
     if (_context.decoder) {
         _context.decoder.setReaders(readers);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
+    } else if (_onUIThread && _context.workerPool.length > 0) {
+        _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
         });
     }
@@ -447,33 +446,33 @@ function registerReader(name, reader) {
     // then make sure any running instances of decoder and workers know about it
     if (_context.decoder) {
         _context.decoder.registerReader(name, reader);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
+    } else if (_onUIThread && _context.workerPool.length > 0) {
+        _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
         });
     }
 }
 
 function adjustWorkerPool(capacity, cb) {
-    const increaseBy = capacity - _workerPool.length;
+    const increaseBy = capacity - _context.workerPool.length;
     if (increaseBy === 0 && cb) {
         cb();
     } else if (increaseBy < 0) {
-        const workersToTerminate = _workerPool.slice(increaseBy);
+        const workersToTerminate = _context.workerPool.slice(increaseBy);
         workersToTerminate.forEach(function(workerThread) {
             workerThread.worker.terminate();
             if (ENV.development) {
                 console.log('Worker terminated!');
             }
         });
-        _workerPool = _workerPool.slice(0, increaseBy);
+        _context.workerPool = _context.workerPool.slice(0, increaseBy);
         if (cb) {
             cb();
         }
     } else {
         const workerInitialized = (workerThread) => {
-            _workerPool.push(workerThread);
-            if (_workerPool.length >= capacity && cb) {
+            _context.workerPool.push(workerThread);
+            if (_context.workerPool.length >= capacity && cb) {
                 cb();
             }
         };

@@ -2,7 +2,7 @@ import { QuaggaJSConfigObject } from "../type-definitions/quagga";
 import ImageWrapper from "common/image_wrapper";
 
 export class QuaggaContext {
-  public config: QuaggaJSConfigObject;
+  public config?: QuaggaJSConfigObject;
 
   public inputStream: any;
 
@@ -17,4 +17,6 @@ export class QuaggaContext {
   public resultCollector: any;
 
   public decoder: any;
+
+  public workerPool: any[] = [];
 }
