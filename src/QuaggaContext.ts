@@ -14,4 +14,6 @@ export class QuaggaContext {
   public inputImageWrapper?: ImageWrapper;
 
   public stopped: boolean = false;
+
+  public boxSize: any;
 }

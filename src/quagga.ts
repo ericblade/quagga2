@@ -33,7 +33,6 @@ var _canvasContainer = {
             overlay: null,
         },
     },
-    _boxSize,
     _decoder,
     _workerPool = [],
     _onUIThread = true,
@@ -147,7 +146,7 @@ function initBuffers(imageWrapper: ImageWrapper) {
     if (ENV.development) {
         console.log(_context.inputImageWrapper.size);
     }
-    _boxSize = [
+    _context.boxSize = [
         vec2.clone([0, 0]),
         vec2.clone([0, _context.inputImageWrapper.size.y]),
         vec2.clone([_context.inputImageWrapper.size.x, _context.inputImageWrapper.size.y]),
@@ -161,10 +160,10 @@ function getBoundingBoxes() {
         return BarcodeLocator.locate();
     } else {
         return [[
-            vec2.clone(_boxSize[0]),
-            vec2.clone(_boxSize[1]),
-            vec2.clone(_boxSize[2]),
-            vec2.clone(_boxSize[3])]];
+            vec2.clone(_context.boxSize[0]),
+            vec2.clone(_context.boxSize[1]),
+            vec2.clone(_context.boxSize[2]),
+            vec2.clone(_context.boxSize[3])]];
     }
 }
 
