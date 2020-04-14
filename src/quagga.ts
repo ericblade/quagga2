@@ -23,17 +23,6 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 
 const _context = new QuaggaContext();
 
-var _canvasContainer = {
-        ctx: {
-            image: null,
-            overlay: null,
-        },
-        dom: {
-            image: null,
-            overlay: null,
-        },
-    };
-
 function initializeData(imageWrapper: ImageWrapper) {
     initBuffers(imageWrapper);
     _context.decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
@@ -85,7 +74,7 @@ function getViewPort() {
 function canRecord(cb) {
     BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
     initCanvas(_context.config);
-    _context.framegrabber = FrameGrabber.create(_context.inputStream, _canvasContainer.dom.image);
+    _context.framegrabber = FrameGrabber.create(_context.inputStream, _context.canvasContainer.dom.image);
 
     adjustWorkerPool(_context.config.numOfWorkers, function() {
         if (_context.config.numOfWorkers === 0) {
@@ -103,29 +92,29 @@ function ready(cb){
 function initCanvas() {
     if (typeof document !== 'undefined') {
         var $viewport = getViewPort();
-        _canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
-        if (!_canvasContainer.dom.image) {
-            _canvasContainer.dom.image = document.createElement('canvas');
-            _canvasContainer.dom.image.className = 'imgBuffer';
+        _context.canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
+        if (!_context.canvasContainer.dom.image) {
+            _context.canvasContainer.dom.image = document.createElement('canvas');
+            _context.canvasContainer.dom.image.className = 'imgBuffer';
             if ($viewport && _context.config.inputStream.type === 'ImageStream') {
-                $viewport.appendChild(_canvasContainer.dom.image);
+                $viewport.appendChild(_context.canvasContainer.dom.image);
             }
         }
-        _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext('2d');
-        _canvasContainer.dom.image.width = _context.inputStream.getCanvasSize().x;
-        _canvasContainer.dom.image.height = _context.inputStream.getCanvasSize().y;
+        _context.canvasContainer.ctx.image = _context.canvasContainer.dom.image.getContext('2d');
+        _context.canvasContainer.dom.image.width = _context.inputStream.getCanvasSize().x;
+        _context.canvasContainer.dom.image.height = _context.inputStream.getCanvasSize().y;
 
-        _canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
-        if (!_canvasContainer.dom.overlay) {
-            _canvasContainer.dom.overlay = document.createElement('canvas');
-            _canvasContainer.dom.overlay.className = 'drawingBuffer';
+        _context.canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
+        if (!_context.canvasContainer.dom.overlay) {
+            _context.canvasContainer.dom.overlay = document.createElement('canvas');
+            _context.canvasContainer.dom.overlay.className = 'drawingBuffer';
             if ($viewport) {
-                $viewport.appendChild(_canvasContainer.dom.overlay);
+                $viewport.appendChild(_context.canvasContainer.dom.overlay);
             }
         }
-        _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
-        _canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
-        _canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
+        _context.canvasContainer.ctx.overlay = _context.canvasContainer.dom.overlay.getContext('2d');
+        _context.canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
+        _context.canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
     }
 }
 
@@ -536,7 +525,7 @@ export default {
             _context.resultCollector = resultCollector;
         }
     },
-    canvas: _canvasContainer,
+    canvas: _context.canvasContainer,
     decodeSingle: function(config, resultCallback) {
         if (this.inDecodeSingle) {
             console.warn('* running multiple decodes in serial');

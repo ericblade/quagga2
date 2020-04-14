@@ -21,4 +21,21 @@ export class QuaggaContext {
   public workerPool: any[] = [];
 
   public onUIThread = true;
+
+  public readonly canvasContainer = new CanvasContainer();
+}
+
+export class CanvasInfo {
+  image: any;
+  overlay: any;
+}
+
+export class CanvasContainer {
+  constructor() {
+    this.ctx = new CanvasInfo();
+    this.dom = new CanvasInfo();
+  }
+
+  public readonly ctx: CanvasInfo;
+  public readonly dom: CanvasInfo;
 }
