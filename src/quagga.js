@@ -4,14 +4,15 @@ import BarcodeLocator from './locator/barcode_locator';
 import BarcodeDecoder from './decoder/barcode_decoder';
 import BarcodeReader from './reader/barcode_reader';
 import Events from './common/events';
-import CameraAccess from './input/camera_access.ts';
-import ImageDebug from './common/image_debug.ts';
-import ResultCollector from './analytics/result_collector.ts';
+import CameraAccess from './input/camera_access';
+import ImageDebug from './common/image_debug';
+import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
 import BrowserInputStream, { NodeInputStream } from './input/input_stream';
 import BrowserFrameGrabber, { NodeFrameGrabber } from './input/frame_grabber';
 import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
+import { QuaggaContext } from './QuaggaContext';
 const vec2 = { clone };
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -20,40 +21,22 @@ const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserF
 // export BarcodeReader and other utilities for external plugins
 export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
 
-var _inputStream,
-    _framegrabber,
-    _stopped,
-    _canvasContainer = {
-        ctx: {
-            image: null,
-            overlay: null,
-        },
-        dom: {
-            image: null,
-            overlay: null,
-        },
-    },
-    _inputImageWrapper,
-    _boxSize,
-    _decoder,
-    _workerPool = [],
-    _onUIThread = true,
-    _resultCollector,
-    _config = {};
+const _context = new QuaggaContext();
 
 function initializeData(imageWrapper) {
     initBuffers(imageWrapper);
-    _decoder = BarcodeDecoder.create(_config.decoder, _inputImageWrapper);
+    _context.decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
 }
 
 function initInputStream(cb) {
     var video;
-    if (_config.inputStream.type === 'VideoStream') {
+
+    if (_context.config.inputStream.type === 'VideoStream') {
         video = document.createElement('video');
-        _inputStream = InputStream.createVideoStream(video);
-    } else if (_config.inputStream.type === 'ImageStream') {
-        _inputStream = InputStream.createImageStream();
-    } else if (_config.inputStream.type === 'LiveStream') {
+        _context.inputStream = InputStream.createVideoStream(video);
+    } else if (_context.config.inputStream.type === 'ImageStream') {
+        _context.inputStream = InputStream.createImageStream();
+    } else if (_context.config.inputStream.type === 'LiveStream') {
         var $viewport = getViewPort();
         if ($viewport) {
             video = $viewport.querySelector('video');
@@ -62,22 +45,22 @@ function initInputStream(cb) {
                 $viewport.appendChild(video);
             }
         }
-        _inputStream = InputStream.createLiveStream(video);
-        CameraAccess.request(video, _config.inputStream.constraints)
+        _context.inputStream = InputStream.createLiveStream(video);
+        CameraAccess.request(video, _context.config.inputStream.constraints)
             .then(() => {
-                _inputStream.trigger('canrecord');
+                _context.inputStream.trigger('canrecord');
             }).catch((err) => {
                 return cb(err);
             });
     }
 
-    _inputStream.setAttribute('preload', 'auto');
-    _inputStream.setInputStream(_config.inputStream);
-    _inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
+    _context.inputStream.setAttribute('preload', 'auto');
+    _context.inputStream.setInputStream(_context.config.inputStream);
+    _context.inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 }
 
 function getViewPort() {
-    var target = _config.inputStream.target;
+    var target = _context.config.inputStream.target;
     // Check if target is already a DOM element
     if (target && target.nodeName && target.nodeType === 1) {
         return target;
@@ -89,12 +72,12 @@ function getViewPort() {
 }
 
 function canRecord(cb) {
-    BarcodeLocator.checkImageConstraints(_inputStream, _config.locator);
-    initCanvas(_config);
-    _framegrabber = FrameGrabber.create(_inputStream, _canvasContainer.dom.image);
+    BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
+    initCanvas(_context.config);
+    _context.framegrabber = FrameGrabber.create(_context.inputStream, _context.canvasContainer.dom.image);
 
-    adjustWorkerPool(_config.numOfWorkers, function() {
-        if (_config.numOfWorkers === 0) {
+    adjustWorkerPool(_context.config.numOfWorkers, function() {
+        if (_context.config.numOfWorkers === 0) {
             initializeData();
         }
         ready(cb);
@@ -102,75 +85,75 @@ function canRecord(cb) {
 }
 
 function ready(cb){
-    _inputStream.play();
+    _context.inputStream.play();
     cb();
 }
 
 function initCanvas() {
     if (typeof document !== 'undefined') {
         var $viewport = getViewPort();
-        _canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
-        if (!_canvasContainer.dom.image) {
-            _canvasContainer.dom.image = document.createElement('canvas');
-            _canvasContainer.dom.image.className = 'imgBuffer';
-            if ($viewport && _config.inputStream.type === 'ImageStream') {
-                $viewport.appendChild(_canvasContainer.dom.image);
+        _context.canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
+        if (!_context.canvasContainer.dom.image) {
+            _context.canvasContainer.dom.image = document.createElement('canvas');
+            _context.canvasContainer.dom.image.className = 'imgBuffer';
+            if ($viewport && _context.config.inputStream.type === 'ImageStream') {
+                $viewport.appendChild(_context.canvasContainer.dom.image);
             }
         }
-        _canvasContainer.ctx.image = _canvasContainer.dom.image.getContext('2d');
-        _canvasContainer.dom.image.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.image.height = _inputStream.getCanvasSize().y;
+        _context.canvasContainer.ctx.image = _context.canvasContainer.dom.image.getContext('2d');
+        _context.canvasContainer.dom.image.width = _context.inputStream.getCanvasSize().x;
+        _context.canvasContainer.dom.image.height = _context.inputStream.getCanvasSize().y;
 
-        _canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
-        if (!_canvasContainer.dom.overlay) {
-            _canvasContainer.dom.overlay = document.createElement('canvas');
-            _canvasContainer.dom.overlay.className = 'drawingBuffer';
+        _context.canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
+        if (!_context.canvasContainer.dom.overlay) {
+            _context.canvasContainer.dom.overlay = document.createElement('canvas');
+            _context.canvasContainer.dom.overlay.className = 'drawingBuffer';
             if ($viewport) {
-                $viewport.appendChild(_canvasContainer.dom.overlay);
+                $viewport.appendChild(_context.canvasContainer.dom.overlay);
             }
         }
-        _canvasContainer.ctx.overlay = _canvasContainer.dom.overlay.getContext('2d');
-        _canvasContainer.dom.overlay.width = _inputStream.getCanvasSize().x;
-        _canvasContainer.dom.overlay.height = _inputStream.getCanvasSize().y;
+        _context.canvasContainer.ctx.overlay = _context.canvasContainer.dom.overlay.getContext('2d');
+        _context.canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
+        _context.canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
     }
 }
 
 function initBuffers(imageWrapper) {
     if (imageWrapper) {
-        _inputImageWrapper = imageWrapper;
+        _context.inputImageWrapper = imageWrapper;
     } else {
-        _inputImageWrapper = new ImageWrapper({
-            x: _inputStream.getWidth(),
-            y: _inputStream.getHeight(),
+        _context.inputImageWrapper = new ImageWrapper({
+            x: _context.inputStream.getWidth(),
+            y: _context.inputStream.getHeight(),
         });
     }
 
     if (ENV.development) {
-        console.log(_inputImageWrapper.size);
+        console.log(_context.inputImageWrapper.size);
     }
-    _boxSize = [
+    _context.boxSize = [
         vec2.clone([0, 0]),
-        vec2.clone([0, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, _inputImageWrapper.size.y]),
-        vec2.clone([_inputImageWrapper.size.x, 0]),
+        vec2.clone([0, _context.inputImageWrapper.size.y]),
+        vec2.clone([_context.inputImageWrapper.size.x, _context.inputImageWrapper.size.y]),
+        vec2.clone([_context.inputImageWrapper.size.x, 0]),
     ];
-    BarcodeLocator.init(_inputImageWrapper, _config.locator);
+    BarcodeLocator.init(_context.inputImageWrapper, _context.config.locator);
 }
 
 function getBoundingBoxes() {
-    if (_config.locate) {
+    if (_context.config.locate) {
         return BarcodeLocator.locate();
     } else {
         return [[
-            vec2.clone(_boxSize[0]),
-            vec2.clone(_boxSize[1]),
-            vec2.clone(_boxSize[2]),
-            vec2.clone(_boxSize[3])]];
+            vec2.clone(_context.boxSize[0]),
+            vec2.clone(_context.boxSize[1]),
+            vec2.clone(_context.boxSize[2]),
+            vec2.clone(_context.boxSize[3])]];
     }
 }
 
 function transformResult(result) {
-    var topRight = _inputStream.getTopRight(),
+    var topRight = _context.inputStream.getTopRight(),
         xOffset = topRight.x,
         yOffset = topRight.y,
         i;
@@ -217,7 +200,7 @@ function transformResult(result) {
 }
 
 function addResult (result, imageData) {
-    if (!imageData || !_resultCollector) {
+    if (!imageData || !_context.resultCollector) {
         return;
     }
 
@@ -225,7 +208,7 @@ function addResult (result, imageData) {
         result.barcodes.filter(barcode => barcode.codeResult)
             .forEach(barcode => addResult(barcode, imageData));
     } else if (result.codeResult) {
-        _resultCollector.addResult(imageData, _inputStream.getCanvasSize(), result.codeResult);
+        _context.resultCollector.addResult(imageData, _context.inputStream.getCanvasSize(), result.codeResult);
     }
 }
 
@@ -238,7 +221,7 @@ function hasCodeResult (result) {
 function publishResult(result, imageData) {
     let resultToPublish = result;
 
-    if (result && _onUIThread) {
+    if (result && _context.onUIThread) {
         transformResult(result);
         addResult(result, imageData);
         resultToPublish = result.barcodes || result;
@@ -254,13 +237,13 @@ function locateAndDecode() {
     const boxes = getBoundingBoxes();
 
     if (boxes) {
-        const decodeResult = _decoder.decodeFromBoundingBoxes(boxes) || {};
+        const decodeResult = _context.decoder.decodeFromBoundingBoxes(boxes) || {};
         decodeResult.boxes = boxes;
-        publishResult(decodeResult, _inputImageWrapper.data);
+        publishResult(decodeResult, _context.inputImageWrapper.data);
     } else {
-        const imageResult = _decoder.decodeFromImage(_inputImageWrapper);
+        const imageResult = _context.decoder.decodeFromImage(_context.inputImageWrapper);
         if (imageResult) {
-            publishResult(imageResult, _inputImageWrapper.data);
+            publishResult(imageResult, _context.inputImageWrapper.data);
         } else {
             publishResult();
         }
@@ -270,20 +253,20 @@ function locateAndDecode() {
 function update() {
     var availableWorker;
 
-    if (_onUIThread) {
-        if (_workerPool.length > 0) {
-            availableWorker = _workerPool.filter(function(workerThread) {
+    if (_context.onUIThread) {
+        if (_context.workerPool.length > 0) {
+            availableWorker = _context.workerPool.filter(function(workerThread) {
                 return !workerThread.busy;
             })[0];
             if (availableWorker) {
-                _framegrabber.attachData(availableWorker.imageData);
+                _context.framegrabber.attachData(availableWorker.imageData);
             } else {
                 return; // all workers are busy
             }
         } else {
-            _framegrabber.attachData(_inputImageWrapper.data);
+            _context.framegrabber.attachData(_context.inputImageWrapper.data);
         }
-        if (_framegrabber.grab()) {
+        if (_context.framegrabber.grab()) {
             if (availableWorker) {
                 availableWorker.busy = true;
                 availableWorker.worker.postMessage({
@@ -301,12 +284,12 @@ function update() {
 
 function startContinuousUpdate() {
     var next = null,
-        delay = 1000 / (_config.frequency || 60);
+        delay = 1000 / (_context.config.frequency || 60);
 
-    _stopped = false;
+    _context.stopped = false;
     (function frame(timestamp) {
         next = next || timestamp;
-        if (!_stopped) {
+        if (!_context.stopped) {
             if (timestamp >= next) {
                 next += delay;
                 update();
@@ -317,7 +300,7 @@ function startContinuousUpdate() {
 }
 
 function start() {
-    if (_onUIThread && _config.inputStream.type === 'LiveStream') {
+    if (_context.onUIThread && _context.config.inputStream.type === 'LiveStream') {
         startContinuousUpdate();
     } else {
         update();
@@ -328,7 +311,7 @@ function initWorker(cb) {
     var blobURL,
         workerThread = {
             worker: undefined,
-            imageData: new Uint8Array(_inputStream.getWidth() * _inputStream.getHeight()),
+            imageData: new Uint8Array(_context.inputStream.getWidth() * _context.inputStream.getHeight()),
             busy: true,
         };
 
@@ -357,9 +340,9 @@ function initWorker(cb) {
 
     workerThread.worker.postMessage({
         cmd: 'init',
-        size: {x: _inputStream.getWidth(), y: _inputStream.getHeight()},
+        size: {x: _context.inputStream.getWidth(), y: _context.inputStream.getHeight()},
         imageData: workerThread.imageData,
-        config: configForWorker(_config),
+        config: configForWorker(_context.config),
     }, [workerThread.imageData.buffer]);
 }
 
@@ -436,10 +419,10 @@ function generateWorkerBlob() {
 }
 
 function setReaders(readers) {
-    if (_decoder) {
-        _decoder.setReaders(readers);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
+    if (_context.decoder) {
+        _context.decoder.setReaders(readers);
+    } else if (_context.onUIThread && _context.workerPool.length > 0) {
+        _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
         });
     }
@@ -449,35 +432,35 @@ function registerReader(name, reader) {
     // load it to the module
     BarcodeDecoder.registerReader(name, reader);
     // then make sure any running instances of decoder and workers know about it
-    if (_decoder) {
-        _decoder.registerReader(name, reader);
-    } else if (_onUIThread && _workerPool.length > 0) {
-        _workerPool.forEach(function(workerThread) {
+    if (_context.decoder) {
+        _context.decoder.registerReader(name, reader);
+    } else if (_context.onUIThread && _context.workerPool.length > 0) {
+        _context.workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
         });
     }
 }
 
 function adjustWorkerPool(capacity, cb) {
-    const increaseBy = capacity - _workerPool.length;
+    const increaseBy = capacity - _context.workerPool.length;
     if (increaseBy === 0 && cb) {
         cb();
     } else if (increaseBy < 0) {
-        const workersToTerminate = _workerPool.slice(increaseBy);
+        const workersToTerminate = _context.workerPool.slice(increaseBy);
         workersToTerminate.forEach(function(workerThread) {
             workerThread.worker.terminate();
             if (ENV.development) {
                 console.log('Worker terminated!');
             }
         });
-        _workerPool = _workerPool.slice(0, increaseBy);
+        _context.workerPool = _context.workerPool.slice(0, increaseBy);
         if (cb) {
             cb();
         }
     } else {
         const workerInitialized = (workerThread) => {
-            _workerPool.push(workerThread);
-            if (_workerPool.length >= capacity && cb) {
+            _context.workerPool.push(workerThread);
+            if (_context.workerPool.length >= capacity && cb) {
                 cb();
             }
         };
@@ -490,13 +473,13 @@ function adjustWorkerPool(capacity, cb) {
 
 export default {
     init: function(config, cb, imageWrapper) {
-        _config = merge({}, Config, config);
+        _context.config = merge({}, Config, config);
         // TODO: pending restructure in Issue #105, we are temp disabling workers
-        if (_config.numOfWorkers > 0) {
-            _config.numOfWorkers = 0;
+        if (_context.config.numOfWorkers > 0) {
+            _context.config.numOfWorkers = 0;
         }
         if (imageWrapper) {
-            _onUIThread = false;
+            _context.onUIThread = false;
             initializeData(imageWrapper);
             if (cb) {
                 cb();
@@ -509,15 +492,15 @@ export default {
         start();
     },
     stop: function() {
-        _stopped = true;
+        _context.stopped = true;
         adjustWorkerPool(0);
-        if (_config.inputStream && _config.inputStream.type === 'LiveStream') {
+        if (_context.config.inputStream && _context.config.inputStream.type === 'LiveStream') {
             CameraAccess.release();
-            _inputStream.clearEventHandlers();
+            _context.inputStream.clearEventHandlers();
         }
     },
     pause: function() {
-        _stopped = true;
+        _context.stopped = true;
     },
     onDetected: function(callback) {
         Events.subscribe('detected', callback);
@@ -539,10 +522,10 @@ export default {
     },
     registerResultCollector: function(resultCollector) {
         if (resultCollector && typeof resultCollector.addResult === 'function') {
-            _resultCollector = resultCollector;
+            _context.resultCollector = resultCollector;
         }
     },
-    canvas: _canvasContainer,
+    canvas: _context.canvasContainer,
     decodeSingle: function(config, resultCallback) {
         if (this.inDecodeSingle) {
             console.warn('* running multiple decodes in serial');
