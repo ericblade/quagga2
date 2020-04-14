@@ -21,7 +21,7 @@ const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserF
 // export BarcodeReader and other utilities for external plugins
 export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
 
-var _context: QuaggaContext;
+const _context = new QuaggaContext();
 
 var _canvasContainer = {
         ctx: {
@@ -33,13 +33,12 @@ var _canvasContainer = {
             overlay: null,
         },
     },
-    _decoder,
     _workerPool = [],
     _onUIThread = true;
 
 function initializeData(imageWrapper: ImageWrapper) {
     initBuffers(imageWrapper);
-    _decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
+    _context.decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
 }
 
 function initInputStream(cb) {
@@ -251,11 +250,11 @@ function locateAndDecode() {
     const boxes = getBoundingBoxes();
 
     if (boxes) {
-        const decodeResult = _decoder.decodeFromBoundingBoxes(boxes) || {};
+        const decodeResult = _context.decoder.decodeFromBoundingBoxes(boxes) || {};
         decodeResult.boxes = boxes;
         publishResult(decodeResult, _context.inputImageWrapper.data);
     } else {
-        const imageResult = _decoder.decodeFromImage(_context.inputImageWrapper);
+        const imageResult = _context.decoder.decodeFromImage(_context.inputImageWrapper);
         if (imageResult) {
             publishResult(imageResult, _context.inputImageWrapper.data);
         } else {
@@ -433,8 +432,8 @@ function generateWorkerBlob() {
 }
 
 function setReaders(readers) {
-    if (_decoder) {
-        _decoder.setReaders(readers);
+    if (_context.decoder) {
+        _context.decoder.setReaders(readers);
     } else if (_onUIThread && _workerPool.length > 0) {
         _workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({cmd: 'setReaders', readers: readers});
@@ -446,8 +445,8 @@ function registerReader(name, reader) {
     // load it to the module
     BarcodeDecoder.registerReader(name, reader);
     // then make sure any running instances of decoder and workers know about it
-    if (_decoder) {
-        _decoder.registerReader(name, reader);
+    if (_context.decoder) {
+        _context.decoder.registerReader(name, reader);
     } else if (_onUIThread && _workerPool.length > 0) {
         _workerPool.forEach(function(workerThread) {
             workerThread.worker.postMessage({ cmd: 'registerReader', name, reader });
@@ -487,7 +486,7 @@ function adjustWorkerPool(capacity, cb) {
 
 export default {
     init: function(config, cb, imageWrapper) {
-        _context =new QuaggaContext(merge({}, Config, config));
+        _context.config = merge({}, Config, config);
         // TODO: pending restructure in Issue #105, we are temp disabling workers
         if (_context.config.numOfWorkers > 0) {
             _context.config.numOfWorkers = 0;
