@@ -17,7 +17,7 @@ module.exports = function(config) {
         webpack: {
             mode: 'production',
             entry: [
-                './src/quagga.ts',
+                './src/quagga.js',
             ],
             module: {
                 rules: [
