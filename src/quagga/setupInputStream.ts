@@ -1,4 +1,4 @@
-type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
+export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
 
 // TODO: need to create an InputStream typescript interface, so we don't have an "any" in the next line
 export default function setupInputStream(type: InputStreamType, viewport: HTMLElement, InputStream: any) {

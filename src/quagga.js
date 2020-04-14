@@ -17,6 +17,7 @@ import { QuaggaContext } from './QuaggaContext';
 import setupInputStream from './quagga/setupInputStream.ts';
 import _getViewPort from './quagga/getViewPort.ts';
 import _initBuffers from './quagga/initBuffers.ts';
+import _initCanvas from './quagga/initCanvas';
 
 const vec2 = { clone };
 
@@ -29,9 +30,9 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 const _context = new QuaggaContext();
 
 function initBuffers(imageWrapper) {
-    const { inputImageWrapper, boxSize } = _initBuffers(_inputStream, imageWrapper, _config.locator);
-    _inputImageWrapper = inputImageWrapper;
-    _boxSize = boxSize;
+    const { inputImageWrapper, boxSize } = _initBuffers(_context._inputStream, imageWrapper, _context._config.locator);
+    _context._inputImageWrapper = inputImageWrapper;
+    _context._boxSize = boxSize;
 }
 
 function initializeData(imageWrapper) {
@@ -40,12 +41,33 @@ function initializeData(imageWrapper) {
 }
 
 function getViewPort() {
-    const { target } = _config.inputStream;
+    const { target } = _context._config.inputStream;
     return _getViewPort(target);
 }
 
+function ready(cb) {
+    _context._inputStream.play();
+    cb();
+}
+
+function initCanvas() {
+    _initCanvas(getViewPort(), _context._canvasContainer, _context._config.inputStream.type, _context._inputStream);
+}
+
+function canRecord(cb) {
+    BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
+    initCanvas(_context.config);
+    _context.framegrabber = FrameGrabber.create(_context.inputStream, _context.canvasContainer.dom.image);
+
+    adjustWorkerPool(_context._config.numOfWorkers, function () {
+        if (_context._config.numOfWorkers === 0) {
+            initializeData();
+        }
+        ready(cb);
+    });
+}
+
 function initInputStream(cb) {
-    console.warn('* initInputStream config=', JSON.stringify(_context._config));
     const { type: inputType, constraints } = _context._config.inputStream;
     const { video, inputStream } = setupInputStream(inputType, getViewPort(), InputStream);
 
@@ -60,53 +82,6 @@ function initInputStream(cb) {
     inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
 
     _context._inputStream = inputStream;
-}
-
-function canRecord(cb) {
-    BarcodeLocator.checkImageConstraints(_context.inputStream, _context.config.locator);
-    initCanvas(_context.config);
-    _context.framegrabber = FrameGrabber.create(_context.inputStream, _context.canvasContainer.dom.image);
-
-    adjustWorkerPool(_context.config.numOfWorkers, function() {
-        if (_context.config.numOfWorkers === 0) {
-            initializeData();
-        }
-        ready(cb);
-    });
-}
-
-function ready(cb){
-    _context.inputStream.play();
-    cb();
-}
-
-function initCanvas() {
-    if (typeof document !== 'undefined') {
-        var $viewport = getViewPort();
-        _context.canvasContainer.dom.image = document.querySelector('canvas.imgBuffer');
-        if (!_context.canvasContainer.dom.image) {
-            _context.canvasContainer.dom.image = document.createElement('canvas');
-            _context.canvasContainer.dom.image.className = 'imgBuffer';
-            if ($viewport && _context.config.inputStream.type === 'ImageStream') {
-                $viewport.appendChild(_context.canvasContainer.dom.image);
-            }
-        }
-        _context.canvasContainer.ctx.image = _context.canvasContainer.dom.image.getContext('2d');
-        _context.canvasContainer.dom.image.width = _context.inputStream.getCanvasSize().x;
-        _context.canvasContainer.dom.image.height = _context.inputStream.getCanvasSize().y;
-
-        _context.canvasContainer.dom.overlay = document.querySelector('canvas.drawingBuffer');
-        if (!_context.canvasContainer.dom.overlay) {
-            _context.canvasContainer.dom.overlay = document.createElement('canvas');
-            _context.canvasContainer.dom.overlay.className = 'drawingBuffer';
-            if ($viewport) {
-                $viewport.appendChild(_context.canvasContainer.dom.overlay);
-            }
-        }
-        _context.canvasContainer.ctx.overlay = _context.canvasContainer.dom.overlay.getContext('2d');
-        _context.canvasContainer.dom.overlay.width = _context.inputStream.getCanvasSize().x;
-        _context.canvasContainer.dom.overlay.height = _context.inputStream.getCanvasSize().y;
-    }
 }
 
 function getBoundingBoxes() {
