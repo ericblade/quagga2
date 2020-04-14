@@ -23,7 +23,7 @@ export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollecto
 
 const _context = new QuaggaContext();
 
-function initializeData(imageWrapper: ImageWrapper) {
+function initializeData(imageWrapper) {
     initBuffers(imageWrapper);
     _context.decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
 }
@@ -118,7 +118,7 @@ function initCanvas() {
     }
 }
 
-function initBuffers(imageWrapper: ImageWrapper) {
+function initBuffers(imageWrapper) {
     if (imageWrapper) {
         _context.inputImageWrapper = imageWrapper;
     } else {
