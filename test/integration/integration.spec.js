@@ -94,7 +94,7 @@ describe('decodeSingle', function () {
                 config.readers = readers;
                 promises.push(Quagga.decodeSingle(config));
             });
-            const results = await Promise.all(promises);
+            const results = await Promise.all(promises).catch((err) => { console.warn('*** Error in test', err); throw(err); });
             const testResults = testSet.map(x => x.result);
             results.forEach((r, index) => {
                 expect(r.codeResult.code).to.equal(testResults[index]);

@@ -13,6 +13,10 @@ import BrowserFrameGrabber, { NodeFrameGrabber } from './input/frame_grabber';
 import { merge } from 'lodash';
 import { clone } from 'gl-vec2';
 import { QuaggaContext } from './QuaggaContext';
+
+import setupInputStream from './quagga/setupInputStream.ts';
+import _getViewPort from './quagga/getViewPort.ts';
+
 const vec2 = { clone };
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -28,47 +32,27 @@ function initializeData(imageWrapper) {
     _context.decoder = BarcodeDecoder.create(_context.config.decoder, _context.inputImageWrapper);
 }
 
-function initInputStream(cb) {
-    var video;
-
-    if (_context.config.inputStream.type === 'VideoStream') {
-        video = document.createElement('video');
-        _context.inputStream = InputStream.createVideoStream(video);
-    } else if (_context.config.inputStream.type === 'ImageStream') {
-        _context.inputStream = InputStream.createImageStream();
-    } else if (_context.config.inputStream.type === 'LiveStream') {
-        var $viewport = getViewPort();
-        if ($viewport) {
-            video = $viewport.querySelector('video');
-            if (!video) {
-                video = document.createElement('video');
-                $viewport.appendChild(video);
-            }
-        }
-        _context.inputStream = InputStream.createLiveStream(video);
-        CameraAccess.request(video, _context.config.inputStream.constraints)
-            .then(() => {
-                _context.inputStream.trigger('canrecord');
-            }).catch((err) => {
-                return cb(err);
-            });
-    }
-
-    _context.inputStream.setAttribute('preload', 'auto');
-    _context.inputStream.setInputStream(_context.config.inputStream);
-    _context.inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
+function getViewPort() {
+    const { target } = _config.inputStream;
+    return _getViewPort(target);
 }
 
-function getViewPort() {
-    var target = _context.config.inputStream.target;
-    // Check if target is already a DOM element
-    if (target && target.nodeName && target.nodeType === 1) {
-        return target;
-    } else {
-        // Use '#interactive.viewport' as a fallback selector (backwards compatibility)
-        var selector = typeof target === 'string' ? target : '#interactive.viewport';
-        return document.querySelector(selector);
+function initInputStream(cb) {
+    console.warn('* initInputStream config=', JSON.stringify(_context._config));
+    const { type: inputType, constraints } = _context._config.inputStream;
+    const { video, inputStream } = setupInputStream(inputType, getViewPort(), InputStream);
+
+    if (inputType === 'LiveStream') {
+        CameraAccess.request(video, constraints)
+            .then(() => inputStream.trigger('canrecord'))
+            .catch((err) => cb(err));
     }
+
+    inputStream.setAttribute('preload', 'auto');
+    inputStream.setInputStream(_context._config.inputStream);
+    inputStream.addEventListener('canrecord', canRecord.bind(undefined, cb));
+
+    _context._inputStream = inputStream;
 }
 
 function canRecord(cb) {
