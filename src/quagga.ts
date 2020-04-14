@@ -4,9 +4,9 @@ import BarcodeLocator from './locator/barcode_locator';
 import BarcodeDecoder from './decoder/barcode_decoder';
 import BarcodeReader from './reader/barcode_reader';
 import Events from './common/events';
-import CameraAccess from './input/camera_access.ts';
-import ImageDebug from './common/image_debug.ts';
-import ResultCollector from './analytics/result_collector.ts';
+import CameraAccess from './input/camera_access';
+import ImageDebug from './common/image_debug';
+import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
 import BrowserInputStream, { NodeInputStream } from './input/input_stream';
 import BrowserFrameGrabber, { NodeFrameGrabber } from './input/frame_grabber';
@@ -35,8 +35,7 @@ var _canvasContainer = {
     },
     _decoder,
     _workerPool = [],
-    _onUIThread = true,
-    _resultCollector;
+    _onUIThread = true;
 
 function initializeData(imageWrapper: ImageWrapper) {
     initBuffers(imageWrapper);
@@ -215,7 +214,7 @@ function transformResult(result) {
 }
 
 function addResult (result, imageData) {
-    if (!imageData || !_resultCollector) {
+    if (!imageData || !_context.resultCollector) {
         return;
     }
 
@@ -223,7 +222,7 @@ function addResult (result, imageData) {
         result.barcodes.filter(barcode => barcode.codeResult)
             .forEach(barcode => addResult(barcode, imageData));
     } else if (result.codeResult) {
-        _resultCollector.addResult(imageData, _context.inputStream.getCanvasSize(), result.codeResult);
+        _context.resultCollector.addResult(imageData, _context.inputStream.getCanvasSize(), result.codeResult);
     }
 }
 
@@ -537,7 +536,7 @@ export default {
     },
     registerResultCollector: function(resultCollector) {
         if (resultCollector && typeof resultCollector.addResult === 'function') {
-            _resultCollector = resultCollector;
+            _context.resultCollector = resultCollector;
         }
     },
     canvas: _canvasContainer,

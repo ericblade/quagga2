@@ -16,4 +16,6 @@ export class QuaggaContext {
   public stopped: boolean = false;
 
   public boxSize: any;
+
+  public resultCollector: any;
 }
