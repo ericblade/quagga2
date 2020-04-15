@@ -53,24 +53,7 @@ function ready(cb) {
 }
 
 function initCanvas() {
-    const viewport = getViewPort();
-    const { type: inputStreamType } = _context.config.inputStream;
-    const container = _initCanvas(_context.inputStream.getCanvasSize());
-    if (!container) {
-        return;
-    }
-    const { dom } = container;
-    if (typeof document !== 'undefined') {
-        if (viewport) {
-            if (inputStreamType === 'ImageStream' && !viewport.contains(dom.image)) {
-                viewport.appendChild(dom.image);
-            }
-            if (!viewport.contains(dom.overlay)) {
-                viewport.appendChild(dom.overlay);
-            }
-        }
-    }
-    _context.canvasContainer = container;
+    _context.canvasContainer = _initCanvas(_context);
 }
 
 function canRecord(cb) {
