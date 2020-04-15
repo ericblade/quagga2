@@ -1,6 +1,4 @@
 import { XYSize } from '../../type-definitions/quagga';
-import { QuaggaContext } from 'QuaggaContext';
-import getViewPort from './getViewPort';
 
 function findOrCreateCanvas(selector: string, className: string) {
     let canvas: HTMLCanvasElement | null = document.querySelector(selector);
