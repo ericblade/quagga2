@@ -69,7 +69,7 @@ function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprec
     return normalized;
 }
 
-export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<MediaStreamConstraints> {
+export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated = {}): Promise<MediaStreamConstraints> {
     const video = deprecatedConstraints(videoConstraints);
 
     if (video && video.deviceId && video.facingMode) {
@@ -95,7 +95,7 @@ function getActiveTrack(): MediaStreamTrack | null {
  * Used for accessing information about the active stream track and available video devices.
  */
 const QuaggaJSCameraAccess = {
-    request: function(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<any> {
+    request: function(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
         return pickConstraints(videoConstraints)
             .then((newConstraints) => initCamera(video, newConstraints))
             .catch(err => {

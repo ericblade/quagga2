@@ -5,6 +5,7 @@ import * as ProdConfig from './config.prod';
 
 declare var ENV: QuaggaBuildEnvironment;
 
+// @ts-ignore // TODO: this produces a bizarre typescript error
 const QuaggaConfig: QuaggaJSConfigObject = ENV.development
     ? DevConfig
     : ENV.node

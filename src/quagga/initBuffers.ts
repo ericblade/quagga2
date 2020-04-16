@@ -7,7 +7,7 @@ declare var ENV: QuaggaBuildEnvironment;
 
 // TODO: need typescript def for inputstream
 // TODO: need typescript def for BarcodeLocator
-export default function initBuffers(inputStream: any, imageWrapper: ImageWrapper, locator: any) {
+export default function initBuffers(inputStream: any, imageWrapper: ImageWrapper | undefined, locator: any) {
     const inputImageWrapper = imageWrapper ? imageWrapper : new ImageWrapper({
         x: inputStream.getWidth(),
         y: inputStream.getHeight(),
