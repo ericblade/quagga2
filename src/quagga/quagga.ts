@@ -13,7 +13,7 @@ import CameraAccess from '../input/camera_access';
 import { clone } from 'gl-vec2';
 import { BarcodeInfo } from '../reader/barcode_reader';
 import { moveLine, moveBox } from './transform';
-import { QuaggaJSResultObject } from '../../type-definitions/quagga';
+import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga';
 import Events from '../common/events';
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -195,7 +195,7 @@ export default class Quagga {
         }
     }
 
-    update() {
+    update = () => {
         if (this.context.onUIThread) {
             const workersUpdated = QWorkers.updateWorkers(this.context.framegrabber);
             if (!workersUpdated) {
@@ -241,4 +241,27 @@ export default class Quagga {
         }
     }
 
+    stop() {
+        this.context.stopped = true;
+        QWorkers.adjustWorkerPool(0);
+        if (this.context.config?.inputStream && this.context.config.inputStream.type === 'LiveStream') {
+            CameraAccess.release();
+            this.context.inputStream.clearEventHandlers();
+        }
+    }
+
+    setReaders(readers: Array<QuaggaJSReaderConfig>) {
+        if (this.context.decoder) {
+            this.context.decoder.setReaders(readers);
+        }
+        QWorkers.setReaders(readers);
+    }
+
+    registerReader(name: string, reader: QuaggaJSReaderConfig) {
+        BarcodeDecoder.registerReader(name, reader);
+        if (this.context.decoder) {
+            this.context.decoder.registerReader(name, reader);
+        }
+        QWorkers.registerReader(name, reader);
+    }
 }

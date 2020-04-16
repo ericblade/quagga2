@@ -391,7 +391,7 @@ export interface QuaggaJSConfigObject {
         /**
          * @default "LiveStream"
          */
-        type: InputStreamType;
+        type?: InputStreamType;
 
         target?: Element | string,
 

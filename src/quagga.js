@@ -8,7 +8,6 @@ import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
 import { merge } from 'lodash';
-import * as QWorkers from './quagga/qworker.ts';
 
 import Quagga from './quagga/quagga';
 
@@ -16,32 +15,27 @@ const instance = new Quagga();
 const _context = instance.context;
 
 const QuaggaJSStaticInterface = {
-    init: function (config, cb, imageWrapper) {
-        _context.config = merge({}, Config, config);
+    init: function (config, cb, imageWrapper, quaggaInstance = instance) {
+        quaggaInstance.context.config = merge({}, Config, config);
         // TODO: pending restructure in Issue #105, we are temp disabling workers
-        if (_context.config.numOfWorkers > 0) {
-            _context.config.numOfWorkers = 0;
+        if (quaggaInstance.context.config.numOfWorkers > 0) {
+            quaggaInstance.context.config.numOfWorkers = 0;
         }
         if (imageWrapper) {
-            _context.onUIThread = false;
-            instance.initializeData(imageWrapper);
+            quaggaInstance.context.onUIThread = false;
+            quaggaInstance.initializeData(imageWrapper);
             if (cb) {
                 cb();
             }
         } else {
-            instance.initInputStream(cb);
+            quaggaInstance.initInputStream(cb);
         }
     },
     start: function () {
         instance.start();
     },
     stop: function () {
-        _context.stopped = true;
-        QWorkers.adjustWorkerPool(0);
-        if (_context.config.inputStream && _context.config.inputStream.type === 'LiveStream') {
-            CameraAccess.release();
-            _context.inputStream.clearEventHandlers();
-        }
+        instance.stop();
     },
     pause: function () {
         _context.stopped = true;
@@ -73,6 +67,7 @@ const QuaggaJSStaticInterface = {
         return _context.canvasContainer;
     },
     decodeSingle: function (config, resultCallback) {
+        const quaggaInstance = new Quagga();
         if (this.inDecodeSingle) {
             // force multiple calls to decodeSingle to run in serial, because presently
             // simultaneous running breaks things.
@@ -87,7 +82,7 @@ const QuaggaJSStaticInterface = {
             }
             return null;
         }
-        this.inDecodeSingle = true;
+        // this.inDecodeSingle = true;
         config = merge({
             inputStream: {
                 type: 'ImageStream',
@@ -116,14 +111,14 @@ const QuaggaJSStaticInterface = {
                 this.init(config, () => {
                     Events.once('processed', (result) => {
                         this.inDecodeSingle = false;
-                        this.stop();
+                        quaggaInstance.stop();
                         if (resultCallback) {
                             resultCallback.call(null, result);
                         }
                         resolve(result);
                     }, true);
-                    instance.start();
-                });
+                    quaggaInstance.start();
+                }, null, quaggaInstance);
             } catch (err) {
                 this.inDecodeSingle = false;
                 reject(err);
