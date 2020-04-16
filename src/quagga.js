@@ -68,21 +68,6 @@ const QuaggaJSStaticInterface = {
     },
     decodeSingle: function (config, resultCallback) {
         const quaggaInstance = new Quagga();
-        if (this.inDecodeSingle) {
-            // force multiple calls to decodeSingle to run in serial, because presently
-            // simultaneous running breaks things.
-            if (resultCallback) {
-                setTimeout(() => this.decodeSingle(config, resultCallback), 300);
-            } else {
-                return new Promise((resolve) => {
-                    setTimeout(() => this.decodeSingle(config, (res) => {
-                        resolve(res);
-                    }, 300));
-                });
-            }
-            return null;
-        }
-        // this.inDecodeSingle = true;
         config = merge({
             inputStream: {
                 type: 'ImageStream',
@@ -110,7 +95,6 @@ const QuaggaJSStaticInterface = {
             try {
                 this.init(config, () => {
                     Events.once('processed', (result) => {
-                        this.inDecodeSingle = false;
                         quaggaInstance.stop();
                         if (resultCallback) {
                             resultCallback.call(null, result);
@@ -120,7 +104,6 @@ const QuaggaJSStaticInterface = {
                     quaggaInstance.start();
                 }, null, quaggaInstance);
             } catch (err) {
-                this.inDecodeSingle = false;
                 reject(err);
             }
         });
