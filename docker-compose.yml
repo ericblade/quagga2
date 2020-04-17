@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  nodejs:
+    image: node:13-alpine
+    volumes:
+      - .:/quagga2
+    working_dir: /quagga2
+    user: node
+    command: "npm run build"
