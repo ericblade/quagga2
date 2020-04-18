@@ -158,9 +158,19 @@ You can build the library yourself by simply cloning the repo and typing:
 or using Docker:
 
 ```console
+> docker build --tag quagg2/build .
+> docker run -v $(pwd):/quagga2 quagga2/build npm install
+> docker run -v $(pwd):/quagga2 quagga2/build npm run build
+```
+
+it's also possible to use docker-compose:
+
+```console
 > docker-compose run nodejs npm install
 > docker-compose run nodejs npm run build
 ```
+
+*Note: when using Docker or docker-compose the build artifacts will end up in `dist/` as usual thanks to the bind-mount.*
 
 This npm script builds a non optimized version `quagga.js` and a minified
 version `quagga.min.js` and places both files in the `dist` folder.
@@ -683,6 +693,14 @@ automatically generated in the coverage/ folder.
 ```
 
 Using Docker:
+
+```console
+> docker build --tag quagga2/build .
+> docker run -v $(pwd):/quagga2 npm install
+> docker run -v $(pwd):/quagga2 npm run test
+```
+
+or using docker-compose:
 
 ```console
 > docker-compose run nodejs npm install

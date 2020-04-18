@@ -2,9 +2,9 @@ version: '3.7'
 
 services:
   nodejs:
-    image: node:13-alpine
+    build:
+      context: ./
+    image: quagga2/build
     volumes:
       - .:/quagga2
-    working_dir: /quagga2
-    user: node
     command: "npm run build"
