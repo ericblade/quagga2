@@ -61,6 +61,14 @@ describe('decodeSingle', function () {
                     expect(result.codeResult.code).to.equal(sample.result);
                     console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
                     expect(result.codeResult.format).to.equal(sample.format);
+                    console.warn(`* Expect Quagga.canvas to be an object ${Quagga.canvas}`);
+                    expect(Quagga.canvas).to.be.an('Object');
+                    console.warn(`* Expect Quagga.canvas.dom to be an object ${Quagga.canvas.dom}`);
+                    expect(Quagga.canvas.dom).to.be.an('Object');
+                    console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
+                    expect(Quagga.canvas.ctx).to.be.an('Object');
+                    console.warn(`* Expect Quagga.canvas.ctx.overlay to be a CanvasRenderingContext2D ${Quagga.canvas.ctx.overlay}`);
+                    expect(Quagga.canvas.ctx.overlay).to.be.an('CanvasRenderingContext2D');
                     callback();
                 });
             }, function() {
@@ -120,7 +128,7 @@ describe('decodeSingle', function () {
 
     // TODO: write a test that tests Promise return/resolve
 
-    describe('EAN', function() {
+    describe.only('EAN', function() {
         var config = generateConfig(),
             testSet = [
                 {'name': 'image-001.jpg', 'result': '3574660239843'},

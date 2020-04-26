@@ -290,7 +290,9 @@ export default {
             _context.resultCollector = resultCollector;
         }
     },
-    canvas: _context.canvasContainer,
+    get canvas() {
+        return _context.canvasContainer;
+    },
     decodeSingle: function (config, resultCallback) {
         if (this.inDecodeSingle) {
             // force multiple calls to decodeSingle to run in serial, because presently
