@@ -26,9 +26,6 @@ const vec2 = { clone };
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
 const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserFrameGrabber;
 
-// export BarcodeReader and other utilities for external plugins
-export { BarcodeReader, BarcodeDecoder, ImageWrapper, ImageDebug, ResultCollector, CameraAccess };
-
 const _context = new QuaggaContext();
 
 function initBuffers(imageWrapper) {
@@ -236,7 +233,7 @@ function registerReader(name, reader) {
     QWorkers.registerReader(name, reader);
 }
 
-export default {
+const QuaggaJSStaticInterface = {
     init: function (config, cb, imageWrapper) {
         _context.config = merge({}, Config, config);
         // TODO: pending restructure in Issue #105, we are temp disabling workers
@@ -351,9 +348,25 @@ export default {
             }
         });
     },
-    ImageWrapper,
-    ImageDebug,
-    ResultCollector,
-    CameraAccess,
+    // add the usually expected "default" for use with require, build step won't allow us to
+    // write to module.exports so do it here.
+    get default() {
+        return QuaggaJSStaticInterface;
+    },
     BarcodeReader,
+    CameraAccess,
+    ImageDebug,
+    ImageWrapper,
+    ResultCollector,
+};
+
+export default QuaggaJSStaticInterface;
+// export BarcodeReader and other utilities for external plugins
+export {
+    BarcodeDecoder,
+    BarcodeReader,
+    CameraAccess,
+    ImageDebug,
+    ImageWrapper,
+    ResultCollector,
 };
