@@ -128,7 +128,7 @@ describe('decodeSingle', function () {
 
     // TODO: write a test that tests Promise return/resolve
 
-    describe.only('EAN', function() {
+    describe('EAN', function() {
         var config = generateConfig(),
             testSet = [
                 {'name': 'image-001.jpg', 'result': '3574660239843'},
