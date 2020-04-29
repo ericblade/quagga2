@@ -4,16 +4,17 @@
  */
 
 if (typeof window !== 'undefined') {
-    window.requestAnimFrame = (function () {
-        return window.requestAnimationFrame ||
-            window.webkitRequestAnimationFrame ||
-            window.mozRequestAnimationFrame ||
-            window.oRequestAnimationFrame ||
-            window.msRequestAnimationFrame ||
-            function (/* function FrameRequestCallback */ callback) {
-                window.setTimeout(callback, 1000 / 60);
-            };
-    }());
+    if (!window.requestAnimationFrame) {
+        window.requestAnimationFrame = (function () {
+            return window.webkitRequestAnimationFrame ||
+                window.mozRequestAnimationFrame ||
+                window.oRequestAnimationFrame ||
+                window.msRequestAnimationFrame ||
+                function (/* function FrameRequestCallback */ callback) {
+                    window.setTimeout(callback, 1000 / 60);
+                };
+        }());
+    }
 }
 Math.imul = Math.imul || function(a, b) {
     var ah = (a >>> 16) & 0xffff,

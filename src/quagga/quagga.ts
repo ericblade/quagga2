@@ -226,8 +226,7 @@ export default class Quagga {
                 next += delay;
                 this.update();
             }
-            // @ts-ignore // TODO: requestAnimFrame is filled in src/common/typedefs.js, i'm not sure how to tell TypeScript of that, though
-            window.requestAnimFrame(frame);
+            window.requestAnimationFrame(newFrame);
         };
 
         newFrame(performance.now());
