@@ -1,6 +1,6 @@
 /*
  * typedefs.js
- * Normalizes browser-specific prefixes
+ * Normalizes browser-specific prefixes and provide some basic polyfills
  */
 
 if (typeof window !== 'undefined') {
@@ -16,15 +16,18 @@ if (typeof window !== 'undefined') {
         }());
     }
 }
-Math.imul = Math.imul || function(a, b) {
-    var ah = (a >>> 16) & 0xffff,
-        al = a & 0xffff,
-        bh = (b >>> 16) & 0xffff,
-        bl = b & 0xffff;
-    // the shift by 0 fixes the sign on the high part
-    // the final |0 converts the unsigned value into a signed value
-    return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
-};
+
+if (typeof Math.imul !== 'function') {
+    Math.imul = function(a, b) {
+        const ah = (a >>> 16) & 0xffff;
+        const al = a & 0xffff;
+        const bh = (b >>> 16) & 0xffff;
+        const bl = b & 0xffff;
+        // the shift by 0 fixes the sign on the high part
+        // the final |0 converts the unsigned value into a signed value
+        return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
+    };
+}
 
 if (typeof Object.assign !== 'function') {
     Object.assign = function(target) { // .length of function is 2
@@ -33,13 +36,13 @@ if (typeof Object.assign !== 'function') {
             throw new TypeError('Cannot convert undefined or null to object');
         }
 
-        var to = Object(target);
+        const to = Object(target);
 
-        for (var index = 1; index < arguments.length; index++) {
-            var nextSource = arguments[index];
+        for (let index = 1; index < arguments.length; index++) {
+            const nextSource = arguments[index];
 
             if (nextSource !== null) { // Skip over if undefined or null
-                for (var nextKey in nextSource) {
+                for (let nextKey in nextSource) {
                     // Avoid bugs when hasOwnProperty is shadowed
                     if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
                         to[nextKey] = nextSource[nextKey];
