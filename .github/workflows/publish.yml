@@ -29,5 +29,6 @@ jobs:
         CI: true
     - name: rollingversions check
       run: |
+        echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
         npx rollingversions publish -d -g ${{ secrets.GITHUB_TOKEN }}
         npx rollingversions publish -g ${{ secrets.GITHUB_TOKEN }}
