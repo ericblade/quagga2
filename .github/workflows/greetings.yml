@@ -1,0 +1,15 @@
+name: Greetings
+
+on: [pull_request, issues]
+
+jobs:
+  greeting:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/first-interaction@v1
+      with:
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue-message: 'Thank you for filing an issue! Please be patient. :-)'
+        pr-message: 'Thank you for issuing a pull request! Open source works best when we all work together! Please make sure you have added yourself to the contributors array in package.json. Have a great day!'
+
+# this maybe could be modified to actually compare the contributors array and warn them if they aren't in contributors every time they contribute...
