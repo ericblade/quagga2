@@ -332,6 +332,7 @@ export interface QuaggaJSResultCollectorFilterFunction {
  */
 export interface QuaggaJSResultObject {
     codeResult: QuaggaJSResultObject_CodeResult;
+    barcodes?: Array<QuaggaJSResultObject>
     line: {
         x: number;
         y: number;
@@ -344,7 +345,7 @@ export interface QuaggaJSResultObject {
 }
 
 export interface QuaggaJSResultObject_CodeResult {
-    code: string;
+    code: string | null;
     start: number;
     end: number;
     codeset: number;
@@ -371,6 +372,8 @@ export interface QuaggaJSResultObject_CodeResult {
     format: string;
 }
 
+export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
+
 export interface QuaggaJSConfigObject {
     /**
      * The image path to load from, or a data url
@@ -388,9 +391,9 @@ export interface QuaggaJSConfigObject {
         /**
          * @default "LiveStream"
          */
-        type?: string;
+        type?: InputStreamType;
 
-        target?: HTMLElement | string,
+        target?: Element | string,
 
         constraints?: MediaTrackConstraints;
 

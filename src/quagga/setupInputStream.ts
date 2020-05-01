@@ -1,7 +1,7 @@
-export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
+import { InputStreamType } from "../../type-definitions/quagga";
 
 // TODO: need to create an InputStream typescript interface, so we don't have an "any" in the next line
-export default function setupInputStream(type: InputStreamType, viewport: HTMLElement, InputStream: any) {
+export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, InputStream: any) {
     switch (type) {
         case 'VideoStream': {
             const video = document.createElement('video');

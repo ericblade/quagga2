@@ -1,4 +1,4 @@
-export default function getViewPort(target?: HTMLElement | string) {
+export default function getViewPort(target?: Element | string): Element | null {
     if (typeof document === 'undefined') {
         return null;
     }

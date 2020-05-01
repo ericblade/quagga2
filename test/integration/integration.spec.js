@@ -67,8 +67,11 @@ describe('decodeSingle', function () {
                     expect(Quagga.canvas.dom).to.be.an('Object');
                     console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
                     expect(Quagga.canvas.ctx).to.be.an('Object');
-                    console.warn(`* Expect Quagga.canvas.ctx.overlay to be a CanvasRenderingContext2D ${Quagga.canvas.ctx.overlay}`);
-                    expect(Quagga.canvas.ctx.overlay).to.be.an('CanvasRenderingContext2D');
+                    // In prior versions, calling decodeSingle was enough to setup the canvas
+                    // variables, that is no longer the case now that decodeSingle() works on
+                    // multiple instances.
+                    // console.warn(`* Expect Quagga.canvas.ctx.overlay to be a CanvasRenderingContext2D ${Quagga.canvas.ctx.overlay}`);
+                    // expect(Quagga.canvas.ctx.overlay).to.be.an('CanvasRenderingContext2D');
                     callback();
                 });
             }, function() {
