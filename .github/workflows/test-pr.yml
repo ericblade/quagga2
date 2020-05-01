@@ -1,0 +1,32 @@
+name: Test GreenKeeper/Pull Requests To Master
+
+on:
+  push:
+    branches:
+      - greenkeeper/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm install, build, and test
+      run: |
+        node --version
+        npm --version
+        npm ci
+        npm run build --if-present
+        npm test
+      env:
+        CI: true

@@ -1,11 +1,7 @@
-name: Node CI
+name: Deploy New Version
 
 on:
   push:
-    branches:
-      - master
-      - greenkeeper/*
-  pull_request:
     branches:
       - master
 
@@ -14,10 +10,10 @@ jobs:
 
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        node-version: [10.x, 12.x, 14.x]
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+    # strategy:
+    #   matrix:
+    #     node-version: [10.x, 12.x, 14.x]
+    #     os: [ubuntu-latest, windows-latest, macOS-latest]
 
     steps:
     - uses: actions/checkout@v1
@@ -25,12 +21,14 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
+    - name: npm install, build, test, publish
       run: |
         node --version
         npm --version
         npm ci
         npm run build --if-present
         npm test
+        npx rollingversions publish -d ${{ secrets.GITHUB_TOKEN }}
+        npx rollingversions publish -g ${{ secrets.GITHUB_TOKEN }}
       env:
         CI: true
