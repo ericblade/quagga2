@@ -1,4 +1,6 @@
-module.exports = {
+import { QuaggaJSConfigObject } from "../../type-definitions/quagga";
+
+const NodeConfig: QuaggaJSConfigObject = {
     inputStream: {
         type: 'ImageStream',
         sequence: false,
@@ -23,3 +25,5 @@ module.exports = {
         patchSize: 'medium', // x-small, small, medium, large, x-large
     },
 };
+
+export default NodeConfig;

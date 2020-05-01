@@ -1,4 +1,6 @@
-module.exports = {
+import { QuaggaJSConfigObject } from "../../type-definitions/quagga";
+
+const ProdConfig: QuaggaJSConfigObject = {
     inputStream: {
         name: 'Live',
         type: 'LiveStream',
@@ -29,3 +31,5 @@ module.exports = {
         patchSize: 'medium', // x-small, small, medium, large, x-large
     },
 };
+
+export default ProdConfig;
