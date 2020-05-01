@@ -1,4 +1,6 @@
-module.exports = {
+import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
+
+const DevConfig: QuaggaJSConfigObject = {
     inputStream: {
         name: 'Live',
         type: 'LiveStream',
@@ -49,3 +51,5 @@ module.exports = {
         },
     },
 };
+
+export default DevConfig;

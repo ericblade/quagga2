@@ -1,7 +1,7 @@
 import { QuaggaBuildEnvironment, QuaggaJSConfigObject } from "../../type-definitions/quagga";
-import * as DevConfig from './config.dev';
-import * as NodeConfig from './config.node';
-import * as ProdConfig from './config.prod';
+import DevConfig from './config.dev';
+import NodeConfig from './config.node';
+import ProdConfig from './config.prod';
 
 declare var ENV: QuaggaBuildEnvironment;
 
