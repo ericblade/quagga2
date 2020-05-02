@@ -1,5 +1,5 @@
 const Quagga = require('../../src/quagga').default;
-const async = require('async');
+// const async = require('async');
 const Code128Reader = require('../../src/reader/code_128_reader');
 
 Quagga.registerReader('external_code_128_reader', Code128Reader.default);
@@ -47,36 +47,44 @@ describe('decodeSingle', function () {
 
         folder = baseFolder + format.split('_').slice(0, -1).concat(suffix ? [suffix] : []).join('_') + '/';
 
-        it('should decode ' + folder + ' correctly', function(done) {
-            async.eachSeries(testSet, function (sample, callback) {
-                config.src = folder + sample.name;
-                config.readers = readers;
-                Quagga.decodeSingle(config, function(result) {
+        function testFactory(sample) {
+            return () => {
+                return new Promise((resolve) => {
+                    const thisConfig = {
+                        ...config,
+                        src: folder + sample.name,
+                        readers,
+                    };
                     console.log('Decoding', sample.name);
-                    // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
-                    expect(result).to.be.an('Object');
-                    // console.warn('* Expect codeResult to be an object');
-                    expect(result.codeResult).to.be.an('Object');
-                    // console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
-                    expect(result.codeResult.code).to.equal(sample.result);
-                    // console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
-                    expect(result.codeResult.format).to.equal(sample.format);
-                    // console.warn(`* Expect Quagga.canvas to be an object ${Quagga.canvas}`);
-                    expect(Quagga.canvas).to.be.an('Object');
-                    // console.warn(`* Expect Quagga.canvas.dom to be an object ${Quagga.canvas.dom}`);
-                    expect(Quagga.canvas.dom).to.be.an('Object');
-                    // console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
-                    expect(Quagga.canvas.ctx).to.be.an('Object');
-                    // In prior versions, calling decodeSingle was enough to setup the canvas
-                    // variables, that is no longer the case now that decodeSingle() works on
-                    // multiple instances.
-                    // console.warn(`* Expect Quagga.canvas.ctx.overlay to be a CanvasRenderingContext2D ${Quagga.canvas.ctx.overlay}`);
-                    // expect(Quagga.canvas.ctx.overlay).to.be.an('CanvasRenderingContext2D');
-                    callback();
+                    Quagga.decodeSingle(thisConfig, (result) => {
+                        // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
+                        expect(result).to.be.an('Object');
+                        // console.warn('* Expect codeResult to be an object');
+                        expect(result.codeResult).to.be.an('Object');
+                        // console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
+                        expect(result.codeResult.code).to.equal(sample.result);
+                        // console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
+                        expect(result.codeResult.format).to.equal(sample.format);
+                        // console.warn(`* Expect Quagga.canvas to be an object ${Quagga.canvas}`);
+                        expect(Quagga.canvas).to.be.an('Object');
+                        // console.warn(`* Expect Quagga.canvas.dom to be an object ${Quagga.canvas.dom}`);
+                        expect(Quagga.canvas.dom).to.be.an('Object');
+                        // console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
+                        expect(Quagga.canvas.ctx).to.be.an('Object');
+                        // In prior versions, calling decodeSingle was enough to setup the canvas
+                        // variables, that is no longer the case now that decodeSingle() works on
+                        // multiple instances.
+                        // console.warn(`* Expect Quagga.canvas.ctx.overlay to be a CanvasRenderingContext2D ${Quagga.canvas.ctx.overlay}`);
+                        // expect(Quagga.canvas.ctx.overlay).to.be.an('CanvasRenderingContext2D');
+                        resolve(result);
+                    });
                 });
-            }, function() {
-                done();
-            });
+            };
+        }
+
+        it('should decode ' + folder + ' correctly', function() {
+            const promises = testSet.map(sample => testFactory(sample));
+            return promises.reduce((promise, func) => promise.then(result => func().then(Array.prototype.concat.bind(result))), Promise.resolve([]));
         });
     }
 
