@@ -129,8 +129,6 @@ describe('camera_access', () => {
         });
 
         describe('not available', function(){
-            var originalGetUserMedia;
-
             it('should throw if getUserMedia not available', function(done) {
                 CameraAccess.request(video, {})
                     .catch((err) => {
@@ -141,30 +139,26 @@ describe('camera_access', () => {
         });
 
         describe('pickConstraints', () => {
-            it('should return the given constraints if no facingMode is defined', (done) => {
+            it('should return the given constraints if no facingMode is defined', async () => {
                 const givenConstraints = {width: 180};
-                return pickConstraints(givenConstraints).then((actualConstraints) => {
+                try {
+                    const actualConstraints = await pickConstraints(givenConstraints);
                     expect(actualConstraints.video).to.deep.equal(givenConstraints);
-                    done();
-                })
-                    .catch((err) => {
-                        expect(err).to.equal(null);
-                        console.log(err);
-                        done();
-                    });
+                } catch (err_1) {
+                    expect(err_1).to.equal(null);
+                    console.log(err_1);
+                }
             });
 
-            it('should return the given constraints if deviceId is defined', (done) => {
+            it('should return the given constraints if deviceId is defined', async () => {
                 const givenConstraints = {width: 180, deviceId: '4343'};
-                return pickConstraints(givenConstraints).then((actualConstraints) => {
+                try {
+                    const actualConstraints = await pickConstraints(givenConstraints);
                     expect(actualConstraints.video).to.deep.equal(givenConstraints);
-                    done();
-                })
-                    .catch((err) => {
-                        expect(err).to.equal(null);
-                        console.log(err);
-                        done();
-                    });
+                } catch (err_1) {
+                    expect(err_1).to.equal(null);
+                    console.log(err_1);
+                }
             });
         });
     });
