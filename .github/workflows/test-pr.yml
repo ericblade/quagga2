@@ -1,4 +1,4 @@
-name: Test GreenKeeper/Pull Requests To Master
+name: Test Pull Requests To Master
 
 on:
   push:
@@ -30,3 +30,10 @@ jobs:
         npm test
       env:
         CI: true
+    - name: test package import
+      run: |
+        npm install ts-node @std/esm
+        npm run test:import
+    - name: test package require
+      run: |
+        npm run test:require

@@ -53,19 +53,19 @@ describe('decodeSingle', function () {
                 config.readers = readers;
                 Quagga.decodeSingle(config, function(result) {
                     console.log('Decoding', sample.name);
-                    console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
+                    // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                     expect(result).to.be.an('Object');
-                    console.warn('* Expect codeResult to be an object');
+                    // console.warn('* Expect codeResult to be an object');
                     expect(result.codeResult).to.be.an('Object');
-                    console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
+                    // console.warn(`* Expect ${result.codeResult.code} to equal ${sample.result}`);
                     expect(result.codeResult.code).to.equal(sample.result);
-                    console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
+                    // console.warn(`* Expect ${result.codeResult.format} to equal ${sample.format}`);
                     expect(result.codeResult.format).to.equal(sample.format);
-                    console.warn(`* Expect Quagga.canvas to be an object ${Quagga.canvas}`);
+                    // console.warn(`* Expect Quagga.canvas to be an object ${Quagga.canvas}`);
                     expect(Quagga.canvas).to.be.an('Object');
-                    console.warn(`* Expect Quagga.canvas.dom to be an object ${Quagga.canvas.dom}`);
+                    // console.warn(`* Expect Quagga.canvas.dom to be an object ${Quagga.canvas.dom}`);
                     expect(Quagga.canvas.dom).to.be.an('Object');
-                    console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
+                    // console.warn(`* Expect Quagga.canvas.ctx to be an object ${Quagga.canvas.ctx}`);
                     expect(Quagga.canvas.ctx).to.be.an('Object');
                     // In prior versions, calling decodeSingle was enough to setup the canvas
                     // variables, that is no longer the case now that decodeSingle() works on
@@ -108,11 +108,11 @@ describe('decodeSingle', function () {
             const results = await Promise.all(promises).catch((err) => { console.warn('*** Error in test', err); throw(err); });
             const testResults = testSet.map(x => x.result);
             results.forEach((r, index) => {
-                console.warn(`* expect r to be an object ${r}`);
+                // console.warn(`* expect r to be an object ${r}`);
                 expect(r).to.be.an('object');
-                console.warn(`* expect r.codeResult to be an object ${r.codeResult}`);
+                // console.warn(`* expect r.codeResult to be an object ${r.codeResult}`);
                 expect(r.codeResult).to.be.an('object');
-                console.warn(`* expect r.codeResult.code to equal ${r.codeResult.code} ${testResults[index]}`);
+                // console.warn(`* expect r.codeResult.code to equal ${r.codeResult.code} ${testResults[index]}`);
                 expect(r.codeResult.code).to.equal(testResults[index]);
             });
         });
