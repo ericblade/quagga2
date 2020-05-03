@@ -30,10 +30,10 @@ jobs:
         npm test
       env:
         CI: true
-    - name: test package import
-      run: |
-        npm install ts-node @std/esm
-        npm run test:import
-    - name: test package require
-      run: |
-        npm run test:require
+    # - name: test package import
+    #   run: |
+    #     npm install ts-node @std/esm
+    #     npm run test:import
+    # - name: test package require
+    #   run: |
+    #     npm run test:require
