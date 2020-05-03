@@ -15,9 +15,10 @@ const instance = new Quagga();
 const _context = instance.context;
 
 const QuaggaJSStaticInterface = {
+    // TODO #185: Quagga.init should return a promise if there's no callback
     init: function (config, cb, imageWrapper, quaggaInstance = instance) {
         quaggaInstance.context.config = merge({}, Config, config);
-        // TODO: pending restructure in Issue #105, we are temp disabling workers
+        // TODO #179: pending restructure in Issue #179, we are temp disabling workers
         if (quaggaInstance.context.config.numOfWorkers > 0) {
             quaggaInstance.context.config.numOfWorkers = 0;
         }
@@ -41,21 +42,41 @@ const QuaggaJSStaticInterface = {
         _context.stopped = true;
     },
     onDetected: function (callback) {
+        if (!callback || (typeof callback !== 'function' && (typeof callback !== 'object' || !callback.callback))) {
+            console.trace('* warning: Quagga.onDetected called with invalid callback, ignoring');
+            return;
+        }
         Events.subscribe('detected', callback);
     },
     offDetected: function (callback) {
         Events.unsubscribe('detected', callback);
     },
     onProcessed: function (callback) {
+        if (!callback || (typeof callback !== 'function' && (typeof callback !== 'object' || !callback.callback))) {
+            console.trace('* warning: Quagga.onProcessed called with invalid callback, ignoring');
+            return;
+        }
         Events.subscribe('processed', callback);
     },
     offProcessed: function (callback) {
         Events.unsubscribe('processed', callback);
     },
     setReaders: function (readers) {
+        if (!readers) {
+            console.trace('* warning: Quagga.setReaders called with no readers, ignoring');
+            return;
+        }
         instance.setReaders(readers);
     },
     registerReader: function (name, reader) {
+        if (!name) {
+            console.trace('* warning: Quagga.registerReader called with no name, ignoring');
+            return;
+        }
+        if (!reader) {
+            console.trace('* warning: Quagga.registerReader called with no reader, ignoring');
+            return;
+        }
         instance.registerReader(name, reader);
     },
     registerResultCollector: function (resultCollector) {
@@ -80,7 +101,7 @@ const QuaggaJSStaticInterface = {
                 halfSample: false,
             },
         }, config);
-        // TODO: restructure worker support so that it will work with typescript using worker-loader
+        // TODO #175: restructure worker support so that it will work with typescript using worker-loader
         // https://webpack.js.org/loaders/worker-loader/
         if (config.numOfWorkers > 0) {
             config.numOfWorkers = 0;

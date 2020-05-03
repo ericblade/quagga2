@@ -91,10 +91,8 @@ export default (function() {
             });
         },
         unsubscribe: function(eventName: EventName, callback?: Function | Subscription) {
-            var event;
-
             if (eventName) {
-                event = getEvent(eventName);
+                const event = getEvent(eventName);
                 if (event && callback) {
                     event.subscribers = event.subscribers.filter(function(subscriber){
                         return subscriber.callback !== callback;
