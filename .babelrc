@@ -19,14 +19,7 @@
     "test": {
       "plugins": [
         "add-module-exports",
-        [
-          "istanbul",
-          {
-            "exclude": [
-              "**/*.spec.js"
-            ]
-          }
-        ]
+        "istanbul"
       ]
     }
   }

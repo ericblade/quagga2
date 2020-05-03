@@ -1,8 +1,8 @@
 /// <reference path="mocha">
 
-import ResultCollector from '../../src/analytics/result_collector';
-import ImageDebug from '../../src/common/image_debug';
-import { XYSize, QuaggaJSResultCollector, QuaggaJSCodeResult } from '../../type-definitions/quagga';
+import ResultCollector from '../../result_collector';
+import ImageDebug from '../../../common/image_debug';
+import { XYSize, QuaggaJSResultCollector, QuaggaJSCodeResult } from '../../../../type-definitions/quagga';
 // import { describe, beforeEach, afterEach, it } from 'mocha';
 import { expect } from 'chai';
 import sinon, { SinonSpy } from 'sinon';
@@ -18,7 +18,7 @@ let canvasMock: MockCanvas;
 let imageSize: XYSize;
 let config: QuaggaJSResultCollector;
 
-describe("resultCollector", () => {
+describe("Result Collector", () => {
     beforeEach(function() {
         imageSize = {x: 320, y: 240};
         config = {
@@ -87,7 +87,7 @@ describe("resultCollector", () => {
             expect(results).to.have.length(2);
 
             results.forEach(function(result: QuaggaJSCodeResult) {
-                expect(result).not.to.deep.equal(config.blacklist[0]);
+                expect(result).not.to.deep.equal(config.blacklist![0]);
             });
         });
 

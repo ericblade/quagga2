@@ -14,7 +14,10 @@ module.exports = function(config) {
             'test/test-main.js': ['webpack'],
         },
         webpack: {
-            mode: 'production',
+            mode: 'development',
+            node: {
+                fs: 'empty',
+            },
             entry: [
                 './test/test-main.js',
             ],

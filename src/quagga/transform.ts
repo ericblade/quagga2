@@ -1,10 +1,10 @@
-type Box = Array<Array<number>>;
-interface Point {
+export type Box = Array<Array<number>>;
+export interface Point {
     x: number,
     y: number,
 };
 
-type Line = [ Point, Point ];
+export type Line = [ Point, Point ];
 
 export function moveBox(box: Box, xOffset: number, yOffset: number) {
     let corner = box.length;

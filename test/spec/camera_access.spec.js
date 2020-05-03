@@ -1,6 +1,6 @@
 /* eslint-disable no-unused-expressions */
 import CameraAccess, {pickConstraints} from '../../src/input/camera_access';
-import {setStream, getConstraints, setSupported, enumerateDevices, getUserMedia} from 'mediaDevices';
+import {setStream, getConstraints, setSupported, enumerateDevices, getUserMedia} from '../mocks/mediaDevices';
 import sinon from 'sinon';
 
 var originalURL,

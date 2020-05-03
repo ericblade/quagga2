@@ -7,4 +7,5 @@ _site/
 .vscode/
 dist/
 lib/quagga.js
-
+cypress/videos
+.nyc_output

@@ -21,19 +21,22 @@ jobs:
       uses: actions/setup-node@v1
       with:
         node-version: ${{ matrix.node-version }}
-    - name: npm install, build, and test
+    - name: npm versions
       run: |
         node --version
         npm --version
-        npm ci
-        npm run build --if-present
-        npm test
-      env:
-        CI: true
-    - name: test package import
-      run: |
-        npm install ts-node @std/esm
-        npm run test:import
-    - name: test package require
-      run: |
-        npm run test:require
+    - name: ci install
+      run: npm ci
+    - name: build
+      run: npm run build --if-present
+    - name: module test
+      run: npm run test:module
+    - name: run all code tests
+      run: npm test
+    # - name: test package import
+    #   run: |
+    #     npm install ts-node @std/esm
+    #     npm run test:import
+    # - name: test package require
+    #   run: |
+    #     npm run test:require

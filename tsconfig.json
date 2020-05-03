@@ -8,7 +8,8 @@
         "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
         "jsx": "react" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
         "types": [
-            "react"
+            "react",
+            "mocha",
         ] /* Type declaration files to be included in compilation. */,
         "module": "esNext" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
         "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,

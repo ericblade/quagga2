@@ -15,7 +15,10 @@ module.exports = function(config) {
             'test/test-main-integration.js': ['webpack'],
         },
         webpack: {
-            mode: 'production',
+            mode: 'development',
+            node: {
+                fs: 'empty',
+            },
             entry: [
                 './src/quagga.js',
             ],
