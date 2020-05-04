@@ -2,7 +2,7 @@ import {
     findTagsInObjectURL,
     findTagsInBuffer,
     base64ToArrayBuffer,
-} from '../../src/input/exif_helper';
+} from '../../exif_helper';
 
 
 const fixtures = {
@@ -15,7 +15,7 @@ const fixtures = {
     },
 };
 
-describe('exif_helper', () => {
+describe('EXIF Helper', () => {
     describe('findTagsInObjectURL', () => {
         it('should return null if the src type is not supported', (done) => {
             findTagsInObjectURL('blabla').then(tags => {

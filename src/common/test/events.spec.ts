@@ -3,7 +3,6 @@ import { expect } from 'chai';
 import Events from '../events';
 import sinon, { SinonSpy } from 'sinon';
 
-
 describe('Events', () => {
     beforeEach(function() {
         Events.unsubscribe();
