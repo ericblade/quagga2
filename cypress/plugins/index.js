@@ -12,12 +12,14 @@
 // This function is called when a project is opened or re-opened (e.g. due to
 // the project's config changing)
 
+const task = require('@cypress/code-coverage/task');
+console.warn('* task=', task);
 /**
  * @type {Cypress.PluginConfig}
  */
-require('@std/esm');
 module.exports = (on, config) => {
     config.env = config.env || {};
     config.env.BUILD_ENV = 'production';
+    on('task', task(on, config));
     return config;
 };
