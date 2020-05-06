@@ -569,6 +569,7 @@ export interface QuaggaJSReaderConfig {
 }
 
 export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
+    maxAspectRatio?: number; // i don't see this in the documentation anywhere, but it's in the original test suite...
     minAspectRatio?: number;
     facing?: string;
 }
