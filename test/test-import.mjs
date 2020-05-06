@@ -11,6 +11,13 @@ describe('testing node import', () => {
         expect(Q.start).to.be.a('function');
         expect(Q.stop).to.be.a('function');
     });
+    it('contains CameraAccess', () => {
+        const { CameraAccess: CA } = Q;
+        expect(CA).to.be.an('object').with.keys([
+            'request', 'release', 'enumerateVideoDevices',
+            'getActiveStreamLabel', 'getActiveTrack',
+        ]);
+    });
 });
 
 // export default 1;

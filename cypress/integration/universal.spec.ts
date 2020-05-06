@@ -6,5 +6,4 @@ import '../../src/common/test/events.spec';
 import '../../src/locator/test/barcode_locator.spec';
 import '../../src/quagga/test/transform.spec';
 
-// import '../../test/spec/camera_access.spec';
 // import '../../test/integration/integration.spec';
