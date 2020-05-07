@@ -67,7 +67,9 @@
   },
   "scripts": {
     "check-types": "tsc",
-    "coverage": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development nyc --no-clean ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.*",
+    "precoverage": "npx rimraf .nyc_output coverage",
+    "coverage:node": "// DOES NOT WORK YET // npx cross-env NODE_ENV=test BUILD_ENV=development nyc --no-clean ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.*",
+    "coverage": "npm run cypress:run",
     "cypress:open": "npx cross-env NODE_ENV=development BUILD_ENV=development cypress open --env BUILD_ENV=development",
     "cypress:run": "npx cross-env NODE_ENV=test BUILD_ENV=development cypress run --env BUILD_ENV=development",
     "test:browser-specific": "NOT WORKING -- something like npx cypress run --config testFiles=[browser]",
@@ -177,8 +179,8 @@
       "text-summary",
       "html"
     ],
-    "sourceMap": true,
-    "instrument": true
+    "sourceMap": false,
+    "instrument": false
   },
   "greenkeeper": {
     "ignore": [
