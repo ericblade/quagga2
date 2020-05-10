@@ -10,6 +10,7 @@
         "types": [
             "react",
             "mocha",
+            "cypress",
         ] /* Type declaration files to be included in compilation. */,
         "module": "esNext" /* Specify module code generation: 'none', 'commonjs', 'amd', 'system', 'umd', 'es2015', or 'ESNext'. */,
         "moduleResolution": "node" /* Specify module resolution strategy: 'node' (Node.js) or 'classic' (TypeScript pre-1.6). */,

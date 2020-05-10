@@ -9,22 +9,20 @@ describe('CameraAccess', () => {
     describe('pickConstraints', () => {
         it('should return the given constraints if no facingMode is defined', async () => {
             const givenConstraints = {width: 180};
-            try {
-                const actualConstraints = await pickConstraints(givenConstraints);
-                expect(actualConstraints.video).to.deep.equal(givenConstraints);
-            } catch (err_1) {
-                expect(err_1).to.equal(null);
-            }
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal(givenConstraints);
         });
 
         it('should return the given constraints if deviceId is defined', async () => {
             const givenConstraints = {width: 180, deviceId: '4343'};
-            try {
-                const actualConstraints = await pickConstraints(givenConstraints);
-                expect(actualConstraints.video).to.deep.equal(givenConstraints);
-            } catch (err_1) {
-                expect(err_1).to.equal(null);
-            }
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal(givenConstraints);
+        });
+
+        it('should remove facingMode if deviceId is defined', async () => {
+            const givenConstraints = { deviceId: 'dummy', facingMode: 'user' };
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal({ deviceId: 'dummy' });
         });
     });
 
@@ -41,6 +39,7 @@ describe('CameraAccess', () => {
             expect(v[0].label).to.equal('fake_device_0');
         });
     });
+
     describe('request', () => {
         it('works', async () => {
             after(() => Quagga.CameraAccess.release());
@@ -53,6 +52,7 @@ describe('CameraAccess', () => {
             expect(((video?.srcObject) as any)?.active).to.equal(true);
             // TODO: ensure we cleanup our video element after this
         });
+
         it('should allow deprecated constraints to be used', async () => {
             after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');
@@ -72,7 +72,34 @@ describe('CameraAccess', () => {
             expect(constraints.minAspectRatio).to.be.undefined;
             expect(constraints.maxAspectRatio).to.be.undefined;
         });
+
+        it('will fail on NotAllowedError', async () => {
+            after(() => Quagga.CameraAccess.release());
+            cy.stub(navigator.mediaDevices, 'getUserMedia').rejects(new DOMException('Not Allowed', 'NotAllowedError'));
+            const video = document.createElement('video');
+            try {
+                const x = await Quagga.CameraAccess.request(video, { width: 320, height: 240 });
+                expect(x).to.not.exist;
+            } catch(err) {
+                expect(err).to.be.an.instanceOf(DOMException);
+                expect(err.name).to.equal('NotAllowedError');
+            }
+        });
+
+        it('fails eventually on unacceptable video size', async function() {
+            this.timeout(10000);
+            after(() => Quagga.CameraAccess.release());
+            const video = document.createElement('video');
+            try {
+                const x = await Quagga.CameraAccess.request(video, { width: 5, height: 5});
+                expect(x).to.not.exist;
+            } catch(err) {
+                expect(err).to.equal('Unable to play video stream. Is webcam working?');
+            }
+        });
+        // TODO: need to add a test for no support in browser to straight up fail
     });
+
     describe('release', () => {
         it('works', async () => {
             const video = document.createElement('video');
@@ -81,44 +108,13 @@ describe('CameraAccess', () => {
             expect(((video?.srcObject) as any)?.active).to.equal(false);
         });
     });
-    // TODO: Original tests also had the ability to stub out the browser's built-in
-    // getUserMedia support, to test for failure to support or to allow permission
-    // to getUserMedia.
-
-    // describe('failure', function() {
-    //     beforeEach(() => {
-    //         setSupported(false);
-    //     });
-
-    //     afterEach(() => {
-    //         setSupported(true);
-    //     });
-
-    //     describe('permission denied', function(){
-    //         it('should throw if getUserMedia not available', function(done) {
-    //             CameraAccess.request(video, {})
-    //                 .catch(function (err) {
-    //                     expect(err).to.be.defined;
-    //                     done();
-    //                 });
-    //         });
-    //     });
-
-    //     describe('not available', function(){
-    //         it('should throw if getUserMedia not available', function(done) {
-    //             CameraAccess.request(video, {})
-    //                 .catch((err) => {
-    //                     expect(err).to.be.defined;
-    //                     done();
-    //                 });
-    //         });
-    //     });
 
     describe('getActiveStreamLabel', () => {
         it('no active stream', () => {
             const x = Quagga.CameraAccess.getActiveStreamLabel();
             expect(x).to.equal('');
         });
+
         it('with active stream', async () => {
             after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');

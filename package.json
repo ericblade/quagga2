@@ -173,7 +173,8 @@
       ".tsx"
     ],
     "require": [
-      "ts-node/register"
+      "ts-node/register",
+      "babel-register"
     ],
     "reporter": [
       "text-summary",
