@@ -22,13 +22,15 @@ FrameGrabber.create = function(inputStream) {
     const _stepSizeX = _video_size.x / _canvasSize.x;
     const _stepSizeY = _video_size.y / _canvasSize.y;
 
-    console.log('FrameGrabber', JSON.stringify({
-        videoSize: _grayImageArray.shape,
-        canvasSize: _canvasImageArray.shape,
-        stepSize: [_stepSizeX, _stepSizeY],
-        size: _targetImageArray.shape,
-        topRight: _topRight,
-    }));
+    if (ENV.development) {
+        console.log('FrameGrabber', JSON.stringify({
+            videoSize: _grayImageArray.shape,
+            canvasSize: _canvasImageArray.shape,
+            stepSize: [_stepSizeX, _stepSizeY],
+            size: _targetImageArray.shape,
+            topRight: _topRight,
+        }));
+    }
 
     /**
      * Uses the given array as frame-buffer

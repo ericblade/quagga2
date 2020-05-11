@@ -33,7 +33,9 @@ InputStream.createImageStream = function() {
                 throw new Error('error decoding pixels in loadImages');
             }
             loaded = true;
-            console.log(pixels.shape);
+            if (ENV.development) {
+                console.log('* InputStreamNode pixels.shape', pixels.shape);
+            }
             frame = pixels;
             width = pixels.shape[0];
             height = pixels.shape[1];

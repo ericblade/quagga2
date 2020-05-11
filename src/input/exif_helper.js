@@ -1,5 +1,8 @@
-// Scraped from https://github.com/exif-js/exif-js
+// NOTE: (SOME OF) THIS IS BROWSER ONLY CODE.  Node does not have 'atob' built in, nor XMLHttpRequest.
+// How exactly is this set of functions used in Quagga? Do we need the browser specific code? Do we
+// need to port any part of this that doesn't work in Node to node?
 
+// Tags scraped from https://github.com/exif-js/exif-js
 const ExifTags = {0x0112: 'orientation'};
 export const AvailableTags = Object.keys(ExifTags).map(key => ExifTags[key]);
 

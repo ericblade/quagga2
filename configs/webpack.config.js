@@ -26,6 +26,9 @@ module.exports = {
             'node_modules',
         ],
     },
+    node: {
+        fs: 'empty',
+    },
     output: {
         path: __dirname + '/../dist',
         publicPath: '/',
