@@ -79,7 +79,7 @@
     "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/newintegration.spec.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
-    "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* && npx cross-env NODE_ENV=production BUILD_ENV=production grunt integrationtest",
+    "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/newintegration.spec.ts && npx cross-env NODE_ENV=production BUILD_ENV=production grunt integrationtest",
     "integrationtest": "grunt integrationtest",
     "build:dev": "npx cross-env NODE_ENV=development BUILD_ENV=development webpack --config configs/webpack.config.js",
     "build:prod": "npx cross-env NODE_ENV=production BUILD_ENV=production webpack --config configs/webpack.config.min.js",
