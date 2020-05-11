@@ -181,54 +181,6 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config, 'code_128_reader');
     });
 
-    describe('Code39', function() {
-        var config = generateConfig(),
-            testSet = [
-                {'name': 'image-001.jpg', 'result': 'B3% $DAD$'},
-                {'name': 'image-003.jpg', 'result': 'CODE39'},
-                {'name': 'image-004.jpg', 'result': 'QUAGGAJS'},
-                // {"name": "image-005.jpg", "result": "CODE39"},
-                {'name': 'image-006.jpg', 'result': '2/4-8/16-32'},
-                // {"name": "image-007.jpg", "result": "2/4-8/16-32"},
-                {'name': 'image-008.jpg', 'result': 'CODE39'},
-                {'name': 'image-009.jpg', 'result': '2/4-8/16-32'},
-                {'name': 'image-010.jpg', 'result': 'CODE39'},
-            ];
-
-        testSet.forEach(function(sample) {
-            sample.format = 'code_39';
-        });
-
-        config.decoder.readers = ['code_39_reader'];
-        _runTestSet(testSet, config);
-    });
-
-    describe('Code39-VIN', function() {
-        const config = generateConfig();
-        config.inputStream.size = 1280;
-        config.inputStream.sequence = false;
-        config.locator.halfSample = false;
-        // see https://github.com/ericblade/quagga2/issues/143 for notes on fixtures
-        const testSet = [
-            { name: 'image-001.jpg', result: '2HGFG1B86BH501831' },
-            // { name: 'image-002.jpg', result: 'JTDKB20U887718156' },
-            // image-003 only works on the second run of a decode of it and only in browser?! wtf?
-            // { name: 'image-003.jpg', result: 'JM1BK32G071773697' },
-            // { name: 'image-004.jpg', result: 'WDBTK75G94T028954' },
-            // { name: 'image-005.jpg', result: '3VW2K7AJ9EM381173' },
-            { name: 'image-006.jpg', result: 'JM1BL1H4XA1335663' },
-            // { name: 'image-007.jpg', result: 'JHMGE8H42AS021233' },
-            // { name: 'image-008.jpg', result: 'WMEEJ3BA4DK652562' },
-            // { name: 'image-009.jpg', result: 'WMEEJ3BA4DK652562' }, //yes, 8 and 9 are same barcodes, different images slightly
-            // { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562' }, // 10 also
-        ];
-        testSet.forEach(function(sample) {
-            sample.format = 'code_39_vin';
-        });
-        config.decoder.readers = ['code_39_vin_reader'];
-        _runTestSet(testSet, config);
-    });
-
     describe('EAN-8', function() {
         var config = generateConfig(),
             testSet = [

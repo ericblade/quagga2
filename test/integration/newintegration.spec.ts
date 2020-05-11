@@ -111,4 +111,49 @@ describe.only('End-To-End Decoder Tests', () => {
         // other samples break at that high a size.
         // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
     ]);
+    runDecoderTest(
+        'code_39',
+        generateConfig({
+            decoder: {
+                readers: ['code_39_reader'],
+            }
+        }), [
+            { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
+            { 'name': 'image-003.jpg', 'result': 'CODE39', format: 'code_39' },
+            { 'name': 'image-004.jpg', 'result': 'QUAGGAJS', format: 'code_39' },
+            // {"name": "image-005.jpg", "result": "CODE39", format: 'code_39' },
+            { 'name': 'image-006.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
+            // {"name": "image-007.jpg", "result": "2/4-8/16-32", format: 'code_39' },
+            { 'name': 'image-008.jpg', 'result': 'CODE39', format: 'code_39' },
+            { 'name': 'image-009.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
+            { 'name': 'image-010.jpg', 'result': 'CODE39', format: 'code_39' },
+        ]);
+    runDecoderTest(
+        'code_39_vin',
+        generateConfig({
+            inputStream: {
+                size: 1280,
+                sequence: false,
+            },
+            locator: {
+                halfSample: false,
+            },
+            decoder: {
+                readers: ['code_39_vin_reader'],
+            },
+        }),
+        [
+            { name: 'image-001.jpg', result: '2HGFG1B86BH501831', format: 'code_39_vin' },
+            // { name: 'image-002.jpg', result: 'JTDKB20U887718156', format: 'code_39_vin' },
+            // image-003 only works on the second run of a decode of it and only in browser?! wtf?
+            // { name: 'image-003.jpg', result: 'JM1BK32G071773697', format: 'code_39_vin' },
+            // { name: 'image-004.jpg', result: 'WDBTK75G94T028954', format: 'code_39_vin' },
+            // { name: 'image-005.jpg', result: '3VW2K7AJ9EM381173', format: 'code_39_vin' },
+            { name: 'image-006.jpg', result: 'JM1BL1H4XA1335663', format: 'code_39_vin' },
+            // { name: 'image-007.jpg', result: 'JHMGE8H42AS021233', format: 'code_39_vin' },
+            // { name: 'image-008.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' },
+            // { name: 'image-009.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' }, //yes, 8 and 9 are same barcodes, different images slightly
+            // { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' }, // 10 also
+        ]
+    );
 });
