@@ -139,57 +139,6 @@ describe('decodeSingle', function () {
 
     // TODO: write a test that tests Promise return/resolve
 
-    // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
-    // difference between a supplement and a separate reader?  is it just semantic?
-    describe('EAN-extended', function() {
-        // TODO: Somehow, the supplements config below is being run with the EAN test above, which shouldn't
-        // need it, but apparently doesn't decode right without it anyway.  Serious wtf'ing here.
-        // I don't understand why, but skipping this test causes 2 tests above to pass, even though
-        // i should only be running one test.  Not skipping this causes only 1 test above to pass.
-        // VERY CONFUSING.
-        var config = {
-                inputStream: {
-                    size: 800,
-                    singleChannel: false,
-                },
-                locator: {
-                    patchSize: 'medium',
-                    halfSample: true,
-                },
-                numOfWorkers: 0,
-                decoder: {
-                    readers: [{
-                        format: 'ean_reader',
-                        config: {
-                            supplements: [
-                                'ean_5_reader',
-                                'ean_2_reader',
-                            ],
-                        },
-                    }],
-                },
-                locate: true,
-                src: null,
-            },
-            testSet = [
-                // // {"name": "image-001.jpg", "result": "900437801102701"},
-                {'name': 'image-002.jpg', 'result': '419871600890101'},
-                // // {"name": "image-003.jpg", "result": "419871600890101"},
-                {'name': 'image-004.jpg', 'result': '978054466825652495'},
-                {'name': 'image-005.jpg', 'result': '419664190890712'},
-                // {"name": "image-006.jpg", "result": "412056690699101"},
-                {'name': 'image-007.jpg', 'result': '419204531290601'},
-                {'name': 'image-008.jpg', 'result': '419871600890101'},
-                {'name': 'image-009.jpg', 'result': '978054466825652495'},
-                {'name': 'image-010.jpg', 'result': '900437801102701'},
-            ];
-
-        testSet.forEach(function(sample) {
-            sample.format = 'ean_13';
-        });
-        _runTestSet(testSet, config);
-    });
-
     describe('Code128', function() {
         var config = {
                 inputStream: {
