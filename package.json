@@ -76,7 +76,7 @@
     "test:browser-universal": "NOT WORKING -- something like npx cypress run --config testFiles=[universal]",
     "test:browser-all": "npm run cypress:run",
     "test:import": "mocha -r @std/esm test/test-import.mjs",
-    "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.*",
+    "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/newintegration.spec.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
     "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* && npx cross-env NODE_ENV=production BUILD_ENV=production grunt integrationtest",
