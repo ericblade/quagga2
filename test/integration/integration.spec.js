@@ -181,29 +181,6 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config, 'code_128_reader');
     });
 
-    describe('UPC-E', function() {
-        var config = generateConfig(),
-            testSet = [
-                // {"name": "image-001.jpg", "result": "04965802"},
-                {'name': 'image-002.jpg', 'result': '04965802'},
-                {'name': 'image-003.jpg', 'result': '03897425'},
-                {'name': 'image-004.jpg', 'result': '05096893'},
-                // {"name": "image-005.jpg", "result": "05096893"},
-                {'name': 'image-006.jpg', 'result': '05096893'},
-                {'name': 'image-007.jpg', 'result': '03897425'},
-                {'name': 'image-008.jpg', 'result': '01264904'},
-                // {"name": "image-009.jpg", "result": "01264904"},
-                {'name': 'image-010.jpg', 'result': '01264904'},
-            ];
-
-        testSet.forEach(function(sample) {
-            sample.format = 'upc_e';
-        });
-
-        config.decoder.readers = ['upc_e_reader'];
-        _runTestSet(testSet, config);
-    });
-
     describe('Codabar', function() {
         var config = generateConfig(),
             testSet = [
