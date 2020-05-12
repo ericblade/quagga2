@@ -181,36 +181,6 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config, 'code_128_reader');
     });
 
-    describe('I2of5 with localization', function() {
-        var config = {
-                inputStream: {
-                    size: 800,
-                    singleChannel: false,
-                },
-                locator: {
-                    patchSize: 'small',
-                    halfSample: false,
-                },
-                numOfWorkers: 0,
-                decoder: {
-                    readers: ['i2of5_reader'],
-                },
-                locate: true,
-                src: null,
-            },
-            testSet = [
-                {'name': 'image-001.jpg', 'result': '2167361334'},
-                {'name': 'image-002.jpg', 'result': '2167361334'},
-                {'name': 'image-003.jpg', 'result': '2167361334'},
-                {'name': 'image-004.jpg', 'result': '2167361334'},
-                {'name': 'image-005.jpg', 'result': '2167361334'},
-            ];
-        testSet.forEach(function(sample) {
-            sample.format = 'i2of5';
-        });
-        _runTestSet(testSet, config);
-    });
-
     describe('2of5', function() {
         var config = {
                 inputStream: {

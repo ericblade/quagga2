@@ -237,5 +237,25 @@ describe.only('End-To-End Decoder Tests', () => {
             { 'name': 'image-009.jpg', 'result': 'C$399.95A', format: 'codabar' },
             { 'name': 'image-010.jpg', 'result': 'C$399.95A', format: 'codabar' },
         ]
-    )
+    );
+    runDecoderTest(
+        'i2of5',
+        generateConfig({
+            inputStream: { size: 800, singleChannel: false },
+            locator: {
+                patchSize: 'small',
+                halfSample: false,
+            },
+            decoder: {
+                readers: ['i2of5_reader'],
+            },
+        }),
+        [
+            { 'name': 'image-001.jpg', 'result': '2167361334', format: 'i2of5' },
+            { 'name': 'image-002.jpg', 'result': '2167361334', format: 'i2of5' },
+            { 'name': 'image-003.jpg', 'result': '2167361334', format: 'i2of5' },
+            { 'name': 'image-004.jpg', 'result': '2167361334', format: 'i2of5' },
+            { 'name': 'image-005.jpg', 'result': '2167361334', format: 'i2of5' },
+        ]
+    );
 });
