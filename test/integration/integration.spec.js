@@ -181,29 +181,6 @@ describe('decodeSingle', function () {
         _runTestSet(testSet, config, 'code_128_reader');
     });
 
-    describe('EAN-8', function() {
-        var config = generateConfig(),
-            testSet = [
-                {'name': 'image-001.jpg', 'result': '42191605'},
-                {'name': 'image-002.jpg', 'result': '42191605'},
-                {'name': 'image-003.jpg', 'result': '90311208'},
-                {'name': 'image-004.jpg', 'result': '24057257'},
-                // {"name": "image-005.jpg", "result": "90162602"},
-                {'name': 'image-006.jpg', 'result': '24036153'},
-                // {"name": "image-007.jpg", "result": "42176817"},
-                {'name': 'image-008.jpg', 'result': '42191605'},
-                {'name': 'image-009.jpg', 'result': '42242215'},
-                {'name': 'image-010.jpg', 'result': '42184799'},
-            ];
-
-        testSet.forEach(function(sample) {
-            sample.format = 'ean_8';
-        });
-
-        config.decoder.readers = ['ean_8_reader'];
-        _runTestSet(testSet, config);
-    });
-
     describe('UPC', function() {
         var config = generateConfig(),
             testSet = [

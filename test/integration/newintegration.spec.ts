@@ -157,4 +157,21 @@ describe.only('End-To-End Decoder Tests', () => {
             // { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' }, // 10 also
         ]
     );
+    runDecoderTest(
+        'ean_8',
+        generateConfig({ decoder: { readers: ['ean_8_reader'] } }),
+        [
+            { 'name': 'image-001.jpg', 'result': '42191605', format: 'ean_8' },
+            { 'name': 'image-002.jpg', 'result': '42191605', format: 'ean_8' },
+            { 'name': 'image-003.jpg', 'result': '90311208', format: 'ean_8' },
+            // TODO: image-004 fails in browser, this is new to running in cypress vs PhantomJS. It does not fail in node.  Likely similar problem to #190
+            // { 'name': 'image-004.jpg', 'result': '24057257', format: 'ean_8' },
+            // {"name": "image-005.jpg", "result": "90162602"},
+            { 'name': 'image-006.jpg', 'result': '24036153', format: 'ean_8' },
+            // {"name": "image-007.jpg", "result": "42176817"},
+            { 'name': 'image-008.jpg', 'result': '42191605', format: 'ean_8' },
+            { 'name': 'image-009.jpg', 'result': '42242215', format: 'ean_8' },
+            { 'name': 'image-010.jpg', 'result': '42184799', format: 'ean_8' },
+        ]
+    )
 });
