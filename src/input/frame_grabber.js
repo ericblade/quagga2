@@ -108,7 +108,6 @@ FrameGrabber.create = function(inputStream, canvas) {
             } else {
                 computeGray(ctxData, _data, _streamConfig);
             }
-            console.warn('* frame_grabber grab _data', _data);
             return true;
         } else {
             return false;
