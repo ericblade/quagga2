@@ -82,12 +82,12 @@ FrameGrabber.create = function(inputStream, canvas) {
                 drawable = frame.img;
                 if (frame.tags && frame.tags.orientation) {
                     switch (frame.tags.orientation) {
-                    case 6:
-                        drawAngle = 90 * TO_RADIANS;
-                        break;
-                    case 8:
-                        drawAngle = -90 * TO_RADIANS;
-                        break;
+                        case 6:
+                            drawAngle = 90 * TO_RADIANS;
+                            break;
+                        case 8:
+                            drawAngle = -90 * TO_RADIANS;
+                            break;
                     }
                 }
             }
@@ -108,6 +108,7 @@ FrameGrabber.create = function(inputStream, canvas) {
             } else {
                 computeGray(ctxData, _data, _streamConfig);
             }
+            console.warn('* frame_grabber grab _data', _data);
             return true;
         } else {
             return false;
