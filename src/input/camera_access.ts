@@ -64,7 +64,7 @@ function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprec
     return normalized;
 }
 
-// TODO: I don't think there's any good reason pickConstraints should return a Promise,
+// TODO: #192 I don't think there's any good reason pickConstraints should return a Promise,
 // I think it was just that way so it could be chained to other functions that did return a Promise.
 // That's not necessary with async functions being a thing, so that should be fixed.
 export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated = {}): Promise<MediaStreamConstraints> {

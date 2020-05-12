@@ -12,7 +12,7 @@ declare var ENV: QuaggaBuildEnvironment; // webpack injects ENV
 class Code39VINReader extends Code39Reader {
     FORMAT = 'code_39_vin';
 
-    // TODO (this was todo in original repo)
+    // TODO (this was todo in original repo, no text was there. sorry.)
     _checkChecksum(code: string) {
         return !!code;
     }
