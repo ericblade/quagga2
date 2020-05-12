@@ -82,12 +82,12 @@ FrameGrabber.create = function(inputStream, canvas) {
                 drawable = frame.img;
                 if (frame.tags && frame.tags.orientation) {
                     switch (frame.tags.orientation) {
-                    case 6:
-                        drawAngle = 90 * TO_RADIANS;
-                        break;
-                    case 8:
-                        drawAngle = -90 * TO_RADIANS;
-                        break;
+                        case 6:
+                            drawAngle = 90 * TO_RADIANS;
+                            break;
+                        case 8:
+                            drawAngle = -90 * TO_RADIANS;
+                            break;
                     }
                 }
             }

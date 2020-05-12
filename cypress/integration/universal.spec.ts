@@ -5,4 +5,4 @@ import '../../src/common/test/cv_utils.spec';
 import '../../src/common/test/events.spec';
 import '../../src/locator/test/barcode_locator.spec';
 import '../../src/quagga/test/transform.spec';
-import '../../test/integration/newintegration.spec';
+import '../../test/integration/integration.spec';

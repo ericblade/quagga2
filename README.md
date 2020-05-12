@@ -33,7 +33,6 @@ if you want to dive deeper into this topic.
 
 ![teaser][teaser_left]![teaser][teaser_right]
 
-
 ## Yet another barcode library?
 
 This is not yet another port of the great [zxing][zxing_github] library, but
@@ -43,13 +42,12 @@ estimated bounding box including the rotation. Simply speaking, this reader is
 invariant to scale and rotation, whereas other libraries require the barcode to
 be aligned with the viewport.
 
-
 ## <a name="browser-support">Browser Support</a>
 
 Quagga makes use of many modern Web-APIs which are not implemented by all
-browsers yet. There are two modes in which Quagga operates: 
-1. analyzing static images and 
-2. using a camera to decode the images from a live-stream. 
+browsers yet. There are two modes in which Quagga operates:
+1. analyzing static images and
+2. using a camera to decode the images from a live-stream.
 
 The latter requires the presence of the MediaDevices API. You can track the compatibility
 of the used Web-APIs for each mode:
@@ -380,16 +378,16 @@ high-level properties:
 
 NOTE: As of quagga2 v0.0.13, numOfWorkers has been *disabled*.  The library needs a major restructuring
 to properly handle Worker threads, and that restructuring is on-going at the moment, to solve other
-problems as well.  It will be re-enabled in the future.
+problems as well.  It will be re-enabled in the future.  As a result, the numOfWorkers setting is ALWAYS 0.
 
-QuaggaJS supports web-workers out of the box and runs with `4` workers in its
+~~QuaggaJS supports web-workers out of the box and runs with `4` workers in its
 default configuration. The number should align with the number of cores
-available in your targeted devices.
+available in your targeted devices.~~
 
-In case you don't know the number upfront, or if the variety of devices is
+~~In case you don't know the number upfront, or if the variety of devices is
 too big, you can either use `navigator.hardwareConcurrency` (see
 [here](https://wiki.whatwg.org/wiki/Navigator_HW_Concurrency)) where available
-or make use of [core-estimator](https://github.com/oftn/core-estimator).
+or make use of [core-estimator](https://github.com/oftn/core-estimator).~~
 
 ### locate
 
@@ -648,11 +646,13 @@ A growing collection of tips & tricks to improve the various aspects of Quagga.
 ### Working with Cordova / PhoneGap?
 
 If you're having issues getting a mobile device to run Quagga using Cordova, you might try the code
-here: https://github.com/serratus/quaggaJS/issues/94#issuecomment-571478711
-```
+here: [Original Repo Issue #94 Comment][https://github.com/serratus/quaggaJS/issues/94#issuecomment-571478711]
+
+```javascript
 let permissions = cordova.plugins.permissions; permissions.checkPermission(permissions.CAMERA,
 (res) => { if (!res.hasPermission) { permissions.requestPermission(permissions.CAMERA, open());
 ```
+
 Thanks, @chrisrodriguezmbww !
 
 ### Barcodes too small?
@@ -683,9 +683,9 @@ To find out more about this feature [read on](https://www.oberhofer.co/mediastre
 
 ## Tests
 
-Unit Tests can be run with [Karma][karmaUrl] and written using
-[Mocha][mochaUrl], [Chai][chaiUrl] and [SinonJS][sinonUrl]. Coverage reports are
-automatically generated in the coverage/ folder.
+Tests are performed with [Cypress][cypressUrl] for browser testing, and [Mocha][mochaUrl], [Chai][chaiUrl], and [SinonJS][sinonUrl] for Node.JS testing. (note that Cypress also uses Mocha, Chai, and Sinon, so tests that are not browser specific can be run virtually identically in node without duplication of code)
+
+Coverage reports are generated in the coverage/ folder.
 
 ```console
 > npm install
@@ -707,11 +707,17 @@ or using docker-compose:
 > docker-compose run nodejs npm run test
 ```
 
+We prefer that Unit tests be located near the unit being tested -- the src/quagga/transform module, for example, has it's test suite located at src/quagga/test/transform.spec.ts.  Likewise, src/locator/barcode_locator test is located at src/locator/test/barcode_locator.spec.ts .
+
+If you have browser or node specific tests, that must be written differently per platform, or do not apply to one platform, then you may add them to src/{filelocation}/test/browser or .../test/node.  See also src/analytics/test/browser/result_collector.spec.ts, which contains browser specific code.
+
+If you add a new test file, you should also make sure to import it in either cypress/integration/browser.spec.ts, for browser-specific tests, or cypress/integration/universal.spec.ts, for tests that can be run both in node and in browser.  Node.JS testing is performed using the power of file globbing, and will pick up your tests, so long as they conform to the existing test file directory and name patterns.
+
 ## Image Debugging
 
 In case you want to take a deeper dive into the inner workings of Quagga, get to
 know the _debugging_ capabilities of the current implementation. The various
-flags exposed through the `config` object give you the abilily to visualize
+flags exposed through the `config` object give you the ability to visualize
 almost every step in the processing. Because of the introduction of the
 web-workers, and their restriction not to have access to the DOM, the
 configuration must be explicitly set to `config.numOfWorkers = 0` in order to
@@ -777,10 +783,10 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 [teaser_left]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-located.png
 [teaser_right]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-detected.png
 [caniuse_getusermedia]: http://caniuse.com/#feat=stream
+[cypressUrl]: https://www.cypress.io/
 [sinonUrl]: http://sinonjs.org/
 [chaiUrl]: http://chaijs.com/
 [mochaUrl]: https://github.com/mochajs/mocha
-[karmaUrl]: http://karma-runner.github.io/
 [code39_wiki]: http://en.wikipedia.org/wiki/Code_39
 [codabar_wiki]: http://en.wikipedia.org/wiki/Codabar
 [upc_wiki]: http://en.wikipedia.org/wiki/Universal_Product_Code

@@ -18,9 +18,6 @@ src/
 *.REMOTE.*
 .babelrc
 .eslintrc
-Gruntfile.js
-karma-integration.conf.js
-karma.conf.js
 server.pem
 simple-https-server.py
 webpack.*config*.js
