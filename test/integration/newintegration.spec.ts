@@ -340,7 +340,7 @@ describe('Parallel decoding works', () => {
     });
 });
 
-describe.only('External Reader Test, using stock code_128 reader', () => {
+describe('External Reader Test, using stock code_128 reader', () => {
     describe('works', () => {
         before(() => {
             Quagga.registerReader('external_code_128_reader', ExternalCode128Reader);
