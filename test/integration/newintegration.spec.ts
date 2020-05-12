@@ -221,5 +221,21 @@ describe.only('End-To-End Decoder Tests', () => {
             { 'name': 'image-009.jpg', 'result': '01264904', format: 'upc_e' },
             { 'name': 'image-010.jpg', 'result': '01264904', format: 'upc_e' },
         ]
+    );
+    runDecoderTest(
+        'codabar',
+        generateConfig({ decoder: { readers: ['codabar_reader'] } }),
+        [
+            { 'name': 'image-001.jpg', 'result': 'A10/53+17-70D', format: 'codabar' },
+            { 'name': 'image-002.jpg', 'result': 'B546745735B', format: 'codabar' },
+            { 'name': 'image-003.jpg', 'result': 'C$399.95A', format: 'codabar' },
+            { 'name': 'image-004.jpg', 'result': 'B546745735B', format: 'codabar' },
+            { 'name': 'image-005.jpg', 'result': 'C$399.95A', format: 'codabar' },
+            { 'name': 'image-006.jpg', 'result': 'B546745735B', format: 'codabar' },
+            { 'name': 'image-007.jpg', 'result': 'C$399.95A', format: 'codabar' },
+            { 'name': 'image-008.jpg', 'result': 'A16:9/4:3/3:2D', format: 'codabar' },
+            { 'name': 'image-009.jpg', 'result': 'C$399.95A', format: 'codabar' },
+            { 'name': 'image-010.jpg', 'result': 'C$399.95A', format: 'codabar' },
+        ]
     )
 });
