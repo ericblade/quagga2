@@ -33,8 +33,6 @@
     "cross-env": "^7.0.2",
     "cypress": "^4.5.0",
     "eslint": "^6.8.0",
-    "isparta-loader": "^2.0.0",
-    "istanbul-lib-coverage": "^3.0.0",
     "mocha": "^5.2.0",
     "nyc": "^15.0.1",
     "sinon": "^9.0.2",
@@ -44,8 +42,7 @@
     "ts-node": "^8.10.1",
     "typescript": "^3.8.3",
     "webpack": "^4.43.0",
-    "webpack-cli": "^3.3.11",
-    "webpack-sources": "^1.4.3"
+    "webpack-cli": "^3.3.11"
   },
   "directories": {
     "doc": "doc"
