@@ -1,4 +1,7 @@
 // TODO: write a test that ensures that Quagga.decodeSingle returns a Promise when it should
+// TODO: write a test that tests the multiple: true decoding option, allowing for multiple barcodes in
+// a single image to be returned.
+// TODO: write a test that allows for locate: false and locator configs to be tested.
 
 import Quagga from '../../src/quagga';
 import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
