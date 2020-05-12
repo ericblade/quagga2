@@ -1,7 +1,8 @@
+// TODO: write a test that ensures that Quagga.decodeSingle returns a Promise when it should
+
 import Quagga from '../../src/quagga';
 import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
 import { expect } from 'chai';
-import tracer from 'locator/tracer';
 
 // add it.allowFail see https://github.com/kellyselden/mocha-helpers/pull/4
 // also see https://github.com/mochajs/mocha/issues/1480#issuecomment-487074628
@@ -63,7 +64,7 @@ function generateConfig(configOverride: QuaggaJSConfigObject = {}) {
     return config;
 }
 
-describe.only('End-To-End Decoder Tests', () => {
+describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     runDecoderTest('ean', generateConfig(), [
         { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13' },
         { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13' },
@@ -304,4 +305,36 @@ describe.only('End-To-End Decoder Tests', () => {
             { 'name': 'image-010.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
         ]
     );
+});
+
+describe('Parallel decoding works', () => {
+    it('decodeSingle running in parallel', async () => {
+        // TODO: we should throw in some other formats here too.
+        const testSet = [
+            { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13' },
+            { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13' },
+            { 'name': 'image-004.jpg', 'result': '9002233139084', format: 'ean_13' },
+            { 'name': 'image-003.jpg', 'result': '4006209700068', format: 'ean_13' },
+            { 'name': 'image-005.jpg', 'result': '8004030044005', format: 'ean_13' },
+            { 'name': 'image-006.jpg', 'result': '4003626011159', format: 'ean_13' },
+            { 'name': 'image-007.jpg', 'result': '2111220009686', format: 'ean_13' },
+            { 'name': 'image-008.jpg', 'result': '9000275609022', format: 'ean_13' },
+            { 'name': 'image-009.jpg', 'result': '9004593978587', format: 'ean_13' },
+            { 'name': 'image-010.jpg', 'result': '9002244845578', format: 'ean_13' },
+        ];
+        const promises: Array<Promise<any>> = [];
+
+        testSet.forEach(sample => {
+            const config = generateConfig();
+            config.src = `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/ean/${sample.name}`;
+            promises.push(Quagga.decodeSingle(config));
+        });
+        const results = await Promise.all(promises).catch((err) => { console.warn('* error decoding simultaneously', err); throw(err); });
+        const testResults = testSet.map(x => x.result);
+        results.forEach((r, index) => {
+            expect(r).to.be.an('object');
+            expect(r.codeResult).to.be.an('object');
+            expect(r.codeResult.code).to.equal(testResults[index]);
+        });
+    });
 });

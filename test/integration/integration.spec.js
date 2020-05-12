@@ -87,55 +87,6 @@ describe('decodeSingle', function () {
         });
     }
 
-    // TODO: I kind of hate how this test is structured, but the existing setup does work, so i just copied it instead of trying to untangle it
-    function _runTestsInParallel(testSet, config, formatOverride) {
-        const readers = config.decoder.readers.slice();
-        let format;
-        let folder;
-        let suffix;
-        if (typeof readers[0] === 'string') {
-            format = readers[0];
-        } else {
-            if (readers[0].config && readers[0].config.supplements && readers[0].config.supplements.length) {
-                suffix = 'extended';
-            }
-            format = readers[0].format;
-        }
-        if (formatOverride) {
-            format = formatOverride;
-        }
-        folder = baseFolder + format.split('_').slice(0, -1).concat(suffix ? [suffix] : []).join('_') + '/';
-        it('decoding multiple EANs simultaneously returns correct results', async () => {
-            const promises = [];
-            testSet.forEach(sample => {
-                config.src = folder + sample.name;
-                config.readers = readers;
-                promises.push(Quagga.decodeSingle(config));
-            });
-            const results = await Promise.all(promises).catch((err) => { console.warn('*** Error in test', err); throw(err); });
-            const testResults = testSet.map(x => x.result);
-            results.forEach((r, index) => {
-                // console.warn(`* expect r to be an object ${r}`);
-                expect(r).to.be.an('object');
-                // console.warn(`* expect r.codeResult to be an object ${r.codeResult}`);
-                expect(r.codeResult).to.be.an('object');
-                // console.warn(`* expect r.codeResult.code to equal ${r.codeResult.code} ${testResults[index]}`);
-                expect(r.codeResult.code).to.equal(testResults[index]);
-            });
-        });
-    }
-
-    describe('Simultaneous calls to decodeSingle return correct results', () => {
-        const config = generateConfig();
-        const testSet = [
-            {'name': 'image-001.jpg', 'result': '3574660239843'},
-            {'name': 'image-002.jpg', 'result': '8032754490297'},
-        ];
-        testSet.forEach((sample) => sample.format = 'ean_13');
-        config.decoder.readers = ['ean_reader'];
-        _runTestsInParallel(testSet, config);
-    });
-
     // TODO: write a test that tests Promise return/resolve
 
     describe('Code128 run as external', function() {
