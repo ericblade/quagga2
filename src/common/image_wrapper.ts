@@ -4,6 +4,13 @@ import { clone } from 'gl-vec2';
 import { moment, XYSize, TypedArrayConstructor, TypedArray, WrapperIndexMapping } from '../../type-definitions/quagga';
 const vec2 = { clone };
 
+type PositiveNumber = number;
+function assertNumberPositive(val: number): asserts val is PositiveNumber {
+    if (val < 0) {
+        throw new Error(`expected positive number, received ${val}`);
+    }
+}
+
 class ImageWrapper {
     data: TypedArray | Array<number>;
     size: XYSize;
@@ -24,11 +31,12 @@ class ImageWrapper {
     }
 
     // tests if a position is within the image with a given offset
-    inImageWithBorder(imgRef: XYSize, border: number) {
-        return (imgRef.x >= border)
-            && (imgRef.y >= border)
-            && (imgRef.x < (this.size.x - border))
-            && (imgRef.y < (this.size.y - border));
+    inImageWithBorder(imgRef: XYSize, border: PositiveNumber = 0) {
+        assertNumberPositive(border);
+        return (imgRef.x >= 0)
+            && (imgRef.y >= 0)
+            && (imgRef.x < (this.size.x + (border * 2)))
+            && (imgRef.y < (this.size.y + (border * 2)));
     }
 
     // Copy from the top-left from location of this image to the ImageWrapper provided, up to the
