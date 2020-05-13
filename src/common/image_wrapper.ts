@@ -30,19 +30,25 @@ class ImageWrapper {
         this.size = size;
     }
 
-    // tests if a position is within the image with a given offset
+    // tests if a position is within the image, extended out by a border on each side
     inImageWithBorder(imgRef: XYSize, border: PositiveNumber = 0) {
         assertNumberPositive(border);
+        // TODO: code_128 starts failing miserably when i only allow imgRef to contain positive numbers.
+        // TODO: this doesn't make much sense to me, why does it go negative?  Tests are not affected by
+        // returning false, but the whole code_128 reader blows up when i throw on negative imgRef.
+        // assertNumberPositive(imgRef.x);
+        // assertNumberPositive(imgRef.y);
         return (imgRef.x >= 0)
             && (imgRef.y >= 0)
             && (imgRef.x < (this.size.x + (border * 2)))
             && (imgRef.y < (this.size.y + (border * 2)));
     }
 
-    // Copy from the top-left from location of this image to the ImageWrapper provided, up to the
-    // size in the new ImageWrapper. Note that if the area from (x, y) to (size.x, size.y) is larger
-    // than THIS image, bad/undefined things may happen.
+    // Copy from THIS ImageWrapper to the new imageWrapper parameter, starting at from, stopping at
+    // end of new imageWrapper size.
     subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize) {
+        assertNumberPositive(from.x);
+        assertNumberPositive(from.y);
         const { x: sizeX, y: sizeY } = imageWrapper.size;
         for(let x = 0; x < sizeX; x++) {
             for(let y = 0; y < sizeY; y++) {

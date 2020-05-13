@@ -161,8 +161,8 @@ export default {
 
             // check if inside image
             extendLine(ext);
-            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0], 0)
-                    || !inputImageWrapper.inImageWithBorder(line[1], 0))) {
+            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0])
+                    || !inputImageWrapper.inImageWithBorder(line[1]))) {
                 ext -= Math.ceil(ext / 2);
                 extendLine(-ext);
             }
