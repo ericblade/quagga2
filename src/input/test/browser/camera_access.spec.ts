@@ -102,7 +102,7 @@ describe('CameraAccess (browser)', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
             } catch (err) {
-                expect(err).to.equal('Unable to play video stream. Is webcam working?');
+                expect(err.message).to.equal('Unable to play video stream. Is webcam working?');
             }
         });
         // TODO: need to add a test for no support in browser to straight up fail
