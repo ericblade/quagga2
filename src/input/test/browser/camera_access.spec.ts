@@ -1,20 +1,22 @@
-import CameraAccess, { pickConstraints } from '../../camera_access';
-import { describe, it } from 'mocha';
+import { describe, it, after } from 'mocha';
 import { expect } from 'chai';
-import { MediaTrackConstraintsWithDeprecated } from '../../../../type-definitions/quagga';
+import CameraAccess, { pickConstraints } from '../../camera_access';
+import { MediaTrackConstraintsWithDeprecated } from '../../../../type-definitions/quagga.d';
 
 const Quagga = { CameraAccess };
 
-describe('CameraAccess', () => {
+describe('CameraAccess (browser)', () => {
+    // TODO: move pickConstraints tests into "universal" test, no reason it shouldn't work in node, even if you wouldn't use it.
+    // TODO: consider moving the entire CameraAccess section to a separate library
     describe('pickConstraints', () => {
         it('should return the given constraints if no facingMode is defined', async () => {
-            const givenConstraints = {width: 180};
+            const givenConstraints = { width: 180 };
             const actualConstraints = await pickConstraints(givenConstraints);
             expect(actualConstraints.video).to.deep.equal(givenConstraints);
         });
 
         it('should return the given constraints if deviceId is defined', async () => {
-            const givenConstraints = {width: 180, deviceId: '4343'};
+            const givenConstraints = { width: 180, deviceId: '4343' };
             const actualConstraints = await pickConstraints(givenConstraints);
             expect(actualConstraints.video).to.deep.equal(givenConstraints);
         });
@@ -68,9 +70,13 @@ describe('CameraAccess', () => {
             expect(constraints.height).to.equal(240);
             expect(constraints.facingMode).to.equal('user');
             expect(constraints.aspectRatio).to.equal(2);
-            expect(constraints.facing).to.be.undefined;
-            expect(constraints.minAspectRatio).to.be.undefined;
-            expect(constraints.maxAspectRatio).to.be.undefined;
+            /* eslint-disable no-unused-expressions */
+            /* eslint-disable @typescript-eslint/no-unused-expressions */
+            expect(constraints.facing).to.not.exist;
+            expect(constraints.minAspectRatio).to.not.exist;
+            expect(constraints.maxAspectRatio).to.not.exist;
+            /* eslint-enable no-unused-expressions */
+            /* eslint-enable @typescript-eslint/no-unused-expressions */
         });
 
         it('will fail on NotAllowedError', async () => {
@@ -79,21 +85,23 @@ describe('CameraAccess', () => {
             const video = document.createElement('video');
             try {
                 const x = await Quagga.CameraAccess.request(video, { width: 320, height: 240 });
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch(err) {
+            } catch (err) {
                 expect(err).to.be.an.instanceOf(DOMException);
                 expect(err.name).to.equal('NotAllowedError');
             }
         });
 
-        it('fails eventually on unacceptable video size', async function() {
+        it('fails eventually on unacceptable video size', async function () {
             this.timeout(10000);
             after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');
             try {
-                const x = await Quagga.CameraAccess.request(video, { width: 5, height: 5});
+                const x = await Quagga.CameraAccess.request(video, { width: 5, height: 5 });
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch(err) {
+            } catch (err) {
                 expect(err).to.equal('Unable to play video stream. Is webcam working?');
             }
         });

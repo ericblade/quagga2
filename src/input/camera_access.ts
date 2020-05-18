@@ -2,7 +2,7 @@ import { pick } from 'lodash';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
 import { QuaggaBuildEnvironment, MediaTrackConstraintsWithDeprecated } from '../../type-definitions/quagga';
 
-declare var ENV: QuaggaBuildEnvironment; // webpack injects ENV
+declare const ENV: QuaggaBuildEnvironment; // webpack injects ENV
 
 let streamRef: MediaStream | null;
 
@@ -10,7 +10,7 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
     return new Promise((resolve, reject) => {
         let attempts = 10;
 
-        function checkVideo() {
+        function checkVideo(): void {
             if (attempts > 0) {
                 if (video.videoWidth > 10 && video.videoHeight > 10) {
                     if (ENV.development) {
@@ -21,7 +21,7 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
                     window.setTimeout(checkVideo, 500);
                 }
             } else {
-                reject('Unable to play video stream. Is webcam working?');
+                reject(new Error('Unable to play video stream. Is webcam working?'));
             }
             attempts--;
         }
@@ -41,6 +41,7 @@ async function initCamera(video: HTMLVideoElement, constraints: MediaStreamConst
     video.setAttribute('autoplay', 'true');
     video.setAttribute('muted', 'true');
     video.setAttribute('playsinline', 'true'); // not listed on MDN...
+    // eslint-disable-next-line no-param-reassign
     video.srcObject = stream;
     video.addEventListener('loadedmetadata', () => {
         video.play();
@@ -86,26 +87,26 @@ function getActiveTrack(): MediaStreamTrack | null {
         return null;
     }
     const tracks = streamRef.getVideoTracks();
-    return tracks && tracks.length && tracks[0] || null;
+    return tracks && tracks?.length ? tracks[0] : null;
 }
 
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
 const QuaggaJSCameraAccess = {
-    request: async function(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
+    async request(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
         const newConstraints = await pickConstraints(videoConstraints);
         return initCamera(video, newConstraints);
     },
-    release: function(): void {
-        var tracks = streamRef && streamRef.getVideoTracks();
+    release(): void {
+        const tracks = streamRef && streamRef.getVideoTracks();
         if (tracks && tracks.length) {
             tracks[0].stop();
         }
         streamRef = null;
     },
     enumerateVideoDevices,
-    getActiveStreamLabel: function(): string {
+    getActiveStreamLabel(): string {
         const track = getActiveTrack();
         return track ? track.label : '';
     },
