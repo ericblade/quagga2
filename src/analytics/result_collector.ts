@@ -1,38 +1,48 @@
 import ImageDebug from '../common/image_debug';
-import { QuaggaJSCodeResult, QuaggaJSResultCollector, QuaggaJSResultCollectorFilterFunction, XYSize, QuaggaImageData } from '../../type-definitions/quagga';
+import {
+    QuaggaJSCodeResult,
+    QuaggaJSResultCollector,
+    QuaggaJSResultCollectorFilterFunction,
+    XYSize,
+    QuaggaImageData,
+} from '../../type-definitions/quagga.d';
 
-function contains(codeResult: QuaggaJSCodeResult, list: Array<QuaggaJSCodeResult>) {
-    if (!list) return false;
-    return list.some((item) => {
+function contains(codeResult: QuaggaJSCodeResult, list: Array<QuaggaJSCodeResult>): boolean {
+    return list && list.some((item) => {
         const keys = Object.keys(item) as Array<keyof QuaggaJSCodeResult>;
         return keys.every((key) => item[key] === codeResult[key]);
     });
 }
 
-function passesFilter(codeResult: QuaggaJSCodeResult, filter: QuaggaJSResultCollectorFilterFunction | undefined) {
-    if (typeof filter === 'function') {
-        return filter(codeResult);
-    }
-    return true;
+function passesFilter(
+    codeResult: QuaggaJSCodeResult,
+    filter: QuaggaJSResultCollectorFilterFunction | undefined,
+): boolean {
+    return typeof filter === 'function' ? filter(codeResult) : true;
+}
+
+interface ResultCollector {
+    addResult: (data: QuaggaImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult) => void;
+    getResults: () => Array<QuaggaJSCodeResult>;
 }
 
 export default {
-    create: function(config: QuaggaJSResultCollector) {
+    create(config: QuaggaJSResultCollector): ResultCollector {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
-        const results:Array<QuaggaJSCodeResult> = [];
+        const results: Array<QuaggaJSCodeResult> = [];
         let capacity = config.capacity ?? 20;
         const capture = config.capture === true;
 
-        function matchesConstraints(codeResult: QuaggaJSCodeResult) {
-            return capacity
+        function matchesConstraints(codeResult: QuaggaJSCodeResult): boolean {
+            return !!capacity
                 && codeResult
                 && !contains(codeResult, config.blacklist as Array<QuaggaJSCodeResult>)
                 && passesFilter(codeResult, config.filter);
         }
-        
+
         return {
-            addResult: function(data: QuaggaImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult) {
+            addResult(data: QuaggaImageData, imageSize: XYSize, codeResult: QuaggaJSCodeResult): void {
                 const result: any = { }; // this is 'any' to avoid having to construct a whole QuaggaJSCodeResult :|
                 if (matchesConstraints(codeResult)) {
                     capacity--;
@@ -46,7 +56,7 @@ export default {
                     results.push(result);
                 }
             },
-            getResults: function() {
+            getResults(): Array<QuaggaJSCodeResult> {
                 return results;
             },
         };
