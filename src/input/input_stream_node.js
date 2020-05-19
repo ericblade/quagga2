@@ -1,8 +1,8 @@
 const GetPixels = require('get-pixels');
 
-var InputStream = {};
+const InputStream = {};
 
-InputStream.createImageStream = function() {
+InputStream.createImageStream = function () {
     const that = {};
     let _config = null;
 
@@ -11,13 +11,13 @@ InputStream.createImageStream = function() {
     let loaded = false;
     let frame = null;
     let baseUrl;
-    let ended = false;
+    const ended = false;
     let calculatedWidth;
     let calculatedHeight;
     const _eventNames = ['canrecord', 'ended'];
     const _eventHandlers = {};
-    const _topRight = {x: 0, y: 0};
-    const _canvasSize = {x: 0, y: 0};
+    const _topRight = { x: 0, y: 0 };
+    const _canvasSize = { x: 0, y: 0 };
     /* eslint-disable no-unused-vars */ // false eslint errors? weird.
     let size = 0;
     let frameIdx = 0;
@@ -27,7 +27,7 @@ InputStream.createImageStream = function() {
     function loadImages() {
         loaded = false;
         /* eslint-disable new-cap */
-        GetPixels(baseUrl, _config.mime, function(err, pixels) {
+        GetPixels(baseUrl, _config.mime, (err, pixels) => {
             if (err) {
                 console.error('**** quagga loadImages error:', err);
                 throw new Error('error decoding pixels in loadImages');
@@ -39,32 +39,32 @@ InputStream.createImageStream = function() {
             frame = pixels;
             width = pixels.shape[0];
             height = pixels.shape[1];
-            calculatedWidth = _config.size ?
-                width / height > 1 ?
-                    _config.size
+            calculatedWidth = _config.size
+                ? width / height > 1
+                    ? _config.size
                     : Math.floor((width / height) * _config.size)
                 : width;
-            calculatedHeight = _config.size ?
-                width / height > 1 ?
-                    Math.floor((height / width) * _config.size)
+            calculatedHeight = _config.size
+                ? width / height > 1
+                    ? Math.floor((height / width) * _config.size)
                     : _config.size
                 : height;
 
             _canvasSize.x = calculatedWidth;
             _canvasSize.y = calculatedHeight;
 
-            setTimeout(function() {
+            setTimeout(() => {
                 publishEvent('canrecord', []);
             }, 0);
         });
     }
 
     function publishEvent(eventName, args) {
-        var j,
-            handlers = _eventHandlers[eventName];
+        let j;
+        const handlers = _eventHandlers[eventName];
 
         if (handlers && handlers.length > 0) {
-            for ( j = 0; j < handlers.length; j++) {
+            for (j = 0; j < handlers.length; j++) {
                 handlers[j].apply(that, args);
             }
         }
@@ -73,60 +73,60 @@ InputStream.createImageStream = function() {
 
     that.trigger = publishEvent;
 
-    that.getWidth = function() {
+    that.getWidth = function () {
         return calculatedWidth;
     };
 
-    that.getHeight = function() {
+    that.getHeight = function () {
         return calculatedHeight;
     };
 
-    that.setWidth = function(w) {
+    that.setWidth = function (w) {
         calculatedWidth = w;
     };
 
-    that.setHeight = function(h) {
+    that.setHeight = function (h) {
         calculatedHeight = h;
     };
 
-    that.getRealWidth = function() {
+    that.getRealWidth = function () {
         return width;
     };
 
-    that.getRealHeight = function() {
+    that.getRealHeight = function () {
         return height;
     };
 
-    that.setInputStream = function(stream) {
+    that.setInputStream = function (stream) {
         _config = stream;
         baseUrl = _config.src;
         size = 1;
         loadImages();
     };
 
-    that.ended = function() {
+    that.ended = function () {
         return ended;
     };
 
-    that.setAttribute = function() {};
+    that.setAttribute = function () {};
 
-    that.getConfig = function() {
+    that.getConfig = function () {
         return _config;
     };
 
-    that.pause = function() {
+    that.pause = function () {
         paused = true;
     };
 
-    that.play = function() {
+    that.play = function () {
         paused = false;
     };
 
-    that.setCurrentTime = function(time) {
+    that.setCurrentTime = function (time) {
         frameIdx = time;
     };
 
-    that.addEventListener = function(event, f) {
+    that.addEventListener = function (event, f) {
         if (_eventNames.indexOf(event) !== -1) {
             if (!_eventHandlers[event]) {
                 _eventHandlers[event] = [];
@@ -135,26 +135,26 @@ InputStream.createImageStream = function() {
         }
     };
 
-    that.setTopRight = function(topRight) {
+    that.setTopRight = function (topRight) {
         _topRight.x = topRight.x;
         _topRight.y = topRight.y;
     };
 
-    that.getTopRight = function() {
+    that.getTopRight = function () {
         return _topRight;
     };
 
-    that.setCanvasSize = function(sz) {
+    that.setCanvasSize = function (sz) {
         _canvasSize.x = sz.x;
         _canvasSize.y = sz.y;
     };
 
-    that.getCanvasSize = function() {
+    that.getCanvasSize = function () {
         return _canvasSize;
     };
 
-    that.getFrame = function() {
-        if (!loaded){
+    that.getFrame = function () {
+        if (!loaded) {
             return null;
         }
         return frame;

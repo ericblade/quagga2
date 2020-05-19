@@ -4,7 +4,7 @@ const Interp2D = require('ndarray-linear-interpolate').d2;
 
 const FrameGrabber = {};
 
-FrameGrabber.create = function(inputStream) {
+FrameGrabber.create = function (inputStream) {
     const _that = {};
     const _video_size = CVUtils.imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
     const _canvasSize = inputStream.getCanvasSize();
@@ -35,14 +35,14 @@ FrameGrabber.create = function(inputStream) {
     /**
      * Uses the given array as frame-buffer
      */
-    _that.attachData = function(data) {
+    _that.attachData = function (data) {
         _data = data;
     };
 
     /**
      * Returns the used frame-buffer
      */
-    _that.getData = function() {
+    _that.getData = function () {
         return _data;
     };
 
@@ -50,15 +50,14 @@ FrameGrabber.create = function(inputStream) {
      * Fetches a frame from the input-stream and puts into the frame-buffer.
      * The image-data is converted to gray-scale and then half-sampled if configured.
      */
-    _that.grab = function() {
-        var frame = inputStream.getFrame();
+    _that.grab = function () {
+        const frame = inputStream.getFrame();
 
         if (frame) {
             this.scaleAndCrop(frame);
             return true;
-        } else {
-            return false;
         }
+        return false;
     };
 
     // eslint-disable-next-line
@@ -74,8 +73,8 @@ FrameGrabber.create = function(inputStream) {
         }
 
         // targetImageArray must be equal to targetSize
-        if (_targetImageArray.shape[0] !== _size.x ||
-            _targetImageArray.shape[1] !== _size.y) {
+        if (_targetImageArray.shape[0] !== _size.x
+            || _targetImageArray.shape[1] !== _size.y) {
             throw new Error('Shapes do not match!');
         }
 
@@ -87,7 +86,7 @@ FrameGrabber.create = function(inputStream) {
         }
     },
 
-    _that.getSize = function() {
+    _that.getSize = function () {
         return _size;
     };
 

@@ -4,7 +4,7 @@ import Tracer from './tracer';
  * http://www.codeproject.com/Tips/407172/Connected-Component-Labeling-and-Vectorization
  */
 var Rasterizer = {
-    createContour2D: function() {
+    createContour2D() {
         return {
             dir: null,
             index: null,
@@ -23,40 +23,40 @@ var Rasterizer = {
         OUTSIDE_EDGE: -32767,
         INSIDE_EDGE: -32766,
     },
-    create: function(imageWrapper, labelWrapper) {
-        var imageData = imageWrapper.data,
-            labelData = labelWrapper.data,
-            width = imageWrapper.size.x,
-            height = imageWrapper.size.y,
-            tracer = Tracer.create(imageWrapper, labelWrapper);
+    create(imageWrapper, labelWrapper) {
+        const imageData = imageWrapper.data;
+        const labelData = labelWrapper.data;
+        const width = imageWrapper.size.x;
+        const height = imageWrapper.size.y;
+        const tracer = Tracer.create(imageWrapper, labelWrapper);
 
         return {
-            rasterize: function(depthlabel) {
-                var color,
-                    bc,
-                    lc,
-                    labelindex,
-                    cx,
-                    cy,
-                    colorMap = [],
-                    vertex,
-                    p,
-                    cc,
-                    sc,
-                    pos,
-                    connectedCount = 0,
-                    i;
+            rasterize(depthlabel) {
+                let color;
+                let bc;
+                let lc;
+                let labelindex;
+                let cx;
+                let cy;
+                const colorMap = [];
+                let vertex;
+                let p;
+                let cc;
+                let sc;
+                let pos;
+                let connectedCount = 0;
+                let i;
 
-                for ( i = 0; i < 400; i++) {
+                for (i = 0; i < 400; i++) {
                     colorMap[i] = 0;
                 }
 
                 colorMap[0] = imageData[0];
                 cc = null;
-                for ( cy = 1; cy < height - 1; cy++) {
+                for (cy = 1; cy < height - 1; cy++) {
                     labelindex = 0;
                     bc = colorMap[0];
-                    for ( cx = 1; cx < width - 1; cx++) {
+                    for (cx = 1; cx < width - 1; cx++) {
                         pos = cy * width + cx;
                         if (labelData[pos] === 0) {
                             color = imageData[pos];
@@ -129,17 +129,17 @@ var Rasterizer = {
                     sc = sc.nextpeer;
                 }
                 return {
-                    cc: cc,
+                    cc,
                     count: connectedCount,
                 };
             },
             debug: {
-                drawContour: function(canvas, firstContour) {
-                    var ctx = canvas.getContext('2d'),
-                        pq = firstContour,
-                        iq,
-                        q,
-                        p;
+                drawContour(canvas, firstContour) {
+                    const ctx = canvas.getContext('2d');
+                    let pq = firstContour;
+                    let iq;
+                    let q;
+                    let p;
 
                     ctx.strokeStyle = 'red';
                     ctx.fillStyle = 'red';
@@ -166,15 +166,15 @@ var Rasterizer = {
                         }
 
                         switch (q.dir) {
-                        case Rasterizer.CONTOUR_DIR.CW_DIR:
-                            ctx.strokeStyle = 'red';
-                            break;
-                        case Rasterizer.CONTOUR_DIR.CCW_DIR:
-                            ctx.strokeStyle = 'blue';
-                            break;
-                        case Rasterizer.CONTOUR_DIR.UNKNOWN_DIR:
-                            ctx.strokeStyle = 'green';
-                            break;
+                            case Rasterizer.CONTOUR_DIR.CW_DIR:
+                                ctx.strokeStyle = 'red';
+                                break;
+                            case Rasterizer.CONTOUR_DIR.CCW_DIR:
+                                ctx.strokeStyle = 'blue';
+                                break;
+                            case Rasterizer.CONTOUR_DIR.UNKNOWN_DIR:
+                                ctx.strokeStyle = 'green';
+                                break;
                         }
 
                         p = q.firstVertex;

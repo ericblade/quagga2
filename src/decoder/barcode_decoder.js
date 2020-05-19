@@ -35,20 +35,20 @@ export default {
     registerReader: (name, reader) => {
         READERS[name] = reader;
     },
-    create: function(config, inputImageWrapper) {
-        var _canvas = {
-                ctx: {
-                    frequency: null,
-                    pattern: null,
-                    overlay: null,
-                },
-                dom: {
-                    frequency: null,
-                    pattern: null,
-                    overlay: null,
-                },
+    create(config, inputImageWrapper) {
+        const _canvas = {
+            ctx: {
+                frequency: null,
+                pattern: null,
+                overlay: null,
             },
-            _barcodeReaders = [];
+            dom: {
+                frequency: null,
+                pattern: null,
+                overlay: null,
+            },
+        };
+        const _barcodeReaders = [];
 
         initCanvas();
         initReaders();
@@ -56,7 +56,7 @@ export default {
 
         function initCanvas() {
             if (ENV.development && typeof document !== 'undefined') {
-                var $debug = document.querySelector('#debug.detection');
+                const $debug = document.querySelector('#debug.detection');
                 _canvas.dom.frequency = document.querySelector('canvas.frequency');
                 if (!_canvas.dom.frequency) {
                     _canvas.dom.frequency = document.createElement('canvas');
@@ -85,10 +85,10 @@ export default {
         }
 
         function initReaders() {
-            config.readers.forEach(function(readerConfig) {
-                var reader,
-                    configuration = {},
-                    supplements = [];
+            config.readers.forEach((readerConfig) => {
+                let reader;
+                let configuration = {};
+                let supplements = [];
 
                 if (typeof readerConfig === 'object') {
                     reader = readerConfig.format;
@@ -101,9 +101,7 @@ export default {
                 }
                 if (configuration.supplements) {
                     supplements = configuration
-                        .supplements.map((supplement) => {
-                            return new READERS[supplement]();
-                        });
+                        .supplements.map((supplement) => new READERS[supplement]());
                 }
                 try {
                     const readerObj = new READERS[reader](configuration, supplements);
@@ -114,22 +112,22 @@ export default {
                 }
             });
             if (ENV.development) {
-                console.log('Registered Readers: ' + _barcodeReaders
-                    .map((reader) => JSON.stringify({format: reader.FORMAT, config: reader.config}))
-                    .join(', '));
+                console.log(`Registered Readers: ${_barcodeReaders
+                    .map((reader) => JSON.stringify({ format: reader.FORMAT, config: reader.config }))
+                    .join(', ')}`);
             }
         }
 
         function initConfig() {
             if (ENV.development && typeof document !== 'undefined') {
-                var i,
-                    vis = [{
-                        node: _canvas.dom.frequency,
-                        prop: config.debug.showFrequency,
-                    }, {
-                        node: _canvas.dom.pattern,
-                        prop: config.debug.showPattern,
-                    }];
+                let i;
+                const vis = [{
+                    node: _canvas.dom.frequency,
+                    prop: config.debug.showFrequency,
+                }, {
+                    node: _canvas.dom.pattern,
+                    prop: config.debug.showPattern,
+                }];
 
                 for (i = 0; i < vis.length; i++) {
                     if (vis[i].prop === true) {
@@ -148,7 +146,7 @@ export default {
          */
         function getExtendedLine(line, angle, ext) {
             function extendLine(amount) {
-                var extension = {
+                const extension = {
                     y: amount * Math.sin(angle),
                     x: amount * Math.cos(angle),
                 };
@@ -180,12 +178,12 @@ export default {
         }
 
         function tryDecode(line) {
-            var result = null,
-                i,
-                barcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, line[0], line[1]);
+            let result = null;
+            let i;
+            const barcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, line[0], line[1]);
 
             if (ENV.development && config.debug.showFrequency) {
-                ImageDebug.drawPath(line, {x: 'x', y: 'y'}, _canvas.ctx.overlay, {color: 'red', lineWidth: 3});
+                ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
                 Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 
@@ -195,15 +193,15 @@ export default {
                 Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
             }
 
-            for ( i = 0; i < _barcodeReaders.length && result === null; i++) {
+            for (i = 0; i < _barcodeReaders.length && result === null; i++) {
                 result = _barcodeReaders[i].decodePattern(barcodeLine.line);
             }
-            if (result === null){
+            if (result === null) {
                 return null;
             }
             return {
                 codeResult: result,
-                barcodeLine: barcodeLine,
+                barcodeLine,
             };
         }
 
@@ -215,16 +213,16 @@ export default {
          * @param {Number} lineAngle
          */
         function tryDecodeBruteForce(box, line, lineAngle) {
-            var sideLength = Math.sqrt(Math.pow(box[1][0] - box[0][0], 2) + Math.pow((box[1][1] - box[0][1]), 2)),
-                i,
-                slices = 16,
-                result = null,
-                dir,
-                extension,
-                xdir = Math.sin(lineAngle),
-                ydir = Math.cos(lineAngle);
+            const sideLength = Math.sqrt(Math.pow(box[1][0] - box[0][0], 2) + Math.pow((box[1][1] - box[0][1]), 2));
+            let i;
+            const slices = 16;
+            let result = null;
+            let dir;
+            let extension;
+            const xdir = Math.sin(lineAngle);
+            const ydir = Math.cos(lineAngle);
 
-            for ( i = 1; i < slices && result === null; i++) {
+            for (i = 1; i < slices && result === null; i++) {
                 // move line perpendicular to angle
                 dir = sideLength / slices * i * (i % 2 === 0 ? -1 : 1);
                 extension = {
@@ -243,8 +241,9 @@ export default {
 
         function getLineLength(line) {
             return Math.sqrt(
-                Math.pow(Math.abs(line[1].y - line[0].y), 2) +
-                Math.pow(Math.abs(line[1].x - line[0].x), 2));
+                Math.pow(Math.abs(line[1].y - line[0].y), 2)
+                + Math.pow(Math.abs(line[1].x - line[0].x), 2),
+            );
         }
 
         function decodeFromImage(imageWrapper) {
@@ -261,15 +260,15 @@ export default {
          * @returns {Object} the result {codeResult, line, angle, pattern, threshold}
          */
         function decodeFromBoundingBox(box) {
-            var line,
-                lineAngle,
-                ctx = _canvas.ctx.overlay,
-                result,
-                lineLength;
+            let line;
+            let lineAngle;
+            const ctx = _canvas.ctx.overlay;
+            let result;
+            let lineLength;
 
             if (ENV.development) {
                 if (config.debug.drawBoundingBox && ctx) {
-                    ImageDebug.drawPath(box, {x: 0, y: 1}, ctx, {color: 'blue', lineWidth: 2});
+                    ImageDebug.drawPath(box, { x: 0, y: 1 }, ctx, { color: 'blue', lineWidth: 2 });
                 }
             }
 
@@ -277,7 +276,7 @@ export default {
             lineLength = getLineLength(line);
             lineAngle = Math.atan2(line[1].y - line[0].y, line[1].x - line[0].x);
             line = getExtendedLine(line, lineAngle, Math.floor(lineLength * 0.1));
-            if (line === null){
+            if (line === null) {
                 return null;
             }
 
@@ -291,12 +290,12 @@ export default {
             }
 
             if (ENV.development && result && config.debug.drawScanline && ctx) {
-                ImageDebug.drawPath(line, {x: 'x', y: 'y'}, ctx, {color: 'red', lineWidth: 3});
+                ImageDebug.drawPath(line, { x: 'x', y: 'y' }, ctx, { color: 'red', lineWidth: 3 });
             }
 
             return {
                 codeResult: result.codeResult,
-                line: line,
+                line,
                 angle: lineAngle,
                 pattern: result.barcodeLine.line,
                 threshold: result.barcodeLine.threshold,
@@ -304,15 +303,15 @@ export default {
         }
 
         return {
-            decodeFromBoundingBox: function(box) {
+            decodeFromBoundingBox(box) {
                 return decodeFromBoundingBox(box);
             },
-            decodeFromBoundingBoxes: function(boxes) {
-                var i, result,
-                    barcodes = [],
-                    multiple = config.multiple;
+            decodeFromBoundingBoxes(boxes) {
+                let i; let result;
+                const barcodes = [];
+                const { multiple } = config;
 
-                for ( i = 0; i < boxes.length; i++) {
+                for (i = 0; i < boxes.length; i++) {
                     const box = boxes[i];
                     result = decodeFromBoundingBox(box) || {};
                     result.box = box;
@@ -330,17 +329,17 @@ export default {
                     };
                 }
             },
-            decodeFromImage: function(inputImageWrapper) {
+            decodeFromImage(inputImageWrapper) {
                 const result = decodeFromImage(inputImageWrapper);
                 return result;
             },
-            registerReader: function(name, reader) {
+            registerReader(name, reader) {
                 if (READERS[name]) {
                     throw new Error('cannot register existing reader', name);
                 }
                 READERS[name] = reader;
             },
-            setReaders: function(readers) {
+            setReaders(readers) {
                 config.readers = readers;
                 _barcodeReaders.length = 0;
                 initReaders();

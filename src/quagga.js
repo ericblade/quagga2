@@ -1,3 +1,4 @@
+import { merge } from 'lodash';
 import TypeDefs from './common/typedefs'; // eslint-disable-line no-unused-vars
 import ImageWrapper from './common/image_wrapper';
 import BarcodeDecoder from './decoder/barcode_decoder';
@@ -7,7 +8,6 @@ import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
-import { merge } from 'lodash';
 
 import Quagga from './quagga/quagga';
 
@@ -16,7 +16,7 @@ const _context = instance.context;
 
 const QuaggaJSStaticInterface = {
     // TODO #185: Quagga.init should return a promise if there's no callback
-    init: function (config, cb, imageWrapper, quaggaInstance = instance) {
+    init(config, cb, imageWrapper, quaggaInstance = instance) {
         quaggaInstance.context.config = merge({}, Config, config);
         // TODO #179: pending restructure in Issue #179, we are temp disabling workers
         if (quaggaInstance.context.config.numOfWorkers > 0) {
@@ -32,43 +32,43 @@ const QuaggaJSStaticInterface = {
             quaggaInstance.initInputStream(cb);
         }
     },
-    start: function () {
+    start() {
         instance.start();
     },
-    stop: function () {
+    stop() {
         instance.stop();
     },
-    pause: function () {
+    pause() {
         _context.stopped = true;
     },
-    onDetected: function (callback) {
+    onDetected(callback) {
         if (!callback || (typeof callback !== 'function' && (typeof callback !== 'object' || !callback.callback))) {
             console.trace('* warning: Quagga.onDetected called with invalid callback, ignoring');
             return;
         }
         Events.subscribe('detected', callback);
     },
-    offDetected: function (callback) {
+    offDetected(callback) {
         Events.unsubscribe('detected', callback);
     },
-    onProcessed: function (callback) {
+    onProcessed(callback) {
         if (!callback || (typeof callback !== 'function' && (typeof callback !== 'object' || !callback.callback))) {
             console.trace('* warning: Quagga.onProcessed called with invalid callback, ignoring');
             return;
         }
         Events.subscribe('processed', callback);
     },
-    offProcessed: function (callback) {
+    offProcessed(callback) {
         Events.unsubscribe('processed', callback);
     },
-    setReaders: function (readers) {
+    setReaders(readers) {
         if (!readers) {
             console.trace('* warning: Quagga.setReaders called with no readers, ignoring');
             return;
         }
         instance.setReaders(readers);
     },
-    registerReader: function (name, reader) {
+    registerReader(name, reader) {
         if (!name) {
             console.trace('* warning: Quagga.registerReader called with no name, ignoring');
             return;
@@ -79,7 +79,7 @@ const QuaggaJSStaticInterface = {
         }
         instance.registerReader(name, reader);
     },
-    registerResultCollector: function (resultCollector) {
+    registerResultCollector(resultCollector) {
         if (resultCollector && typeof resultCollector.addResult === 'function') {
             _context.resultCollector = resultCollector;
         }
@@ -87,7 +87,7 @@ const QuaggaJSStaticInterface = {
     get canvas() {
         return _context.canvasContainer;
     },
-    decodeSingle: function (config, resultCallback) {
+    decodeSingle(config, resultCallback) {
         const quaggaInstance = new Quagga();
         config = merge({
             inputStream: {
