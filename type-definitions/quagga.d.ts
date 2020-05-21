@@ -608,11 +608,6 @@ export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstrain
     facing?: string;
 }
 
-export interface QuaggaBuildEnvironment {
-    development?: boolean;
-    node?: boolean;
-}
-
 export type TypedArrayConstructor =
     Int8ArrayConstructor
     | Uint8ArrayConstructor
