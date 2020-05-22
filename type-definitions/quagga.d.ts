@@ -21,12 +21,13 @@ export type SparseImageWrapper = {
     size: ImageRef;
 };
 
-export interface WrapperIndexMapping {
+export type WrapperIndexMapping = {
     x: Array<number>;
     y: Array<number>;
-}
+};
+
 // eslint-disable-next-line @typescript-eslint/class-name-casing
-export interface moment {
+export type Moment = {
     m00: number;
     m01: number;
     m10: number;
@@ -36,7 +37,7 @@ export interface moment {
     theta: number;
     rad: number;
     vec?: Array<number>;
-}
+};
 
 export class ImageWrapper {
     data: TypedArray | Array<number>;
@@ -64,7 +65,7 @@ export class ImageWrapper {
 
     zeroBorder(): ImageWrapper;
 
-    moments(labelcount: any): Array<moment>;
+    moments(labelcount: any): Array<Moment>;
 
     getAsRGBA(scale?: number): Uint8ClampedArray;
 
