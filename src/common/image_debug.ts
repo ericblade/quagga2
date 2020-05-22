@@ -1,5 +1,6 @@
 import { XYSize } from '../../type-definitions/quagga.d';
 
+// TODO: XYPosition should be an XYObject, but that breaks XYDefinition, which breaks drawPath() below.
 declare interface XYPosition {
     x: number;
     y: number;

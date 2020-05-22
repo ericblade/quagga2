@@ -10,11 +10,19 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
-// TODO: fill this in from cv_utils#imageRef
-export type ImageRef = {
+// There are many different spots inside Quagga where we refer to an X/Y position of something, but it has entirely different
+// contextual meaning.  This allows us to create a type that is branded by name, and therefore these variables cannot be directly
+// mixed up with each other, without explicitly forcing it to happen.  Good.
+export interface XYObject<T extends string> {
     x: number;
     y: number;
-};
+    type: T;
+}
+
+// TODO: fill this in from cv_utils#imageRef
+export type ImageRef = XYObject<'ImageRef'>;
+
+export type XYSize = XYObject<'XYSize'>;
 
 export type SparseImageWrapper = {
     data: TypedArray | Array<number> | null;
@@ -95,11 +103,6 @@ export class SubImage {
 
     updateFrom(from: ImageRef): void;
 }
-
-export type XYSize = {
-    x: number;
-    y: number;
-};
 
 export type QuaggaImageData = Array<number>;
 

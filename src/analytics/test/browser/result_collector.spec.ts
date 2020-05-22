@@ -23,7 +23,7 @@ let config: QuaggaJSResultCollector;
 
 describe('Result Collector', () => {
     beforeEach(() => {
-        imageSize = { x: 320, y: 240 };
+        imageSize = { x: 320, y: 240, type: 'XYSize' };
         config = {
             capture: true,
             capacity: 20,

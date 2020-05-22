@@ -8,6 +8,7 @@ export default function initBuffers(inputStream: any, imageWrapper: ImageWrapper
     const inputImageWrapper = imageWrapper || new ImageWrapper({
         x: inputStream.getWidth(),
         y: inputStream.getHeight(),
+        type: 'XYSize',
     });
 
     if (ENV.development) {
