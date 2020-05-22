@@ -3,17 +3,15 @@
  * to refer to until it is re-implemented. We may be able to fix/use some of this.
  */
 
-import { QuaggaBuildEnvironment, QuaggaJSConfigObject, QuaggaJSReaderConfig } from "../../type-definitions/quagga";
+import { QuaggaJSConfigObject, QuaggaJSReaderConfig } from "../../type-definitions/quagga";
 
 // TODO: need a typescript interface for FrameGrabber
 
-declare var ENV: QuaggaBuildEnvironment; // webpack injects ENV
-
 interface QWorkerThread {
-    imageData: Uint8Array,
-    busy: boolean,
-    worker: Worker,
-};
+    imageData: Uint8Array;
+    busy: boolean;
+    worker: Worker;
+}
 
 let workerPool: Array<QWorkerThread> = [];
 

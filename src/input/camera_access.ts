@@ -1,8 +1,6 @@
 import { pick } from 'lodash';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
-import { QuaggaBuildEnvironment, MediaTrackConstraintsWithDeprecated } from '../../type-definitions/quagga';
-
-declare const ENV: QuaggaBuildEnvironment; // webpack injects ENV
+import { MediaTrackConstraintsWithDeprecated } from '../../type-definitions/quagga.d';
 
 let streamRef: MediaStream | null;
 

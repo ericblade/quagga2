@@ -1,13 +1,10 @@
 import Code39Reader from './code_39_reader';
 import { BarcodePosition, Barcode } from './barcode_reader';
-import { QuaggaBuildEnvironment } from '../../type-definitions/quagga';
 
 const patterns = {
     IOQ: /[IOQ]/g,
     AZ09: /[A-Z0-9]{17}/,
 };
-
-declare var ENV: QuaggaBuildEnvironment; // webpack injects ENV
 
 class Code39VINReader extends Code39Reader {
     FORMAT = 'code_39_vin';

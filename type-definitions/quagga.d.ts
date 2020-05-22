@@ -10,23 +10,32 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
-// TODO: fill this in from cv_utils#imageRef
-export type ImageRef = {
+// There are many different spots inside Quagga where we refer to an X/Y position of something, but it has entirely different
+// contextual meaning.  This allows us to create a type that is branded by name, and therefore these variables cannot be directly
+// mixed up with each other, without explicitly forcing it to happen.  Good.
+export interface XYObject<T extends string> {
     x: number;
     y: number;
-};
+    type: T;
+}
+
+// TODO: fill this in from cv_utils#imageRef
+export type ImageRef = XYObject<'ImageRef'>;
+
+export type XYSize = XYObject<'XYSize'>;
 
 export type SparseImageWrapper = {
     data: TypedArray | Array<number> | null;
     size: ImageRef;
 };
 
-export interface WrapperIndexMapping {
+export type WrapperIndexMapping = {
     x: Array<number>;
     y: Array<number>;
-}
+};
+
 // eslint-disable-next-line @typescript-eslint/class-name-casing
-export interface moment {
+export type Moment = {
     m00: number;
     m01: number;
     m10: number;
@@ -36,7 +45,7 @@ export interface moment {
     theta: number;
     rad: number;
     vec?: Array<number>;
-}
+};
 
 export class ImageWrapper {
     data: TypedArray | Array<number>;
@@ -64,7 +73,7 @@ export class ImageWrapper {
 
     zeroBorder(): ImageWrapper;
 
-    moments(labelcount: any): Array<moment>;
+    moments(labelcount: any): Array<Moment>;
 
     getAsRGBA(scale?: number): Uint8ClampedArray;
 
@@ -94,11 +103,6 @@ export class SubImage {
 
     updateFrom(from: ImageRef): void;
 }
-
-export type XYSize = {
-    x: number;
-    y: number;
-};
 
 export type QuaggaImageData = Array<number>;
 
@@ -606,11 +610,6 @@ export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstrain
     maxAspectRatio?: number; // i don't see this in the documentation anywhere, but it's in the original test suite...
     minAspectRatio?: number;
     facing?: string;
-}
-
-export interface QuaggaBuildEnvironment {
-    development?: boolean;
-    node?: boolean;
 }
 
 export type TypedArrayConstructor =

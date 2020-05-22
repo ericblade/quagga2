@@ -1,16 +1,14 @@
+import { clone } from 'gl-vec2';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeLocator from '../locator/barcode_locator';
-import { clone } from 'gl-vec2';
-import { QuaggaBuildEnvironment } from '../../type-definitions/quagga';
-
-declare var ENV: QuaggaBuildEnvironment;
 
 // TODO: need typescript def for inputstream
 // TODO: need typescript def for BarcodeLocator
 export default function initBuffers(inputStream: any, imageWrapper: ImageWrapper | undefined, locator: any) {
-    const inputImageWrapper = imageWrapper ? imageWrapper : new ImageWrapper({
+    const inputImageWrapper = imageWrapper || new ImageWrapper({
         x: inputStream.getWidth(),
         y: inputStream.getHeight(),
+        type: 'XYSize',
     });
 
     if (ENV.development) {

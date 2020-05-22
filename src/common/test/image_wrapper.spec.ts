@@ -1,46 +1,50 @@
-import ImageWrapper from '../image_wrapper';
+import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
+import ImageWrapper from '../image_wrapper';
 
 describe('Image Wrapper', () => {
     it('constructs', () => {
-        const iw = new ImageWrapper({ x: 320, y: 240 }, undefined, Uint8Array, true);
+        const iw = new ImageWrapper({ x: 320, y: 240, type: 'XYSize' }, undefined, Uint8Array, true);
         expect(iw).to.be.an.instanceOf(ImageWrapper);
         expect(iw.data).to.be.a('Uint8Array').with.lengthOf(320 * 240);
-        expect(iw.size).to.deep.equal({ x: 320, y: 240 });
+        expect(iw.size).to.deep.equal({ x: 320, y: 240, type: 'XYSize' });
     });
     describe('inImageWithBorder', () => {
         let iw: ImageWrapper;
-        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240 }, undefined, Uint8Array, true));
+        // eslint-disable-next-line no-return-assign
+        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240, type: 'XYSize' }, undefined, Uint8Array, true));
         it('returns true for location inside image', () => {
-            expect(iw.inImageWithBorder({ x: 100, y: 100 })).to.equal(true);
+            expect(iw.inImageWithBorder({ x: 100, y: 100, type: 'XYSize' })).to.equal(true);
         });
         it('returns false for location outside image', () => {
-            expect(iw.inImageWithBorder({ x: 1000, y: 1000 })).to.equal(false);
+            expect(iw.inImageWithBorder({ x: 1000, y: 1000, type: 'XYSize' })).to.equal(false);
         });
         it('returns true for locations inside border area', () => {
-            expect(iw.inImageWithBorder({ x: 325, y: 245 }, 15)).to.equal(true);
+            expect(iw.inImageWithBorder({ x: 325, y: 245, type: 'XYSize' }, 15)).to.equal(true);
         });
         it('returns false for location outside image and border', () => {
-            expect(iw.inImageWithBorder({ x: 330, y: 250 }, 5)).to.equal(false);
+            expect(iw.inImageWithBorder({ x: 330, y: 250, type: 'XYSize' }, 5)).to.equal(false);
         });
         it('throws with negative borders', () => {
-            expect(iw.inImageWithBorder.bind(iw, { x: 320, y: 240 }, -240)).to.throw();
+            expect(iw.inImageWithBorder.bind(iw, { x: 320, y: 240, type: 'XYSize' }, -240)).to.throw();
         });
     });
     describe('subImageAsCopy', () => {
         let iw: ImageWrapper;
-        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240 }, undefined, Uint8Array, true));
+        // eslint-disable-next-line no-return-assign
+        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240, type: 'XYSize' }, undefined, Uint8Array, true));
         it('returns a correctly sized image', () => {
-            const testIW = iw.subImageAsCopy(new ImageWrapper({ x: 220, y: 140 }), { x: 100, y: 100 });
+            const testIW = iw.subImageAsCopy(new ImageWrapper({ x: 220, y: 140, type: 'XYSize' }), { x: 100, y: 100, type: 'XYSize' });
             expect(testIW).to.be.an.instanceOf(ImageWrapper);
             expect(testIW.data).to.be.a('Uint8Array').with.lengthOf(220 * 140);
-            expect(testIW.size).to.deep.equal({ x: 220, y: 140 });
+            expect(testIW.size).to.deep.equal({ x: 220, y: 140, type: 'XYSize' });
         });
         it('TODO: write a test that does this with a real image and compares');
     });
     describe('set/get/getSafe', () => {
         let iw: ImageWrapper;
-        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240 }, undefined, Uint8Array, true));
+        // eslint-disable-next-line no-return-assign
+        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240, type: 'XYSize' }, undefined, Uint8Array, true));
         it('set and get', () => {
             expect(iw.get(100, 100)).to.equal(0);
             iw.set(100, 100, 255);
@@ -62,14 +66,15 @@ describe('Image Wrapper', () => {
         });
         it('getSafe returns undefined for out-of-bounds', () => {
             expect(iw.getSafe(5000, 5000)).to.equal(undefined);
-        })
+        });
     });
     describe.skip('moments', () => {
         it('TODO');
     });
     describe('getAsRGBA', () => {
         let iw: ImageWrapper;
-        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240 }, undefined, Uint8Array, true));
+        // eslint-disable-next-line no-return-assign
+        beforeEach(() => iw = new ImageWrapper({ x: 320, y: 240, type: 'XYSize' }, undefined, Uint8Array, true));
         it('returns a 1:1 copy by default', () => {
             iw.set(0, 0, 128);
             iw.set(200, 200, 227);
