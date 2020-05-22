@@ -15,12 +15,12 @@ export class SubImage {
 
     // Construct representing a part of another {ImageWrapper}. Shares data between the parent and
     // child. Returns a shared part of the original image.
-    constructor(from: ImageRef, size: XYSize, I: SparseImageWrapper = { data: null, size }) {
+    constructor(from: ImageRef, size: XYSize, I: SparseImageWrapper = { data: null, size: { ...size, type: 'ImageRef' } }) {
         this.data = I.data as ImageWrapper['data'];
-        this.originalSize = { ...size };
+        this.originalSize = size;
         this.I = I;
-        this.from = { ...from };
-        this.size = { ...size };
+        this.from = from;
+        this.size = size;
     }
 
     // Retrieves a given pixel position from the {SubImage}, returns the grayscale value at the position
