@@ -15,7 +15,7 @@ export class SubImage {
 
     // Construct representing a part of another {ImageWrapper}. Shares data between the parent and
     // child. Returns a shared part of the original image.
-    constructor(from: ImageRef, size: XYSize, I: SparseImageWrapper = { data: null, size: { ...size, type: 'ImageRef' } }) {
+    constructor(from: ImageRef, size: XYSize, I: SparseImageWrapper = { data: null, size }) {
         this.data = I.data as ImageWrapper['data'];
         this.originalSize = size;
         this.I = I;

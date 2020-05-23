@@ -1,8 +1,7 @@
 /* eslint-disable no-param-reassign */
-import { XYObject } from '../../type-definitions/quagga.d';
+import { Point } from '../../type-definitions/quagga.d';
 
 export type Box = Array<[ number, number ]>;
-type Point = XYObject<'Point'>;
 
 export type Line = [ Point, Point ];
 

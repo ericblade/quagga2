@@ -94,7 +94,7 @@
     "codabar",
     "i2of5",
     "upc",
-    "getusermedia",
+    "getUserMedia",
     "imageprocessing"
   ],
   "author": "Eric Blade <blade.eric@gmail.com>",
