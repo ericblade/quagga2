@@ -1,3 +1,4 @@
+import { clone } from 'gl-vec2';
 import { QuaggaContext } from '../QuaggaContext';
 import _initBuffers from './initBuffers';
 import _getViewPort from './getViewPort';
@@ -5,15 +6,14 @@ import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
 import _initCanvas from './initCanvas';
 import BarcodeLocator from '../locator/barcode_locator';
-import BrowserInputStream, { NodeInputStream } from '../input/input_stream';
+import BrowserInputStream, { NodeInputStream } from '../input/input_stream_factory';
 import BrowserFrameGrabber, { NodeFrameGrabber } from '../input/frame_grabber';
 import * as QWorkers from './qworker';
 import setupInputStream from './setupInputStream';
 import CameraAccess from '../input/camera_access';
-import { clone } from 'gl-vec2';
 import { BarcodeInfo } from '../reader/barcode_reader';
 import { moveLine, moveBox } from './transform';
-import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga';
+import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -82,7 +82,7 @@ export default class Quagga {
             }
             this.ready(callback);
         });
-    }
+    };
 
     initInputStream(callback: Function) {
         if (!this.context.config || !this.context.config.inputStream) {
@@ -105,13 +105,13 @@ export default class Quagga {
     }
 
     getBoundingBoxes() {
-        return this.context.config?.locate ? BarcodeLocator.locate() :
-            [[
+        return this.context.config?.locate ? BarcodeLocator.locate()
+            : [[
                 clone(this.context.boxSize[0]),
                 clone(this.context.boxSize[1]),
                 clone(this.context.boxSize[2]),
                 clone(this.context.boxSize[3]),
-            ]]
+            ]];
     }
 
     // TODO: need a typescript type for result here.
@@ -159,9 +159,9 @@ export default class Quagga {
     }
 
     hasCodeResult(result: QuaggaJSResultObject) {
-        return result && (result.barcodes ?
-            result.barcodes.some(barcode => barcode.codeResult) :
-            result.codeResult);
+        return result && (result.barcodes
+            ? result.barcodes.some((barcode) => barcode.codeResult)
+            : result.codeResult);
     }
 
     publishResult(result: QuaggaJSResultObject | null = null, imageData?: any) {
@@ -211,14 +211,14 @@ export default class Quagga {
             this.context.framegrabber.grab();
             this.locateAndDecode();
         }
-    }
+    };
 
     startContinuousUpdate() {
-        var next: number | null = null,
-            delay = 1000 / (this.context.config?.frequency || 60);
+        let next: number | null = null;
+        const delay = 1000 / (this.context.config?.frequency || 60);
 
         this.context.stopped = false;
-        const context = this.context;
+        const { context } = this;
 
         const newFrame = (timestamp: number) => {
             next = next || timestamp;

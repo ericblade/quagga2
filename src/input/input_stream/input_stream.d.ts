@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { XYSize, Point } from '../../type-definitions/quagga.d';
+import { XYSize, Point } from '../../../type-definitions/quagga.d';
 
 type EventHandler = (arg?: any) => void;
 
@@ -40,5 +39,3 @@ export interface InputStreamFactory {
     createLiveStream: LiveStreamFactory;
     createImageStream: ImageStreamFactory;
 }
-
-export declare const NodeInputStream: InputStreamFactory;

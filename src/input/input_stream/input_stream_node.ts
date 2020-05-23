@@ -1,7 +1,7 @@
 // TODO: It's pretty likely that this shares code with the browser version, investigate that
 import GetPixels from 'get-pixels';
 import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
-import { Point, XYSize } from '../../type-definitions/quagga.d';
+import { Point, XYSize } from '../../../type-definitions/quagga.d';
 
 const inputStreamFactory: InputStreamFactory = {
     createVideoStream(): never {
@@ -48,7 +48,9 @@ const inputStreamFactory: InputStreamFactory = {
                 if (ENV.development) {
                     console.log('* InputStreamNode pixels.shape', pixels.shape);
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 frame = pixels;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                 [width, height] = pixels.shape;
                 // eslint-disable-next-line no-nested-ternary
                 calculatedWidth = _config?.size
@@ -113,7 +115,9 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             setInputStream(stream) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 _config = stream;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                 baseUrl = _config?.src;
                 size = 1;
                 loadImages();
@@ -177,6 +181,7 @@ const inputStreamFactory: InputStreamFactory = {
                 if (!loaded) {
                     return null;
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return frame;
             },
         };

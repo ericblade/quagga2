@@ -1,7 +1,8 @@
-import NodeInputStream from './input_stream_node';
-import ImageLoader from './image_loader';
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
+import ImageLoader from '../image_loader';
+import { XYSize, Point } from '../../../type-definitions/quagga.d';
 import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
-import { Point, XYSize } from '../../type-definitions/quagga.d';
 
 const inputStreamFactory: InputStreamFactory = {
     createVideoStream(video): InputStream {
@@ -51,7 +52,9 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             setInputStream(config) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 _config = config;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 video.setAttribute('src', (typeof config.src !== 'undefined') ? config.src : '');
             },
 
@@ -72,6 +75,7 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             play() {
+                // eslint-disable-next-line @typescript-eslint/no-floating-promises
                 video.play();
             },
 
@@ -105,6 +109,7 @@ const inputStreamFactory: InputStreamFactory = {
 
             trigger(eventName, args) {
                 let j;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 const handlers = _eventHandlers[eventName];
 
                 if (eventName === 'canrecord') {
@@ -173,7 +178,9 @@ const inputStreamFactory: InputStreamFactory = {
             loaded = false;
             ImageLoader.load(baseUrl, (imgs: Array<{ tags: any; img: HTMLImageElement}>) => {
                 imgArray = imgs;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (imgs[0].tags && imgs[0].tags.orientation) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                     switch (imgs[0].tags.orientation) {
                         case 6:
                         case 8:
@@ -248,12 +255,17 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             setInputStream(stream) {
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 _config = stream;
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (stream.sequence === false) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                     baseUrl = stream.src;
                     size = 1;
                 } else {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                     baseUrl = stream.src;
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                     size = stream.length;
                 }
                 loadImages();
@@ -319,6 +331,7 @@ const inputStreamFactory: InputStreamFactory = {
                     return null;
                 }
                 if (!paused) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     frame = imgArray?.[frameIdx];
                     if (frameIdx < (size - 1)) {
                         frameIdx++;
@@ -329,6 +342,7 @@ const inputStreamFactory: InputStreamFactory = {
                         }, 0);
                     }
                 }
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-return
                 return frame;
             },
         };
@@ -337,4 +351,3 @@ const inputStreamFactory: InputStreamFactory = {
 };
 
 export default inputStreamFactory;
-export { NodeInputStream };
