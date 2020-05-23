@@ -1,6 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { XYSize, Point } from '../../type-definitions/quagga.d';
 
+type EventHandler = (arg?: any) => void;
+
+export type EventHandlerList = {
+    [index: string]: Array<EventHandler>;
+};
+
 export interface InputStream {
     getRealWidth(): number;
     getRealHeight(): number;
@@ -15,7 +21,7 @@ export interface InputStream {
     pause(): void;
     play(): void;
     setCurrentTime(time: number): void;
-    addEventListener(event: any, f: any, bool: any): void;
+    addEventListener(event: string, f: (args?: any) => void, bool: boolean): void;
     clearEventHandlers(): void;
     trigger(eventName: any, args: any): void;
     setTopRight(topRight: Point): void;
