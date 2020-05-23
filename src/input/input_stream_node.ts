@@ -1,166 +1,187 @@
-const GetPixels = require('get-pixels');
+// TODO: It's pretty likely that this shares code with the browser version, investigate that
+import GetPixels from 'get-pixels';
+import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
+import { Point, XYSize } from '../../type-definitions/quagga.d';
 
-var InputStream = {};
+const inputStreamFactory: InputStreamFactory = {
+    createVideoStream(): never {
+        throw new Error('createVideoStream not available');
+    },
+    createLiveStream(): never {
+        throw new Error('createLiveStream not available');
+    },
+    createImageStream(): InputStream {
+        let _config: { mime: string; size: number; src: any } | null = null;
 
-InputStream.createImageStream = function() {
-    const that = {};
-    let _config = null;
+        let width = 0;
+        let height = 0;
+        let loaded = false;
+        // TODO: frame should be a type NdArray, but NdArray doesn't have ts definitions
+        // TODO: there is a ts-ndarray that might work, though
+        let frame: any = null;
+        let baseUrl: string;
+        const ended = false;
+        let calculatedWidth: number;
+        let calculatedHeight: number;
+        const _eventNames = ['canrecord', 'ended'];
+        const _eventHandlers: EventHandlerList = {};
+        const _topRight: Point = { x: 0, y: 0, type: 'Point' };
+        const _canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
+        /* eslint-disable no-unused-vars */ // false eslint errors? weird.
+        // @ts-ignore
+        let size = 0;
+        // @ts-ignore
+        let frameIdx = 0;
+        // @ts-ignore
+        let paused = false;
+        /* eslint-enable no-unused-vars */
 
-    let width = 0;
-    let height = 0;
-    let loaded = false;
-    let frame = null;
-    let baseUrl;
-    let ended = false;
-    let calculatedWidth;
-    let calculatedHeight;
-    const _eventNames = ['canrecord', 'ended'];
-    const _eventHandlers = {};
-    const _topRight = {x: 0, y: 0};
-    const _canvasSize = {x: 0, y: 0};
-    /* eslint-disable no-unused-vars */ // false eslint errors? weird.
-    let size = 0;
-    let frameIdx = 0;
-    let paused = false;
-    /* eslint-enable no-unused-vars */
+        function loadImages(): void {
+            loaded = false;
+            /* eslint-disable new-cap */
+            GetPixels(baseUrl, _config?.mime, (err, pixels) => {
+                if (err) {
+                    console.error('**** quagga loadImages error:', err);
+                    throw new Error('error decoding pixels in loadImages');
+                }
+                loaded = true;
+                if (ENV.development) {
+                    console.log('* InputStreamNode pixels.shape', pixels.shape);
+                }
+                frame = pixels;
+                [width, height] = pixels.shape;
+                // eslint-disable-next-line no-nested-ternary
+                calculatedWidth = _config?.size
+                    ? width / height > 1
+                        ? _config.size
+                        : Math.floor((width / height) * _config.size)
+                    : width;
+                // eslint-disable-next-line no-nested-ternary
+                calculatedHeight = _config?.size
+                    ? width / height > 1
+                        ? Math.floor((height / width) * _config.size)
+                        : _config.size
+                    : height;
 
-    function loadImages() {
-        loaded = false;
-        /* eslint-disable new-cap */
-        GetPixels(baseUrl, _config.mime, function(err, pixels) {
-            if (err) {
-                console.error('**** quagga loadImages error:', err);
-                throw new Error('error decoding pixels in loadImages');
-            }
-            loaded = true;
-            if (ENV.development) {
-                console.log('* InputStreamNode pixels.shape', pixels.shape);
-            }
-            frame = pixels;
-            width = pixels.shape[0];
-            height = pixels.shape[1];
-            calculatedWidth = _config.size ?
-                width / height > 1 ?
-                    _config.size
-                    : Math.floor((width / height) * _config.size)
-                : width;
-            calculatedHeight = _config.size ?
-                width / height > 1 ?
-                    Math.floor((height / width) * _config.size)
-                    : _config.size
-                : height;
+                _canvasSize.x = calculatedWidth;
+                _canvasSize.y = calculatedHeight;
 
-            _canvasSize.x = calculatedWidth;
-            _canvasSize.y = calculatedHeight;
+                setTimeout(() => {
+                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                    publishEvent('canrecord', []);
+                }, 0);
+            });
+        }
 
-            setTimeout(function() {
-                publishEvent('canrecord', []);
-            }, 0);
-        });
-    }
+        function publishEvent(eventName: string, args: Array<any>): void {
+            const handlers = _eventHandlers[eventName];
 
-    function publishEvent(eventName, args) {
-        var j,
-            handlers = _eventHandlers[eventName];
-
-        if (handlers && handlers.length > 0) {
-            for ( j = 0; j < handlers.length; j++) {
-                handlers[j].apply(that, args);
+            if (handlers && handlers.length > 0) {
+                for (let j = 0; j < handlers.length; j++) {
+                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                    handlers[j].apply(inputStream, args as any);
+                }
             }
         }
-    }
+
+        // eslint-disable-next-line no-var,vars-on-top
+        var inputStream: InputStream = {
+            trigger: publishEvent,
+
+            getWidth() {
+                return calculatedWidth;
+            },
+
+            getHeight() {
+                return calculatedHeight;
+            },
+
+            setWidth(w) {
+                calculatedWidth = w;
+            },
+
+            setHeight(h) {
+                calculatedHeight = h;
+            },
+
+            getRealWidth() {
+                return width;
+            },
+
+            getRealHeight() {
+                return height;
+            },
+
+            setInputStream(stream) {
+                _config = stream;
+                baseUrl = _config?.src;
+                size = 1;
+                loadImages();
+            },
+
+            ended() {
+                return ended;
+            },
+
+            setAttribute() {},
+
+            getConfig() {
+                return _config;
+            },
+
+            pause() {
+                paused = true;
+            },
+
+            play() {
+                paused = false;
+            },
+
+            setCurrentTime(time) {
+                frameIdx = time;
+            },
+
+            addEventListener(event, f) {
+                if (_eventNames.indexOf(event) !== -1) {
+                    if (!_eventHandlers[event]) {
+                        _eventHandlers[event] = [];
+                    }
+                    _eventHandlers[event].push(f);
+                }
+            },
+
+            clearEventHandlers() {
+                Object.keys(_eventHandlers).forEach((ind) => delete _eventHandlers[ind]);
+            },
 
 
-    that.trigger = publishEvent;
+            setTopRight(topRight) {
+                _topRight.x = topRight.x;
+                _topRight.y = topRight.y;
+            },
 
-    that.getWidth = function() {
-        return calculatedWidth;
-    };
+            getTopRight() {
+                return _topRight;
+            },
 
-    that.getHeight = function() {
-        return calculatedHeight;
-    };
+            setCanvasSize(sz) {
+                _canvasSize.x = sz.x;
+                _canvasSize.y = sz.y;
+            },
 
-    that.setWidth = function(w) {
-        calculatedWidth = w;
-    };
+            getCanvasSize() {
+                return _canvasSize;
+            },
 
-    that.setHeight = function(h) {
-        calculatedHeight = h;
-    };
-
-    that.getRealWidth = function() {
-        return width;
-    };
-
-    that.getRealHeight = function() {
-        return height;
-    };
-
-    that.setInputStream = function(stream) {
-        _config = stream;
-        baseUrl = _config.src;
-        size = 1;
-        loadImages();
-    };
-
-    that.ended = function() {
-        return ended;
-    };
-
-    that.setAttribute = function() {};
-
-    that.getConfig = function() {
-        return _config;
-    };
-
-    that.pause = function() {
-        paused = true;
-    };
-
-    that.play = function() {
-        paused = false;
-    };
-
-    that.setCurrentTime = function(time) {
-        frameIdx = time;
-    };
-
-    that.addEventListener = function(event, f) {
-        if (_eventNames.indexOf(event) !== -1) {
-            if (!_eventHandlers[event]) {
-                _eventHandlers[event] = [];
-            }
-            _eventHandlers[event].push(f);
-        }
-    };
-
-    that.setTopRight = function(topRight) {
-        _topRight.x = topRight.x;
-        _topRight.y = topRight.y;
-    };
-
-    that.getTopRight = function() {
-        return _topRight;
-    };
-
-    that.setCanvasSize = function(sz) {
-        _canvasSize.x = sz.x;
-        _canvasSize.y = sz.y;
-    };
-
-    that.getCanvasSize = function() {
-        return _canvasSize;
-    };
-
-    that.getFrame = function() {
-        if (!loaded){
-            return null;
-        }
-        return frame;
-    };
-
-    return that;
+            getFrame() {
+                if (!loaded) {
+                    return null;
+                }
+                return frame;
+            },
+        };
+        return inputStream;
+    },
 };
 
-module.exports = InputStream;
+export default inputStreamFactory;
