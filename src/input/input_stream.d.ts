@@ -34,3 +34,5 @@ export interface InputStreamFactory {
     createLiveStream: LiveStreamFactory;
     createImageStream: ImageStreamFactory;
 }
+
+export declare const NodeInputStream: InputStreamFactory;
