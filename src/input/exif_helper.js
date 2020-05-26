@@ -3,24 +3,24 @@
 // need to port any part of this that doesn't work in Node to node?
 
 // Tags scraped from https://github.com/exif-js/exif-js
-const ExifTags = {0x0112: 'orientation'};
-export const AvailableTags = Object.keys(ExifTags).map(key => ExifTags[key]);
+const ExifTags = { 0x0112: 'orientation' };
+export const AvailableTags = Object.keys(ExifTags).map((key) => ExifTags[key]);
 
 export function findTagsInObjectURL(src, tags = AvailableTags) {
     if (/^blob:/i.test(src)) {
         return objectURLToBlob(src)
             .then(readToBuffer)
-            .then(buffer => findTagsInBuffer(buffer, tags));
+            .then((buffer) => findTagsInBuffer(buffer, tags));
     }
     return Promise.resolve(null);
 }
 
 export function base64ToArrayBuffer(dataUrl) {
-    const base64 = dataUrl.replace(/^data:([^;]+);base64,/gmi, ''),
-        binary = atob(base64),
-        len = binary.length,
-        buffer = new ArrayBuffer(len),
-        view = new Uint8Array(buffer);
+    const base64 = dataUrl.replace(/^data:([^;]+);base64,/gmi, '');
+    const binary = atob(base64);
+    const len = binary.length;
+    const buffer = new ArrayBuffer(len);
+    const view = new Uint8Array(buffer);
 
     for (let i = 0; i < len; i++) {
         view[i] = binary.charCodeAt(i);
@@ -29,9 +29,9 @@ export function base64ToArrayBuffer(dataUrl) {
 }
 
 function readToBuffer(blob) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
         const fileReader = new FileReader();
-        fileReader.onload = function(e) {
+        fileReader.onload = function (e) {
             return resolve(e.target.result);
         };
         fileReader.readAsArrayBuffer(blob);
@@ -54,17 +54,17 @@ function objectURLToBlob(url) {
 }
 
 export function findTagsInBuffer(file, selectedTags = AvailableTags) {
-    const dataView = new DataView(file),
-        length = file.byteLength,
-        exifTags = selectedTags.reduce((result, selectedTag) => {
-            const exifTag = Object.keys(ExifTags).filter(tag => ExifTags[tag] === selectedTag)[0];
-            if (exifTag) {
-                result[exifTag] = selectedTag;
-            }
-            return result;
-        }, {});
-    let offset = 2,
-        marker;
+    const dataView = new DataView(file);
+    const length = file.byteLength;
+    const exifTags = selectedTags.reduce((result, selectedTag) => {
+        const exifTag = Object.keys(ExifTags).filter((tag) => ExifTags[tag] === selectedTag)[0];
+        if (exifTag) {
+            result[exifTag] = selectedTag;
+        }
+        return result;
+    }, {});
+    let offset = 2;
+    let marker;
 
     if ((dataView.getUint8(0) !== 0xFF) || (dataView.getUint8(1) !== 0xD8)) {
         return false;
@@ -78,9 +78,8 @@ export function findTagsInBuffer(file, selectedTags = AvailableTags) {
         marker = dataView.getUint8(offset + 1);
         if (marker === 0xE1) {
             return readEXIFData(dataView, offset + 4, exifTags);
-        } else {
-            offset += 2 + dataView.getUint16(offset + 2);
         }
+        offset += 2 + dataView.getUint16(offset + 2);
     }
 
     return false;
@@ -92,8 +91,7 @@ function readEXIFData(file, start, exifTags) {
     }
 
     const tiffOffset = start + 6;
-    let bigEnd,
-        tags;
+    let bigEnd;
 
     if (file.getUint16(tiffOffset) === 0x4949) {
         bigEnd = false;
@@ -112,17 +110,17 @@ function readEXIFData(file, start, exifTags) {
         return false;
     }
 
-    tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, exifTags, bigEnd);
+    const tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, exifTags, bigEnd);
     return tags;
 }
 
 function readTags(file, tiffStart, dirStart, strings, bigEnd) {
-    const entries = file.getUint16(dirStart, !bigEnd),
-        tags = {};
+    const entries = file.getUint16(dirStart, !bigEnd);
+    const tags = {};
 
     for (let i = 0; i < entries; i++) {
-        const entryOffset = dirStart + i * 12 + 2,
-            tag = strings[file.getUint16(entryOffset, !bigEnd)];
+        const entryOffset = dirStart + i * 12 + 2;
+        const tag = strings[file.getUint16(entryOffset, !bigEnd)];
         if (tag) {
             tags[tag] = readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd);
         }
@@ -131,14 +129,14 @@ function readTags(file, tiffStart, dirStart, strings, bigEnd) {
 }
 
 function readTagValue(file, entryOffset, tiffStart, dirStart, bigEnd) {
-    const type = file.getUint16(entryOffset + 2, !bigEnd),
-        numValues = file.getUint32(entryOffset + 4, !bigEnd);
+    const type = file.getUint16(entryOffset + 2, !bigEnd);
+    const numValues = file.getUint32(entryOffset + 4, !bigEnd);
 
     switch (type) {
-    case 3:
-        if (numValues === 1) {
-            return file.getUint16(entryOffset + 8, !bigEnd);
-        }
+        case 3:
+            if (numValues === 1) {
+                return file.getUint16(entryOffset + 8, !bigEnd);
+            }
     }
 
     return null;

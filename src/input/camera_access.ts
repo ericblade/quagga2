@@ -51,8 +51,8 @@ function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprec
     const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
         'aspectRatio', 'deviceId']);
 
-    if (typeof videoConstraints.minAspectRatio !== 'undefined' &&
-            videoConstraints.minAspectRatio > 0) {
+    if (typeof videoConstraints.minAspectRatio !== 'undefined'
+            && videoConstraints.minAspectRatio > 0) {
         normalized.aspectRatio = videoConstraints.minAspectRatio;
         console.log('WARNING: Constraint \'minAspectRatio\' is deprecated; Use \'aspectRatio\' instead');
     }
