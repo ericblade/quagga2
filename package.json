@@ -15,7 +15,7 @@
     "@babel/preset-env": "^7.9.6",
     "@babel/preset-typescript": "^7.9.0",
     "@babel/runtime": "^7.9.6",
-    "@cypress/code-coverage": "^3.7.4",
+    "@cypress/code-coverage": "^3.7.6",
     "@cypress/webpack-preprocessor": "5.2.1",
     "@std/esm": "^0.26.0",
     "@types/chai": "^4.2.11",
