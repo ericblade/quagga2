@@ -23,22 +23,22 @@ function adjustCanvasSize(canvas, targetSize) {
     }
 }
 
-var FrameGrabber = {};
+const FrameGrabber = {};
 
-FrameGrabber.create = function(inputStream, canvas) {
-    var _that = {},
-        _streamConfig = inputStream.getConfig(),
-        _video_size = imageRef(inputStream.getRealWidth(), inputStream.getRealHeight()),
-        _canvasSize = inputStream.getCanvasSize(),
-        _size = imageRef(inputStream.getWidth(), inputStream.getHeight()),
-        topRight = inputStream.getTopRight(),
-        _sx = topRight.x,
-        _sy = topRight.y,
-        _canvas,
-        _ctx = null,
-        _data = null;
+FrameGrabber.create = function (inputStream, canvas) {
+    const _that = {};
+    const _streamConfig = inputStream.getConfig();
+    const _videoSize = imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+    const _canvasSize = inputStream.getCanvasSize();
+    const _size = imageRef(inputStream.getWidth(), inputStream.getHeight());
+    const topRight = inputStream.getTopRight();
+    const _sx = topRight.x;
+    const _sy = topRight.y;
+    let _canvas;
+    let _ctx = null;
+    let _data = null;
 
-    _canvas = canvas ? canvas : document.createElement('canvas');
+    _canvas = canvas || document.createElement('canvas');
     _canvas.width = _canvasSize.x;
     _canvas.height = _canvasSize.y;
     _ctx = _canvas.getContext('2d');
@@ -46,8 +46,8 @@ FrameGrabber.create = function(inputStream, canvas) {
     if (ENV.development) {
         console.log('FrameGrabber', JSON.stringify({
             size: _size,
-            topRight: topRight,
-            videoSize: _video_size,
+            topRight,
+            videoSize: _videoSize,
             canvasSize: _canvasSize,
         }));
     }
@@ -55,14 +55,14 @@ FrameGrabber.create = function(inputStream, canvas) {
     /**
      * Uses the given array as frame-buffer
      */
-    _that.attachData = function(data) {
+    _that.attachData = function (data) {
         _data = data;
     };
 
     /**
      * Returns the used frame-buffer
      */
-    _that.getData = function() {
+    _that.getData = function () {
         return _data;
     };
 
@@ -70,12 +70,12 @@ FrameGrabber.create = function(inputStream, canvas) {
      * Fetches a frame from the input-stream and puts into the frame-buffer.
      * The image-data is converted to gray-scale and then half-sampled if configured.
      */
-    _that.grab = function() {
-        var doHalfSample = _streamConfig.halfSample,
-            frame = inputStream.getFrame(),
-            drawable = frame,
-            drawAngle = 0,
-            ctxData;
+    _that.grab = function () {
+        const doHalfSample = _streamConfig.halfSample;
+        const frame = inputStream.getFrame();
+        let drawable = frame;
+        let drawAngle = 0;
+        let ctxData;
         if (drawable) {
             adjustCanvasSize(_canvas, _canvasSize);
             if (_streamConfig.type === 'ImageStream') {
@@ -103,18 +103,17 @@ FrameGrabber.create = function(inputStream, canvas) {
             }
 
             ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
-            if (doHalfSample){
+            if (doHalfSample) {
                 grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
             } else {
                 computeGray(ctxData, _data, _streamConfig);
             }
             return true;
-        } else {
-            return false;
         }
+        return false;
     };
 
-    _that.getSize = function() {
+    _that.getSize = function () {
         return _size;
     };
 
