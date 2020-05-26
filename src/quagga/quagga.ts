@@ -173,9 +173,9 @@ export default class Quagga {
             resultToPublish = result.barcodes || result;
         }
 
-        Events.publish('processed', resultToPublish);
+        Events.publish('processed', resultToPublish as never);
         if (this.hasCodeResult(result as QuaggaJSResultObject)) {
-            Events.publish('detected', resultToPublish);
+            Events.publish('detected', resultToPublish as never);
         }
     }
 

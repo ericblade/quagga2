@@ -1,17 +1,18 @@
+import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 
-import Events from '../events';
 import sinon, { SinonSpy } from 'sinon';
+import Events from '../events';
 
 describe('Events', () => {
-    beforeEach(function() {
+    beforeEach(() => {
         Events.unsubscribe();
     });
 
-    describe('subscribe', function() {
-        it('should call one callback for a single event', function() {
-            var callbackA = sinon.stub(),
-                callbackB = sinon.stub();
+    describe('subscribe', () => {
+        it('should call one callback for a single event', () => {
+            const callbackA = sinon.stub();
+            const callbackB = sinon.stub();
 
             Events.subscribe('test', callbackA);
             Events.subscribe('test', callbackB);
@@ -21,8 +22,8 @@ describe('Events', () => {
             expect(callbackB.calledOnce).to.be.equal(true);
         });
 
-        it('should call one callback twice if published twice', function() {
-            var callback = sinon.stub();
+        it('should call one callback twice if published twice', () => {
+            const callback = sinon.stub();
 
             Events.subscribe('test', callback);
 
@@ -32,27 +33,27 @@ describe('Events', () => {
             expect(callback.calledTwice).to.be.equal(true);
         });
 
-        it('should call the callback asynchronuously', function(done) {
-            var test = {
-                callback: function() {
+        it('should call the callback asynchronously', (done) => {
+            const test = {
+                callback: (): void => {
 
                 },
             };
 
-            sinon.stub(test, 'callback').callsFake(function() {
-                expect((test.callback as SinonSpy).calledOnce).to.be.true;
+            sinon.stub(test, 'callback').callsFake(() => {
+                expect((test.callback as SinonSpy).calledOnce).to.equal(true);
                 done();
             });
             Events.subscribe('test', test.callback, true);
             Events.publish('test');
-            expect((test.callback as SinonSpy).called).to.be.false;
+            expect((test.callback as SinonSpy).called).to.equal(false);
         });
     });
 
-    describe('once', function() {
-        it('should call the callback once, even when published twice', function() {
-            var callbackA = sinon.stub(),
-                callbackB = sinon.stub();
+    describe('once', () => {
+        it('should call the callback once, even when published twice', () => {
+            const callbackA = sinon.stub();
+            const callbackB = sinon.stub();
 
             Events.once('test', callbackA);
             Events.subscribe('test', callbackB);
@@ -65,11 +66,11 @@ describe('Events', () => {
         });
     });
 
-    describe('unsubscribe', function() {
-        it('should unsubscribe all callbacks from a single event', function() {
-            var callbackA = sinon.stub(),
-                callbackB = sinon.stub(),
-                callbackC = sinon.stub();
+    describe('unsubscribe', () => {
+        it('should unsubscribe all callbacks from a single event', () => {
+            const callbackA = sinon.stub();
+            const callbackB = sinon.stub();
+            const callbackC = sinon.stub();
 
             Events.subscribe('test', callbackA);
             Events.subscribe('test', callbackB);
@@ -95,9 +96,9 @@ describe('Events', () => {
             expect(callbackB.calledOnce).to.be.equal(true);
         });
 
-        it('should unsubscribe a single callback from a single event', function() {
-            var callbackA = sinon.stub(),
-                callbackB = sinon.stub();
+        it('should unsubscribe a single callback from a single event', () => {
+            const callbackA = sinon.stub();
+            const callbackB = sinon.stub();
 
             Events.subscribe('test', callbackA);
             Events.subscribe('test', callbackB);
