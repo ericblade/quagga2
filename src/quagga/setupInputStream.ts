@@ -1,4 +1,4 @@
-import { InputStreamType } from "../../type-definitions/quagga";
+import { InputStreamType } from '../../type-definitions/quagga.d';
 
 // TODO: need to create an InputStream typescript interface, so we don't have an "any" in the next line
 export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, InputStream: any) {
@@ -30,4 +30,4 @@ export default function setupInputStream(type: InputStreamType = 'LiveStream', v
             console.error(`* setupInputStream invalid type ${type}`);
             return { video: null, inputStream: null };
     }
-};
+}

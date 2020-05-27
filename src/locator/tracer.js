@@ -1,21 +1,21 @@
 /**
  * http://www.codeproject.com/Tips/407172/Connected-Component-Labeling-and-Vectorization
  */
-var Tracer = {
+const Tracer = {
     searchDirections: [[0, 1], [1, 1], [1, 0], [1, -1], [0, -1], [-1, -1], [-1, 0], [-1, 1]],
-    create: function(imageWrapper, labelWrapper) {
-        var imageData = imageWrapper.data,
-            labelData = labelWrapper.data,
-            searchDirections = this.searchDirections,
-            width = imageWrapper.size.x,
-            pos;
+    create(imageWrapper, labelWrapper) {
+        const imageData = imageWrapper.data;
+        const labelData = labelWrapper.data;
+        const { searchDirections } = this;
+        const width = imageWrapper.size.x;
+        let pos;
 
         function trace(current, color, label, edgelabel) {
-            var i,
-                y,
-                x;
+            let i;
+            let y;
+            let x;
 
-            for ( i = 0; i < 7; i++) {
+            for (i = 0; i < 7; i++) {
                 y = current.cy + searchDirections[current.dir][0];
                 x = current.cx + searchDirections[current.dir][1];
                 pos = y * width + x;
@@ -24,36 +24,35 @@ var Tracer = {
                     current.cy = y;
                     current.cx = x;
                     return true;
-                } else {
-                    if (labelData[pos] === 0) {
-                        labelData[pos] = edgelabel;
-                    }
-                    current.dir = (current.dir + 1) % 8;
                 }
+                if (labelData[pos] === 0) {
+                    labelData[pos] = edgelabel;
+                }
+                current.dir = (current.dir + 1) % 8;
             }
             return false;
         }
 
         function vertex2D(x, y, dir) {
             return {
-                dir: dir,
-                x: x,
-                y: y,
+                dir,
+                x,
+                y,
                 next: null,
                 prev: null,
             };
         }
 
         function contourTracing(sy, sx, label, color, edgelabel) {
-            var Fv = null,
-                Cv,
-                P,
-                ldir,
-                current = {
-                    cx: sx,
-                    cy: sy,
-                    dir: 0,
-                };
+            let Fv = null;
+            let Cv;
+            let P;
+            let ldir;
+            const current = {
+                cx: sx,
+                cy: sy,
+                dir: 0,
+            };
 
             if (trace(current, color, label, edgelabel)) {
                 Fv = vertex2D(sx, sy, current.dir);
@@ -88,10 +87,10 @@ var Tracer = {
         }
 
         return {
-            trace: function(current, color, label, edgelabel) {
+            trace(current, color, label, edgelabel) {
                 return trace(current, color, label, edgelabel);
             },
-            contourTracing: function(sy, sx, label, color, edgelabel) {
+            contourTracing(sy, sx, label, color, edgelabel) {
                 return contourTracing(sy, sx, label, color, edgelabel);
             },
         };
