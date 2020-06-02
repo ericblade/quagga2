@@ -62,7 +62,7 @@ export default (function() {
         subscribe: function(event: EventName, callback: Function | Subscription, async?: boolean) {
             return subscribe(event, callback, async);
         },
-        publish: function(eventName: EventName, data: any) {
+        publish: function(eventName: EventName, data?: any) {
             var event = getEvent(eventName),
                 subscribers = event.subscribers;
 
@@ -83,18 +83,16 @@ export default (function() {
                 publishSubscription(subscriber, data);
             });
         },
-        once: function(event: EventName, callback: Function, async: boolean) {
+        once: function(event: EventName, callback: Function, async: boolean = false) {
             subscribe(event, {
                 callback: callback,
                 async: async,
                 once: true,
             });
         },
-        unsubscribe: function(eventName: EventName, callback?: Function | Subscription) {
-            var event;
-
+        unsubscribe: function(eventName?: EventName, callback?: Function | Subscription) {
             if (eventName) {
-                event = getEvent(eventName);
+                const event = getEvent(eventName);
                 if (event && callback) {
                     event.subscribers = event.subscribers.filter(function(subscriber){
                         return subscriber.callback !== callback;

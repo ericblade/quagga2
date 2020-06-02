@@ -1,0 +1,42 @@
+name: Test Pull Requests To Master
+
+on:
+  push:
+    branches:
+      - greenkeeper/*
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version: [10.x, 12.x, 14.x]
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+    steps:
+    - uses: actions/checkout@v1
+    - name: Use Node.js ${{ matrix.node-version }}
+      uses: actions/setup-node@v1
+      with:
+        node-version: ${{ matrix.node-version }}
+    - name: npm versions
+      run: |
+        node --version
+        npm --version
+    - name: ci install
+      run: npm ci
+    - name: build
+      run: npm run build --if-present
+    - name: module test
+      run: npm run test:module
+    - name: run all code tests
+      run: npm test
+    # - name: test package import
+    #   run: |
+    #     npm install ts-node @std/esm
+    #     npm run test:import
+    # - name: test package require
+    #   run: |
+    #     npm run test:require

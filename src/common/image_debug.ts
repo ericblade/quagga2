@@ -1,36 +1,34 @@
-declare interface XYPosition {
-    x: number,
-    y: number,
-};
+import { XYSize } from '../../type-definitions/quagga.d';
 
-declare interface XYSize {
-    x: number,
-    y: number,
-};
+// TODO: XYPosition should be an XYObject, but that breaks XYDefinition, which breaks drawPath() below.
+declare interface XYPosition {
+    x: number;
+    y: number;
+}
 
 declare interface CanvasStyle {
-    color: string,
-    lineWidth: number,
-};
+    color: string;
+    lineWidth: number;
+}
 
 // XYDefinition tells us which component of a given array or object is the "X" and which is the "Y".
 // Usually this is 0 for X and 1 for Y, but might be used as 'x' for x and 'y' for Y.
 declare interface XYDefinition {
-    x: keyof XYPosition,
-    y: keyof XYPosition,
-};
+    x: keyof XYPosition;
+    y: keyof XYPosition;
+}
 
 declare type Path = Array<XYPosition>;
 
 export default {
-    drawRect: function(pos: XYPosition, size: XYSize, ctx: CanvasRenderingContext2D, style: CanvasStyle){
+    drawRect(pos: XYPosition, size: XYSize, ctx: CanvasRenderingContext2D, style: CanvasStyle): void {
         ctx.strokeStyle = style.color;
         ctx.fillStyle = style.color;
         ctx.lineWidth = style.lineWidth || 1;
         ctx.beginPath();
         ctx.strokeRect(pos.x, pos.y, size.x, size.y);
     },
-    drawPath: function(path: Path, def: XYDefinition, ctx: CanvasRenderingContext2D, style: CanvasStyle) {
+    drawPath(path: Path, def: XYDefinition, ctx: CanvasRenderingContext2D, style: CanvasStyle): void {
         ctx.strokeStyle = style.color;
         ctx.fillStyle = style.color;
         ctx.lineWidth = style.lineWidth;
@@ -42,16 +40,16 @@ export default {
         ctx.closePath();
         ctx.stroke();
     },
-    drawImage: function(imageData: Array<number>, size: XYSize, ctx: CanvasRenderingContext2D) {
+    drawImage(imageData: Array<number>, size: XYSize, ctx: CanvasRenderingContext2D): boolean {
         const canvasData = ctx.getImageData(0, 0, size.x, size.y);
-        const data = canvasData.data;
+        const { data } = canvasData;
         let canvasDataPos = data.length;
         let imageDataPos = imageData.length;
 
         if (canvasDataPos / imageDataPos !== 4) {
             return false;
         }
-        while (imageDataPos--){
+        while (imageDataPos--) {
             const value = imageData[imageDataPos];
             data[--canvasDataPos] = 255;
             data[--canvasDataPos] = value;

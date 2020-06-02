@@ -1,6 +1,7 @@
 import Bresenham from './bresenham';
 import ImageDebug from '../common/image_debug.ts';
 import Code128Reader from '../reader/code_128_reader';
+// import EANReader from '../reader/ean_reader';
 import EANReader from '../reader/ean_reader';
 import Code39Reader from '../reader/code_39_reader';
 import Code39VINReader from '../reader/code_39_vin_reader';
@@ -162,8 +163,8 @@ export default {
 
             // check if inside image
             extendLine(ext);
-            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0], 0)
-                    || !inputImageWrapper.inImageWithBorder(line[1], 0))) {
+            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0])
+                    || !inputImageWrapper.inImageWithBorder(line[1]))) {
                 ext -= Math.ceil(ext / 2);
                 extendLine(-ext);
             }

@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 // Type definitions for QuaggaJS v0.12.1 (2017-10-19)
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
@@ -9,64 +10,99 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
-// TODO: fill this in from cv_utils#imageRef
-export type ImageRef = {
-    x: number,
-    y: number,
+// There are many different spots inside Quagga where we refer to an X/Y position of something, but it has entirely different
+// contextual meaning.  This allows us to create a type that is branded by name, and therefore these variables cannot be directly
+// mixed up with each other, without explicitly forcing it to happen.  Good.
+export interface XYObject<T extends string> {
+    x: number;
+    y: number;
+    type: T;
 }
 
-export type SparseImageWrapper = { data: TypedArray | Array<number> | null, size: ImageRef };
+// TODO: fill this in from cv_utils#imageRef
+export type ImageRef = XYObject<'ImageRef'>;
 
-export interface WrapperIndexMapping {
+export type XYSize = XYObject<'XYSize'>;
+
+export type SparseImageWrapper = {
+    data: TypedArray | Array<number> | null;
+    size: ImageRef;
+};
+
+export type WrapperIndexMapping = {
     x: Array<number>;
     y: Array<number>;
-}
-export interface moment {
-    m00: number,
-    m01: number,
-    m10: number,
-    m11: number,
-    m02: number,
-    m20: number,
-    theta: number,
-    rad: number,
-    vec?: Array<number>
-}
+};
 
-export interface ImageWrapper {
+// eslint-disable-next-line @typescript-eslint/class-name-casing
+export type Moment = {
+    m00: number;
+    m01: number;
+    m10: number;
+    m11: number;
+    m02: number;
+    m20: number;
+    theta: number;
+    rad: number;
+    vec?: Array<number>;
+};
+
+export class ImageWrapper {
     data: TypedArray | Array<number>;
+
     size: XYSize;
+
     indexMapping?: WrapperIndexMapping;
-    constructor(size: XYSize, data?: TypedArray | Array<number>, ArrayType?: TypedArrayConstructor | ArrayConstructor, initialize?: boolean): ImageWrapper;
+
+    constructor(
+        size: XYSize,
+        data?: TypedArray | Array<number>,
+        ArrayType?: TypedArrayConstructor | ArrayConstructor,
+        initialize?: boolean
+    );
+
     inImageWithBorder(imgRef: ImageRef, border: number): boolean;
+
     subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): ImageWrapper;
+
     get(x: number, y: number): number;
+
     getSafe(x: number, y: number): number;
+
     set(x: number, y: number, value: number): ImageWrapper;
+
     zeroBorder(): ImageWrapper;
-    moments(labelcount: any): Array<moment>;
+
+    moments(labelcount: any): Array<Moment>;
+
     getAsRGBA(scale?: number): Uint8ClampedArray;
+
     show(canvas: HTMLCanvasElement, scale?: number): void;
+
     overlay(canvas: HTMLCanvasElement, scale: number, from: XYSize): void;
 }
 
-export interface SubImage {
+export class SubImage {
     I: ImageWrapper | SparseImageWrapper;
+
     data: ImageWrapper['data'];
+
     originalSize: ImageRef;
+
     from: ImageRef;
+
     size: ImageRef;
-    constructor(from: ImageRef, size: ImageRef, I: SparseImageWrapper): SubImage;
+
+    constructor(from: ImageRef, size: ImageRef, I: SparseImageWrapper);
+
     get(x: number, y: number): number;
+
     show(canvas: HTMLCanvasElement, scale: number): void;
+
     updateData(image: ImageWrapper): void;
+
     updateFrom(from: ImageRef): void;
 }
-
-export type XYSize = {
-    x: number,
-    y: number,
-};
 
 export type QuaggaImageData = Array<number>;
 
@@ -167,12 +203,12 @@ export interface QuaggaJSStatic {
     canvas: {
         ctx: {
             image: CanvasRenderingContext2D;
-            overlay: CanvasRenderingContext2D
+            overlay: CanvasRenderingContext2D;
         };
         dom: {
             image: HTMLCanvasElement;
-            overlay: HTMLCanvasElement
-        }
+            overlay: HTMLCanvasElement;
+        };
     };
 
     CameraAccess: QuaggaJSCameraAccess;
@@ -215,7 +251,7 @@ export interface QuaggaJSDebugDrawPath {
         def: QuaggaJSxyDef,
         ctx: CanvasRenderingContext2D,
         style: QuaggaJSStyle
-    ): void
+    ): void;
 }
 
 /**
@@ -227,7 +263,7 @@ export interface QuaggaJSDebugDrawRect {
         size: QuaggaJSRectSize,
         ctx: CanvasRenderingContext2D,
         style: QuaggaJSStyle
-    ): void
+    ): void;
 }
 
 /**
@@ -331,7 +367,9 @@ export interface QuaggaJSResultCollectorFilterFunction {
  * empty.
  */
 export interface QuaggaJSResultObject {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     codeResult: QuaggaJSResultObject_CodeResult;
+    barcodes?: Array<QuaggaJSResultObject>;
     line: {
         x: number;
         y: number;
@@ -343,8 +381,9 @@ export interface QuaggaJSResultObject {
     frame?: string;
 }
 
+// eslint-disable-next-line @typescript-eslint/camelcase,@typescript-eslint/class-name-casing
 export interface QuaggaJSResultObject_CodeResult {
-    code: string;
+    code: string | null;
     start: number;
     end: number;
     codeset: number;
@@ -371,6 +410,8 @@ export interface QuaggaJSResultObject_CodeResult {
     format: string;
 }
 
+export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
+
 export interface QuaggaJSConfigObject {
     /**
      * The image path to load from, or a data url
@@ -388,9 +429,9 @@ export interface QuaggaJSConfigObject {
         /**
          * @default "LiveStream"
          */
-        type?: string;
+        type?: InputStreamType;
 
-        target?: HTMLElement | string,
+        target?: Element | string;
 
         constraints?: MediaTrackConstraints;
 
@@ -554,7 +595,7 @@ export interface QuaggaJSConfigObject {
                  */
                 showBB?: boolean;
             };
-        }
+        };
     };
 }
 
@@ -562,17 +603,13 @@ export interface QuaggaJSReaderConfig {
     format: string;
     config: {
         supplements: string[];
-    }
+    };
 }
 
 export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
+    maxAspectRatio?: number; // i don't see this in the documentation anywhere, but it's in the original test suite...
     minAspectRatio?: number;
     facing?: string;
-}
-
-export interface QuaggaBuildEnvironment {
-    development?: boolean;
-    node?: boolean;
 }
 
 export type TypedArrayConstructor =

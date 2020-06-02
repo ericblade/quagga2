@@ -4,6 +4,7 @@
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
         "target": "ES2015",
+        "module": "commonjs",
         "lib": [ "es2015", "esnext", "dom" ],
         "types": [ "mocha", "chai", "sinon", "sinon-chai", "es6-promise" ],
         "strictNullChecks": false,

@@ -1,0 +1,10 @@
+version: '3.7'
+
+services:
+  nodejs:
+    build:
+      context: ./
+    image: quagga2/build
+    volumes:
+      - .:/quagga2
+    command: "npm run build"

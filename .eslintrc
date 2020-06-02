@@ -1,8 +1,15 @@
 {
-    "extends": "eslint:recommended",
+    "extends": [
+        "eslint:recommended",
+        "airbnb-typescript",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+    ],
     "parserOptions": {
         "ecmaVersion": 2019,
-        "sourceType": "module"
+        "sourceType": "module",
+        "project": "./tsconfig.json"
     },
     "env": {
         "browser": true,
@@ -42,7 +49,8 @@
         "dot-notation": "error",
         "eol-last": "error",
         "func-call-spacing": [ "error", "never" ],
-        "indent": ["error", 4],
+        "indent": ["error", 4, { "SwitchCase": 1 }],
+        "@typescript-eslint/indent": ["error", 4],
         "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
         "keyword-spacing": [ "error", { "after": true }],
         "max-len" : ["warn", 120],
@@ -57,6 +65,7 @@
         "semi-spacing": "error",
         "semi": ["error", "always"],
         "space-infix-ops": "error",
-        "yoda": "error"
+        "yoda": "error",
+        "linebreak-style": "off"
     }
 }
