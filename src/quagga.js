@@ -15,8 +15,13 @@ const instance = new Quagga();
 const _context = instance.context;
 
 const QuaggaJSStaticInterface = {
-    // TODO #185: Quagga.init should return a promise if there's no callback
     init: function (config, cb, imageWrapper, quaggaInstance = instance) {
+        let promise;
+        if (!cb) {
+            promise = new Promise((resolve, reject) => {
+                cb = (err) => { err ? reject(err) : resolve(); };
+            });
+        }
         quaggaInstance.context.config = merge({}, Config, config);
         // TODO #179: pending restructure in Issue #179, we are temp disabling workers
         if (quaggaInstance.context.config.numOfWorkers > 0) {
@@ -31,6 +36,7 @@ const QuaggaJSStaticInterface = {
         } else {
             quaggaInstance.initInputStream(cb);
         }
+        return promise;
     },
     start: function () {
         instance.start();
