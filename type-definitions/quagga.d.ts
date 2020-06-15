@@ -24,9 +24,11 @@ export type ImageRef = XYObject<'ImageRef'>;
 
 export type XYSize = XYObject<'XYSize'>;
 
+export type Point = XYObject<'Point'>;
+
 export type SparseImageWrapper = {
     data: TypedArray | Array<number> | null;
-    size: ImageRef;
+    size: XYSize;
 };
 
 export type WrapperIndexMapping = {
@@ -73,7 +75,7 @@ export class ImageWrapper {
 
     zeroBorder(): ImageWrapper;
 
-    moments(labelcount: any): Array<Moment>;
+    moments(labelCount: any): Array<Moment>;
 
     getAsRGBA(scale?: number): Uint8ClampedArray;
 
@@ -241,7 +243,7 @@ export interface QuaggaJSResultCallbackFunction {
 
 /**
  * Called to draw debugging path. The path is an array of array of 2 numbers.
- * The def.x specifies element in the sub array is the x, and similary the def.y
+ * The def.x specifies element in the sub array is the x, and similarly the def.y
  * defines the y.
  * typical values 0, 1, 'x', 'y'
  */
@@ -287,7 +289,7 @@ export interface QuaggaJSxy {
 
 /**
  * an object with a pair of x and a y values.
- * Used for giving a htiml canvas context.strokeRect function it's x, y, width
+ * Used for giving a html canvas context.strokeRect function it's x, y, width
  * and height values.
  */
 export interface QuaggaJSRectSize {
@@ -297,7 +299,7 @@ export interface QuaggaJSRectSize {
 
 /**
  * an object with the styles, color can actually be a color, a gradient or a
- * pattern (see defintions for context.strokeStyle. But is most commonly a
+ * pattern (see definitions for context.strokeStyle. But is most commonly a
  * colour.
  */
 export interface QuaggaJSStyle {

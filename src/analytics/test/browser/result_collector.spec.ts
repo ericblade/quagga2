@@ -90,7 +90,7 @@ describe('Result Collector', () => {
             expect(results).to.have.length(2);
 
             results.forEach((result: QuaggaJSCodeResult) => {
-                expect(result).not.to.deep.equal(config.blacklist![0]);
+                expect(result).not.to.deep.equal(config.blacklist?.[0]);
             });
         });
 

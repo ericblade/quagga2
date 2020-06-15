@@ -51,8 +51,8 @@ function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprec
     const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
         'aspectRatio', 'deviceId']);
 
-    if (typeof videoConstraints.minAspectRatio !== 'undefined' &&
-            videoConstraints.minAspectRatio > 0) {
+    if (typeof videoConstraints.minAspectRatio !== 'undefined'
+            && videoConstraints.minAspectRatio > 0) {
         normalized.aspectRatio = videoConstraints.minAspectRatio;
         console.log('WARNING: Constraint \'minAspectRatio\' is deprecated; Use \'aspectRatio\' instead');
     }
@@ -97,6 +97,7 @@ const QuaggaJSCameraAccess = {
         return initCamera(video, newConstraints);
     },
     release(): void {
+        // TODO: i wonder if telling the Video element to pause() before calling MediaStreamTrack.stop() would alleviate some of the issues with the camera appearing to stay open on Android even after stopping.
         const tracks = streamRef && streamRef.getVideoTracks();
         if (tracks && tracks.length) {
             tracks[0].stop();

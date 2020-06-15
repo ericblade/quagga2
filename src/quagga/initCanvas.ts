@@ -1,5 +1,5 @@
-import { XYSize } from '../../type-definitions/quagga';
 import { QuaggaContext, CanvasContainer } from 'QuaggaContext';
+import { XYSize } from '../../type-definitions/quagga.d';
 import getViewPort from './getViewPort';
 
 function findOrCreateCanvas(selector: string, className: string) {
@@ -33,8 +33,8 @@ function initCanvases(canvasSize: XYSize): CanvasContainer | null {
             ctx: {
                 image: image.context,
                 overlay: overlay.context,
-            }
-        }
+            },
+        };
     }
     return null;
 }

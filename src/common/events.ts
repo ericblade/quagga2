@@ -1,23 +1,30 @@
 type EventName = string;
 
-declare interface EventData {
-    subscribers: Array<any>,
-};
+interface Subscription {
+    async?: boolean;
+    callback: Function;
+    once?: boolean;
+}
 
-declare interface Events {
-    [key: string]: EventData,
-};
+interface EventData {
+    subscribers: Array<Subscription>;
+}
 
-declare interface Subscription {
-    async?: boolean,
-    callback: Function,
-    once?: boolean,
-};
+interface Events {
+    [key: string]: EventData;
+}
 
-export default (function() {
+interface EventInterface {
+    subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void;
+    publish(eventName: EventName, data?: never): void;
+    once(event: EventName, callback: Function, async?: boolean): void;
+    unsubscribe(eventName?: EventName, callback?: Function | Subscription): void;
+}
+
+export default (function EventInterface(): EventInterface {
     let events: Events = {};
 
-    function getEvent(eventName: EventName) {
+    function getEvent(eventName: EventName): EventData {
         if (!events[eventName]) {
             events[eventName] = {
                 subscribers: [],
@@ -26,13 +33,13 @@ export default (function() {
         return events[eventName];
     }
 
-    function clearEvents(){
+    function clearEvents(): void {
         events = {};
     }
 
-    function publishSubscription(subscription: Subscription, data: any) {
+    function publishSubscription(subscription: Subscription, data: never): void {
         if (subscription.async) {
-            setTimeout(function() {
+            setTimeout(() => {
                 subscription.callback(data);
             }, 4);
         } else {
@@ -40,18 +47,18 @@ export default (function() {
         }
     }
 
-    function subscribe(event: EventName, callback: Function | Subscription, async?: boolean) {
+    function _subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void {
         let subscription;
 
-        if ( typeof callback === 'function') {
+        if (typeof callback === 'function') {
             subscription = {
-                callback: callback,
-                async: async,
+                callback,
+                async,
             };
         } else {
             subscription = callback;
             if (!subscription.callback) {
-                throw 'Callback was not specified on options';
+                throw new Error('Callback was not specified on options');
             }
         }
 
@@ -59,44 +66,38 @@ export default (function() {
     }
 
     return {
-        subscribe: function(event: EventName, callback: Function | Subscription, async?: boolean) {
-            return subscribe(event, callback, async);
+        subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void {
+            return _subscribe(event, callback, async);
         },
-        publish: function(eventName: EventName, data?: any) {
-            var event = getEvent(eventName),
-                subscribers = event.subscribers;
+        publish(eventName: EventName, data?: never): void {
+            const event = getEvent(eventName);
+            const { subscribers } = event;
 
             // Publish one-time subscriptions
-            subscribers.filter(function(subscriber) {
-                return !!subscriber.once;
-            }).forEach((subscriber) => {
-                publishSubscription(subscriber, data);
+            subscribers.filter((subscriber) => !!subscriber.once).forEach((subscriber) => {
+                publishSubscription(subscriber, data as never);
             });
 
             // remove them from the subscriber
-            event.subscribers = subscribers.filter(function(subscriber) {
-                return !subscriber.once;
-            });
+            event.subscribers = subscribers.filter((subscriber) => !subscriber.once);
 
             // publish the rest
             event.subscribers.forEach((subscriber) => {
-                publishSubscription(subscriber, data);
+                publishSubscription(subscriber, data as never);
             });
         },
-        once: function(event: EventName, callback: Function, async: boolean = false) {
-            subscribe(event, {
-                callback: callback,
-                async: async,
+        once(event: EventName, callback: Function, async = false): void {
+            _subscribe(event, {
+                callback,
+                async,
                 once: true,
             });
         },
-        unsubscribe: function(eventName?: EventName, callback?: Function | Subscription) {
+        unsubscribe(eventName?: EventName, callback?: Function | Subscription): void {
             if (eventName) {
                 const event = getEvent(eventName);
                 if (event && callback) {
-                    event.subscribers = event.subscribers.filter(function(subscriber){
-                        return subscriber.callback !== callback;
-                    });
+                    event.subscribers = event.subscribers.filter((subscriber) => subscriber.callback !== callback);
                 } else {
                     event.subscribers = [];
                 }

@@ -6,11 +6,11 @@
 if (typeof window !== 'undefined') {
     if (!window.requestAnimationFrame) {
         window.requestAnimationFrame = (function () {
-            return window.webkitRequestAnimationFrame ||
-                window.mozRequestAnimationFrame ||
-                window.oRequestAnimationFrame ||
-                window.msRequestAnimationFrame ||
-                function (/* function FrameRequestCallback */ callback) {
+            return window.webkitRequestAnimationFrame
+                || window.mozRequestAnimationFrame
+                || window.oRequestAnimationFrame
+                || window.msRequestAnimationFrame
+                || function (/* function FrameRequestCallback */ callback) {
                     window.setTimeout(callback, 1000 / 60);
                 };
         }());
@@ -18,7 +18,8 @@ if (typeof window !== 'undefined') {
 }
 
 if (typeof Math.imul !== 'function') {
-    Math.imul = function(a, b) {
+    /* eslint-disable no-bitwise */
+    Math.imul = function (a, b) {
         const ah = (a >>> 16) & 0xffff;
         const al = a & 0xffff;
         const bh = (b >>> 16) & 0xffff;
@@ -27,11 +28,14 @@ if (typeof Math.imul !== 'function') {
         // the final |0 converts the unsigned value into a signed value
         return ((al * bl) + (((ah * bl + al * bh) << 16) >>> 0) | 0);
     };
+    /* eslint-enable no-bitwise */
 }
 
 if (typeof Object.assign !== 'function') {
-    Object.assign = function(target) { // .length of function is 2
-        'use strict';
+    Object.assign = function (target) { // .length of function is 2
+
+'use strict';
+
         if (target === null) { // TypeError if undefined or null
             throw new TypeError('Cannot convert undefined or null to object');
         }
@@ -39,10 +43,12 @@ if (typeof Object.assign !== 'function') {
         const to = Object(target);
 
         for (let index = 1; index < arguments.length; index++) {
+            // eslint-disable-next-line prefer-rest-params
             const nextSource = arguments[index];
 
             if (nextSource !== null) { // Skip over if undefined or null
-                for (let nextKey in nextSource) {
+                // eslint-disable-next-line no-restricted-syntax
+                for (const nextKey in nextSource) {
                     // Avoid bugs when hasOwnProperty is shadowed
                     if (Object.prototype.hasOwnProperty.call(nextSource, nextKey)) {
                         to[nextKey] = nextSource[nextKey];
