@@ -12,7 +12,7 @@ export default function setupInputStream(type: InputStreamType = 'LiveStream', v
         }
         case 'ImageStream':
             return { inputStream: InputStream.createImageStream() };
-        case 'LiveStream': { // TODO: test to see what happens if you run in node and ask for LiveStream, it probably fails spectacularly, and should fail gracefully
+        case 'LiveStream': {
             let video: HTMLVideoElement | null = null;
             if (viewport) {
                 video = viewport.querySelector('video');

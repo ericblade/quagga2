@@ -55,7 +55,7 @@ const inputStreamFactory: InputStreamFactory = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 _config = config;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                video.setAttribute('src', (typeof config.src !== 'undefined') ? config.src : '');
+                this.setAttribute('src', (typeof config.src !== 'undefined') ? config.src : '');
             },
 
             ended() {
@@ -67,7 +67,9 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             setAttribute(name, value) {
-                video.setAttribute(name, value);
+                if (video) {
+                    video.setAttribute(name, value);
+                }
             },
 
             pause() {
@@ -81,7 +83,7 @@ const inputStreamFactory: InputStreamFactory = {
 
             setCurrentTime(time) {
                 if (_config?.type !== 'LiveStream') {
-                    video.setAttribute('currentTime', time.toString());
+                    this.setAttribute('currentTime', time.toString());
                 }
             },
 
@@ -147,7 +149,9 @@ const inputStreamFactory: InputStreamFactory = {
         return inputStream;
     },
     createLiveStream(video): InputStream {
-        video.setAttribute('autoplay', 'true');
+        if (video) {
+            video.setAttribute('autoplay', 'true');
+        }
         const that = inputStreamFactory.createVideoStream(video);
         that.ended = function ended(): false {
             return false;

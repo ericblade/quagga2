@@ -1,21 +1,24 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
-import QuaggaJSStaticInterface from '../quagga.js';
+import QuaggaJSStaticInterface from '../quagga';
 
 const mockQuaggaInstance = {
     context: {},
     initializeData: () => {},
-    initInputStream: (cb) => {cb()},
-}
+    initInputStream: (cb: () => void) => cb(),
+};
 
 describe('src/quagga.js', () => {
     describe('init', () => {
         it('returns undefined when callback provided', (done) => {
-            const ret = QuaggaJSStaticInterface.init({}, done, null, mockQuaggaInstance);
-            expect(ret).to.be.undefined;
+            // @ts-expect-error
+            const ret = QuaggaJSStaticInterface.init({ }, done, null, mockQuaggaInstance);
+            expect(ret).to.equal(undefined);
         });
         it('returns promise when no callback provided', () => {
-            const ret = QuaggaJSStaticInterface.init({}, null, null, mockQuaggaInstance);
+            // @ts-expect-error
+            const ret = QuaggaJSStaticInterface.init({ }, null, null, mockQuaggaInstance);
             expect(ret).to.be.a('promise');
             return ret;
         });
