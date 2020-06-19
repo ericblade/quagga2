@@ -1,3 +1,4 @@
+import { clone } from 'gl-vec2';
 import { QuaggaContext } from '../QuaggaContext';
 import _initBuffers from './initBuffers';
 import _getViewPort from './getViewPort';
@@ -5,15 +6,14 @@ import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
 import _initCanvas from './initCanvas';
 import BarcodeLocator from '../locator/barcode_locator';
-import BrowserInputStream, { NodeInputStream } from '../input/input_stream';
+import BrowserInputStream, { NodeInputStream } from '../input/input_stream_factory';
 import BrowserFrameGrabber, { NodeFrameGrabber } from '../input/frame_grabber';
 import * as QWorkers from './qworker';
 import setupInputStream from './setupInputStream';
 import CameraAccess from '../input/camera_access';
-import { clone } from 'gl-vec2';
 import { BarcodeInfo } from '../reader/barcode_reader';
 import { moveLine, moveBox } from './transform';
-import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga';
+import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
@@ -22,16 +22,20 @@ const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserF
 export default class Quagga {
     context: QuaggaContext = new QuaggaContext();
 
-    initBuffers(imageWrapper?: ImageWrapper) {
+    initBuffers(imageWrapper?: ImageWrapper): void {
         if (!this.context.config) {
             return;
         }
-        const { inputImageWrapper, boxSize } = _initBuffers(this.context.inputStream, imageWrapper, this.context.config.locator);
+        const { inputImageWrapper, boxSize } = _initBuffers(
+            this.context.inputStream,
+            imageWrapper,
+            this.context.config.locator,
+        );
         this.context.inputImageWrapper = inputImageWrapper;
         this.context.boxSize = boxSize;
     }
 
-    initializeData(imageWrapper?: ImageWrapper) {
+    initializeData(imageWrapper?: ImageWrapper): void {
         if (!this.context.config) {
             return;
         }
@@ -39,7 +43,7 @@ export default class Quagga {
         this.context.decoder = BarcodeDecoder.create(this.context.config.decoder, this.context.inputImageWrapper);
     }
 
-    getViewPort() {
+    getViewPort(): Element | null {
         if (!this.context.config || !this.context.config.inputStream) {
             return null;
         }
@@ -47,12 +51,12 @@ export default class Quagga {
         return _getViewPort(target);
     }
 
-    ready(callback: Function) {
+    ready(callback: () => void): void {
         this.context.inputStream.play();
         callback();
     }
 
-    initCanvas() {
+    initCanvas(): void {
         const container = _initCanvas(this.context);
         if (!container) {
             return;
@@ -64,27 +68,33 @@ export default class Quagga {
         this.context.canvasContainer.ctx.overlay = ctx.overlay;
     }
 
-    canRecord = (callback: Function) => {
+    canRecord = (callback: () => void): void => {
         if (!this.context.config) {
             return;
         }
         BarcodeLocator.checkImageConstraints(this.context.inputStream, this.context.config?.locator);
         this.initCanvas();
-        this.context.framegrabber = FrameGrabber.create(this.context.inputStream, this.context.canvasContainer.dom.image);
+        this.context.framegrabber = FrameGrabber.create(
+            this.context.inputStream,
+            this.context.canvasContainer.dom.image,
+        );
 
         if (this.context.config.numOfWorkers === undefined) {
             this.context.config.numOfWorkers = 0;
         }
 
-        QWorkers.adjustWorkerPool(this.context.config.numOfWorkers, this.context.config, this.context.inputStream, () => {
-            if (this.context.config?.numOfWorkers === 0) {
-                this.initializeData();
-            }
-            this.ready(callback);
-        });
-    }
+        QWorkers.adjustWorkerPool(this.context.config.numOfWorkers,
+            this.context.config,
+            this.context.inputStream,
+            () => {
+                if (this.context.config?.numOfWorkers === 0) {
+                    this.initializeData();
+                }
+                this.ready(callback);
+            });
+    };
 
-    initInputStream(callback: Function) {
+    initInputStream(callback: (err?: Error) => void): void {
         if (!this.context.config || !this.context.config.inputStream) {
             return;
         }
@@ -104,18 +114,19 @@ export default class Quagga {
         this.context.inputStream = inputStream;
     }
 
-    getBoundingBoxes() {
-        return this.context.config?.locate ? BarcodeLocator.locate() :
-            [[
+    getBoundingBoxes(): Array<Array<number>> | null {
+        return this.context.config?.locate ? BarcodeLocator.locate()
+            : [[
                 clone(this.context.boxSize[0]),
                 clone(this.context.boxSize[1]),
                 clone(this.context.boxSize[2]),
                 clone(this.context.boxSize[3]),
-            ]]
+            ]];
     }
 
     // TODO: need a typescript type for result here.
-    transformResult(result: any) {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    transformResult(result: any): void {
         const topRight = this.context.inputStream.getTopRight();
         const xOffset = topRight.x;
         const yOffset = topRight.y;
@@ -144,7 +155,7 @@ export default class Quagga {
         }
     }
 
-    addResult(result: QuaggaJSResultObject, imageData: any) {
+    addResult(result: QuaggaJSResultObject, imageData: Array<number>): void {
         if (!imageData || !this.context.resultCollector) {
             return;
         }
@@ -154,17 +165,23 @@ export default class Quagga {
             result.barcodes.filter((barcode: QuaggaJSResultObject) => barcode.codeResult)
                 .forEach((barcode: QuaggaJSResultObject) => this.addResult(barcode, imageData));
         } else if (result.codeResult) {
-            this.context.resultCollector.addResult(imageData, this.context.inputStream.getCanvasSize(), result.codeResult);
+            this.context.resultCollector.addResult(
+                imageData,
+                this.context.inputStream.getCanvasSize(),
+                result.codeResult,
+            );
         }
     }
 
-    hasCodeResult(result: QuaggaJSResultObject) {
-        return result && (result.barcodes ?
-            result.barcodes.some(barcode => barcode.codeResult) :
-            result.codeResult);
+    // eslint-disable-next-line class-methods-use-this
+    hasCodeResult(result: QuaggaJSResultObject): boolean {
+        return !!(result && (result.barcodes
+            ? result.barcodes.some((barcode) => barcode.codeResult)
+            : result.codeResult));
     }
 
-    publishResult(result: QuaggaJSResultObject | null = null, imageData?: any) {
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    publishResult(result: QuaggaJSResultObject | null = null, imageData?: any): void {
         let resultToPublish: Array<QuaggaJSResultObject> | QuaggaJSResultObject | null = result;
 
         if (result && this.context.onUIThread) {
@@ -173,13 +190,13 @@ export default class Quagga {
             resultToPublish = result.barcodes || result;
         }
 
-        Events.publish('processed', resultToPublish);
+        Events.publish('processed', resultToPublish as never);
         if (this.hasCodeResult(result as QuaggaJSResultObject)) {
-            Events.publish('detected', resultToPublish);
+            Events.publish('detected', resultToPublish as never);
         }
     }
 
-    locateAndDecode() {
+    locateAndDecode(): void {
         const boxes = this.getBoundingBoxes();
         if (boxes) {
             const decodeResult = this.context.decoder.decodeFromBoundingBoxes(boxes) || {};
@@ -195,7 +212,7 @@ export default class Quagga {
         }
     }
 
-    update = () => {
+    update = (): void => {
         if (this.context.onUIThread) {
             const workersUpdated = QWorkers.updateWorkers(this.context.framegrabber);
             if (!workersUpdated) {
@@ -211,14 +228,14 @@ export default class Quagga {
             this.context.framegrabber.grab();
             this.locateAndDecode();
         }
-    }
+    };
 
-    startContinuousUpdate() {
-        var next: number | null = null,
-            delay = 1000 / (this.context.config?.frequency || 60);
+    startContinuousUpdate(): void {
+        let next: number | null = null;
+        const delay = 1000 / (this.context.config?.frequency || 60);
 
         this.context.stopped = false;
-        const context = this.context;
+        const { context } = this;
 
         const newFrame = (timestamp: number) => {
             next = next || timestamp;
@@ -232,7 +249,7 @@ export default class Quagga {
         newFrame(performance.now());
     }
 
-    start() {
+    start(): void {
         if (this.context.onUIThread && this.context.config?.inputStream?.type === 'LiveStream') {
             this.startContinuousUpdate();
         } else {
@@ -240,7 +257,7 @@ export default class Quagga {
         }
     }
 
-    stop() {
+    stop(): void {
         this.context.stopped = true;
         QWorkers.adjustWorkerPool(0);
         if (this.context.config?.inputStream && this.context.config.inputStream.type === 'LiveStream') {
@@ -249,14 +266,14 @@ export default class Quagga {
         }
     }
 
-    setReaders(readers: Array<QuaggaJSReaderConfig>) {
+    setReaders(readers: Array<QuaggaJSReaderConfig>): void {
         if (this.context.decoder) {
             this.context.decoder.setReaders(readers);
         }
         QWorkers.setReaders(readers);
     }
 
-    registerReader(name: string, reader: QuaggaJSReaderConfig) {
+    registerReader(name: string, reader: QuaggaJSReaderConfig): void {
         BarcodeDecoder.registerReader(name, reader);
         if (this.context.decoder) {
             this.context.decoder.registerReader(name, reader);

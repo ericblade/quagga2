@@ -7,6 +7,7 @@ import {
     TypedArray,
     WrapperIndexMapping,
     Moment,
+    SparseImageWrapper,
 } from '../../type-definitions/quagga.d';
 
 const vec2 = { clone };
@@ -18,7 +19,7 @@ function assertNumberPositive(val: number): asserts val is PositiveNumber {
     }
 }
 
-class ImageWrapper {
+class ImageWrapper implements SparseImageWrapper {
     data: TypedArray | Array<number>;
 
     size: XYSize;
@@ -27,7 +28,12 @@ class ImageWrapper {
 
     // Represents a basic image combining the data and size. In addition, some methods for
     // manipulation are contained within.
-    constructor(size: XYSize, data?: TypedArray | Array<number>, ArrayType: TypedArrayConstructor | ArrayConstructor = Uint8Array, initialize?: boolean) {
+    constructor(
+        size: XYSize,
+        data?: TypedArray | Array<number>,
+        ArrayType: TypedArrayConstructor | ArrayConstructor = Uint8Array,
+        initialize?: boolean,
+    ) {
         if (!data) {
             this.data = new (ArrayType)(size.x * size.y);
             if (initialize) {
@@ -125,7 +131,7 @@ class ImageWrapper {
     // TODO: this function is entirely too large for me to reason out right at this moment that i'm handling
     // all the rest of it, so this is a verbatim copy of the javascript source, with only tweaks
     // necessary to get it to run, no thought put into it yet.
-    moments(labelcount: any): Array<Moment> {
+    moments(labelCount: number): Array<Moment> {
         const { data } = this;
         let x;
         let y;
@@ -133,7 +139,7 @@ class ImageWrapper {
         const width = this.size.x;
         let val;
         let ysq;
-        const labelsum: Array<Moment> = [];
+        const labelSum: Array<Moment> = [];
         let i;
         let label;
         let mu11;
@@ -146,12 +152,12 @@ class ImageWrapper {
         const { PI } = Math;
         const PI_4 = PI / 4;
 
-        if (labelcount <= 0) {
+        if (labelCount <= 0) {
             return result;
         }
 
-        for (i = 0; i < labelcount; i++) {
-            labelsum[i] = {
+        for (i = 0; i < labelCount; i++) {
+            labelSum[i] = {
                 m00: 0,
                 m01: 0,
                 m10: 0,
@@ -168,7 +174,7 @@ class ImageWrapper {
             for (x = 0; x < width; x++) {
                 val = data[y * width + x];
                 if (val > 0) {
-                    label = labelsum[val - 1];
+                    label = labelSum[val - 1];
                     label.m00 += 1;
                     label.m01 += y;
                     label.m10 += x;
@@ -179,8 +185,8 @@ class ImageWrapper {
             }
         }
 
-        for (i = 0; i < labelcount; i++) {
-            label = labelsum[i];
+        for (i = 0; i < labelCount; i++) {
+            label = labelSum[i];
             // eslint-disable-next-line no-restricted-globals
             if (!isNaN(label.m00) && label.m00 !== 0) {
                 x_ = label.m10 / label.m00;

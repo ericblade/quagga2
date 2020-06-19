@@ -1,10 +1,10 @@
 {
     "extends": [
         "eslint:recommended",
-        "airbnb-typescript",
         "plugin:@typescript-eslint/eslint-recommended",
         "plugin:@typescript-eslint/recommended",
-        "plugin:@typescript-eslint/recommended-requiring-type-checking"
+        // "plugin:@typescript-eslint/recommended-requiring-type-checking",
+        "airbnb-typescript"
     ],
     "parserOptions": {
         "ecmaVersion": 2019,
@@ -66,6 +66,7 @@
         "semi": ["error", "always"],
         "space-infix-ops": "error",
         "yoda": "error",
-        "linebreak-style": "off"
+        "linebreak-style": "off",
+        "react/static-property-placement": "off"
     }
 }

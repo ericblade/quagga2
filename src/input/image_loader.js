@@ -1,34 +1,34 @@
-import {findTagsInObjectURL} from './exif_helper';
+import { findTagsInObjectURL } from './exif_helper';
 
-var ImageLoader = {};
-ImageLoader.load = function(directory, callback, offset, size, sequence) {
-    var htmlImagesSrcArray = new Array(size),
-        htmlImagesArray = new Array(htmlImagesSrcArray.length),
-        i,
-        img,
-        num;
+const ImageLoader = {};
+ImageLoader.load = function (directory, callback, offset, size, sequence) {
+    const htmlImagesSrcArray = new Array(size);
+    const htmlImagesArray = new Array(htmlImagesSrcArray.length);
+    let i;
+    let img;
+    let num;
 
     if (sequence === false) {
         htmlImagesSrcArray[0] = directory;
     } else {
-        for ( i = 0; i < htmlImagesSrcArray.length; i++) {
+        for (i = 0; i < htmlImagesSrcArray.length; i++) {
             num = (offset + i);
-            htmlImagesSrcArray[i] = directory + 'image-' + ('00' + num).slice(-3) + '.jpg';
+            htmlImagesSrcArray[i] = `${directory}image-${(`00${num}`).slice(-3)}.jpg`;
         }
     }
     htmlImagesArray.notLoaded = [];
-    htmlImagesArray.addImage = function(image) {
+    htmlImagesArray.addImage = function (image) {
         htmlImagesArray.notLoaded.push(image);
     };
-    htmlImagesArray.loaded = function(loadedImg) {
-        var notloadedImgs = htmlImagesArray.notLoaded;
-        for (var x = 0; x < notloadedImgs.length; x++) {
+    htmlImagesArray.loaded = function (loadedImg) {
+        const notloadedImgs = htmlImagesArray.notLoaded;
+        for (let x = 0; x < notloadedImgs.length; x++) {
             if (notloadedImgs[x] === loadedImg) {
                 notloadedImgs.splice(x, 1);
-                for (var y = 0; y < htmlImagesSrcArray.length; y++) {
-                    var imgName = htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf('/'));
+                for (let y = 0; y < htmlImagesSrcArray.length; y++) {
+                    const imgName = htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf('/'));
                     if (loadedImg.src.lastIndexOf(imgName) !== -1) {
-                        htmlImagesArray[y] = {img: loadedImg};
+                        htmlImagesArray[y] = { img: loadedImg };
                         break;
                     }
                 }
@@ -41,10 +41,10 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
             }
             if (sequence === false) {
                 findTagsInObjectURL(directory, ['orientation'])
-                    .then(tags => {
+                    .then((tags) => {
                         htmlImagesArray[0].tags = tags;
                         callback(htmlImagesArray);
-                    }).catch(e => {
+                    }).catch((e) => {
                         console.log(e);
                         callback(htmlImagesArray);
                     });
@@ -54,7 +54,7 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
         }
     };
 
-    for ( i = 0; i < htmlImagesSrcArray.length; i++) {
+    for (i = 0; i < htmlImagesSrcArray.length; i++) {
         img = new Image();
         htmlImagesArray.addImage(img);
         addOnloadHandler(img, htmlImagesArray);
@@ -63,7 +63,7 @@ ImageLoader.load = function(directory, callback, offset, size, sequence) {
 };
 
 function addOnloadHandler(img, htmlImagesArray) {
-    img.onload = function() {
+    img.onload = function () {
         htmlImagesArray.loaded(this);
     };
 }

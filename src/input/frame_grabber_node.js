@@ -4,23 +4,23 @@ const Interp2D = require('ndarray-linear-interpolate').d2;
 
 const FrameGrabber = {};
 
-FrameGrabber.create = function(inputStream) {
+FrameGrabber.create = function (inputStream) {
     const _that = {};
-    const _video_size = CVUtils.imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+    const _videoSize = CVUtils.imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
     const _canvasSize = inputStream.getCanvasSize();
     const _size = CVUtils.imageRef(inputStream.getWidth(), inputStream.getHeight());
     const _topRight = inputStream.getTopRight();
     let _data = new Uint8Array(_size.x * _size.y);
-    const _grayData = new Uint8Array(_video_size.x * _video_size.y);
+    const _grayData = new Uint8Array(_videoSize.x * _videoSize.y);
     const _canvasData = new Uint8Array(_canvasSize.x * _canvasSize.y);
     /* eslint-disable new-cap */
-    const _grayImageArray = Ndarray(_grayData, [_video_size.y, _video_size.x]).transpose(1, 0);
+    const _grayImageArray = Ndarray(_grayData, [_videoSize.y, _videoSize.x]).transpose(1, 0);
     const _canvasImageArray = Ndarray(_canvasData, [_canvasSize.y, _canvasSize.x]).transpose(1, 0);
     const _targetImageArray = _canvasImageArray
         .hi(_topRight.x + _size.x, _topRight.y + _size.y)
         .lo(_topRight.x, _topRight.y);
-    const _stepSizeX = _video_size.x / _canvasSize.x;
-    const _stepSizeY = _video_size.y / _canvasSize.y;
+    const _stepSizeX = _videoSize.x / _canvasSize.x;
+    const _stepSizeY = _videoSize.y / _canvasSize.y;
 
     if (ENV.development) {
         console.log('FrameGrabber', JSON.stringify({
@@ -35,14 +35,14 @@ FrameGrabber.create = function(inputStream) {
     /**
      * Uses the given array as frame-buffer
      */
-    _that.attachData = function(data) {
+    _that.attachData = function (data) {
         _data = data;
     };
 
     /**
      * Returns the used frame-buffer
      */
-    _that.getData = function() {
+    _that.getData = function () {
         return _data;
     };
 
@@ -50,15 +50,14 @@ FrameGrabber.create = function(inputStream) {
      * Fetches a frame from the input-stream and puts into the frame-buffer.
      * The image-data is converted to gray-scale and then half-sampled if configured.
      */
-    _that.grab = function() {
-        var frame = inputStream.getFrame();
+    _that.grab = function () {
+        const frame = inputStream.getFrame();
 
         if (frame) {
             this.scaleAndCrop(frame);
             return true;
-        } else {
-            return false;
         }
+        return false;
     };
 
     // eslint-disable-next-line
@@ -69,13 +68,14 @@ FrameGrabber.create = function(inputStream) {
         // 2. interpolate
         for (let y = 0; y < _canvasSize.y; y++) {
             for (let x = 0; x < _canvasSize.x; x++) {
+                // eslint-disable-next-line no-bitwise
                 _canvasImageArray.set(x, y, (Interp2D(_grayImageArray, x * _stepSizeX, y * _stepSizeY)) | 0);
             }
         }
 
         // targetImageArray must be equal to targetSize
-        if (_targetImageArray.shape[0] !== _size.x ||
-            _targetImageArray.shape[1] !== _size.y) {
+        if (_targetImageArray.shape[0] !== _size.x
+            || _targetImageArray.shape[1] !== _size.y) {
             throw new Error('Shapes do not match!');
         }
 
@@ -85,9 +85,9 @@ FrameGrabber.create = function(inputStream) {
                 _data[y * _size.x + x] = _targetImageArray.get(x, y);
             }
         }
-    },
+    };
 
-    _that.getSize = function() {
+    _that.getSize = function () {
         return _size;
     };
 

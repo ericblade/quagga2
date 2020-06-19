@@ -1,4 +1,4 @@
-import { QuaggaJSConfigObject } from "../../type-definitions/quagga";
+import { QuaggaJSConfigObject } from '../../type-definitions/quagga.d';
 
 const ProdConfig: QuaggaJSConfigObject = {
     inputStream: {
