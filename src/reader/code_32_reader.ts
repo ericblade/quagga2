@@ -42,7 +42,7 @@ const plaintextcode = [
 ];
 
 class Code32Reader extends Code39Reader {
-    FORMAT = 'code_32';
+    FORMAT = 'code_32_reader';
 
     // TODO (this was todo in original repo, no text was there. sorry.)
     _checkChecksum(code: string) {
