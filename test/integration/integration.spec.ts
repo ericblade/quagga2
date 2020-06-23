@@ -179,6 +179,17 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         ]
     );
     runDecoderTest(
+        'code_32',
+        generateConfig({
+            decoder: {
+                readers: ['code_32_reader']
+            }
+        }),
+        [
+            { name: 'image-1.jpg', result: 'A123456788', format: 'code_32_reader' },
+        ]
+    );
+    runDecoderTest(
         'ean_8',
         generateConfig({ decoder: { readers: ['ean_8_reader'] } }),
         [
