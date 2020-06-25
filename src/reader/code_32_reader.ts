@@ -93,7 +93,7 @@ class Code32Reader extends Code39Reader {
         }
 
         if (new_code.toString().length !== 9) {
-            for (let n = 9; n > new_code.toString.length; n++) {
+            for (let n = 9; n > new_code.toString().length; n++) {
                 code_final = "0"+new_code;
             }
         }
