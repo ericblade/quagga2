@@ -92,8 +92,10 @@ class Code32Reader extends Code39Reader {
             
         }
 
-        if (new_code.toString().length !== 9) {
-            for (let n = 9; n > new_code.toString().length; n++) {
+        if (new_code.toString().length < 9) {
+            let code_diff_length = 9 - new_code.toString().length;
+            
+            for (let n = 0; n < code_diff_length; n++) {
                 code_final = "0"+new_code;
             }
         }
