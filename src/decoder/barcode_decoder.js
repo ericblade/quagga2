@@ -13,6 +13,7 @@ import UPCEReader from '../reader/upc_e_reader';
 import I2of5Reader from '../reader/i2of5_reader';
 import TwoOfFiveReader from '../reader/2of5_reader';
 import Code93Reader from '../reader/code_93_reader';
+import Code32Reader from '../reader/code_32_reader';
 
 const READERS = {
     code_128_reader: Code128Reader,
@@ -28,6 +29,7 @@ const READERS = {
     i2of5_reader: I2of5Reader,
     '2of5_reader': TwoOfFiveReader,
     code_93_reader: Code93Reader,
+    code_32_reader: Code32Reader,
 };
 
 export default {
