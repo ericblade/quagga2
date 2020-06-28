@@ -100,7 +100,7 @@ class Code32Reader extends Code39Reader {
             }
         }
 
-        code_final = "A"+new_code;
+        code_final = "A"+code_final;
 
         result.code = code_final;
         return result;
