@@ -98,6 +98,8 @@ class Code32Reader extends Code39Reader {
             for (let n = 0; n < code_diff_length; n++) {
                 code_final = "0"+new_code;
             }
+        } else {
+            code_final = new_code;
         }
 
         code_final = "A"+code_final;
