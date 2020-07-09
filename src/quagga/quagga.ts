@@ -240,10 +240,12 @@ export default class Quagga {
         const newFrame = (timestamp: number) => {
             next = next || timestamp;
             if (!context.stopped) {
-                next += delay;
-                this.update();
+                if (timestamp >= next) {
+                    next += delay;
+                    this.update();
+                }
+                window.requestAnimationFrame(newFrame);
             }
-            window.requestAnimationFrame(newFrame);
         };
 
         newFrame(performance.now());
