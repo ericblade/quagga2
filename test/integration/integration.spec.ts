@@ -176,6 +176,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             { name: 'image-008.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' },
             { name: 'image-009.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' }, //yes, 8 and 9 are same barcodes, different images slightly
             { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin' }, // 10 also
+            { name: 'image-011.jpg', result: '5FNRL38488B411196', format: 'code_39_vin' },
         ]
     );
     runDecoderTest(
