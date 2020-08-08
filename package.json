@@ -142,7 +142,7 @@
     "lodash": "^4.17.19",
     "ndarray": "^1.0.19",
     "ndarray-linear-interpolate": "^1.0.0",
-    "snyk": "^1.361.3"
+    "snyk": "^1.362.0"
   },
   "snyk": true,
   "nyc": {
