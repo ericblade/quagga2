@@ -47,7 +47,7 @@
     "source-map-loader": "^1.0.1",
     "ts-mocha": "^7.0.0",
     "ts-node": "^8.10.2",
-    "typescript": "^3.9.6",
+    "typescript": "^4.1.0-dev.20200814",
     "webpack": "^4.43.0",
     "webpack-cli": "^3.3.12"
   },
@@ -76,7 +76,8 @@
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
     "snyk-protect": "npx snyk protect",
-    "prepublish": "npm run snyk-protect"
+    "prepublish": "npm run snyk-protect",
+    "upgrade-deps": "npx npm-check-updates && npm install"
   },
   "repository": {
     "type": "git",
