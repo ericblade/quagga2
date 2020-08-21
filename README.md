@@ -682,6 +682,12 @@ and check out the __Torch__ feature.
 
 To find out more about this feature [read on](https://www.oberhofer.co/mediastreamtrack-and-its-capabilities).
 
+### Handling false positives
+
+Most readers provide an error object that describes the confidence of the reader in it's accuracy.  There are strategies you can implement in your application to improve what your application accepts as acceptable input from the barcode scanner, [in this thread](https://github.com/serratus/quaggaJS/issues/237).
+
+If you choose to explore check-digit validation, you might find [barcode-validator](https://github.com/ericblade/barcode-validator) a useful library.
+
 ## Tests
 
 Tests are performed with [Cypress][cypressUrl] for browser testing, and [Mocha][mochaUrl], [Chai][chaiUrl], and [SinonJS][sinonUrl] for Node.JS testing. (note that Cypress also uses Mocha, Chai, and Sinon, so tests that are not browser specific can be run virtually identically in node without duplication of code)
