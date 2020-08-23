@@ -181,6 +181,14 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     runDecoderTest(
         'code_32',
         generateConfig({
+            inputStream: {
+                size: 1280,
+            },
+            locator: {
+                patchSize: 'large',
+                halfSample: true,
+            },
+            numOfWorkers: 4,
             decoder: {
                 readers: ['code_32_reader']
             }
