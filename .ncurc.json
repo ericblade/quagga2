@@ -1,0 +1,7 @@
+{
+    "upgrade": true,
+    "reject": [
+        "mocha",
+        "@types/mocha"
+    ]
+}
