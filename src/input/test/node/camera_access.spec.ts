@@ -12,7 +12,8 @@ describe('CameraAccess (node)', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
             } catch (err) {
-                expect(err.message).to.equal('enumerateDevices is not defined');
+                // expect(err.message).to.equal('enumerateDevices is not defined');
+                expect(err.code).to.equal(-1);
             }
         });
     });
@@ -25,7 +26,8 @@ describe('CameraAccess (node)', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
             } catch (err) {
-                expect(err.message).to.equal('getUserMedia is not defined');
+                // expect(err.message).to.equal('getUserMedia is not defined');
+                expect(err.code).to.equal(-1);
             }
         });
     });

@@ -76,6 +76,7 @@ export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDepre
 }
 
 async function enumerateVideoDevices(): Promise<Array<MediaDeviceInfo>> {
+
     const devices = await enumerateDevices();
     return devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput');
 }
