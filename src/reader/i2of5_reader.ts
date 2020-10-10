@@ -1,7 +1,7 @@
 // TODO: i2of5_reader and 2of5_reader share very similar code, make use of that
 
 import BarcodeReader, { BarcodeReaderConfig, BarcodeInfo, BarcodePosition, Barcode } from './barcode_reader';
-import {merge} from 'lodash';
+import merge from 'lodash/merge';
 
 const N = 1;
 const W = 3;
