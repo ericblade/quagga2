@@ -216,20 +216,19 @@ export interface QuaggaJSStatic {
     CameraAccess: QuaggaJSCameraAccess;
 }
 
-
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
 export interface QuaggaJSCameraAccess {
-    request(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<void>;
+    request(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
 
     release(): void;
 
-    enumerateVideoDevices(): Promise<MediaDeviceInfo[]>;
+    enumerateVideoDevices(): Promise<MediaDeviceInfo[]> | never;
 
     getActiveStreamLabel(): string;
 
-    getActiveTrack(): MediaStreamTrack;
+    getActiveTrack(): MediaStreamTrack | null;
 }
 
 /**
