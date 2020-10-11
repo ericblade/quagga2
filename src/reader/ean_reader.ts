@@ -1,5 +1,5 @@
 import BarcodeReader, { BarcodeReaderConfig, BarcodeInfo, BarcodePosition, Barcode } from './barcode_reader';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 // const CODE_L_START = 0;
 const CODE_G_START = 10;

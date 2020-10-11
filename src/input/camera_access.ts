@@ -1,4 +1,4 @@
-import { pick } from 'lodash';
+import pick from 'lodash/pick';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
 import { MediaTrackConstraintsWithDeprecated } from '../../type-definitions/quagga.d';
 

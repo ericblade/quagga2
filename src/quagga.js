@@ -7,7 +7,7 @@ import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
-import { merge } from 'lodash';
+import merge from 'lodash/merge';
 
 import Quagga from './quagga/quagga';
 

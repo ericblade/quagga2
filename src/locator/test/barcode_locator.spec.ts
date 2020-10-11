@@ -4,7 +4,7 @@ if (typeof (globalThis as any).ENV === 'undefined') {
 
 import BarcodeLocator from '../barcode_locator';
 import QuaggaConfig from '../../config/config';
-import {merge} from 'lodash';
+import merge from 'lodash/merge';
 import sinon, {SinonSpy} from 'sinon';
 import { expect } from 'chai';
 import { QuaggaJSConfigObject } from '../../../type-definitions/quagga';
