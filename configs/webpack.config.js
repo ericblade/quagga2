@@ -45,6 +45,7 @@ module.exports = {
         new webpack.DefinePlugin({
             ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
         }),
+        new webpack.NormalModuleReplacementPlugin(/input_stream_node/, './input_stream/input_stream_browser'),
     ],
     optimization: {
         minimize: false,
