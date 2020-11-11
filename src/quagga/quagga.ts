@@ -7,7 +7,7 @@ import BarcodeDecoder from '../decoder/barcode_decoder';
 import _initCanvas from './initCanvas';
 import BarcodeLocator from '../locator/barcode_locator';
 import BrowserInputStream, { NodeInputStream } from '../input/input_stream_factory';
-import BrowserFrameGrabber, { NodeFrameGrabber } from '../input/frame_grabber';
+import FrameGrabber from '../input/frame_grabber.js';
 import * as QWorkers from './qworker';
 import setupInputStream from './setupInputStream';
 import CameraAccess from '../input/camera_access';
@@ -17,7 +17,6 @@ import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitio
 import Events from '../common/events';
 
 const InputStream = typeof window === 'undefined' ? NodeInputStream : BrowserInputStream;
-const FrameGrabber = typeof window === 'undefined' ? NodeFrameGrabber : BrowserFrameGrabber;
 
 export default class Quagga {
     context: QuaggaContext = new QuaggaContext();
