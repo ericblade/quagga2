@@ -1,5 +1,5 @@
 import { clone } from 'gl-vec2';
-import type { InputStream } from '../input/input_stream_factory';
+import type { InputStream } from '../input/input_stream/input_stream.d';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeLocator from '../locator/barcode_locator';
 
