@@ -16,7 +16,6 @@ module.exports.plugins = [
     new webpack.DefinePlugin({
         ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
     }),
-    new webpack.NormalModuleReplacementPlugin(/input_stream_browser/, './input_stream/input_stream_node'),
 ];
 module.exports.output.path = __dirname + '/../lib';
 module.exports.output.filename = 'quagga.js';

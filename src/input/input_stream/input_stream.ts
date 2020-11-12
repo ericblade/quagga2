@@ -1,4 +1,7 @@
 // TODO: It's pretty likely that this shares code with the browser version, investigate that
+// FOR ANYONE IN HERE IN THE FUTURE: This is the default input_stream module used for the Node bundle.
+// webpack.config.js *replaces* this with input_stream_browser.ts when the bundle is being built for browser.
+
 import GetPixels from 'get-pixels';
 import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
 import { Point, XYSize } from '../../../type-definitions/quagga.d';
