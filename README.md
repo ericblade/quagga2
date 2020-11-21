@@ -125,6 +125,24 @@ You can simply include `dist/quagga.min.js` in your project and you are ready
 to go. The script exposes the library on the global namespace under `Quagga`.
 
 
+<p align="center">(OR)</p>
+
+
+You can include the following CDN links in your script tags:
+
+
+a) `Quagga.js`
+```html
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.2.6/dist/quagga.js"></script>
+```
+
+b) `Quagga.min.js`
+```html
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.2.6/dist/quagga.min.js"></script>
+```
+
+
+
 ## <a name="gettingstarted">Getting Started</a>
 
 For starters, have a look at the [examples][github_examples] to get an idea
