@@ -128,23 +128,23 @@ to go. The script exposes the library on the global namespace under `Quagga`.
 <script src="quagga.js"></script>
 ```
 
-You can get the `quagga.js` file in two ways:
+You can get the `quagga.js` file in the following ways:
 
-1. By installing the npm module and copying the `quagga.js` file from the `dist` folder.
-
-<p align="center">(OR)</p>
-
-2. You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details) 
+By [installing the npm module](https://github.com/SudhamJayanthi/quagga2#npm) and copying the `quagga.js` file from the `dist` folder.
 
 <p align="center">(OR)</p>
 
-3. You can include the following script tags with  CDN links:
+You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details) 
 
-   a) `quagga.js`
+<p align="center">(OR)</p>
+
+You can include the following script tags with  CDN links:
+
+a) `quagga.js`
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
 ```
-   b) `quagga.min.js` (minified version)
+b) `quagga.min.js` (minified version)
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 ```
