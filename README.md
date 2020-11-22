@@ -119,11 +119,40 @@ Currently, the full functionality is only available through the browser. When
 using QuaggaJS within __node__, only file-based decoding is available. See the
 example for [node_examples](#node-example).
 
-### Using with script tag
+### Using with script tag 
 
-You can simply include `dist/quagga.min.js` in your project and you are ready
+You can simply include `quagga.js` in your project and you are ready
 to go. The script exposes the library on the global namespace under `Quagga`.
 
+```html
+<script src="quagga.js"></script>
+```
+
+You can get the `quagga.js` file in the following ways:
+
+By [installing the npm module](https://github.com/SudhamJayanthi/quagga2#npm) and copying the `quagga.js` file from the `dist` folder.
+
+<p align="center">(OR)</p>
+
+You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details) 
+
+<p align="center">(OR)</p>
+
+You can include the following script tags with  CDN links:
+
+a) `quagga.js`
+```html
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
+```
+b) `quagga.min.js` (minified version)
+```html
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
+```
+*Note: You can include a specific version of the library by including the version as shown below.*
+```html
+<!-- Link for Version 1.2.6 -->
+<script src="https://cdn.jsdelivr.net/npm/@ericblade@version/quagga2@1.2.6/dist/quagga.js"></script>
+```
 
 ## <a name="gettingstarted">Getting Started</a>
 
