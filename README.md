@@ -151,7 +151,7 @@ b) `quagga.min.js` (minified version)
 *Note: You can include a specific version of the library by including the version as shown below.*
 ```html
 <!-- Link for Version 1.2.6 -->
-<script src="https://cdn.jsdelivr.net/npm/@ericblade@version/quagga2@1.2.6/dist/quagga.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.2.6/dist/quagga.js"></script>
 ```
 
 ## <a name="gettingstarted">Getting Started</a>
