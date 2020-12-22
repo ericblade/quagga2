@@ -1,7 +1,9 @@
 quagga2
 =======
 
-[![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) [![Greenkeeper badge](https://badges.greenkeeper.io/ericblade/quagga2.svg)](https://greenkeeper.io/)
+[![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
+[![Rate on Openbase](https://badges.openbase.io/js/rating/@ericblade/quagga2.svg)](https://openbase.io/js/@ericblade/quagga2?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
 
 This is a fork of the original QuaggaJS library, that will be maintained until such time as the
 original author and maintainer returns, or it has been completely replaced by built-in browser and
