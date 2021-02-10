@@ -147,8 +147,9 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             { 'name': 'image-007.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
             { 'name': 'image-008.jpg', 'result': 'CODE39', format: 'code_39' },
             { 'name': 'image-009.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
-            // TODO: image 10 in this set appears to be dependent upon #190
+            // TODO: image 10 in this set appears to be dependent upon #191
             { 'name': 'image-010.jpg', 'result': 'CODE39', format: 'code_39' },
+            { 'name': 'image-011.jpg', 'result': '4', format: 'code_39' },
         ]);
     runDecoderTest(
         'code_39_vin',
