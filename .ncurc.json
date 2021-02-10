@@ -2,6 +2,10 @@
     "upgrade": true,
     "reject": [
         "mocha",
-        "@types/mocha"
+        "@types/mocha",
+        "webpack",
+        "webpack-cli",
+        "cypress",
+        "source-map-loader"
     ]
 }
