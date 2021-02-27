@@ -118,13 +118,13 @@ export interface QuaggaJSStatic {
     init(
         config: QuaggaJSConfigObject,
         callback?: (err: any) => void
-    ): void;
+    ): Promise<void>;
 
     init(
         config: QuaggaJSConfigObject,
         callback: (err: any) => void,
         imageWrapper: ImageWrapper,
-    ): void;
+    ): Promise<void>;
 
     /**
      * When the library is initialized, the start()
@@ -139,7 +139,7 @@ export interface QuaggaJSStatic {
      * Additionally, if a camera-stream was requested upon initialization,
      * this operation also disconnects the camera.
      */
-    stop(): void;
+    stop(): Promise<void>;
 
     /**
      * Pauses processing, but does not release any handlers
@@ -220,9 +220,10 @@ export interface QuaggaJSStatic {
  * Used for accessing information about the active stream track and available video devices.
  */
 export interface QuaggaJSCameraAccess {
-    request(video: HTMLVideoElement, videoConstraints: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
+    requestedVideoElement: HTMLVideoElement | null,
+    request(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
 
-    release(): void;
+    release(): Promise<void>;
 
     enumerateVideoDevices(): Promise<MediaDeviceInfo[]> | never;
 

@@ -256,11 +256,11 @@ export default class Quagga {
         }
     }
 
-    stop(): void {
+    async stop(): Promise<void> {
         this.context.stopped = true;
         QWorkers.adjustWorkerPool(0);
         if (this.context.config?.inputStream && this.context.config.inputStream.type === 'LiveStream') {
-            CameraAccess.release();
+            await CameraAccess.release();
             this.context.inputStream.clearEventHandlers();
         }
     }

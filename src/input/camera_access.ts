@@ -1,6 +1,6 @@
 import pick from 'lodash/pick';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
-import { MediaTrackConstraintsWithDeprecated } from '../../type-definitions/quagga.d';
+import { MediaTrackConstraintsWithDeprecated, QuaggaJSCameraAccess as CameraAccessType } from '../../type-definitions/quagga.d';
 
 let streamRef: MediaStream | null;
 
@@ -92,18 +92,28 @@ function getActiveTrack(): MediaStreamTrack | null {
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
-const QuaggaJSCameraAccess = {
+const QuaggaJSCameraAccess: CameraAccessType = {
+    requestedVideoElement: null,
     async request(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
+        QuaggaJSCameraAccess.requestedVideoElement = video;
         const newConstraints = await pickConstraints(videoConstraints);
         return initCamera(video, newConstraints);
     },
-    release(): void {
-        // TODO: i wonder if telling the Video element to pause() before calling MediaStreamTrack.stop() would alleviate some of the issues with the camera appearing to stay open on Android even after stopping.
+    release(): Promise<void> {
         const tracks = streamRef && streamRef.getVideoTracks();
-        if (tracks && tracks.length) {
-            tracks[0].stop();
+        if (QuaggaJSCameraAccess.requestedVideoElement !== null) {
+            QuaggaJSCameraAccess.requestedVideoElement.pause();
         }
-        streamRef = null;
+        return new Promise<void>((resolve) => {
+            setTimeout(() => {
+                if (tracks && tracks.length) {
+                    tracks[0].stop();
+                }
+                streamRef = null;
+                QuaggaJSCameraAccess.requestedVideoElement = null;
+                resolve();
+            });
+        });
     },
     enumerateVideoDevices,
     getActiveStreamLabel(): string {

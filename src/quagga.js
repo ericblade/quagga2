@@ -1,3 +1,4 @@
+import merge from 'lodash/merge';
 import TypeDefs from './common/typedefs'; // eslint-disable-line no-unused-vars
 import ImageWrapper from './common/image_wrapper';
 import BarcodeDecoder from './decoder/barcode_decoder';
@@ -7,7 +8,6 @@ import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
-import merge from 'lodash/merge';
 
 import Quagga from './quagga/quagga';
 
@@ -39,10 +39,10 @@ const QuaggaJSStaticInterface = {
         return promise;
     },
     start: function () {
-        instance.start();
+        return instance.start();
     },
     stop: function () {
-        instance.stop();
+        return instance.stop();
     },
     pause: function () {
         _context.stopped = true;
