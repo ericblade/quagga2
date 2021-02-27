@@ -112,7 +112,7 @@ describe('CameraAccess (browser)', () => {
         it('works', async () => {
             const video = document.createElement('video');
             await Quagga.CameraAccess.request(video, {});
-            Quagga.CameraAccess.release();
+            await Quagga.CameraAccess.release();
             expect(((video?.srcObject) as any)?.active).to.equal(false);
         });
     });
