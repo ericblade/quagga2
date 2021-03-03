@@ -112,7 +112,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
                 streamRef = null;
                 QuaggaJSCameraAccess.requestedVideoElement = null;
                 resolve();
-            });
+            }, 0);
         });
     },
     enumerateVideoDevices,
