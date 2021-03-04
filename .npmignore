@@ -27,3 +27,11 @@ build/
 .snyk
 configs/*
 .github/*
+CHANGELOG.md
+Dockerfile
+README.md
+.ncurc.json
+.nyc_output/
+.vscode/
+cypress.json
+docker-compose.yml
