@@ -33,18 +33,21 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
  * @param {Object} constraints
  * @param {Object} video
  */
-async function initCamera(video: HTMLVideoElement, constraints: MediaStreamConstraints): Promise<void> {
+async function initCamera(video: HTMLVideoElement | null, constraints: MediaStreamConstraints): Promise<void> {
     const stream = await getUserMedia(constraints);
     streamRef = stream;
-    video.setAttribute('autoplay', 'true');
-    video.setAttribute('muted', 'true');
-    video.setAttribute('playsinline', 'true'); // not listed on MDN...
-    // eslint-disable-next-line no-param-reassign
-    video.srcObject = stream;
-    video.addEventListener('loadedmetadata', () => {
-        video.play();
-    });
-    return waitForVideo(video);
+    if (video) {
+        video.setAttribute('autoplay', 'true');
+        video.setAttribute('muted', 'true');
+        video.setAttribute('playsinline', 'true'); // not listed on MDN...
+        // eslint-disable-next-line no-param-reassign
+        video.srcObject = stream;
+        video.addEventListener('loadedmetadata', () => {
+            video.play();
+        });
+        return waitForVideo(video);
+    }
+    return Promise.resolve();
 }
 
 function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): MediaTrackConstraints {
@@ -76,7 +79,6 @@ export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDepre
 }
 
 async function enumerateVideoDevices(): Promise<Array<MediaDeviceInfo>> {
-
     const devices = await enumerateDevices();
     return devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput');
 }
@@ -94,7 +96,7 @@ function getActiveTrack(): MediaStreamTrack | null {
  */
 const QuaggaJSCameraAccess: CameraAccessType = {
     requestedVideoElement: null,
-    async request(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
+    async request(video: HTMLVideoElement | null, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<any> {
         QuaggaJSCameraAccess.requestedVideoElement = video;
         const newConstraints = await pickConstraints(videoConstraints);
         return initCamera(video, newConstraints);

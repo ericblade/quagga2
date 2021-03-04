@@ -221,7 +221,7 @@ export interface QuaggaJSStatic {
  */
 export interface QuaggaJSCameraAccess {
     requestedVideoElement: HTMLVideoElement | null,
-    request(video: HTMLVideoElement, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
+    request(video: HTMLVideoElement | null, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
 
     release(): Promise<void>;
 
