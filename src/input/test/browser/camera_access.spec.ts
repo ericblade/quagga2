@@ -44,15 +44,17 @@ describe('CameraAccess (browser)', () => {
 
     describe('request', () => {
         it('works', async () => {
-            after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');
+            after(() => {
+                video.pause();
+                Quagga.CameraAccess.release();
+            });
             await Quagga.CameraAccess.request(video, {});
             expect(video.srcObject).to.not.equal(null);
             // "as any" here to prevent typescript blowing up because it doesn't understand 'id' and
             // 'active' as members of MediaStream | MediaSource | Blob .. why?
             expect(((video?.srcObject) as any)?.id).to.be.a('string');
             expect(((video?.srcObject) as any)?.active).to.equal(true);
-            // TODO: ensure we cleanup our video element after this
         });
 
         it('should allow deprecated constraints to be used', async () => {

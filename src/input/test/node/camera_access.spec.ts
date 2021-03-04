@@ -21,7 +21,6 @@ describe('CameraAccess (node)', () => {
     describe('request', () => {
         it('rejects', async () => {
             try {
-                // @ts-expect-error
                 const x = await Quagga.CameraAccess.request(null, {});
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
