@@ -2,7 +2,7 @@ import merge from 'lodash/merge';
 import TypeDefs from './common/typedefs'; // eslint-disable-line no-unused-vars
 import ImageWrapper from './common/image_wrapper';
 import BarcodeDecoder from './decoder/barcode_decoder';
-import BarcodeReader from './reader/barcode_reader';
+import * as Readers from './reader/index';
 import Events from './common/events';
 import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
@@ -140,7 +140,7 @@ const QuaggaJSStaticInterface = {
     get default() {
         return QuaggaJSStaticInterface;
     },
-    BarcodeReader,
+    Readers,
     CameraAccess,
     ImageDebug,
     ImageWrapper,
@@ -151,7 +151,7 @@ export default QuaggaJSStaticInterface;
 // export BarcodeReader and other utilities for external plugins
 export {
     BarcodeDecoder,
-    BarcodeReader,
+    Readers,
     CameraAccess,
     ImageDebug,
     ImageWrapper,

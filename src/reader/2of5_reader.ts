@@ -27,7 +27,7 @@ class TwoOfFiveReader extends BarcodeReader {
 
     AVG_CODE_ERROR = 0.30;
 
-    _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite = false, tryHarder = false): BarcodeInfo | null {
+    protected _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite = false, tryHarder = false): BarcodeInfo | null {
         const counter = [];
         let counterPos = 0;
         const bestMatch = {
@@ -84,7 +84,7 @@ class TwoOfFiveReader extends BarcodeReader {
         return null;
     }
 
-    _findStart() {
+    protected _findStart(): BarcodePosition | null {
         let startInfo = null;
         let offset = this._nextSet(this._row);
         let narrowBarWidth = 1;
@@ -108,7 +108,7 @@ class TwoOfFiveReader extends BarcodeReader {
         return startInfo;
     }
 
-    _verifyTrailingWhitespace(endInfo: BarcodeInfo) {
+    protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodePosition | null {
         const trailingWhitespaceEnd = endInfo.end + ((endInfo.end - endInfo.start) / 2);
         if (trailingWhitespaceEnd < this._row.length) {
             if (this._matchRange(endInfo.end, trailingWhitespaceEnd, 0)) {
@@ -118,7 +118,7 @@ class TwoOfFiveReader extends BarcodeReader {
         return null;
     }
 
-    _findEnd() {
+    protected _findEnd(): BarcodePosition | null {
         // TODO: reverse, followed by some calcs, followed by another reverse? really?
         this._row.reverse();
         const offset = this._nextSet(this._row);
@@ -137,11 +137,11 @@ class TwoOfFiveReader extends BarcodeReader {
         return endInfo !== null ? this._verifyTrailingWhitespace(endInfo) : null;
     }
 
-    _verifyCounterLength(counters: Array<number>) {
+    protected _verifyCounterLength(counters: Array<number>) {
         return (counters.length % 10 === 0);
     }
 
-    _decodeCode(counter: ReadonlyArray<number>) {
+    protected _decodeCode(counter: ReadonlyArray<number>): BarcodeInfo | null {
         const epsilon = this.AVG_CODE_ERROR;
         const bestMatch = {
             error: Number.MAX_VALUE,
@@ -152,18 +152,18 @@ class TwoOfFiveReader extends BarcodeReader {
 
         for (let code = 0; code < CODE_PATTERN.length; code++) {
             const error = this._matchPattern(counter, CODE_PATTERN[code]);
-            if (error < bestMatch.error) {
+            if (error < bestMatch.error!) {
                 bestMatch.code = code;
                 bestMatch.error = error;
             }
         }
-        if (bestMatch.error < epsilon) {
+        if (bestMatch.error! < epsilon) {
             return bestMatch;
         }
         return null;
     }
 
-    _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo>) {
+    protected _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo | BarcodePosition>): BarcodeInfo | null {
         let pos = 0;
         const counterLength = counters.length;
         const counter = [0, 0, 0, 0, 0];
@@ -185,7 +185,7 @@ class TwoOfFiveReader extends BarcodeReader {
     }
 
 
-    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
         const startInfo = this._findStart();
         if (!startInfo) {
             return null;

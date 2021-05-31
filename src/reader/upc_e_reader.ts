@@ -29,7 +29,7 @@ class UPCEReader extends EANReader {
         return outCode as BarcodeInfo;
     };
 
-    _determineParity(codeFrequency: number, result: Array<number>) {
+    protected _determineParity(codeFrequency: number, result: Array<number>) {
         for (let nrSystem = 0; nrSystem < this.CODE_FREQUENCY.length; nrSystem++){
             for (let i = 0; i < this.CODE_FREQUENCY[nrSystem].length; i++) {
                 if (codeFrequency === this.CODE_FREQUENCY[nrSystem][i]) {
@@ -42,7 +42,7 @@ class UPCEReader extends EANReader {
         return false;
     };
 
-    _convertToUPCA(result: Array<number>) {
+    protected _convertToUPCA(result: Array<number>) {
         let upca = [result[0]];
         const lastDigit = result[result.length - 2];
 

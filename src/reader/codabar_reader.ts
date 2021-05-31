@@ -32,7 +32,7 @@ class NewCodabarReader extends BarcodeReader {
     _counters: Array<number> = [];
     FORMAT = 'codabar';
 
-    _computeAlternatingThreshold(offset: number, end: number) {
+    protected _computeAlternatingThreshold(offset: number, end: number) {
         let min = Number.MAX_VALUE;
         let max = 0;
         let counter = 0;
@@ -50,7 +50,7 @@ class NewCodabarReader extends BarcodeReader {
         return ((min + max) / 2.0) | 0;
     };
 
-    _toPattern(offset: number) {
+    protected _toPattern(offset: number) {
         const numCounters = 7;
         const end = offset + numCounters;
 
@@ -76,7 +76,7 @@ class NewCodabarReader extends BarcodeReader {
         return pattern;
     };
 
-    _isStartEnd(pattern: number) {
+    protected _isStartEnd(pattern: number) {
         for (let i = 0; i < START_END.length; i++) {
             if (START_END[i] === pattern) {
                 return true;
@@ -85,7 +85,7 @@ class NewCodabarReader extends BarcodeReader {
         return false;
     };
 
-    _sumCounters(start: number, end: number) {
+    protected _sumCounters(start: number, end: number) {
         let sum = 0;
 
         for (let i = start; i < end; i++) {
@@ -94,7 +94,7 @@ class NewCodabarReader extends BarcodeReader {
         return sum;
     };
 
-    _findStart(): BarcodePosition | null {
+    protected _findStart(): BarcodePosition | null {
         let start = this._nextUnset(this._row);
         let end = start;
 
@@ -115,7 +115,7 @@ class NewCodabarReader extends BarcodeReader {
         return null;
     }
 
-    _patternToChar(pattern: number) {
+    protected _patternToChar(pattern: number) {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
             if (CHARACTER_ENCODINGS[i] === pattern) {
                 return String.fromCharCode(ALPHABET[i]);
@@ -124,7 +124,7 @@ class NewCodabarReader extends BarcodeReader {
         return null;
     };
 
-    _calculatePatternLength(offset: number) {
+    protected _calculatePatternLength(offset: number) {
         let sum = 0;
 
         for (let i = offset; i < offset + 7; i++) {
@@ -134,7 +134,7 @@ class NewCodabarReader extends BarcodeReader {
         return sum;
     };
 
-    _verifyWhitespace(startCounter: number, endCounter: number) {
+    protected _verifyWhitespace(startCounter: number, endCounter: number) {
         if ((startCounter - 1 <= 0)
             || this._counters[startCounter - 1] >= (this._calculatePatternLength(startCounter) / 2.0)) {
             if ((endCounter + 8 >= this._counters.length)
@@ -145,7 +145,7 @@ class NewCodabarReader extends BarcodeReader {
         return false;
     };
 
-    _charToPattern(char: string) {
+    protected _charToPattern(char: string) {
         const charCode = char.charCodeAt(0);
 
         for (let i = 0; i < ALPHABET.length; i++) {
@@ -156,7 +156,7 @@ class NewCodabarReader extends BarcodeReader {
         return 0x0;
     };
 
-    _thresholdResultPattern(result: ReadonlyArray<string>, startCounter: number) {
+    protected _thresholdResultPattern(result: ReadonlyArray<string>, startCounter: number) {
         const categorization: Threshold = {
                 space: {
                     narrow: { size: 0, counts: 0, min: 0, max: Number.MAX_VALUE },
@@ -193,7 +193,7 @@ class NewCodabarReader extends BarcodeReader {
         return categorization;
     };
 
-    _validateResult(result: ReadonlyArray<string>, startCounter: number) {
+    protected _validateResult(result: ReadonlyArray<string>, startCounter: number) {
         const thresholds = this._thresholdResultPattern(result, startCounter);
         let pos = startCounter;
         let pattern: number;
@@ -214,7 +214,7 @@ class NewCodabarReader extends BarcodeReader {
         return true;
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
 
         this._counters = this._fillCounters();
         start = this._findStart();

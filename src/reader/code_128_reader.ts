@@ -123,7 +123,7 @@ class Code128Reader extends BarcodeReader {
     FORMAT = 'code_128';
     MODULE_INDICES = { bar: [0, 2, 4], space: [1, 3, 5] };
 
-    _decodeCode(start: number, correction?: BarcodeCorrection) {
+    protected _decodeCode(start: number, correction?: BarcodeCorrection): BarcodeInfo | null {
         const bestMatch = {
             error: Number.MAX_VALUE,
             code: -1,
@@ -177,13 +177,13 @@ class Code128Reader extends BarcodeReader {
         return null;
     };
 
-    _correct(counter: Array<number>, correction: BarcodeCorrection) {
+    protected _correct(counter: Array<number>, correction: BarcodeCorrection) {
         this._correctBars(counter, correction.bar, this.MODULE_INDICES.bar);
         this._correctBars(counter, correction.space, this.MODULE_INDICES.space);
     };
 
     // TODO: _findStart and decodeCode share similar code, can we re-use some?
-    _findStart() {
+    protected _findStart(): BarcodeInfo | null {
         const counter = [0, 0, 0, 0, 0, 0];
         const offset = this._nextSet(this._row);
         const bestMatch = {
@@ -240,7 +240,7 @@ class Code128Reader extends BarcodeReader {
         return null;
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
         const startInfo = this._findStart();
         if (startInfo === null) {
             return null;
@@ -262,8 +262,8 @@ class Code128Reader extends BarcodeReader {
             start: startInfo.start,
             end: startInfo.end,
             correction: {
-                bar: startInfo.correction.bar,
-                space: startInfo.correction.space,
+                bar: startInfo.correction!.bar,
+                space: startInfo.correction!.space,
             },
         };
         const decodedCodes = [];
@@ -421,7 +421,7 @@ class Code128Reader extends BarcodeReader {
         };
     };
 
-    _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodeInfo | null {
+    protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodeInfo | null {
 
         var self = this,
             trailingWhitespaceEnd;
@@ -436,7 +436,7 @@ class Code128Reader extends BarcodeReader {
     };
 
 
-    calculateCorrection(expected: ReadonlyArray<number>, normalized: ReadonlyArray<number>, indices: ReadonlyArray<number>): number {
+    public calculateCorrection(expected: ReadonlyArray<number>, normalized: ReadonlyArray<number>, indices: ReadonlyArray<number>): number {
         var length = indices.length,
             sumNormalized = 0,
             sumExpected = 0;

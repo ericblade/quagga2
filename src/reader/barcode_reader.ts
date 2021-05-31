@@ -55,7 +55,7 @@ export abstract class BarcodeReader {
     // TODO: should add ALPHABETH_STRING, ALPHABET, CHARACTER_ENCODINGS to base class, if they
     // are useful in most readers.
 
-    abstract _decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
+    public abstract decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
 
     static get Exception() {
         return {
@@ -75,14 +75,14 @@ export abstract class BarcodeReader {
         return this;
     }
 
-    _nextUnset(line: ReadonlyArray<number>, start: number = 0): number {
+    protected _nextUnset(line: ReadonlyArray<number>, start: number = 0): number {
         for (let i = start; i < line.length; i++) {
             if (!line[i]) return i;
         }
         return line.length;
     }
 
-    _matchPattern(counter: ReadonlyArray<number>, code: ReadonlyArray<number>, maxSingleError?: number): number {
+    protected _matchPattern(counter: ReadonlyArray<number>, code: ReadonlyArray<number>, maxSingleError?: number): number {
         let error = 0;
         let singleError = 0;
         let sum = 0;
@@ -115,14 +115,14 @@ export abstract class BarcodeReader {
         return error / modulo;
     }
 
-    _nextSet(line: ReadonlyArray<number>, offset: number = 0) {
+    protected _nextSet(line: ReadonlyArray<number>, offset: number = 0) {
         for (let i = offset; i < line.length; i++) {
             if (line[i]) return i;
         }
         return line.length;
     }
 
-    _correctBars(counter: Array<number>, correction: number, indices: Array<number>) {
+    protected _correctBars(counter: Array<number>, correction: number, indices: Array<number>) {
         let length = indices.length;
         let tmp = 0;
         while (length--) {
@@ -133,15 +133,15 @@ export abstract class BarcodeReader {
         }
     }
 
-    decodePattern(pattern: Array<number>) {
+    public decodePattern(pattern: Array<number>) {
         // console.warn('* decodePattern', pattern);
         this._row = pattern;
         // console.warn('* decodePattern calling decode', typeof this, this.constructor, this.FORMAT, JSON.stringify(this));
-        let result = this._decode();
+        let result = this.decode();
         // console.warn('* first result=', result);
         if (result === null) {
             this._row.reverse();
-            result = this._decode();
+            result = this.decode();
             // console.warn('* reversed result=', result);
             if (result) {
                 result.direction = BarcodeDirection.Reverse;
@@ -158,7 +158,7 @@ export abstract class BarcodeReader {
         return result;
     }
 
-    _matchRange(start: number, end: number, value: number) {
+    protected _matchRange(start: number, end: number, value: number) {
         var i;
         start = start < 0 ? 0 : start;
         for (i = start; i < end; i++) {
@@ -169,7 +169,7 @@ export abstract class BarcodeReader {
         return true;
     }
 
-    _fillCounters(offset: number = this._nextUnset(this._row), end: number = this._row.length, isWhite: boolean = true) {
+    protected _fillCounters(offset: number = this._nextUnset(this._row), end: number = this._row.length, isWhite: boolean = true) {
         const counters: Array<number> = [];
         let counterPos = 0;
         counters[counterPos] = 0;
@@ -185,7 +185,7 @@ export abstract class BarcodeReader {
         return counters;
     }
 
-    _toCounters(start: number, counters: Uint16Array | Array<number>) {
+    protected _toCounters(start: number, counters: Uint16Array | Array<number>) {
         const numCounters = counters.length;
         const end = this._row.length;
         let isWhite = !this._row[start];

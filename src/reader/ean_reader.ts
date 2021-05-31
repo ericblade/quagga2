@@ -42,7 +42,8 @@ class EANReader extends BarcodeReader {
     constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         super(merge({ supplements: [] }, config), supplements);
     }
-    _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite: boolean, tryHarder: boolean): BarcodePosition | null {
+
+    protected _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite: boolean, tryHarder: boolean): BarcodePosition | null {
         const counter = new Array<number>(pattern.length).fill(0);
         const bestMatch: BarcodePosition = {
             error: Number.MAX_VALUE,
@@ -96,7 +97,7 @@ class EANReader extends BarcodeReader {
     }
 
     // TODO: findPattern and decodeCode appear to share quite similar code, can it be reduced?
-    _decodeCode(start: number, coderange?: number): BarcodeInfo | null {
+    protected _decodeCode(start: number, coderange?: number): BarcodeInfo | null {
         // console.warn('* decodeCode', start, coderange);
         const counter = [0, 0, 0, 0];
         const offset = start;
@@ -298,7 +299,7 @@ class EANReader extends BarcodeReader {
         for (let i = 0; i < this.supplements.length; i++) {
             // console.warn('* extensions loop', i, this.supplements[i], this.supplements[i]._decode);
             try {
-                let result = this.supplements[i]._decode(this._row, startInfo.end);
+                let result = this.supplements[i].decode(this._row, startInfo.end);
                 // console.warn('* decode result=', result);
                 if (result !== null) {
                     return {
@@ -319,7 +320,7 @@ class EANReader extends BarcodeReader {
         return null;
     }
 
-    _decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null {
         // console.warn('* decode', row);
         // console.warn('* decode', start);
         const result = new Array<number>();
