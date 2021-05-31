@@ -108,6 +108,338 @@ export class SubImage {
 
 export type QuaggaImageData = Array<number>;
 
+export type BarcodeReaderType = string;
+
+export interface BarcodeReaderConfig {
+    normalizeBarSpaceWidth?: boolean,
+    supplements?: Array<BarcodeReaderType>,
+}
+
+export enum BarcodeDirection {
+    Forward = 1,
+    Reverse = -1
+}
+type BarcodeFormat = string;
+
+export interface BarcodeCorrection {
+    bar: number;
+    space: number;
+}
+
+export interface BarcodePosition {
+    start: number;
+    startCounter?: number;
+    end: number;
+    endCounter?: number;
+    error?: number;
+}
+
+export interface BarcodeInfo extends BarcodePosition {
+    code: number;
+    correction?: BarcodeCorrection;
+}
+
+export interface Barcode {
+    code: string;
+    codeset?: number;
+    correction?: BarcodeCorrection;
+    decodedCodes?: Array<string | BarcodeInfo | BarcodePosition>;
+    direction?: BarcodeDirection;
+    end: number;
+    endInfo?: BarcodePosition;
+    format: BarcodeFormat;
+    start: number;
+    startInfo: BarcodePosition;
+    supplement?: Barcode;
+}
+
+export interface ThresholdSize {
+    size: number;
+    counts: number;
+    min: number;
+    max: number;
+}
+
+export interface Threshold {
+    space: {
+        narrow: ThresholdSize;
+        wide: ThresholdSize;
+    };
+    bar: {
+        narrow: ThresholdSize;
+        wide: ThresholdSize;
+    };
+}
+
+export declare module Readers {
+    export abstract class BarcodeReader {
+        _row: Array<number>;
+        SINGLE_CODE_ERROR: number;
+        FORMAT: BarcodeFormat;
+        CONFIG_KEYS: BarcodeReaderConfig;
+
+        static get Exception(): {
+            StartNotFoundException: string;
+            CodeNotFoundException: string;
+            PatternNotFoundException: string;
+        };
+
+        constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
+
+        abstract decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
+
+        decodePattern(pattern: Array<number>): Barcode | null;
+
+        protected _nextUnset(line: ReadonlyArray<number>, start?: number): number;
+
+        protected _matchPattern(counter: ReadonlyArray<number>, code: ReadonlyArray<number>, maxSingleError?: number): number;
+
+        protected _nextSet(line: ReadonlyArray<number>, offset?: number): number;
+
+        protected _correctBars(counter: Array<number>, correction: number, indices: Array<number>): void;
+
+        protected _matchRange(start: number, end: number, value: number): boolean;
+
+        protected _fillCounters(offset?: number, end?: number, isWhite?: boolean): number[];
+
+        protected _toCounters(start: number, counters: Uint16Array | Array<number>): number[] | Uint16Array;
+    }
+
+    export class TwoOfFiveReader extends BarcodeReader {
+        FORMAT: string;
+        SINGLE_CODE_ERROR: number;
+        AVG_CODE_ERROR: number;
+        
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        protected _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite?: boolean, tryHarder?: boolean): BarcodeInfo | null;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodePosition | null;
+
+        protected _findEnd(): BarcodePosition | null;
+
+        protected _verifyCounterLength(counters: Array<number>): boolean;
+
+        protected _decodeCode(counter: ReadonlyArray<number>): BarcodeInfo | null;
+
+        protected _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo | BarcodePosition>): BarcodeInfo | null;
+    }
+
+    export class NewCodabarReader extends BarcodeReader {
+        FORMAT: string;
+        
+        decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null;
+
+        protected _computeAlternatingThreshold(offset: number, end: number): number;
+
+        protected _toPattern(offset: number): number;
+
+        protected _isStartEnd(pattern: number): boolean;
+
+        protected _sumCounters(start: number, end: number): number;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _patternToChar(pattern: number): string | null;
+
+        protected _calculatePatternLength(offset: number): number;
+
+        protected _verifyWhitespace(startCounter: number, endCounter: number): boolean;
+
+        protected _charToPattern(char: string): number;
+
+        protected _thresholdResultPattern(result: ReadonlyArray<string>, startCounter: number): Threshold;
+
+        protected _validateResult(result: ReadonlyArray<string>, startCounter: number): boolean;
+    }
+
+    export class Code128Reader extends BarcodeReader {
+        CODE_SHIFT: number;
+        CODE_C: number;
+        CODE_B: number;
+        CODE_A: number;
+        START_CODE_A: number;
+        START_CODE_B: number;
+        START_CODE_C: number;
+        STOP_CODE: number;
+        CODE_PATTERN: number[][];
+        SINGLE_CODE_ERROR: number;
+        AVG_CODE_ERROR: number;
+        FORMAT: string;
+        MODULE_INDICES: {
+            bar: number[];
+            space: number[];
+        };
+
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        calculateCorrection(expected: ReadonlyArray<number>, normalized: ReadonlyArray<number>, indices: ReadonlyArray<number>): number;
+
+        protected _decodeCode(start: number, correction?: BarcodeCorrection): BarcodeInfo | null;
+
+        protected _correct(counter: Array<number>, correction: BarcodeCorrection): void;
+
+        protected _findStart(): BarcodeInfo | null;
+
+        protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodeInfo | null;
+    }
+
+    export class Code32Reader extends Code39Reader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        protected _decodeCode32(code: string): string | null;
+
+        protected _checkChecksum(code: string): boolean;
+    }
+
+    export class Code39Reader extends BarcodeReader {
+        FORMAT: string;
+        
+        decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _toPattern(counters: Uint16Array): number;
+
+        protected _findNextWidth(counters: Uint16Array, current: number): number;
+
+        protected _patternToChar(pattern: number): string | null;
+
+        protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean;
+    }
+
+    export class Code39VINReader extends Code39Reader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        protected _checkChecksum(code: string): boolean;
+    }
+
+    export class Code93Reader extends BarcodeReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null;
+
+        protected _patternToChar(pattern: number): string | null;
+
+        protected _toPattern(counters: Uint16Array): number;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _verifyEnd(lastStart: number, nextStart: number): boolean;
+
+        protected _decodeExtended(charArray: Array<string>): string[] | null;
+
+        protected _matchCheckChar(charArray: Array<string>, index: number, maxWeight: number): boolean;
+
+        protected _verifyChecksums(charArray: Array<string>): boolean;
+    }
+
+    export class EAN2Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN5Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN8Reader extends EANReader {
+        FORMAT: string;
+
+        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
+    }
+
+    export class EANReader extends BarcodeReader {
+        FORMAT: string;
+        SINGLE_CODE_ERROR: number;
+        STOP_PATTERN: number[];
+
+        constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
+
+        decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
+
+        protected _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite: boolean, tryHarder: boolean): BarcodePosition | null;
+
+        protected _decodeCode(start: number, coderange?: number): BarcodeInfo | null;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
+
+        protected _verifyTrailingWhitespace(endInfo: BarcodePosition): BarcodePosition | null;
+
+        protected _findEnd(offset: number, isWhite: boolean): BarcodePosition | null;
+
+        protected _checksum(result: Array<number>): boolean;
+    }
+
+    export class I2of5Reader extends BarcodeReader {
+        SINGLE_CODE_ERROR: number;
+        AVG_CODE_ERROR: number;
+        START_PATTERN: number[];
+        STOP_PATTERN: number[];
+        CODE_PATTERN: number[][];
+        MAX_CORRECTION_FACTOR: number;
+        FORMAT: string;
+
+        constructor(opts: BarcodeReaderConfig);
+
+        decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
+
+        protected _matchPattern(counter: Array<number>, code: ReadonlyArray<number>): number;
+
+        protected _findPattern(pattern: ReadonlyArray<number>, offset?: number, isWhite?: boolean, tryHarder?: boolean): BarcodePosition | null;
+
+        protected _findStart(): BarcodePosition | null;
+
+        protected _verifyTrailingWhitespace(endInfo: BarcodePosition): BarcodePosition | null;
+
+        protected _findEnd(): BarcodePosition | null;
+
+        protected _decodePair(counterPair: Array<Array<number>>): Array<BarcodeInfo> | null;
+
+        protected _decodeCode(counter: Array<number>): BarcodeInfo | null;
+
+        protected _decodePayload(counters: ReadonlyArray<number>, result: Array<string>, decodedCodes: Array<BarcodeInfo | BarcodePosition>): Array<BarcodeInfo> | null;
+
+        protected _verifyCounterLength(counters: Array<number>): boolean;
+    }
+
+    export class UPCEReader extends EANReader {
+        CODE_FREQUENCY: number[][];
+        STOP_PATTERN: number[];
+        FORMAT: string;
+
+        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
+
+        protected _determineParity(codeFrequency: number, result: Array<number>): boolean;
+
+        protected _convertToUPCA(result: Array<number>): number[];
+
+        protected _checksum(result: Array<number>): boolean;
+
+        protected _findEnd(offset: number, isWhite: boolean): BarcodePosition | null;
+
+        protected _verifyTrailingWhitespace(endInfo: BarcodePosition): BarcodePosition | null;
+    }
+
+    export class UPCReader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;
+    }
+
+}
+
 export interface QuaggaJSStatic {
     /**
      * This method initializes the library for a given

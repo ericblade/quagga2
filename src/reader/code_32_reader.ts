@@ -11,7 +11,7 @@ const code32set = '0123456789BCDFGHJKLMNPQRSTUVWXYZ';
 class Code32Reader extends Code39Reader {
     FORMAT = 'code_32_reader';
 
-    _decodeCode32(code: string) {
+    protected _decodeCode32(code: string) {
         if (/[^0-9BCDFGHJKLMNPQRSTUVWXYZ]/.test(code)) {
             return null;
         }
@@ -27,12 +27,12 @@ class Code32Reader extends Code39Reader {
     }
 
     // TODO (this was todo in original repo, no text was there. sorry.)
-    _checkChecksum(code: string) {
+    protected _checkChecksum(code: string): boolean {
         return !!code;
     }
 
-    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
-        const result = super._decode(row, start);
+    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+        const result = super.decode(row, start);
         if (!result) {
             return null;
         }

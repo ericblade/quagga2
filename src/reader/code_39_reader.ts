@@ -13,7 +13,7 @@ const ASTERISK = 0x094;
 class Code39Reader extends BarcodeReader {
     FORMAT = 'code_39';
 
-    _findStart() {
+    protected _findStart(): BarcodePosition | null {
         const offset = this._nextSet(this._row);
         let patternStart = offset;
         const counter = new Uint16Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -53,7 +53,7 @@ class Code39Reader extends BarcodeReader {
         return null;
     };
 
-    _toPattern(counters: Uint16Array) {
+    protected _toPattern(counters: Uint16Array): number {
         const numCounters = counters.length;
         let maxNarrowWidth = 0;
         let numWideBars = numCounters;
@@ -86,7 +86,7 @@ class Code39Reader extends BarcodeReader {
         return -1;
     };
 
-    _findNextWidth(counters: Uint16Array, current: number) {
+    protected _findNextWidth(counters: Uint16Array, current: number): number {
         let minWidth = Number.MAX_VALUE;
 
         for (let i = 0; i < counters.length; i++) {
@@ -98,7 +98,7 @@ class Code39Reader extends BarcodeReader {
         return minWidth;
     };
 
-    _patternToChar(pattern: number) {
+    protected _patternToChar(pattern: number): string | null {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
             if (CHARACTER_ENCODINGS[i] === pattern) {
                 return String.fromCharCode(ALPHABET[i]);
@@ -107,7 +107,7 @@ class Code39Reader extends BarcodeReader {
         return null;
     };
 
-    _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array) {
+    protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean {
         const patternSize = ArrayHelper.sum(counters);
 
         const trailingWhitespaceEnd = nextStart - lastStart - patternSize;
@@ -117,7 +117,7 @@ class Code39Reader extends BarcodeReader {
         return false;
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         let counters = new Uint16Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
         const result: Array<string> = [];
         start = this._findStart();

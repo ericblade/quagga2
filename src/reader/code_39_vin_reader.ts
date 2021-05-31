@@ -10,14 +10,14 @@ class Code39VINReader extends Code39Reader {
     FORMAT = 'code_39_vin';
 
     // TODO (this was todo in original repo, no text was there. sorry.)
-    _checkChecksum(code: string) {
+    protected _checkChecksum(code: string): boolean {
         return !!code;
     }
 
     // Cribbed from:
     // https://github.com/zxing/zxing/blob/master/core/src/main/java/com/google/zxing/client/result/VINResultParser.java
-    _decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
-        const result = super._decode(row, start);
+    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
+        const result = super.decode(row, start);
         if (!result) {
             return null;
         }

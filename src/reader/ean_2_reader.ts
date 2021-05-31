@@ -4,7 +4,7 @@ import { BarcodePosition, Barcode, BarcodeInfo } from './barcode_reader';
 
 class EAN2Reader extends EANReader {
     FORMAT = 'ean_2';
-    _decode(row?: Array<number>, start?: number): Barcode | null {
+    public decode(row?: Array<number>, start?: number): Barcode | null {
         if (row) {
             this._row = row;
         }

@@ -14,7 +14,7 @@ const ASTERISK = 0x15E;
 
 class Code93Reader extends BarcodeReader {
     FORMAT = 'code_93';
-    _patternToChar(pattern: number) {
+    protected _patternToChar(pattern: number): string | null {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
             if (CHARACTER_ENCODINGS[i] === pattern) {
                 return String.fromCharCode(ALPHABET[i]);
@@ -23,7 +23,7 @@ class Code93Reader extends BarcodeReader {
         return null;
     };
 
-    _toPattern(counters: Uint16Array) {
+    protected _toPattern(counters: Uint16Array): number {
         const numCounters = counters.length;
         const sum = counters.reduce((prev, next) => prev + next, 0);
         let pattern = 0;
@@ -44,7 +44,7 @@ class Code93Reader extends BarcodeReader {
         return pattern;
     };
 
-    _findStart() {
+    protected _findStart(): BarcodePosition | null {
         const offset = this._nextSet(this._row);
         let patternStart = offset;
         const counter = new Uint16Array([0, 0, 0, 0, 0, 0]);
@@ -84,14 +84,14 @@ class Code93Reader extends BarcodeReader {
         return null;
     };
 
-    _verifyEnd(lastStart: number, nextStart: number) {
+    protected _verifyEnd(lastStart: number, nextStart: number): boolean {
         if (lastStart === nextStart || !this._row[nextStart]) {
             return false;
         }
         return true;
     };
 
-    _decodeExtended(charArray: Array<string>) {
+    protected _decodeExtended(charArray: Array<string>): string[] | null {
         const length = charArray.length;
         const result: Array<string> = [];
         for (let i = 0; i < length; i++) {
@@ -154,7 +154,7 @@ class Code93Reader extends BarcodeReader {
         return result;
     };
 
-    _matchCheckChar(charArray: Array<string>, index: number, maxWeight: number) {
+    protected _matchCheckChar(charArray: Array<string>, index: number, maxWeight: number): boolean {
         const arrayToCheck = charArray.slice(0, index);
         const length = arrayToCheck.length;
         const weightedSums = arrayToCheck.reduce((sum, char, i) => {
@@ -167,12 +167,12 @@ class Code93Reader extends BarcodeReader {
         return checkChar === charArray[index].charCodeAt(0);
     };
 
-    _verifyChecksums(charArray: Array<string>) {
+    protected _verifyChecksums(charArray: Array<string>): boolean {
         return this._matchCheckChar(charArray, charArray.length - 2, 20)
             && this._matchCheckChar(charArray, charArray.length - 1, 15);
     };
 
-    _decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
+    public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         start = this._findStart();
         if (!start) {
             return null;

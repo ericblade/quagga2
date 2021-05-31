@@ -29,7 +29,7 @@ function extensionChecksum(result: Array<number>) {
 
 class EAN5Reader extends EANReader {
     FORMAT = 'ean_5';
-    _decode(row?: Array<number>, start?: number): Barcode | null {
+    public decode(row?: Array<number>, start?: number): Barcode | null {
         if (start === undefined) {
             return null;
         }
