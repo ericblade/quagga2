@@ -1,6 +1,7 @@
 import pick from 'lodash/pick';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
 import { MediaTrackConstraintsWithDeprecated, QuaggaJSCameraAccess as CameraAccessType } from '../../type-definitions/quagga.d';
+import { Exception } from '../quagga/Exception';
 
 let streamRef: MediaStream | null;
 
@@ -19,7 +20,7 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
                     window.setTimeout(checkVideo, 500);
                 }
             } else {
-                reject(new Error('Unable to play video stream. Is webcam working?'));
+                reject(new Exception('Unable to play video stream. Is webcam working?', -1)); // TODO: add error code
             }
             attempts--;
         }
