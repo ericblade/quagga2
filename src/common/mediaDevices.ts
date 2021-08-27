@@ -1,18 +1,12 @@
-const ERROR_DESC = 'This may mean that the user has declined camera access, or the browser does not support media APIs. If you are running in iOS, you must use Safari.';
+import { Exception } from '../quagga/Exception';
 
-interface Error {
-    name: string;
-    message: string;
-    stack?: string;
-    code?: number;
-}
+const ERROR_DESC = 'This may mean that the user has declined camera access, or the browser does not support media APIs. If you are running in iOS, you must use Safari.';
 
 export function enumerateDevices(): Promise<Array<MediaDeviceInfo>> {
     try {
         return navigator.mediaDevices.enumerateDevices();
     } catch (err) {
-        const error: Error = new Error(`enumerateDevices is not defined. ${ERROR_DESC}`);
-        error.code = -1;
+        const error: Error = new Exception(`enumerateDevices is not defined. ${ERROR_DESC}`, -1);
         return Promise.reject(error);
     }
 }
@@ -21,8 +15,7 @@ export function getUserMedia(constraints: MediaStreamConstraints): Promise<Media
     try {
         return navigator.mediaDevices.getUserMedia(constraints);
     } catch (err) {
-        const error: Error = new Error(`getUserMedia is not defined. ${ERROR_DESC}`);
-        error.code = -1;
+        const error: Error = new Exception(`getUserMedia is not defined. ${ERROR_DESC}`, -1);
         return Promise.reject(error);
     }
 }

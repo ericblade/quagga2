@@ -11,7 +11,7 @@ describe('CameraAccess (node)', () => {
                 const x = await Quagga.CameraAccess.enumerateVideoDevices();
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch (err) {
+            } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
                 // expect(err.message).to.equal('enumerateDevices is not defined');
                 expect(err.code).to.equal(-1);
             }
@@ -24,7 +24,7 @@ describe('CameraAccess (node)', () => {
                 const x = await Quagga.CameraAccess.request(null, {});
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch (err) {
+            } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
                 // expect(err.message).to.equal('getUserMedia is not defined');
                 expect(err.code).to.equal(-1);
             }
