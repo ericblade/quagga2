@@ -132,7 +132,7 @@ to go. The script exposes the library on the global namespace under `Quagga`.
 
 You can get the `quagga.js` file in the following ways:
 
-By [installing the npm module](https://github.com/SudhamJayanthi/quagga2#npm) and copying the `quagga.js` file from the `dist` folder.
+By [installing the npm module](https://github.com/ericblade/quagga2#npm) and copying the `quagga.js` file from the `dist` folder.
 
 <p align="center">(OR)</p>
 
