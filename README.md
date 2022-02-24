@@ -19,6 +19,10 @@ node functionality.
 - [Configuration](#configobject)
 - [Tips & Tricks](#tipsandtricks)
 
+## Using React / Redux?
+
+Please see also https://github.com/ericblade/quagga2-react-example/ and https://github.com/ericblade/quagga2-redux-middleware/
+
 ## What is QuaggaJS?
 
 QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real-
