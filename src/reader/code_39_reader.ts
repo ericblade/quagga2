@@ -51,7 +51,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _toPattern(counters: Uint16Array): number {
         const numCounters = counters.length;
@@ -84,7 +84,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return -1;
-    };
+    }
 
     protected _findNextWidth(counters: Uint16Array, current: number): number {
         let minWidth = Number.MAX_VALUE;
@@ -96,7 +96,7 @@ class Code39Reader extends BarcodeReader {
         }
 
         return minWidth;
-    };
+    }
 
     protected _patternToChar(pattern: number): string | null {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
@@ -105,7 +105,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean {
         const patternSize = ArrayHelper.sum(counters);
@@ -115,7 +115,7 @@ class Code39Reader extends BarcodeReader {
             return true;
         }
         return false;
-    };
+    }
 
     public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         let counters = new Uint16Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
@@ -162,7 +162,6 @@ class Code39Reader extends BarcodeReader {
             decodedCodes: result,
             format: this.FORMAT,
         };
-
     }
 }
 

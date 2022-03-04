@@ -1,4 +1,5 @@
 import Code39Reader from './code_39_reader';
+
 import { BarcodePosition, Barcode } from './barcode_reader';
 
 const patterns = {
@@ -37,7 +38,7 @@ class Code32Reader extends Code39Reader {
             return null;
         }
 
-        var code = result.code;
+        let code = result.code;
 
         if (!code) {
             return null;
@@ -49,16 +50,15 @@ class Code32Reader extends Code39Reader {
             return null;
         }
 
-        var code32 = this._decodeCode32(code);
-        
+        const code32 = this._decodeCode32(code);
+
         if (!code32) {
             return null;
         }
-        
+
         result.code = code32;
         return result;
-
-    };
+    }
 }
 
 export default Code32Reader;

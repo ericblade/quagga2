@@ -252,10 +252,13 @@ export default {
             );
         }
 
-        function decodeFromImage(imageWrapper) {
+        async function decodeFromImage(imageWrapper) {
             let result = null;
-            for (let i = 0; i < _barcodeReaders.length && result === null; i++) {
-                result = _barcodeReaders[i].decodeImage ? _barcodeReaders[i].decodeImage(imageWrapper) : null;
+            for (const reader of _barcodeReaders) {
+                result = await reader.decodeFromImage(imageWrapper);
+                if (result) {
+                    break;
+                }
             }
             return result;
         }
@@ -327,14 +330,12 @@ export default {
                     }
                 }
 
-                if (multiple) {
-                    return {
-                        barcodes,
-                    };
-                }
+                return {
+                    barcodes,
+                };
             },
-            decodeFromImage(inputImageWrapper) {
-                const result = decodeFromImage(inputImageWrapper);
+            async decodeFromImage(imageWrapperIn) {
+                const result = await decodeFromImage(imageWrapperIn);
                 return result;
             },
             registerReader(name, reader) {
