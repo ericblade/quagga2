@@ -1,6 +1,8 @@
 quagga2
 =======
 
+[![Rolling Versions](https://img.shields.io/badge/Rolling%20Versions-Enabled-brightgreen)](https://rollingversions.com/ericblade/quagga2)
+
 [![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 [![Rate on Openbase](https://badges.openbase.io/js/rating/@ericblade/quagga2.svg)](https://openbase.io/js/@ericblade/quagga2?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
@@ -125,7 +127,7 @@ Currently, the full functionality is only available through the browser. When
 using QuaggaJS within __node__, only file-based decoding is available. See the
 example for [node_examples](#node-example).
 
-### Using with script tag 
+### Using with script tag
 
 You can simply include `quagga.js` in your project and you are ready
 to go. The script exposes the library on the global namespace under `Quagga`.
@@ -140,7 +142,7 @@ By [installing the npm module](https://github.com/ericblade/quagga2#npm) and cop
 
 <p align="center">(OR)</p>
 
-You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details) 
+You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details)
 
 <p align="center">(OR)</p>
 
