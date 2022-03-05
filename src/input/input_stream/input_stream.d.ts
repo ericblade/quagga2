@@ -7,7 +7,7 @@ export type EventHandlerList = {
 };
 
 export interface InputStream {
-    addEventListener(event: string, f: (args?: any) => void, bool: boolean): void;
+    addEventListener(event: string, f: (args?: any) => void, bool?: boolean): void;
     clearEventHandlers(): void;
     ended(): boolean;
     getCanvasSize(): XYSize;
@@ -27,7 +27,7 @@ export interface InputStream {
     setInputStream(config: any): void;
     setTopRight(topRight: Point): void;
     setWidth(width: number): void;
-    trigger(eventName: any, args: any): void;
+    trigger(eventName: any, args?: any): void;
 }
 
 type VideoStreamFactory = (video: HTMLVideoElement) => InputStream;
