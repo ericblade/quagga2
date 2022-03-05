@@ -1,8 +1,9 @@
-import BarcodeReader, { BarcodePosition, Barcode } from './barcode_reader';
+/* eslint-disable class-methods-use-this */
 import ArrayHelper from '../common/array_helper';
+import BarcodeReader, { type BarcodePosition, type Barcode } from './barcode_reader';
 
 const ALPHABETH_STRING = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%';
-const ALPHABET = new Uint16Array([...ALPHABETH_STRING].map(char => char.charCodeAt(0)));
+const ALPHABET = new Uint16Array([...ALPHABETH_STRING].map((char) => char.charCodeAt(0)));
 const CHARACTER_ENCODINGS = new Uint16Array([
     0x034, 0x121, 0x061, 0x160, 0x031, 0x130, 0x070, 0x025, 0x124, 0x064, 0x109, 0x049,
     0x148, 0x019, 0x118, 0x058, 0x00D, 0x10C, 0x04C, 0x01C, 0x103, 0x043, 0x142, 0x013, 0x112, 0x052, 0x007, 0x106,
@@ -21,6 +22,7 @@ class Code39Reader extends BarcodeReader {
         let isWhite = false;
 
         for (let i = offset; i < this._row.length; i++) {
+            // eslint-disable-next-line no-bitwise
             if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
             } else {
@@ -51,7 +53,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _toPattern(counters: Uint16Array): number {
         const numCounters = counters.length;
@@ -65,6 +67,7 @@ class Code39Reader extends BarcodeReader {
             let pattern = 0;
             for (let i = 0; i < numCounters; i++) {
                 if (counters[i] > maxNarrowWidth) {
+                    // eslint-disable-next-line no-bitwise
                     pattern |= 1 << (numCounters - 1 - i);
                     numWideBars++;
                     wideBarWidth += counters[i];
@@ -84,7 +87,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return -1;
-    };
+    }
 
     protected _findNextWidth(counters: Uint16Array, current: number): number {
         let minWidth = Number.MAX_VALUE;
@@ -96,7 +99,7 @@ class Code39Reader extends BarcodeReader {
         }
 
         return minWidth;
-    };
+    }
 
     protected _patternToChar(pattern: number): string | null {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
@@ -105,7 +108,7 @@ class Code39Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean {
         const patternSize = ArrayHelper.sum(counters);
@@ -115,12 +118,12 @@ class Code39Reader extends BarcodeReader {
             return true;
         }
         return false;
-    };
+    }
 
-    public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
+    public decode(): Barcode | null {
         let counters = new Uint16Array([0, 0, 0, 0, 0, 0, 0, 0, 0]);
         const result: Array<string> = [];
-        start = this._findStart();
+        const start = this._findStart();
 
         if (!start) {
             return null;
@@ -162,7 +165,6 @@ class Code39Reader extends BarcodeReader {
             decodedCodes: result,
             format: this.FORMAT,
         };
-
     }
 }
 

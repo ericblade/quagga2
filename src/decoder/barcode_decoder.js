@@ -1,19 +1,21 @@
-import Bresenham from './bresenham';
+/* eslint-disable import/no-cycle */
+
 import ImageDebug from '../common/image_debug';
+import TwoOfFiveReader from '../reader/2of5_reader';
+import CodabarReader from '../reader/codabar_reader';
 import Code128Reader from '../reader/code_128_reader';
-import EANReader from '../reader/ean_reader';
+import Code32Reader from '../reader/code_32_reader';
 import Code39Reader from '../reader/code_39_reader';
 import Code39VINReader from '../reader/code_39_vin_reader';
-import CodabarReader from '../reader/codabar_reader';
-import UPCReader from '../reader/upc_reader';
-import EAN8Reader from '../reader/ean_8_reader';
+import Code93Reader from '../reader/code_93_reader';
 import EAN2Reader from '../reader/ean_2_reader';
 import EAN5Reader from '../reader/ean_5_reader';
-import UPCEReader from '../reader/upc_e_reader';
+import EAN8Reader from '../reader/ean_8_reader';
+import EANReader from '../reader/ean_reader';
 import I2of5Reader from '../reader/i2of5_reader';
-import TwoOfFiveReader from '../reader/2of5_reader';
-import Code93Reader from '../reader/code_93_reader';
-import Code32Reader from '../reader/code_32_reader';
+import UPCEReader from '../reader/upc_e_reader';
+import UPCReader from '../reader/upc_reader';
+import Bresenham from './bresenham';
 
 const READERS = {
     code_128_reader: Code128Reader,
@@ -252,10 +254,15 @@ export default {
             );
         }
 
-        function decodeFromImage(imageWrapper) {
+        async function decodeFromImage(imageWrapper) {
             let result = null;
-            for (let i = 0; i < _barcodeReaders.length && result === null; i++) {
-                result = _barcodeReaders[i].decodeImage ? _barcodeReaders[i].decodeImage(imageWrapper) : null;
+            for (const reader of _barcodeReaders) {
+                if (reader.decodeImage) {
+                    result = await reader.decodeImage(imageWrapper);
+                    if (result) {
+                        break;
+                    }
+                }
             }
             return result;
         }
@@ -327,14 +334,12 @@ export default {
                     }
                 }
 
-                if (multiple) {
-                    return {
-                        barcodes,
-                    };
-                }
+                return {
+                    barcodes,
+                };
             },
-            decodeFromImage(inputImageWrapper) {
-                const result = decodeFromImage(inputImageWrapper);
+            async decodeFromImage(imageWrapperIn) {
+                const result = await decodeFromImage(imageWrapperIn);
                 return result;
             },
             registerReader(name, reader) {

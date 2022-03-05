@@ -1,5 +1,6 @@
+/* eslint-disable class-methods-use-this */
+import { Barcode } from './barcode_reader';
 import Code39Reader from './code_39_reader';
-import { BarcodePosition, Barcode } from './barcode_reader';
 
 const patterns = {
     IOQ: /[IOQ]/g,
@@ -16,13 +17,13 @@ class Code39VINReader extends Code39Reader {
 
     // Cribbed from:
     // https://github.com/zxing/zxing/blob/master/core/src/main/java/com/google/zxing/client/result/VINResultParser.java
-    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
-        const result = super.decode(row, start);
+    public decode(): Barcode | null {
+        const result = super.decode();
         if (!result) {
             return null;
         }
 
-        var code = result.code;
+        let { code } = result;
 
         if (!code) {
             return null;
@@ -43,7 +44,7 @@ class Code39VINReader extends Code39Reader {
 
         result.code = code;
         return result;
-    };
+    }
 }
 
 export default Code39VINReader;

@@ -1,10 +1,11 @@
 {
     "extends": [
+        "airbnb-base",
         "eslint:recommended",
-        "plugin:@typescript-eslint/eslint-recommended",
-        "plugin:@typescript-eslint/recommended",
+        // "plugin:@typescript-eslint/eslint-recommended",
+        // "plugin:@typescript-eslint/recommended",
         // "plugin:@typescript-eslint/recommended-requiring-type-checking",
-        "airbnb-typescript"
+        "airbnb-typescript-base"
     ],
     "parserOptions": {
         "ecmaVersion": 2019,
@@ -40,6 +41,7 @@
         "quotes": [ "error", "single" ],
         "strict": "off",
         "wrap-iife": [ "error", "outside" ],
+        "import/no-named-as-default": "off",
         // STYLE
         "brace-style": ["error", "1tbs"],
         "comma-spacing": ["error", { "before": false, "after": true }],
@@ -66,7 +68,6 @@
         "semi": ["error", "always"],
         "space-infix-ops": "error",
         "yoda": "error",
-        "linebreak-style": "off",
-        "react/static-property-placement": "off"
+        "linebreak-style": "off"
     }
 }

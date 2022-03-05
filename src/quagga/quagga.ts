@@ -193,14 +193,14 @@ export default class Quagga {
         }
     }
 
-    locateAndDecode(): void {
+    async locateAndDecode(): Promise<void> {
         const boxes = this.getBoundingBoxes();
         if (boxes) {
-            const decodeResult = this.context.decoder.decodeFromBoundingBoxes(boxes) || {};
+            const decodeResult = (await this.context.decoder.decodeFromBoundingBoxes(boxes)) || {};
             decodeResult.boxes = boxes;
             this.publishResult(decodeResult, this.context.inputImageWrapper?.data);
         } else {
-            const imageResult = this.context.decoder.decodeFromImage(this.context.inputImageWrapper);
+            const imageResult = await this.context.decoder.decodeFromImage(this.context.inputImageWrapper);
             if (imageResult) {
                 this.publishResult(imageResult, this.context.inputImageWrapper?.data);
             } else {
