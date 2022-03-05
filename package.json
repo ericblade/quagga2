@@ -173,10 +173,5 @@
     "sourceMap": false,
     "instrument": false
   },
-  "greenkeeper": {
-    "ignore": [
-      "mocha",
-      "@types/mocha"
-    ]
-  }
+  "versioning": "ALWAYS_INCREASING"
 }
