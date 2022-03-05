@@ -173,5 +173,6 @@
     "sourceMap": false,
     "instrument": false
   },
-  "versioningMode": "ALWAYS_INCREASING"
+  "versioningMode": "ALWAYS_INCREASING",
+  "versioning": "ALWAYS_INCREASING"
 }
