@@ -16,6 +16,7 @@ describe('Array Helper', () => {
     describe('shuffle', () => {
         let MathStub: sinon.SinonStub;
         before(() => {
+            // presumably, this makes the shuffle deterministic so it can be tested
             MathStub = sinon.stub(Math as any, 'random').returns(0.5); // TODO: remove as any, and fix this type def issue
         });
 

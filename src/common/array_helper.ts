@@ -1,29 +1,24 @@
-import { TypedArray } from "../../type-definitions/quagga";
+/* eslint-disable no-param-reassign */
+import { TypedArray } from '../../type-definitions/quagga';
 
 export default {
-    init: function(arr: TypedArray | Array<any>, val: any) {
-        // arr.fill(val);
-        let l = arr.length;
-        while (l--) {
-            arr[l] = val;
-        }
+    init(arr: TypedArray | Array<number>, val: number) {
+        arr.fill(val);
     },
 
     /**
      * Shuffles the content of an array
      */
-    shuffle: function(arr: Array<number>) {
-        let i = arr.length - 1;
-        for (i; i >= 0; i--) {
-            const j = Math.floor(Math.random() * i);
-            const x = arr[i];
-            arr[i] = arr[j];
-            arr[j] = x;
+    shuffle(arr: Array<number>) {
+        // Durstenfeld shuffle algorithm
+        // https://stackoverflow.com/questions/2450954/how-to-randomize-shuffle-a-javascript-array
+        for (let i = arr.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [arr[i], arr[j]] = [arr[j], arr[i]];
         }
-        return arr;
     },
 
-    toPointList: function(arr: Array<Array<number>>) {
+    toPointList(arr: Array<Array<number>>) {
         const rows = arr.reduce((p, n) => {
             const row = `[${n.join(',')}]`;
             p.push(row);
@@ -35,7 +30,8 @@ export default {
     /**
      * returns the elements which's score is bigger than the threshold
      */
-    threshold: function(arr: Array<number>, threshold: number, scoreFunc: ((score: number) => number)) {
+    // eslint-disable-next-line no-unused-vars
+    threshold(arr: Array<number>, threshold: number, scoreFunc: ((score: number) => number)) {
         const queue = arr.reduce((prev: Array<number>, next) => {
             if (scoreFunc.apply(arr, [next]) >= threshold) {
                 prev.push(next);
@@ -45,7 +41,7 @@ export default {
         return queue;
     },
 
-    maxIndex: function(arr: Array<any>) {
+    maxIndex(arr: Array<number>) {
         let max = 0;
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] > arr[max]) {
@@ -55,7 +51,7 @@ export default {
         return max;
     },
 
-    max: function(arr: Array<any>) {
+    max(arr: Array<number>) {
         let max = 0;
         for (let i = 0; i < arr.length; i++) {
             if (arr[i] > max) {
@@ -65,8 +61,8 @@ export default {
         return max;
     },
 
-    sum: function(arr: Array<any> | TypedArray): number {
-        let length = arr.length;
+    sum(arr: Array<number> | TypedArray): number {
+        let { length } = arr;
         let sum = 0;
 
         while (length--) {
