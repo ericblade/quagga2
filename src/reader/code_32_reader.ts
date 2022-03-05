@@ -1,7 +1,5 @@
 import Code39Reader from './code_39_reader';
 
-import { BarcodePosition, Barcode } from './barcode_reader';
-
 const patterns = {
     AEIO: /[AEIO]/g,
     AZ09: /[A-Z0-9]/,
@@ -20,7 +18,7 @@ class Code32Reader extends Code39Reader {
         for (let i = 0; i < code.length; i++) {
             res = res * 32 + code32set.indexOf(code[i]);
         }
-        let code32 = '' + res;
+        let code32 = `${res}`;
         if (code32.length < 9) {
             code32 = ('000000000' + code32).slice(-9);
         }
@@ -32,8 +30,8 @@ class Code32Reader extends Code39Reader {
         return !!code;
     }
 
-    public decode(row?: Array<number>, start?: BarcodePosition): Barcode | null {
-        const result = super.decode(row, start);
+    public decode() {
+        const result = super.decode();
         if (!result) {
             return null;
         }
