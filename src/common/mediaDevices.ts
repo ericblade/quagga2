@@ -1,4 +1,4 @@
-import { Exception } from '../quagga/Exception';
+import Exception from '../quagga/Exception';
 
 const ERROR_DESC = 'This may mean that the user has declined camera access, or the browser does not support media APIs. If you are running in iOS, you must use Safari.';
 

@@ -1,7 +1,13 @@
+// TODO: when this file was written years ago, HTMLMediaElement.play() did not return a useful value
+// to let us know when the video started playing.  Now, it does.  So, we shouldn't need to run this
+// odd waitForVideo() function that polls to see if the video has started.
 import pick from 'lodash/pick';
+import type {
+    MediaTrackConstraintsWithDeprecated,
+    QuaggaJSCameraAccess as CameraAccessType,
+} from '../../type-definitions/quagga.d';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
-import { MediaTrackConstraintsWithDeprecated, QuaggaJSCameraAccess as CameraAccessType } from '../../type-definitions/quagga.d';
-import { Exception } from '../quagga/Exception';
+import Exception from '../quagga/Exception';
 
 let streamRef: MediaStream | null;
 
@@ -44,7 +50,9 @@ async function initCamera(video: HTMLVideoElement | null, constraints: MediaStre
         // eslint-disable-next-line no-param-reassign
         video.srcObject = stream;
         video.addEventListener('loadedmetadata', () => {
-            video.play();
+            video.play().catch((err) => {
+                console.warn('* Error while trying to play video stream:', err);
+            });
         });
         return waitForVideo(video);
     }

@@ -2,8 +2,8 @@
     "extends": [
         "airbnb-base",
         "eslint:recommended",
-        // "plugin:@typescript-eslint/eslint-recommended",
-        // "plugin:@typescript-eslint/recommended",
+        "plugin:@typescript-eslint/eslint-recommended",
+        "plugin:@typescript-eslint/recommended",
         // "plugin:@typescript-eslint/recommended-requiring-type-checking",
         "airbnb-typescript-base"
     ],
@@ -36,12 +36,12 @@
         "no-trailing-spaces": "error",
         "no-underscore-dangle": "off",
         "no-unused-expressions": "error",
-        "no-unused-vars": "error",
         "no-use-before-define": "warn",
         "quotes": [ "error", "single" ],
         "strict": "off",
         "wrap-iife": [ "error", "outside" ],
         "import/no-named-as-default": "off",
+        "@typescript-eslint/restrict-template-expressions": "off",
         // STYLE
         "brace-style": ["error", "1tbs"],
         "comma-spacing": ["error", { "before": false, "after": true }],

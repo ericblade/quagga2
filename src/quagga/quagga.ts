@@ -1,20 +1,20 @@
 import { clone } from 'gl-vec2';
-import { QuaggaContext } from '../QuaggaContext';
-import _initBuffers from './initBuffers';
-import _getViewPort from './getViewPort';
-import ImageWrapper from '../common/image_wrapper';
-import BarcodeDecoder from '../decoder/barcode_decoder';
-import _initCanvas from './initCanvas';
-import BarcodeLocator from '../locator/barcode_locator';
-import InputStream from '../input/input_stream/input_stream';
-import FrameGrabber from '../input/frame_grabber.js';
-import * as QWorkers from './qworker';
-import setupInputStream from './setupInputStream';
-import CameraAccess from '../input/camera_access';
-import { BarcodeInfo } from '../reader/barcode_reader';
-import { moveLine, moveBox } from './transform';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
+import ImageWrapper from '../common/image_wrapper';
+import BarcodeDecoder from '../decoder/barcode_decoder';
+import CameraAccess from '../input/camera_access';
+import FrameGrabber from '../input/frame_grabber.js';
+import InputStream from '../input/input_stream/input_stream';
+import BarcodeLocator from '../locator/barcode_locator';
+import { QuaggaContext } from '../QuaggaContext';
+import { BarcodeInfo } from '../reader/barcode_reader';
+import _getViewPort from './getViewPort';
+import _initBuffers from './initBuffers';
+import _initCanvas from './initCanvas';
+import * as QWorkers from './qworker';
+import setupInputStream from './setupInputStream';
+import { moveLine, moveBox } from './transform';
 
 export default class Quagga {
     context: QuaggaContext = new QuaggaContext();
@@ -80,7 +80,8 @@ export default class Quagga {
             this.context.config.numOfWorkers = 0;
         }
 
-        QWorkers.adjustWorkerPool(this.context.config.numOfWorkers,
+        QWorkers.adjustWorkerPool(
+            this.context.config.numOfWorkers,
             this.context.config,
             this.context.inputStream,
             () => {
@@ -88,7 +89,8 @@ export default class Quagga {
                     this.initializeData();
                 }
                 this.ready(callback);
-            });
+            },
+        );
     };
 
     initInputStream(callback: (err?: Error) => void): void {

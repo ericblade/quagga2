@@ -1,12 +1,12 @@
 import { clone } from 'gl-vec2';
-import type { InputStream } from '../input/input_stream/input_stream.d';
 import ImageWrapper from '../common/image_wrapper';
+import type { InputStream } from '../input/input_stream/input_stream.d';
 import BarcodeLocator from '../locator/barcode_locator';
 
 type BufferReturn = {
-    inputImageWrapper: ImageWrapper;
     // boxSize should be like [[ number, number], ...] but clone's signature doesn't seem to allow that
     boxSize: Array<Array<number>>;
+    inputImageWrapper: ImageWrapper;
 };
 
 // TODO: need typescript def for BarcodeLocator

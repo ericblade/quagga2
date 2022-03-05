@@ -7,6 +7,10 @@
         "sourceMap": true /* Generates corresponding '.map' file. */,
         "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
         "jsx": "react" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
+        "lib": [
+            "es2015",
+            "dom"
+        ] /* Specify library files to be included in the compilation. */,
         "types": [
             "mocha",
         ] /* Type declaration files to be included in compilation. */,

@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { Point } from '../../type-definitions/quagga.d';
+import type { Point } from '../../type-definitions/quagga.d';
 
 export type Box = Array<[ number, number ]>;
 

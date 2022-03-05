@@ -7,27 +7,27 @@ export type EventHandlerList = {
 };
 
 export interface InputStream {
-    getRealWidth(): number;
-    getRealHeight(): number;
-    getWidth(): number;
-    getHeight(): number;
-    setWidth(width: number): void;
-    setHeight(height: number): void;
-    setInputStream(config: any): void;
-    ended(): boolean;
-    getConfig(): any;
-    setAttribute(name: any, value: any): void;
-    pause(): void;
-    play(): void;
-    setCurrentTime(time: number): void;
     addEventListener(event: string, f: (args?: any) => void, bool: boolean): void;
     clearEventHandlers(): void;
-    trigger(eventName: any, args: any): void;
-    setTopRight(topRight: Point): void;
-    getTopRight(): Point;
-    setCanvasSize(size: XYSize): void;
+    ended(): boolean;
     getCanvasSize(): XYSize;
+    getConfig(): any;
     getFrame(): any;
+    getHeight(): number;
+    getRealHeight(): number;
+    getRealWidth(): number;
+    getTopRight(): Point;
+    getWidth(): number;
+    pause(): void;
+    play(): void;
+    setAttribute(name: any, value: any): void;
+    setCanvasSize(size: XYSize): void;
+    setCurrentTime(time: number): void;
+    setHeight(height: number): void;
+    setInputStream(config: any): void;
+    setTopRight(topRight: Point): void;
+    setWidth(width: number): void;
+    trigger(eventName: any, args: any): void;
 }
 
 type VideoStreamFactory = (video: HTMLVideoElement) => InputStream;
@@ -35,7 +35,7 @@ type LiveStreamFactory = (video: HTMLVideoElement) => InputStream;
 type ImageStreamFactory = () => InputStream;
 
 export interface InputStreamFactory {
-    createVideoStream: VideoStreamFactory;
-    createLiveStream: LiveStreamFactory;
     createImageStream: ImageStreamFactory;
+    createLiveStream: LiveStreamFactory;
+    createVideoStream: VideoStreamFactory;
 }
