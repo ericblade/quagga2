@@ -173,5 +173,5 @@
     "sourceMap": false,
     "instrument": false
   },
-  "versioning": "ALWAYS_INCREASING"
+  "versioningMode": "ALWAYS_INCREASING"
 }
