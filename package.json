@@ -176,5 +176,8 @@
   "@rollingversions": {
     "versioningMode": "ALWAYS_INCREASING",
     "versioning": "ALWAYS_INCREASING"
+  },
+  "publishConfig": {
+    "access": "public"
   }
 }
