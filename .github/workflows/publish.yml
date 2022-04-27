@@ -24,6 +24,7 @@ jobs:
         npm run build --if-present
       env:
         CI: true
+        NODE_OPTIONS: --openssl-legacy-provider
     - name: rollingversions check
       run: npx rollingversions publish
       env:
