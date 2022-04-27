@@ -16,6 +16,7 @@ describe('testing node import', () => {
         expect(CA).to.be.an('object').with.keys([
             'request', 'release', 'enumerateVideoDevices',
             'getActiveStreamLabel', 'getActiveTrack', 'requestedVideoElement',
+            'enableTorch', 'disableTorch',
         ]);
     });
 });
