@@ -23,7 +23,15 @@ node functionality.
 
 ## Using React / Redux?
 
-Please see also https://github.com/ericblade/quagga2-react-example/ and https://github.com/ericblade/quagga2-redux-middleware/
+Please see also <https://github.com/ericblade/quagga2-react-example/> and <https://github.com/ericblade/quagga2-redux-middleware/>
+
+## Using Angular?
+
+Please see <https://github.com/julienboulay/ngx-barcode-scanner> or <https://github.com/classycodeoss/mobile-scanning-demo>
+
+## Using ThingWorx?
+
+Please see <https://github.com/ptc-iot-sharing/ThingworxBarcodeScannerWidget>
 
 ## What is QuaggaJS?
 
@@ -54,6 +62,7 @@ be aligned with the viewport.
 
 Quagga makes use of many modern Web-APIs which are not implemented by all
 browsers yet. There are two modes in which Quagga operates:
+
 1. analyzing static images and
 2. using a camera to decode the images from a live-stream.
 
@@ -66,6 +75,7 @@ of the used Web-APIs for each mode:
 ### Static Images
 
 The following APIs need to be implemented in your browser:
+
 - [webworkers](http://caniuse.com/#feat=webworkers)
 - [canvas](http://caniuse.com/#feat=canvas)
 - [typedarrays](http://caniuse.com/#feat=typedarrays)
@@ -75,6 +85,7 @@ The following APIs need to be implemented in your browser:
 ### Live Stream
 
 In addition to the APIs mentioned above:
+
 - [MediaDevices](http://caniuse.com/#feat=stream)
 
 __Important:__ Accessing `getUserMedia` requires a secure origin in most
@@ -149,14 +160,19 @@ You can also build the library yourself and copy `quagga.js` file from the `dist
 You can include the following script tags with  CDN links:
 
 a) `quagga.js`
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.js"></script>
 ```
+
 b) `quagga.min.js` (minified version)
+
 ```html
 <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2/dist/quagga.min.js"></script>
 ```
+
 *Note: You can include a specific version of the library by including the version as shown below.*
+
 ```html
 <!-- Link for Version 1.2.6 -->
 <script src="https://cdn.jsdelivr.net/npm/@ericblade/quagga2@1.2.6/dist/quagga.js"></script>
@@ -222,10 +238,13 @@ quagga, then you can run from the quagga directory:
 ```
 npm install && npm run build && npm link
 ```
+
 then from the other project directory that needs this quagga, do
+
 ```
 npm link @ericblade/quagga2
 ```
+
 When linking is successful, all future runs of 'npm run build' will update the version that is
 linked in the project.  When combined with an application using webpack-dev-server or some other
 hot-reload system, you can do very rapid iteration this way.
@@ -588,7 +607,6 @@ values which worked best during development.
 Only two properties are relevant for the use in Quagga (`halfSample` and
 `patchSize`) whereas the rest is only needed for development and debugging.
 
-
 ```javascript
 {
   halfSample: true,
@@ -630,7 +648,7 @@ recommended to crank up the resolution in order to find a barcode.
 ## Examples
 
 The following example takes an image `src` as input and prints the result on the
-console. The decoder is configured to detect _Code128_ barcodes and enables the
+console. The decoder is configured to detect *Code128* barcodes and enables the
 locating-mechanism for more robust results.
 
 ```javascript
@@ -760,7 +778,7 @@ If you add a new test file, you should also make sure to import it in either cyp
 ## Image Debugging
 
 In case you want to take a deeper dive into the inner workings of Quagga, get to
-know the _debugging_ capabilities of the current implementation. The various
+know the *debugging* capabilities of the current implementation. The various
 flags exposed through the `config` object give you the ability to visualize
 almost every step in the processing. Because of the introduction of the
 web-workers, and their restriction not to have access to the DOM, the
