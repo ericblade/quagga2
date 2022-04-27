@@ -1,6 +1,4 @@
 import { clone } from 'gl-vec2';
-import { hsv2rgb } from './cv_utils';
-import ArrayHelper from './array_helper';
 import {
     XYSize,
     TypedArrayConstructor,
@@ -9,6 +7,8 @@ import {
     Moment,
     SparseImageWrapper,
 } from '../../type-definitions/quagga.d';
+import ArrayHelper from './array_helper';
+import { hsv2rgb } from './cv_utils';
 
 const vec2 = { clone };
 

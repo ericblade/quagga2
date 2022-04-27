@@ -1,5 +1,5 @@
 import { QuaggaContext, CanvasContainer } from 'QuaggaContext';
-import { XYSize } from '../../type-definitions/quagga.d';
+import type { XYSize } from '../../type-definitions/quagga.d';
 import getViewPort from './getViewPort';
 
 function findOrCreateCanvas(selector: string, className: string) {
@@ -22,7 +22,9 @@ function initCanvases(canvasSize: XYSize): CanvasContainer | null {
         const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer');
         const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer');
 
+        // eslint-disable-next-line no-multi-assign
         image.canvas.width = overlay.canvas.width = canvasSize.x;
+        // eslint-disable-next-line no-multi-assign
         image.canvas.height = overlay.canvas.height = canvasSize.y;
 
         return {

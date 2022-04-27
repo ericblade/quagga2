@@ -134,4 +134,9 @@ describe('CameraAccess (browser)', () => {
             expect(x).to.equal(v[0].label);
         });
     });
+
+    // TODO: can this be tested?
+    describe('enableTorch', () => {});
+    // TODO: can this be tested?
+    describe('disableTorch', () => {});
 });

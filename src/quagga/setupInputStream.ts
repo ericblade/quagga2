@@ -1,17 +1,18 @@
-import { InputStreamType } from '../../type-definitions/quagga.d';
+import { InputStreamFactory } from 'input/input_stream/input_stream.d';
+import type { InputStreamType } from '../../type-definitions/quagga.d';
 
 // TODO: need to create an InputStream typescript interface, so we don't have an "any" in the next line
-export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, InputStream: any) {
+export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, inputStreamFactory: InputStreamFactory) {
     switch (type) {
         case 'VideoStream': {
             const video = document.createElement('video');
             return {
                 video,
-                inputStream: InputStream.createVideoStream(video),
+                inputStream: inputStreamFactory.createVideoStream(video),
             };
         }
         case 'ImageStream':
-            return { inputStream: InputStream.createImageStream() };
+            return { inputStream: inputStreamFactory.createImageStream() };
         case 'LiveStream': {
             let video: HTMLVideoElement | null = null;
             if (viewport) {
@@ -23,7 +24,7 @@ export default function setupInputStream(type: InputStreamType = 'LiveStream', v
             }
             return {
                 video,
-                inputStream: InputStream.createLiveStream(video),
+                inputStream: inputStreamFactory.createLiveStream(video as HTMLVideoElement),
             };
         }
         default:
