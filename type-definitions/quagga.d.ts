@@ -209,7 +209,7 @@ export declare module Readers {
         FORMAT: string;
         SINGLE_CODE_ERROR: number;
         AVG_CODE_ERROR: number;
-        
+
         decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
 
         protected _findPattern(pattern: ReadonlyArray<number>, offset: number, isWhite?: boolean, tryHarder?: boolean): BarcodeInfo | null;
@@ -229,7 +229,7 @@ export declare module Readers {
 
     export class NewCodabarReader extends BarcodeReader {
         FORMAT: string;
-        
+
         decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null;
 
         protected _computeAlternatingThreshold(offset: number, end: number): number;
@@ -298,7 +298,7 @@ export declare module Readers {
 
     export class Code39Reader extends BarcodeReader {
         FORMAT: string;
-        
+
         decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null;
 
         protected _findStart(): BarcodePosition | null;
@@ -552,16 +552,17 @@ export interface QuaggaJSStatic {
  * Used for accessing information about the active stream track and available video devices.
  */
 export interface QuaggaJSCameraAccess {
-    requestedVideoElement: HTMLVideoElement | null,
-    request(video: HTMLVideoElement | null, videoConstraints?: MediaTrackConstraintsWithDeprecated): Promise<void> | never;
-
-    release(): Promise<void>;
-
+    disableTorch(): Promise<void>;
+    enableTorch(): Promise<void>;
     enumerateVideoDevices(): Promise<MediaDeviceInfo[]> | never;
-
     getActiveStreamLabel(): string;
-
     getActiveTrack(): MediaStreamTrack | null;
+    release(): Promise<void>;
+    request(
+        video: HTMLVideoElement | null,
+        videoConstraints?: MediaTrackConstraintsWithDeprecated
+    ): Promise<void> | never;
+    requestedVideoElement: HTMLVideoElement | null;
 }
 
 /**

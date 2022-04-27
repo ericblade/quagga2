@@ -132,6 +132,24 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         return track ? track.label : '';
     },
     getActiveTrack,
+    async disableTorch() {
+        const track = getActiveTrack();
+        // TODO: should we acquire camera access even if there's no current camera open?
+        // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
+        if (track) {
+            // @ts-ignore // typescript doesn't know the torch property
+            await track.applyConstraints({ advanced: [{ torch: false }] });
+        }
+    },
+    async enableTorch() {
+        const track = getActiveTrack();
+        // TODO: should we acquire camera access even if there's no current camera open?
+        // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
+        if (track) {
+            // @ts-ignore // typescript doesn't know the torch property
+            await track.applyConstraints({ advanced: [{ torch: true }] });
+        }
+    },
 };
 
 export default QuaggaJSCameraAccess;
