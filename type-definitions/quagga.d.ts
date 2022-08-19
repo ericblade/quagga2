@@ -753,7 +753,7 @@ export interface QuaggaJSConfigObject {
      * Ex: '/test/fixtures/code_128/image-001.jpg'
      * or: 'data:image/jpg;base64,' + data
      */
-    src?: string;
+    src?: string | Uint8Array | Buffer;
 
     inputStream?: {
         /**
@@ -800,6 +800,8 @@ export interface QuaggaJSConfigObject {
              */
             bottom?: string;
         };
+        
+        mimeType?: string;
 
         singleChannel?: boolean;
         size?: number;
