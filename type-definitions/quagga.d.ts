@@ -801,7 +801,7 @@ export interface QuaggaJSConfigObject {
             bottom?: string;
         };
         
-        mimeType?: string;
+        mime?: string;
 
         singleChannel?: boolean;
         size?: number;
