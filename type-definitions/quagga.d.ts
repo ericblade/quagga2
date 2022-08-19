@@ -10,13 +10,35 @@
 declare const Quagga: QuaggaJSStatic;
 export default Quagga;
 
+export type TypedArrayConstructor =
+    Int8ArrayConstructor
+    | Uint8ArrayConstructor
+    | Uint8ClampedArrayConstructor
+    | Int16ArrayConstructor
+    | Uint16ArrayConstructor
+    | Int32ArrayConstructor
+    | Uint32ArrayConstructor
+    | Float32ArrayConstructor
+    | Float64ArrayConstructor;
+
+export type TypedArray =
+    Int8Array
+    | Uint8Array
+    | Uint8ClampedArray
+    | Int16Array
+    | Uint16Array
+    | Int32Array
+    | Uint32Array
+    | Float32Array
+    | Float64Array;
+
 // There are many different spots inside Quagga where we refer to an X/Y position of something, but it has entirely different
 // contextual meaning.  This allows us to create a type that is branded by name, and therefore these variables cannot be directly
 // mixed up with each other, without explicitly forcing it to happen.  Good.
 export interface XYObject<T extends string> {
+    type: T;
     x: number;
     y: number;
-    type: T;
 }
 
 // TODO: fill this in from cv_utils#imageRef
@@ -40,12 +62,12 @@ export type WrapperIndexMapping = {
 export type Moment = {
     m00: number;
     m01: number;
+    m02: number;
     m10: number;
     m11: number;
-    m02: number;
     m20: number;
-    theta: number;
     rad: number;
+    theta: number;
     vec?: Array<number>;
 };
 
@@ -117,8 +139,9 @@ export interface BarcodeReaderConfig {
 
 export enum BarcodeDirection {
     Forward = 1,
-    Reverse = -1
+    Reverse = -1,
 }
+
 type BarcodeFormat = string;
 
 export interface BarcodeCorrection {
@@ -127,11 +150,11 @@ export interface BarcodeCorrection {
 }
 
 export interface BarcodePosition {
-    start: number;
-    startCounter?: number;
     end: number;
     endCounter?: number;
     error?: number;
+    start: number;
+    startCounter?: number;
 }
 
 export interface BarcodeInfo extends BarcodePosition {
@@ -154,34 +177,37 @@ export interface Barcode {
 }
 
 export interface ThresholdSize {
-    size: number;
     counts: number;
-    min: number;
     max: number;
+    min: number;
+    size: number;
 }
 
 export interface Threshold {
-    space: {
-        narrow: ThresholdSize;
-        wide: ThresholdSize;
-    };
     bar: {
         narrow: ThresholdSize;
         wide: ThresholdSize;
     };
+    space: {
+        narrow: ThresholdSize;
+        wide: ThresholdSize;
+    };
 }
 
-export declare module Readers {
+export declare namespace Readers {
     export abstract class BarcodeReader {
         _row: Array<number>;
+
         SINGLE_CODE_ERROR: number;
+
         FORMAT: BarcodeFormat;
+
         CONFIG_KEYS: BarcodeReaderConfig;
 
         static get Exception(): {
-            StartNotFoundException: string;
             CodeNotFoundException: string;
             PatternNotFoundException: string;
+            StartNotFoundException: string;
         };
 
         constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
@@ -207,7 +233,9 @@ export declare module Readers {
 
     export class TwoOfFiveReader extends BarcodeReader {
         FORMAT: string;
+
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
 
         decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
@@ -257,17 +285,29 @@ export declare module Readers {
 
     export class Code128Reader extends BarcodeReader {
         CODE_SHIFT: number;
+
         CODE_C: number;
+
         CODE_B: number;
+
         CODE_A: number;
+
         START_CODE_A: number;
+
         START_CODE_B: number;
+
         START_CODE_C: number;
+
         STOP_CODE: number;
+
         CODE_PATTERN: number[][];
+
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
+
         FORMAT: string;
+
         MODULE_INDICES: {
             bar: number[];
             space: number[];
@@ -286,16 +326,6 @@ export declare module Readers {
         protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodeInfo | null;
     }
 
-    export class Code32Reader extends Code39Reader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
-
-        protected _decodeCode32(code: string): string | null;
-
-        protected _checkChecksum(code: string): boolean;
-    }
-
     export class Code39Reader extends BarcodeReader {
         FORMAT: string;
 
@@ -310,6 +340,16 @@ export declare module Readers {
         protected _patternToChar(pattern: number): string | null;
 
         protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean;
+    }
+
+    export class Code32Reader extends Code39Reader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        protected _decodeCode32(code: string): string | null;
+
+        protected _checkChecksum(code: string): boolean;
     }
 
     export class Code39VINReader extends Code39Reader {
@@ -340,27 +380,11 @@ export declare module Readers {
         protected _verifyChecksums(charArray: Array<string>): boolean;
     }
 
-    export class EAN2Reader extends EANReader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: number): Barcode | null;
-    }
-
-    export class EAN5Reader extends EANReader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: number): Barcode | null;
-    }
-
-    export class EAN8Reader extends EANReader {
-        FORMAT: string;
-
-        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
-    }
-
     export class EANReader extends BarcodeReader {
         FORMAT: string;
+
         SINGLE_CODE_ERROR: number;
+
         STOP_PATTERN: number[];
 
         constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
@@ -382,13 +406,37 @@ export declare module Readers {
         protected _checksum(result: Array<number>): boolean;
     }
 
+    export class EAN2Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN5Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN8Reader extends EANReader {
+        FORMAT: string;
+
+        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
+    }
+
     export class I2of5Reader extends BarcodeReader {
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
+
         START_PATTERN: number[];
+
         STOP_PATTERN: number[];
+
         CODE_PATTERN: number[][];
+
         MAX_CORRECTION_FACTOR: number;
+
         FORMAT: string;
 
         constructor(opts: BarcodeReaderConfig);
@@ -416,7 +464,9 @@ export declare module Readers {
 
     export class UPCEReader extends EANReader {
         CODE_FREQUENCY: number[][];
+
         STOP_PATTERN: number[];
+
         FORMAT: string;
 
         protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
@@ -441,85 +491,7 @@ export declare module Readers {
 }
 
 export interface QuaggaJSStatic {
-    /**
-     * This method initializes the library for a given
-     * configuration config (see below) and invokes the callback when Quagga is
-     * ready to start. The initialization process also requests for camera
-     * access if real-time detection is configured.
-     */
-    init(
-        config: QuaggaJSConfigObject,
-        callback?: (err: any) => void
-    ): Promise<void>;
-
-    init(
-        config: QuaggaJSConfigObject,
-        callback: (err: any) => void,
-        imageWrapper: ImageWrapper,
-    ): Promise<void>;
-
-    /**
-     * When the library is initialized, the start()
-     * method starts the video-stream and begins locating and decoding the
-     * images.
-     */
-    start(): void;
-
-    /**
-     * If the decoder is currently running, after calling
-     * stop() the decoder does not process any more images.
-     * Additionally, if a camera-stream was requested upon initialization,
-     * this operation also disconnects the camera.
-     */
-    stop(): Promise<void>;
-
-    /**
-     * Pauses processing, but does not release any handlers
-     */
-    pause(): void;
-
-    /**
-     * This method registers a callback(data) function that is
-     * called for each frame after the processing is done. The data object
-     * contains detailed information about the success/failure of the operation.
-     * The output varies, depending whether the detection and/or decoding were
-     * successful or not.
-     */
-    onProcessed(callback: QuaggaJSResultCallbackFunction): void;
-
-    /**
-     * Removes a callback that was previously registered with @see onProcessed
-     */
-    offProcessed(callback?: QuaggaJSResultCallbackFunction): void;
-
-    /**
-     * Registers a callback(data) function which is triggered whenever a
-     * barcode- pattern has been located and decoded successfully. The passed
-     * data object contains information about the decoding process including the
-     * detected code which can be obtained by calling data.codeResult.code.
-     */
-    onDetected(callback: QuaggaJSResultCallbackFunction): void;
-
-    /**
-     * Removes a callback that was previously registered with @see onDetected
-     */
-    offDetected(callback?: QuaggaJSResultCallbackFunction): void;
-
-    ResultCollector: QuaggaJSResultCollector;
-    registerResultCollector(resultCollector: QuaggaJSResultCollector): void;
-    setReaders(readers: (QuaggaJSReaderConfig | string)[]): void;
-    registerReader(name: string, reader: object): void;
-
-    /**
-     * In contrast to the calls described
-     * above, this method does not rely on getUserMedia and operates on a single
-     * image instead. The provided callback is the same as in onDetected and
-     * contains the result data object.
-     */
-    decodeSingle(
-        config: QuaggaJSConfigObject,
-        resultCallback?: QuaggaJSResultCallbackFunction
-    ): Promise<QuaggaJSResultObject>;
+    CameraAccess: QuaggaJSCameraAccess;
 
     /**
      * Constructs used for debugging purposes
@@ -528,7 +500,10 @@ export interface QuaggaJSStatic {
         drawPath: QuaggaJSDebugDrawPath;
         drawRect: QuaggaJSDebugDrawRect;
     };
+
     ImageWrapper: ImageWrapper;
+
+    ResultCollector: QuaggaJSResultCollector;
 
     /**
      * an object Quagga uses for drawing and processing, useful for calling code
@@ -545,7 +520,80 @@ export interface QuaggaJSStatic {
         };
     };
 
-    CameraAccess: QuaggaJSCameraAccess;
+    /**
+     * In contrast to the calls described
+     * above, this method does not rely on getUserMedia and operates on a single
+     * image instead. The provided callback is the same as in onDetected and
+     * contains the result data object.
+     */
+    decodeSingle(
+        config: QuaggaJSConfigObject,
+        resultCallback?: QuaggaJSResultCallbackFunction
+    ): Promise<QuaggaJSResultObject>;
+
+    init(
+        config: QuaggaJSConfigObject,
+        callback: (err: any) => void,
+        imageWrapper: ImageWrapper,
+    ): Promise<void>;
+
+    /**
+     * This method initializes the library for a given
+     * configuration config (see below) and invokes the callback when Quagga is
+     * ready to start. The initialization process also requests for camera
+     * access if real-time detection is configured.
+     */
+    init(
+        config: QuaggaJSConfigObject,
+        callback?: (err: any) => void
+    ): Promise<void>;
+
+    /**
+     * Removes a callback that was previously registered with @see onDetected
+     */
+    offDetected(callback?: QuaggaJSResultCallbackFunction): void;
+
+    /**
+     * Removes a callback that was previously registered with @see onProcessed
+     */
+    offProcessed(callback?: QuaggaJSResultCallbackFunction): void;
+    /**
+     * Registers a callback(data) function which is triggered whenever a
+     * barcode- pattern has been located and decoded successfully. The passed
+     * data object contains information about the decoding process including the
+     * detected code which can be obtained by calling data.codeResult.code.
+     */
+    onDetected(callback: QuaggaJSResultCallbackFunction): void;
+    /**
+     * This method registers a callback(data) function that is
+     * called for each frame after the processing is done. The data object
+     * contains detailed information about the success/failure of the operation.
+     * The output varies, depending whether the detection and/or decoding were
+     * successful or not.
+     */
+    onProcessed(callback: QuaggaJSResultCallbackFunction): void;
+    /**
+     * Pauses processing, but does not release any handlers
+     */
+    pause(): void;
+    registerReader(name: string, reader: object): void;
+    registerResultCollector(resultCollector: QuaggaJSResultCollector): void;
+    setReaders(readers: (QuaggaJSReaderConfig | string)[]): void;
+
+    /**
+     * When the library is initialized, the start()
+     * method starts the video-stream and begins locating and decoding the
+     * images.
+     */
+    start(): void;
+
+    /**
+     * If the decoder is currently running, after calling
+     * stop() the decoder does not process any more images.
+     * Additionally, if a camera-stream was requested upon initialization,
+     * this operation also disconnects the camera.
+     */
+    stop(): Promise<void>;
 }
 
 /**
@@ -647,9 +695,10 @@ export interface QuaggaJSStyle {
  */
 export interface QuaggaJSResultCollector {
     /**
-     * keep track of the image producing this result
+     * a list of codes that should not be recorded. This is effectively a list
+     * of filters that return false.
      */
-    capture?: boolean;
+    blacklist?: Array<QuaggaJSCodeResult>;
 
     /**
      * maximum number of results to store
@@ -657,10 +706,14 @@ export interface QuaggaJSResultCollector {
     capacity?: number;
 
     /**
-     * a list of codes that should not be recorded. This is effectively a list
-     * of filters that return false.
+     * keep track of the image producing this result
      */
-    blacklist?: Array<QuaggaJSCodeResult>;
+    capture?: boolean;
+
+    /*
+     * a static function that returns you a ResultCollector
+     */
+    create?(param: QuaggaJSResultCollector): QuaggaJSResultCollector;
 
     /**
      * passed a QuaggaJSCodeResult, return true if you want this to be stored,
@@ -669,11 +722,6 @@ export interface QuaggaJSResultCollector {
      * you would say return codeResult.format==="ean_13"
      */
     filter?: QuaggaJSResultCollectorFilterFunction;
-
-    /*
-     * a static function that returns you a ResultCollector
-     */
-    create?(param: QuaggaJSResultCollector): QuaggaJSResultCollector;
 
     getResults?(): QuaggaJSCodeResult[];
 }
@@ -702,56 +750,54 @@ export interface QuaggaJSResultCollectorFilterFunction {
  * empty.
  */
 export interface QuaggaJSResultObject {
+    angle: number;
+    barcodes?: Array<QuaggaJSResultObject>;
+    box: number[][];
+    boxes: number[][][];
     // eslint-disable-next-line @typescript-eslint/camelcase
     codeResult: QuaggaJSResultObject_CodeResult;
-    barcodes?: Array<QuaggaJSResultObject>;
+    frame?: string;
     line: {
         x: number;
         y: number;
     }[];
-    angle: number;
     pattern: number[];
-    box: number[][];
-    boxes: number[][][];
-    frame?: string;
 }
 
 // eslint-disable-next-line @typescript-eslint/camelcase,@typescript-eslint/class-name-casing
 export interface QuaggaJSResultObject_CodeResult {
     code: string | null;
-    start: number;
-    end: number;
     codeset: number;
-    startInfo: {
-        error: number;
-        code: number;
-        start: number;
-        end: number;
-    };
     decodedCodes: {
+        code: number;
+        end: number;
         error?: number;
-        code: number;
         start: number;
-        end: number;
     }[];
-
-    endInfo: {
-        error: number;
-        code: number;
-        start: number;
-        end: number;
-    };
     direction: number;
+    end: number;
+    endInfo: {
+        code: number;
+        end: number;
+        error: number;
+        start: number;
+    };
+
     format: string;
+    start: number;
+    startInfo: {
+        code: number;
+        end: number;
+        error: number;
+        start: number;
+    };
 }
 
 export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
 
 export interface QuaggaJSConfigObject {
     /**
-     * The image path to load from, or a data url
-     * Ex: '/test/fixtures/code_128/image-001.jpg'
-     * or: 'data:image/jpg;base64,' + data
+     * @default false
      */
     src?: string | Uint8Array | Buffer;
 
@@ -769,74 +815,9 @@ export interface QuaggaJSConfigObject {
         target?: Element | string;
 
         constraints?: MediaTrackConstraints;
-
-        /**
-         * defines rectangle of the detection/localization area. Useful when you
-         * KNOW that certain parts of the image will not contain a barcode, also
-         * useful when you have multiple barcodes in a row and you want to make
-         * sure that only a code in, say the middle quarter is read not codes
-         * above or below
-         */
-        area?: {
-            /**
-             * @default "0%", set this and bottom to 25% if you only want to
-             * read a 'line' that is in the middle quarter
-             */
-            top?: string;
-
-            /**
-             * @default "0%"
-             */
-            right?: string;
-
-            /**
-             * @default "0%"
-             */
-            left?: string;
-
-            /**
-             * @default "0%", set this and top to 50% if you only want to read a
-             * 'line' that is in the middle half
-             */
-            bottom?: string;
-        };
-        
-        mime?: string;
-
-        singleChannel?: boolean;
-        size?: number;
-        sequence?: boolean;
-    };
-
-    /**
-     * @default false
-     */
     debug?: boolean;
 
-    /**
-     * @default true
-     */
-    locate?: boolean;
-
-    /**
-     * @default 4
-     */
-    numOfWorkers?: number;
-
-    /**
-     * This top-level property controls the scan-frequency of the video-stream.
-     * It’s optional and defines the maximum number of scans per second.
-     * This renders useful for cases where the scan-session is long-running and
-     * resources such as CPU power are of concern.
-     */
-    frequency?: number;
-
     decoder?: {
-        /**
-         * @default [ "code_128_reader" ]
-         */
-        readers?: (QuaggaJSReaderConfig | string)[];
-
         debug?: {
             /**
              * @default false
@@ -846,18 +827,20 @@ export interface QuaggaJSConfigObject {
             /**
              * @default false
              */
-            showFrequency?: boolean;
+            drawScanline?: boolean;
 
             /**
              * @default false
              */
-            drawScanline?: boolean;
+            showFrequency?: boolean;
 
             /**
              * @default false
              */
             showPattern?: boolean;
         };
+
+        mime?: string;
 
         /**
          * The multiple property tells the decoder if it should continue decoding after finding a valid barcode.
@@ -866,21 +849,96 @@ export interface QuaggaJSConfigObject {
          * depending on the success of decoding the individual box.
          */
         multiple?: boolean;
+
+        /**
+         * @default [ "code_128_reader" ]
+         */
+        readers?: (QuaggaJSReaderConfig | string)[];
     };
 
+    /**
+     * This top-level property controls the scan-frequency of the video-stream.
+     * It’s optional and defines the maximum number of scans per second.
+     * This renders useful for cases where the scan-session is long-running and
+     * resources such as CPU power are of concern.
+     */
+    frequency?: number;
+
+    inputStream?: {
+        /**
+         * defines rectangle of the detection/localization area. Useful when you
+         * KNOW that certain parts of the image will not contain a barcode, also
+         * useful when you have multiple barcodes in a row and you want to make
+         * sure that only a code in, say the middle quarter is read not codes
+         * above or below
+         */
+        area?: {
+            /**
+             * @default "0%", set this and top to 50% if you only want to read a
+             * 'line' that is in the middle half
+             */
+            bottom?: string;
+
+            /**
+             * @default "0%"
+             */
+            left?: string;
+
+            /**
+             * @default "0%"
+             */
+            right?: string;
+
+            /**
+             * @default "0%", set this and bottom to 25% if you only want to
+             * read a 'line' that is in the middle quarter
+             */
+            top?: string;
+        };
+
+        constraints?: MediaTrackConstraints;
+
+        /**
+         * @default "Live"
+         */
+        name?: string;
+
+        sequence?: boolean;
+
+        singleChannel?: boolean;
+
+        size?: number;
+        target?: Element | string;
+        /**
+         * @default "LiveStream"
+         */
+        type?: InputStreamType;
+    };
+
+    /**
+     * @default true
+     */
+    locate?: boolean;
+
     locator?: {
-        /**
-         * @default true
-         */
-        halfSample?: boolean;
-
-        /**
-         * @default "medium"
-         * Available values: x-small, small, medium, large, x-large
-         */
-        patchSize?: string;
-
         debug?: {
+            boxFromPatches?: {
+                /**
+                 * @default false
+                 */
+                showBB?: boolean;
+
+                /**
+                 * @default false
+                 */
+                showTransformed?: boolean;
+
+                /**
+                 * @default false
+                 */
+                showTransformedBox?: boolean;
+            };
+
             /**
              * @default false
              */
@@ -889,17 +947,7 @@ export interface QuaggaJSConfigObject {
             /**
              * @default false
              */
-            showPatches?: boolean;
-
-            /**
-             * @default false
-             */
             showFoundPatches?: boolean;
-
-            /**
-             * @default false
-             */
-            showSkeleton?: boolean;
 
             /**
              * @default false
@@ -914,59 +962,54 @@ export interface QuaggaJSConfigObject {
             /**
              * @default false
              */
+            showPatches?: boolean;
+
+            /**
+             * @default false
+             */
             showRemainingPatchLabels?: boolean;
 
-            boxFromPatches?: {
-                /**
-                 * @default false
-                 */
-                showTransformed?: boolean;
-
-                /**
-                 * @default false
-                 */
-                showTransformedBox?: boolean;
-
-                /**
-                 * @default false
-                 */
-                showBB?: boolean;
-            };
+            /**
+             * @default false
+             */
+            showSkeleton?: boolean;
         };
+
+        /**
+         * @default true
+         */
+        halfSample?: boolean;
+
+        /**
+         * @default "medium"
+         * Available values: x-small, small, medium, large, x-large
+         */
+        patchSize?: string;
     };
+
+    /**
+     * @default 4
+     */
+    numOfWorkers?: number;
+
+    /**
+     * The image path to load from, or a data url
+     * Ex: '/test/fixtures/code_128/image-001.jpg'
+     * or: 'data:image/jpg;base64,' + data
+     */
+    src?: string;
 }
 
 export interface QuaggaJSReaderConfig {
-    format: string;
     config: {
         supplements: string[];
     };
+    format: string;
 }
 
 export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
-    maxAspectRatio?: number; // i don't see this in the documentation anywhere, but it's in the original test suite...
-    minAspectRatio?: number;
     facing?: string;
+    maxAspectRatio?: number;
+    // i don't see this in the documentation anywhere, but it's in the original test suite...
+    minAspectRatio?: number;
 }
-
-export type TypedArrayConstructor =
-    Int8ArrayConstructor
-    | Uint8ArrayConstructor
-    | Uint8ClampedArrayConstructor
-    | Int16ArrayConstructor
-    | Uint16ArrayConstructor
-    | Int32ArrayConstructor
-    | Uint32ArrayConstructor
-    | Float32ArrayConstructor
-    | Float64ArrayConstructor;
-
-export type TypedArray =
-    Int8Array
-    | Uint8Array
-    | Uint8ClampedArray
-    | Int16Array
-    | Uint16Array
-    | Int32Array
-    | Uint32Array
-    | Float32Array
-    | Float64Array;
