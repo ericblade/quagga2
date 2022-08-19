@@ -800,7 +800,7 @@ export interface QuaggaJSConfigObject {
              */
             bottom?: string;
         };
-        
+
         mime?: string;
 
         singleChannel?: boolean;
