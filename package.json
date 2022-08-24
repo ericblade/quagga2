@@ -9,7 +9,7 @@
     "fsevents": "2.3.2"
   },
   "devDependencies": {
-    "@babel/core": "^7.18.10",
+    "@babel/core": "^7.18.13",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.18.9",
@@ -26,8 +26,8 @@
     "@types/mocha": "^5.2.7",
     "@types/sinon": "^10.0.13",
     "@types/sinon-chai": "^3.2.8",
-    "@typescript-eslint/eslint-plugin": "^5.33.1",
-    "@typescript-eslint/parser": "^5.33.1",
+    "@typescript-eslint/eslint-plugin": "^5.34.0",
+    "@typescript-eslint/parser": "^5.34.0",
     "babel-loader": "^8.2.5",
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^6.1.1",
@@ -78,7 +78,7 @@
     "build": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
-    "upgrade-deps": "npx npm-check-updates && npm install"
+    "upgrade-deps": "npx npm-check-updates --doctor"
   },
   "repository": {
     "type": "git",
