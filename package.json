@@ -34,7 +34,7 @@
     "chai": "^4.3.6",
     "core-js": "^3.24.1",
     "cross-env": "^7.0.3",
-    "cypress": "^4.12.1",
+    "cypress": "^10.0.0",
     "eslint": "^8.22.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",

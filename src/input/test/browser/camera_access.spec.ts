@@ -43,12 +43,12 @@ describe('CameraAccess (browser)', () => {
     });
 
     describe('request', () => {
+        const video = document.createElement('video');
+        after(() => {
+            video.pause();
+            Quagga.CameraAccess.release();
+        });
         it('works', async () => {
-            const video = document.createElement('video');
-            after(() => {
-                video.pause();
-                Quagga.CameraAccess.release();
-            });
             await Quagga.CameraAccess.request(video, {});
             expect(video.srcObject).to.not.equal(null);
             // "as any" here to prevent typescript blowing up because it doesn't understand 'id' and
@@ -58,8 +58,6 @@ describe('CameraAccess (browser)', () => {
         });
 
         it('should allow deprecated constraints to be used', async () => {
-            after(() => Quagga.CameraAccess.release());
-            const video = document.createElement('video');
             await Quagga.CameraAccess.request(video, {
                 width: 320, height: 240, facing: 'user', minAspectRatio: 2, maxAspectRatio: 100,
             });
@@ -82,7 +80,6 @@ describe('CameraAccess (browser)', () => {
         });
 
         it('will fail on NotAllowedError', async () => {
-            after(() => Quagga.CameraAccess.release());
             cy.stub(navigator.mediaDevices, 'getUserMedia').rejects(new DOMException('Not Allowed', 'NotAllowedError'));
             const video = document.createElement('video');
             try {
@@ -97,7 +94,6 @@ describe('CameraAccess (browser)', () => {
 
         it('fails eventually on unacceptable video size', async function () {
             this.timeout(10000);
-            after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');
             try {
                 const x = await Quagga.CameraAccess.request(video, { width: 5, height: 5 });
@@ -120,13 +116,13 @@ describe('CameraAccess (browser)', () => {
     });
 
     describe('getActiveStreamLabel', () => {
+        after(() => Quagga.CameraAccess.release());
         it('no active stream', () => {
             const x = Quagga.CameraAccess.getActiveStreamLabel();
             expect(x).to.equal('');
         });
 
         it('with active stream', async () => {
-            after(() => Quagga.CameraAccess.release());
             const video = document.createElement('video');
             await Quagga.CameraAccess.request(video, {});
             const x = Quagga.CameraAccess.getActiveStreamLabel();
