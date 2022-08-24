@@ -25,7 +25,12 @@ describe('Array Helper', () => {
         });
         it('shuffles the content of an array', () => {
             const input = [1, 2, 3];
-            expect(ArrayHelper.shuffle(input)).to.deep.equal([3, 1, 2]);
+            const output = ArrayHelper.shuffle(input);
+            expect(output).to.be.an('Array').with.length(3);
+            expect(output).to.not.deep.equal([1, 2, 3]);
+            expect(output).to.be.an('Array').that.contains(1);
+            expect(output).to.be.an('Array').that.contains(2);
+            expect(output).to.be.an('Array').that.contains(3);
         });
     });
 

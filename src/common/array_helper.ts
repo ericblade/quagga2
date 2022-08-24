@@ -7,7 +7,7 @@ export default {
     },
 
     /**
-     * Shuffles the content of an array
+     * IN-PLACE Shuffles the content of an array
      */
     shuffle(arr: Array<number>) {
         // Durstenfeld shuffle algorithm
@@ -16,6 +16,7 @@ export default {
             const j = Math.floor(Math.random() * (i + 1));
             [arr[i], arr[j]] = [arr[j], arr[i]];
         }
+        return arr;
     },
 
     toPointList(arr: Array<Array<number>>) {
