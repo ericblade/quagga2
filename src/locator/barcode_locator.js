@@ -1,6 +1,6 @@
-import * as vec2 from 'gl-vec2';
 import * as mat2 from 'gl-mat2';
-import ImageWrapper from '../common/image_wrapper';
+import * as vec2 from 'gl-vec2';
+import * as ArrayHelper from '../common/ArrayHelper';
 import {
     calculatePatchSize,
     otsuThreshold,
@@ -11,12 +11,11 @@ import {
     halfSample,
     computeImageArea,
 } from '../common/cv_utils';
-import ArrayHelper from '../common/array_helper';
 import ImageDebug from '../common/image_debug';
+import ImageWrapper from '../common/image_wrapper';
 import Rasterizer from './rasterizer';
-import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
-
+import Tracer from './tracer';
 
 let _config;
 let _currentImageWrapper;

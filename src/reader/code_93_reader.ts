@@ -1,8 +1,8 @@
+import * as ArrayHelper from '../common/ArrayHelper';
 import BarcodeReader, { BarcodePosition, Barcode } from './barcode_reader';
-import ArrayHelper from '../common/array_helper';
 
 const ALPHABETH_STRING = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. $/+%abcd*';
-const ALPHABET = new Uint16Array([...ALPHABETH_STRING].map(char => char.charCodeAt(0)));
+const ALPHABET = new Uint16Array([...ALPHABETH_STRING].map((char) => char.charCodeAt(0)));
 const CHARACTER_ENCODINGS = new Uint16Array([
     0x114, 0x148, 0x144, 0x142, 0x128, 0x124, 0x122, 0x150, 0x112, 0x10A,
     0x1A8, 0x1A4, 0x1A2, 0x194, 0x192, 0x18A, 0x168, 0x164, 0x162, 0x134,
@@ -14,6 +14,7 @@ const ASTERISK = 0x15E;
 
 class Code93Reader extends BarcodeReader {
     FORMAT = 'code_93';
+
     protected _patternToChar(pattern: number): string | null {
         for (let i = 0; i < CHARACTER_ENCODINGS.length; i++) {
             if (CHARACTER_ENCODINGS[i] === pattern) {
@@ -21,7 +22,7 @@ class Code93Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _toPattern(counters: Uint16Array): number {
         const numCounters = counters.length;
@@ -42,7 +43,7 @@ class Code93Reader extends BarcodeReader {
             }
         }
         return pattern;
-    };
+    }
 
     protected _findStart(): BarcodePosition | null {
         const offset = this._nextSet(this._row);
@@ -82,14 +83,14 @@ class Code93Reader extends BarcodeReader {
             }
         }
         return null;
-    };
+    }
 
     protected _verifyEnd(lastStart: number, nextStart: number): boolean {
         if (lastStart === nextStart || !this._row[nextStart]) {
             return false;
         }
         return true;
-    };
+    }
 
     protected _decodeExtended(charArray: Array<string>): string[] | null {
         const length = charArray.length;
@@ -152,7 +153,7 @@ class Code93Reader extends BarcodeReader {
             }
         }
         return result;
-    };
+    }
 
     protected _matchCheckChar(charArray: Array<string>, index: number, maxWeight: number): boolean {
         const arrayToCheck = charArray.slice(0, index);
@@ -165,12 +166,12 @@ class Code93Reader extends BarcodeReader {
 
         const checkChar = ALPHABET[(weightedSums % 47)];
         return checkChar === charArray[index].charCodeAt(0);
-    };
+    }
 
     protected _verifyChecksums(charArray: Array<string>): boolean {
         return this._matchCheckChar(charArray, charArray.length - 2, 20)
             && this._matchCheckChar(charArray, charArray.length - 1, 15);
-    };
+    }
 
     public decode(row?: Array<number>, start?: BarcodePosition | number | null): Barcode | null {
         start = this._findStart();
@@ -226,7 +227,6 @@ class Code93Reader extends BarcodeReader {
             decodedCodes: result,
             format: this.FORMAT,
         };
-
     }
 }
 

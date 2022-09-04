@@ -7,7 +7,7 @@ import {
     Moment,
     SparseImageWrapper,
 } from '../../type-definitions/quagga.d';
-import ArrayHelper from './array_helper';
+import * as ArrayHelper from './ArrayHelper';
 import { hsv2rgb } from './cv_utils';
 
 const vec2 = { clone };

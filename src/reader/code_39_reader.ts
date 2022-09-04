@@ -1,5 +1,5 @@
 /* eslint-disable class-methods-use-this */
-import ArrayHelper from '../common/array_helper';
+import * as ArrayHelper from '../common/ArrayHelper';
 import BarcodeReader, { type BarcodePosition, type Barcode } from './barcode_reader';
 
 const ALPHABETH_STRING = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-. *$/+%';

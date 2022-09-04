@@ -3,13 +3,13 @@
 // eslint-disable-next-line import/no-cycle
 import { ImageWrapper } from 'quagga';
 import { QuaggaJSResultObject } from '../../type-definitions/quagga';
-import ArrayHelper from '../common/array_helper';
+import * as ArrayHelper from '../common/ArrayHelper';
 
 // for some reason this throws a shadow error on itself?!
 // eslint-disable-next-line no-shadow
 export enum BarcodeDirection {
     Forward = 1,
-    Reverse = -1
+    Reverse = -1,
 }
 
 export type BarcodeReaderType = string;
