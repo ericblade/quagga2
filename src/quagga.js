@@ -1,5 +1,4 @@
 import merge from 'lodash/merge';
-import TypeDefs from './common/typedefs'; // eslint-disable-line no-unused-vars
 import ImageWrapper from './common/image_wrapper';
 import BarcodeDecoder from './decoder/barcode_decoder';
 import * as Readers from './reader/index';
