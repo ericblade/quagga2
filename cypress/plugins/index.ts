@@ -15,20 +15,29 @@
 /**
  * @type {Cypress.PluginConfig}
 */
-const webpack = require('@cypress/webpack-preprocessor');
+// const webpack = require('@cypress/webpack-preprocessor');
+import webpackPreprocessor from '@cypress/webpack-preprocessor';
+import webpackconfig from '../../configs/webpack.config';
+
+console.warn(JSON.stringify(webpackconfig));
+process.exit();
 
 module.exports = (on, config) => {
     config.env = config.env || {};
     config.env.BUILD_ENV = 'production';
-    if (process.env.NODE_ENV === 'test') {
-        const webpackOptions = {
-            webpackOptions: require('../../configs/webpack.config'),
+    // if (process.env.NODE_ENV === 'test') {
+/*         const webpackOptions = {
+            webpackOptions: webpackconfig(),
+            // webpackOptions: testconfig,
             watchOptions: {},
         };
-        on('file:preprocessor', webpack(webpackOptions));
+ */
+    on('file:preprocessor');
         // on('file:preprocessor', webpack());
         // require('@cypress/code-coverage/task')(on, config);
-    }
+    // }
     // on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'));
     return config;
 };
+
+export default module.exports;

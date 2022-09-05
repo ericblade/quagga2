@@ -1,4 +1,5 @@
-import { defineConfig } from 'cypress'
+import { defineConfig } from 'cypress';
+import plugin from './cypress/plugins/index';
 
 export default defineConfig({
   video: false,
@@ -8,7 +9,7 @@ export default defineConfig({
     // We've imported your old cypress plugins here.
     // You may want to clean this up later by importing these.
     setupNodeEvents(on, config) {
-      return require('./cypress/plugins/index.js')(on, config)
+      // return plugin(on, config)
     },
   },
 })

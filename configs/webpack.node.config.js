@@ -1,21 +1,25 @@
 var webpack = require('webpack'),
     path = require('path');
 
-module.exports = require('./webpack.config.js');
+const config = require('./webpack.config.js')();
 
-module.exports.externals = [
-    'get-pixels',
-    'gl-matrix',
-    'lodash',
-    'ndarray',
-    'ndarray-linear-interpolate',
-];
-module.exports.output.libraryTarget = 'commonjs';
-module.exports.output.library = undefined;
-module.exports.plugins = [
-    new webpack.DefinePlugin({
-        ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
-    }),
-];
-module.exports.output.path = __dirname + '/../lib';
-module.exports.output.filename = 'quagga.js';
+module.exports = (env, argv) => {
+    config.externals = [
+        'get-pixels',
+        'gl-matrix',
+        'lodash',
+        'ndarray',
+        'ndarray-linear-interpolate',
+    ];
+    config.output.libraryTarget = 'commonjs';
+    config.output.library = undefined;
+    config.plugins = [
+        new webpack.DefinePlugin({
+            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
+        }),
+    ];
+    config.output.path = __dirname + '/../lib';
+    config.output.filename = 'quagga.js';
+    config.mode = 'production';
+    return config;
+}

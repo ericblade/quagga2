@@ -1,7 +1,7 @@
-var webpack = require('webpack'),
-    path = require('path');
+const webpack = require('webpack');
+const path = require('path');
 
-module.exports = {
+const defaultConfig = {
     entry: [
         './src/quagga.js',
     ],
@@ -25,9 +25,9 @@ module.exports = {
             path.resolve('./src'),
             'node_modules',
         ],
-    },
-    node: {
-        fs: 'empty',
+        fallback: {
+            fs: false,
+        }
     },
     output: {
         path: __dirname + '/../dist',
@@ -51,5 +51,9 @@ module.exports = {
     optimization: {
         minimize: false,
     },
-    mode: 'production',
+    mode: 'development',
 };
+
+module.exports = (env, argv) => {
+    return defaultConfig;
+}

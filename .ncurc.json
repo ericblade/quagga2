@@ -3,9 +3,6 @@
     "reject": [
         "mocha",
         "@types/mocha",
-        "webpack",
-        "webpack-cli",
-        "cypress",
         "source-map-loader"
     ]
 }
