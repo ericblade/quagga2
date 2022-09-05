@@ -7,6 +7,7 @@ import Quagga from '../../src/quagga';
 import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
 import { expect } from 'chai';
 import ExternalCode128Reader from '../../src/reader/code_128_reader';
+import { PatchSize } from '../../src/common/cvutils/calculatePatchSize'
 
 // add it.allowFail see https://github.com/kellyselden/mocha-helpers/pull/4
 // also see https://github.com/mochajs/mocha/issues/1480#issuecomment-487074628
@@ -24,6 +25,7 @@ if (typeof it.allowFail === 'undefined') {
 }
 
 function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string }>) {
+    // if (name !== 'ean') return;
     describe(`Decoder ${name}`, () => {
         testSet.forEach((sample) => {
             it.allowFail(`decodes ${sample.name}`, async function() {
@@ -53,11 +55,10 @@ function generateConfig(configOverride: QuaggaJSConfigObject = {}) {
             ...configOverride.inputStream,
         },
         locator: {
-            patchSize: 'medium',
+            patchSize: PatchSize.medium,
             halfSample: true,
             ...configOverride.locator,
         },
-        numOfWorkers: 0,
         decoder: {
             readers: ['ean_reader'],
             ...configOverride.decoder,
@@ -187,10 +188,9 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
                 size: 1280,
             },
             locator: {
-                patchSize: 'large',
+                patchSize: PatchSize.large,
                 halfSample: true,
             },
-            numOfWorkers: 4,
             decoder: {
                 readers: ['code_32_reader']
             }
@@ -278,7 +278,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         generateConfig({
             inputStream: { size: 800, singleChannel: false },
             locator: {
-                patchSize: 'small',
+                patchSize: PatchSize.small,
                 halfSample: false,
             },
             decoder: {
@@ -319,7 +319,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         generateConfig({
             inputStream: { size: 800, singleChannel: false },
             locator: {
-                patchSize: 'large',
+                patchSize: PatchSize.large,
                 halfSample: true,
             },
             decoder: {

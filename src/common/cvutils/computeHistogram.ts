@@ -1,8 +1,6 @@
-export default function computeHistogram(imageWrapper, bitsPerPixel) {
-    if (!bitsPerPixel) {
-        // eslint-disable-next-line no-param-reassign
-        bitsPerPixel = 8;
-    }
+import { ImageWrapper } from "quagga";
+
+export default function computeHistogram(imageWrapper: ImageWrapper, bitsPerPixel = 8) {
     const imageData = imageWrapper.data;
     let { length } = imageData;
     const bitShift = 8 - bitsPerPixel;

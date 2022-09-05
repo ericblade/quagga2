@@ -83,7 +83,6 @@ function workerInterface(factory) {
     self.onmessage = function (e) {
         if (e.data.cmd === 'init') {
             var config = e.data.config;
-            config.numOfWorkers = 0;
             imageWrapper = new Quagga.ImageWrapper({
                 x: e.data.size.x,
                 y: e.data.size.y,

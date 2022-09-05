@@ -2,7 +2,6 @@ var Quagga = require('../lib/quagga').default;
 
 Quagga.decodeSingle({
     src: "../test/fixtures/code_128/image-001.jpg",
-    numOfWorkers: 0,
     inputStream: {
         size: 800,
         area: {

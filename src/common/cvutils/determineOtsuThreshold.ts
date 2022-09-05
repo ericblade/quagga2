@@ -1,11 +1,12 @@
-import * as ArrayHelper from '../ArrayHelper';
+import { ImageWrapper } from 'quagga';
+import { maxIndex } from '../ArrayHelper';
 import computeHistogram from './computeHistogram';
 
-export default function determineOtsuThreshold(imageWrapper, bitsPerPixel = 8) {
-    let hist;
+export default function determineOtsuThreshold(imageWrapper: ImageWrapper, bitsPerPixel = 8) {
+    let hist: Int32Array;
     const bitShift = 8 - bitsPerPixel;
 
-    function px(init, end) {
+    function px(init: number, end: number) {
         let sum = 0;
         for (let i = init; i <= end; i++) {
             sum += hist[i];
@@ -13,7 +14,7 @@ export default function determineOtsuThreshold(imageWrapper, bitsPerPixel = 8) {
         return sum;
     }
 
-    function mx(init, end) {
+    function mx(init: number, end: number) {
         let sum = 0;
 
         for (let i = init; i <= end; i++) {
@@ -46,7 +47,7 @@ export default function determineOtsuThreshold(imageWrapper, bitsPerPixel = 8) {
             m12 = m1 - m2;
             vet[k] = m12 * m12 / p12;
         }
-        return ArrayHelper.maxIndex(vet);
+        return maxIndex(vet);
     }
 
     const threshold = determineThreshold();

@@ -1,4 +1,4 @@
-export default function computeIntersection(arr1, arr2) {
+export default function computeIntersection<T>(arr1: Array<T>, arr2: Array<T>) {
     let i = 0;
     let j = 0;
     const result = [];

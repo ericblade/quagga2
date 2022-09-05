@@ -16,7 +16,7 @@ $(function() {
                     size: 800
                 },
                 locator: {
-                    patchSize: "medium",
+                    patchSize: PatchSize.medium,
                     halfSample: true
                 }
             },
@@ -27,7 +27,7 @@ $(function() {
                     length: 5
                 },
                 locator: {
-                    patchSize: "small",
+                    patchSize: PatchSize.small,
                     halfSample: false
                 }
             }

@@ -105,7 +105,7 @@ $(function() {
                 singleChannel: false
             },
             locator: {
-                patchSize: "medium",
+                patchSize: PatchSize.medium,
                 halfSample: true
             },
             decoder: {

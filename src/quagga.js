@@ -23,10 +23,6 @@ const QuaggaJSStaticInterface = {
             });
         }
         quaggaInstance.context.config = merge({}, Config, config);
-        // TODO #179: pending restructure in Issue #179, we are temp disabling workers
-        if (quaggaInstance.context.config.numOfWorkers > 0) {
-            quaggaInstance.context.config.numOfWorkers = 0;
-        }
         if (imageWrapper) {
             quaggaInstance.context.onUIThread = false;
             quaggaInstance.initializeData(imageWrapper);
@@ -102,22 +98,10 @@ const QuaggaJSStaticInterface = {
                 size: 800,
                 src: config.src,
             },
-            numOfWorkers: (ENV.development && config.debug) ? 0 : 1,
             locator: {
                 halfSample: false,
             },
         }, config);
-        // TODO #175: restructure worker support so that it will work with typescript using worker-loader
-        // https://webpack.js.org/loaders/worker-loader/
-        if (config.numOfWorkers > 0) {
-            config.numOfWorkers = 0;
-        }
-        // workers require Worker and Blob support presently, so if no Blob or Worker then set
-        // workers to 0.
-        if (config.numOfWorkers > 0 && (typeof Blob === 'undefined' || typeof Worker === 'undefined')) {
-            console.warn('* no Worker and/or Blob support - forcing numOfWorkers to 0');
-            config.numOfWorkers = 0;
-        }
         return new Promise((resolve, reject) => {
             try {
                 this.init(config, () => {

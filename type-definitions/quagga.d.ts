@@ -3,6 +3,8 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
+import { PatchSize } from "common/cvutils/calculatePatchSize";
+
 // import SubImage from '../src/common/subImage';
 // import ImageWrapper from '../src/common/image_wrapper';
 // export { SubImage, ImageWrapper };
@@ -747,82 +749,42 @@ export interface QuaggaJSResultObject_CodeResult {
 
 export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
 
+/**
+ * defines rectangle of the detection/localization area. Useful when you
+ * KNOW that certain parts of the image will not contain a barcode, also
+ * useful when you have multiple barcodes in a row and you want to make
+ * sure that only a code in, say the middle quarter is read not codes
+ * above or below
+ */
+export interface InputStreamArea {
+    /**
+     * @default "0%", set this and top to 50% if you only want to read a
+     * 'line' that is in the middle half
+     */
+    bottom?: string;
+    left?: string;
+    right?: string;
+    /**
+     * @default "0%", set this and bottom to 25% if you only want to
+     * read a 'line' that is in the middle quarter
+     */
+    top?: string;
+}
+
+export interface InputStreamConfig {
+    area?: InputStreamArea;
+    constraints?: MediaTrackConstraints;
+    mime?: string;
+    name?: string; // "Live"
+    sequence?: boolean;
+    singleChannel?: boolean;
+    size?: number;
+    target?: Element | string;
+    type?: InputStreamType; // "LiveStream"
+}
+
 export interface QuaggaJSConfigObject {
-    /**
-     * The image path to load from, or a data url
-     * Ex: '/test/fixtures/code_128/image-001.jpg'
-     * or: 'data:image/jpg;base64,' + data
-     */
-    src?: string | Uint8Array | Buffer;
-
-    inputStream?: {
-        /**
-         * @default "Live"
-         */
-        name?: string;
-
-        /**
-         * @default "LiveStream"
-         */
-        type?: InputStreamType;
-
-        target?: Element | string;
-
-        constraints?: MediaTrackConstraints;
-
-        /**
-         * defines rectangle of the detection/localization area. Useful when you
-         * KNOW that certain parts of the image will not contain a barcode, also
-         * useful when you have multiple barcodes in a row and you want to make
-         * sure that only a code in, say the middle quarter is read not codes
-         * above or below
-         */
-        area?: {
-            /**
-             * @default "0%", set this and bottom to 25% if you only want to
-             * read a 'line' that is in the middle quarter
-             */
-            top?: string;
-
-            /**
-             * @default "0%"
-             */
-            right?: string;
-
-            /**
-             * @default "0%"
-             */
-            left?: string;
-
-            /**
-             * @default "0%", set this and top to 50% if you only want to read a
-             * 'line' that is in the middle half
-             */
-            bottom?: string;
-        };
-
-        mime?: string;
-
-        singleChannel?: boolean;
-        size?: number;
-        sequence?: boolean;
-    };
-
-    /**
-     * @default false
-     */
-    debug?: boolean;
-
-    /**
-     * @default true
-     */
-    locate?: boolean;
-
-    /**
-     * @default 4
-     */
-    numOfWorkers?: number;
-
+    debug?: boolean; // false
     /**
      * This top-level property controls the scan-frequency of the video-stream.
      * It’s optional and defines the maximum number of scans per second.
@@ -830,6 +792,14 @@ export interface QuaggaJSConfigObject {
      * resources such as CPU power are of concern.
      */
     frequency?: number;
+    inputStream?: InputStreamConfig;
+    locate?: boolean; // true
+    /**
+     * The image path to load from, or a data url
+     * Ex: '/test/fixtures/code_128/image-001.jpg'
+     * or: 'data:image/jpg;base64,' + data
+     */
+    src?: string | Uint8Array | Buffer;
 
     decoder?: {
         /**
@@ -878,7 +848,7 @@ export interface QuaggaJSConfigObject {
          * @default "medium"
          * Available values: x-small, small, medium, large, x-large
          */
-        patchSize?: string;
+        patchSize?: PatchSize;
 
         debug?: {
             /**
@@ -970,3 +940,5 @@ export type TypedArray =
     | Uint32Array
     | Float32Array
     | Float64Array;
+
+export type ImageData = TypedArray | Array<number>;

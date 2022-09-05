@@ -1,8 +1,9 @@
-export default function computeGray(imageData, outArray, config) {
-    const l = (imageData.length / 4) | 0;
-    const singleChannel = config && config.singleChannel === true;
+import { ImageData, InputStreamConfig } from '../../../type-definitions/quagga';
 
-    if (singleChannel) {
+export default function computeGray(imageData: ImageData, outArray: ImageData, config: InputStreamConfig) {
+    const l = Math.trunc(imageData.length / 4);
+
+    if (config?.singleChannel === true) {
         for (let i = 0; i < l; i++) {
             // eslint-disable-next-line no-param-reassign
             outArray[i] = imageData[i * 4 + 0];

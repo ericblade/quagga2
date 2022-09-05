@@ -1,4 +1,5 @@
 import { QuaggaJSConfigObject } from '../../type-definitions/quagga.d';
+import { PatchSize } from '../common/cvutils/calculatePatchSize';
 
 const NodeConfig: QuaggaJSConfigObject = {
     inputStream: {
@@ -14,7 +15,6 @@ const NodeConfig: QuaggaJSConfigObject = {
         singleChannel: false, // true: only the red color-channel is read
     },
     locate: true,
-    numOfWorkers: 0,
     decoder: {
         readers: [
             'code_128_reader',
@@ -22,7 +22,7 @@ const NodeConfig: QuaggaJSConfigObject = {
     },
     locator: {
         halfSample: true,
-        patchSize: 'medium', // x-small, small, medium, large, x-large
+        patchSize: PatchSize.medium, // x-small, small, medium, large, x-large
     },
 };
 

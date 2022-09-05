@@ -1,4 +1,4 @@
-export default function computeDivisors(n) {
+export default function computeDivisors(n: number) {
     const largeDivisors = [];
     const divisors = [];
 

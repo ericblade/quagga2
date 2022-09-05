@@ -76,18 +76,16 @@ export default class Quagga {
             this.context.canvasContainer.dom.image,
         );
 
-        if (this.context.config.numOfWorkers === undefined) {
-            this.context.config.numOfWorkers = 0;
-        }
+        // @ts-ignore
+        this.context.config.numOfWorkers = 0;
 
+        // TODO: removing this line breaks everything.
         QWorkers.adjustWorkerPool(
-            this.context.config.numOfWorkers,
+            0,
             this.context.config,
             this.context.inputStream,
             () => {
-                if (this.context.config?.numOfWorkers === 0) {
-                    this.initializeData();
-                }
+                this.initializeData();
                 this.ready(callback);
             },
         );

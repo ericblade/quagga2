@@ -1,25 +1,31 @@
 import computeDivisors from './computeDivisors';
 import computeIntersection from './computeIntersection';
 
-export default function calculatePatchSize(patchSize, imgSize) {
+export interface ImageDimensions {
+    x: number;
+    y: number;
+}
+
+export enum PatchSize {
+    xlarge = 1,
+    large,
+    medium,
+    small,
+    xsmall,
+}
+
+export default function calculatePatchSize(patchSize: PatchSize, imgSize: ImageDimensions) {
     const divisorsX = computeDivisors(imgSize.x);
     const divisorsY = computeDivisors(imgSize.y);
     const wideSide = Math.max(imgSize.x, imgSize.y);
     const common = computeIntersection(divisorsX, divisorsY);
     const nrOfPatchesList = [8, 10, 15, 20, 32, 60, 80];
-    const nrOfPatchesMap = {
-        'x-small': 5,
-        small: 4,
-        medium: 3,
-        large: 2,
-        'x-large': 1,
-    };
-    const nrOfPatchesIdx = nrOfPatchesMap[patchSize] || nrOfPatchesMap.medium;
+    const nrOfPatchesIdx = patchSize;
     const nrOfPatches = nrOfPatchesList[nrOfPatchesIdx];
     const desiredPatchSize = Math.floor(wideSide / nrOfPatches);
     let optimalPatchSize;
 
-    function findPatchSizeForDivisors(divisors) {
+    function findPatchSizeForDivisors(divisors: Array<number>) {
         let i = 0;
         let found = divisors[Math.floor(divisors.length / 2)];
 

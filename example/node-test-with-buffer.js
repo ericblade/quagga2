@@ -6,7 +6,6 @@ decode(buffer);
 function decode(buff){
     Quagga.decodeSingle({
         src: buff,
-        numOfWorkers: 0,
         inputStream: {
             mime: "image/jpeg",
             size: 800,

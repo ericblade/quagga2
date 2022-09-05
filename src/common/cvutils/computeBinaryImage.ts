@@ -1,14 +1,12 @@
+// TODO: not used?
+import { ImageWrapper } from 'quagga';
 import computeIntegralImage from './computeIntegralImage';
 
 // local thresholding
 
-export default function computeBinaryImage(imageWrapper, integralWrapper, targetWrapper) {
+export default function computeBinaryImage(imageWrapper: ImageWrapper, integralWrapper: ImageWrapper, targetWrapper: ImageWrapper) {
     computeIntegralImage(imageWrapper, integralWrapper);
 
-    if (!targetWrapper) {
-        // eslint-disable-next-line no-param-reassign
-        targetWrapper = imageWrapper;
-    }
     const imageData = imageWrapper.data;
     const targetData = targetWrapper.data;
     const width = imageWrapper.size.x;
