@@ -8,7 +8,7 @@ import {
     SparseImageWrapper,
 } from '../../type-definitions/quagga.d';
 import * as ArrayHelper from './ArrayHelper';
-import { hsv2rgb } from './cv_utils';
+import hsv2rgb from './cvutils/hsv2rgb';
 
 const vec2 = { clone };
 

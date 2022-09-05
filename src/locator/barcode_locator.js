@@ -1,16 +1,14 @@
 import * as mat2 from 'gl-mat2';
 import * as vec2 from 'gl-vec2';
 import * as ArrayHelper from '../common/ArrayHelper';
-import {
-    calculatePatchSize,
-    otsuThreshold,
-    hsv2rgb,
-    cluster,
-    topGeneric,
-    imageRef,
-    halfSample,
-    computeImageArea,
-} from '../common/cv_utils';
+import { cluster } from '../common/cv_utils';
+import calculatePatchSize from '../common/cvutils/calculatePatchSize';
+import computeImageArea from '../common/cvutils/computeImageArea';
+import halfSample from '../common/cvutils/halfSample';
+import hsv2rgb from '../common/cvutils/hsv2rgb';
+import imageRef from '../common/cvutils/imageRef';
+import otsuThreshold from '../common/cvutils/otsuThreshold';
+import topGeneric from '../common/cvutils/topGeneric';
 import ImageDebug from '../common/image_debug';
 import ImageWrapper from '../common/image_wrapper';
 import Rasterizer from './rasterizer';

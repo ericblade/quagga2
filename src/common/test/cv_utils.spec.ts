@@ -1,13 +1,9 @@
-
-const { describe, it, beforeEach } = require('mocha');
-const { expect } = require('chai');
-const {
-    imageRef,
-    calculatePatchSize,
-    _parseCSSDimensionValues,
-    _dimensionsConverters,
-    computeImageArea,
-} = require('../cv_utils');
+import { expect } from 'chai';
+import { describe, it, beforeEach } from 'mocha';
+import calculatePatchSize from '../cvutils/calculatePatchSize';
+import computeImageArea, { _dimensionsConverters } from '../cvutils/computeImageArea';
+import imageRef from '../cvutils/imageRef';
+import parseCSSDimensionValues from '../cvutils/parseCSSDimensionValues';
 
 describe('CV Utils', () => {
     describe('imageRef', () => {
@@ -41,7 +37,7 @@ describe('CV Utils', () => {
                 value: 10,
                 unit: '%',
             };
-            const result = _parseCSSDimensionValues('10%');
+            const result = parseCSSDimensionValues('10%');
 
             expect(result).to.deep.equal(expected);
         });
@@ -51,7 +47,7 @@ describe('CV Utils', () => {
                 value: 100,
                 unit: '%',
             };
-            const result = _parseCSSDimensionValues('100%');
+            const result = parseCSSDimensionValues('100%');
 
             expect(result).to.deep.equal(expected);
         });
@@ -61,7 +57,7 @@ describe('CV Utils', () => {
                 value: 0,
                 unit: '%',
             };
-            const result = _parseCSSDimensionValues('0%');
+            const result = parseCSSDimensionValues('0%');
 
             expect(result).to.deep.equal(expected);
         });
@@ -71,7 +67,7 @@ describe('CV Utils', () => {
                 value: 26.3,
                 unit: '%',
             };
-            const result = _parseCSSDimensionValues('26.3px');
+            const result = parseCSSDimensionValues('26.3px');
 
             // console.log(result);
             expect(result).to.deep.equal(expected);
@@ -79,7 +75,7 @@ describe('CV Utils', () => {
     });
 
     describe('_dimensionsConverters', () => {
-        let context;
+        let context: { height: number, width: number };
 
         beforeEach(() => {
             context = {

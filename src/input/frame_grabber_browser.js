@@ -1,11 +1,9 @@
 // NOTE FOR ANYONE IN HERE IN THE FUTURE:
 // webpack.config.js replaces the frame_grabber module with THIS module when it is building for a Browser environment.
 
-import {
-    imageRef,
-    grayAndHalfSampleFromCanvasData,
-    computeGray,
-} from '../common/cv_utils';
+import computeGray from '../common/cvutils/computeGray';
+import grayAndHalfSampleFromCanvasData from '../common/cvutils/grayAndHalfSampleFromCanvasData';
+import imageRef from '../common/cvutils/imageRef';
 
 const TO_RADIANS = Math.PI / 180;
 
