@@ -24,11 +24,28 @@ if (typeof it.allowFail === 'undefined') {
     };
 }
 
+// fill with the name of a reader to test alone
+const onlyRunTestsForDecoders: Array<string> = [];
+if (process.env.QUAGGA_TEST_DECODER) {
+    onlyRunTestsForDecoders.push(process.env.QUAGGA_TEST_DECODER);
+}
+// fill with the indices of tests to test alone
+const onlyRunTestsWithIndices: Array<number> = [];
+if (process.env.QUAGGA_TEST_INDEX) {
+    onlyRunTestsWithIndices.push(parseInt(process.env.QUAGGA_TEST_INDEX, 10));
+}
+
 function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string }>) {
-    // if (name !== 'ean') return;
+    if (onlyRunTestsForDecoders.length > 0 && !onlyRunTestsForDecoders.includes(name)) {
+        return;
+    }
     describe(`Decoder ${name}`, () => {
-        testSet.forEach((sample) => {
-            it.allowFail(`decodes ${sample.name}`, async function() {
+        testSet.forEach((sample, index) => {
+            if (onlyRunTestsWithIndices.length > 0 && !onlyRunTestsWithIndices.includes(index)) {
+                return;
+            }
+            const shouldAllowFail = (onlyRunTestsForDecoders.length && onlyRunTestsWithIndices.length) ? it : it.allowFail;
+            shouldAllowFail(`decodes ${sample.name}`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
                 const thisConfig = {
                     ...config,
@@ -341,70 +358,74 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     );
 });
 
-describe('Parallel decoding works', () => {
-    it('decodeSingle running in parallel', async () => {
-        // TODO: we should throw in some other formats here too.
-        const testSet = [
-            { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13' },
-            { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13' },
-            { 'name': 'image-004.jpg', 'result': '9002233139084', format: 'ean_13' },
-            { 'name': 'image-003.jpg', 'result': '4006209700068', format: 'ean_13' },
-            { 'name': 'image-005.jpg', 'result': '8004030044005', format: 'ean_13' },
-            { 'name': 'image-006.jpg', 'result': '4003626011159', format: 'ean_13' },
-            { 'name': 'image-007.jpg', 'result': '2111220009686', format: 'ean_13' },
-            { 'name': 'image-008.jpg', 'result': '9000275609022', format: 'ean_13' },
-            { 'name': 'image-009.jpg', 'result': '9004593978587', format: 'ean_13' },
-            { 'name': 'image-010.jpg', 'result': '9002244845578', format: 'ean_13' },
-        ];
-        const promises: Array<Promise<any>> = [];
+if (!onlyRunTestsForDecoders.length && !onlyRunTestsWithIndices.length) {
+    describe('Parallel decoding works', () => {
+        it('decodeSingle running in parallel', async () => {
+            // TODO: we should throw in some other formats here too.
+            const testSet = [
+                { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13' },
+                { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13' },
+                { 'name': 'image-004.jpg', 'result': '9002233139084', format: 'ean_13' },
+                { 'name': 'image-003.jpg', 'result': '4006209700068', format: 'ean_13' },
+                { 'name': 'image-005.jpg', 'result': '8004030044005', format: 'ean_13' },
+                { 'name': 'image-006.jpg', 'result': '4003626011159', format: 'ean_13' },
+                { 'name': 'image-007.jpg', 'result': '2111220009686', format: 'ean_13' },
+                { 'name': 'image-008.jpg', 'result': '9000275609022', format: 'ean_13' },
+                { 'name': 'image-009.jpg', 'result': '9004593978587', format: 'ean_13' },
+                { 'name': 'image-010.jpg', 'result': '9002244845578', format: 'ean_13' },
+            ];
+            const promises: Array<Promise<any>> = [];
 
-        testSet.forEach(sample => {
-            const config = generateConfig();
-            config.src = `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/ean/${sample.name}`;
-            promises.push(Quagga.decodeSingle(config));
-        });
-        const results = await Promise.all(promises).catch((err) => { console.warn('* error decoding simultaneously', err); throw(err); });
-        const testResults = testSet.map(x => x.result);
-        results.forEach((r, index) => {
-            expect(r).to.be.an('object');
-            expect(r.codeResult).to.be.an('object');
-            expect(r.codeResult.code).to.equal(testResults[index]);
+            testSet.forEach(sample => {
+                const config = generateConfig();
+                config.src = `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/ean/${sample.name}`;
+                promises.push(Quagga.decodeSingle(config));
+            });
+            const results = await Promise.all(promises).catch((err) => { console.warn('* error decoding simultaneously', err); throw(err); });
+            const testResults = testSet.map(x => x.result);
+            results.forEach((r, index) => {
+                expect(r).to.be.an('object');
+                expect(r.codeResult).to.be.an('object');
+                expect(r.codeResult.code).to.equal(testResults[index]);
+            });
         });
     });
-});
+}
 
-describe('External Reader Test, using stock code_128 reader', () => {
-    describe('works', () => {
-        before(() => {
-            Quagga.registerReader('external_code_128_reader', ExternalCode128Reader);
+if (!onlyRunTestsForDecoders.length && !onlyRunTestsWithIndices.length) {
+    describe('External Reader Test, using stock code_128 reader', () => {
+        describe('works', () => {
+            before(() => {
+                Quagga.registerReader('external_code_128_reader', ExternalCode128Reader);
+            });
+            runDecoderTest(
+                'code_128',
+                generateConfig({
+                    inputStream: {
+                        size: 800,
+                        singleChannel: false,
+                    },
+                    decoder: {
+                        readers: ['external_code_128_reader'],
+                    },
+                }),
+                [
+                    { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
+                    { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
+                    { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
+                    { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128' },
+                    { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
+                    { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
+                    { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
+                    { 'name': 'image-008.jpg', 'result': '1020185021797280784055', format: 'code_128' },
+                    { 'name': 'image-009.jpg', 'result': '0001285112001000040801', format: 'code_128' },
+                    { 'name': 'image-010.jpg', 'result': '673023', format: 'code_128' },
+                    // TODO: need to implement having different inputStream parameters to be able to
+                    // read this one -- it works only with inputStream size set to 1600 presently, but
+                    // other samples break at that high a size.
+                    // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
+                ]
+            );
         });
-        runDecoderTest(
-            'code_128',
-            generateConfig({
-                inputStream: {
-                    size: 800,
-                    singleChannel: false,
-                },
-                decoder: {
-                    readers: ['external_code_128_reader'],
-                },
-            }),
-            [
-                { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
-                { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
-                { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
-                { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128' },
-                { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
-                { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
-                { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
-                { 'name': 'image-008.jpg', 'result': '1020185021797280784055', format: 'code_128' },
-                { 'name': 'image-009.jpg', 'result': '0001285112001000040801', format: 'code_128' },
-                { 'name': 'image-010.jpg', 'result': '673023', format: 'code_128' },
-                // TODO: need to implement having different inputStream parameters to be able to
-                // read this one -- it works only with inputStream size set to 1600 presently, but
-                // other samples break at that high a size.
-                // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
-            ]
-        );
     });
-});
+}
