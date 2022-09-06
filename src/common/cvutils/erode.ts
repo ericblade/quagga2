@@ -1,4 +1,6 @@
-export default function erode(inImageWrapper, outImageWrapper) {
+import { ImageWrapper } from "quagga";
+
+export default function erode(inImageWrapper: ImageWrapper, outImageWrapper: ImageWrapper) {
     let v;
     let u;
     const inImageData = inImageWrapper.data;

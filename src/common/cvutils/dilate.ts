@@ -1,4 +1,7 @@
-export default function dilate(inImageWrapper, outImageWrapper) {
+import { ImageWrapper } from "quagga";
+
+// TODO: not used?
+export default function dilate(inImageWrapper: ImageWrapper, outImageWrapper: ImageWrapper) {
     let v;
     let u;
     const inImageData = inImageWrapper.data;

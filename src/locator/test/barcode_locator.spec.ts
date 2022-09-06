@@ -9,7 +9,7 @@ import sinon, {SinonSpy} from 'sinon';
 import { expect } from 'chai';
 import { QuaggaJSConfigObject } from '../../../type-definitions/quagga';
 
-declare interface AreaConfig {
+export interface AreaConfig {
     area: {
         top: string,
         right: string,

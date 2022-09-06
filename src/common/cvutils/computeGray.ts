@@ -1,6 +1,6 @@
-import { ImageData, InputStreamConfig } from '../../../type-definitions/quagga';
+import { ImageDataArray, InputStreamConfig } from '../../../type-definitions/quagga';
 
-export default function computeGray(imageData: ImageData, outArray: ImageData, config: InputStreamConfig) {
+export default function computeGray(imageData: ImageDataArray, outArray: ImageDataArray, config?: InputStreamConfig) {
     const l = Math.trunc(imageData.length / 4);
 
     if (config?.singleChannel === true) {

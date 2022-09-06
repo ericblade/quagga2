@@ -941,4 +941,4 @@ export type TypedArray =
     | Float32Array
     | Float64Array;
 
-export type ImageData = TypedArray | Array<number>;
+export type ImageDataArray = TypedArray | Array<number>;

@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import calculatePatchSize, { PatchSize } from '../cvutils/calculatePatchSize';
-import computeImageArea, { _dimensionsConverters } from '../cvutils/computeImageArea';
+import computeImageArea, { dimensionsConverters } from '../cvutils/computeImageArea';
 import imageRef from '../cvutils/imageRef';
 import parseCSSDimensionValues from '../cvutils/parseCSSDimensionValues';
 
@@ -86,28 +86,28 @@ describe('CV Utils', () => {
 
         it('should convert a top-value correclty', () => {
             const expected = 48;
-            const result = _dimensionsConverters.top({ value: 10, unit: '%' }, context);
+            const result = dimensionsConverters.top({ value: 10, unit: '%' }, context);
 
             expect(result).to.be.equal(expected);
         });
 
         it('should convert a right-value correclty', () => {
             const expected = 640 - 128;
-            const result = _dimensionsConverters.right({ value: 20, unit: '%' }, context);
+            const result = dimensionsConverters.right({ value: 20, unit: '%' }, context);
 
             expect(result).to.be.equal(expected);
         });
 
         it('should convert a bottom-value correclty', () => {
             const expected = 480 - 77;
-            const result = _dimensionsConverters.bottom({ value: 16, unit: '%' }, context);
+            const result = dimensionsConverters.bottom({ value: 16, unit: '%' }, context);
 
             expect(result).to.be.equal(expected);
         });
 
         it('should convert a left-value correclty', () => {
             const expected = 57;
-            const result = _dimensionsConverters.left({ value: 9, unit: '%' }, context);
+            const result = dimensionsConverters.left({ value: 9, unit: '%' }, context);
 
             expect(result).to.be.equal(expected);
         });

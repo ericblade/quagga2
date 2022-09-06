@@ -1,9 +1,11 @@
+import { ImageWrapper } from "quagga";
+
 /**
  * @param inImg {ImageWrapper} input image to be sampled
  * @param outImg {ImageWrapper} to be stored in
  */
 
-export default function halfSample(inImgWrapper, outImgWrapper) {
+export default function halfSample(inImgWrapper: ImageWrapper, outImgWrapper: ImageWrapper) {
     const inImg = inImgWrapper.data;
     const inWidth = inImgWrapper.size.x;
     const outImg = outImgWrapper.data;

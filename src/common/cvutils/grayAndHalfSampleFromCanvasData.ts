@@ -1,4 +1,11 @@
-export default function grayAndHalfSampleFromCanvasData(canvasData, size, outArray) {
+import { ImageDataArray } from '../../../type-definitions/quagga';
+import { ImageDimensions } from './calculatePatchSize';
+
+export default function grayAndHalfSampleFromCanvasData<T extends ImageDataArray>(
+    canvasData: T,
+    size: ImageDimensions,
+    outArray: T,
+) {
     let topRowIdx = 0;
     let bottomRowIdx = size.x;
     const endIdx = Math.floor(canvasData.length / 4);

@@ -1,8 +1,7 @@
-export default function subtract(aImageWrapper, bImageWrapper, resultImageWrapper) {
-    if (!resultImageWrapper) {
-        // eslint-disable-next-line no-param-reassign
-        resultImageWrapper = aImageWrapper;
-    }
+import { ImageWrapper } from "quagga";
+
+// TODO: not used?
+export default function subtract(aImageWrapper: ImageWrapper, bImageWrapper: ImageWrapper, resultImageWrapper = aImageWrapper) {
     let { length } = aImageWrapper.data;
     const aImageData = aImageWrapper.data;
     const bImageData = bImageWrapper.data;

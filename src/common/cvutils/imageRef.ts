@@ -1,9 +1,5 @@
-import { clone as v2clone } from 'gl-vec2';
-import { clone as v3clone } from 'gl-vec3';
-
-export const vec2 = { clone: v2clone };
-export const vec3 = { clone: v3clone };
-
+import { clone as vec2clone } from 'gl-vec2';
+import { clone as vec3clone } from 'gl-vec3';
 
 /**
  * @param x x-coordinate
@@ -11,15 +7,15 @@ export const vec3 = { clone: v3clone };
  * @return ImageReference {x,y} Coordinate
  */
 
-export default function imageRef(x, y) {
+export default function imageRef(x: number, y: number) {
     const that = {
         x,
         y,
         toVec2() {
-            return vec2.clone([this.x, this.y]);
+            return vec2clone([this.x, this.y]);
         },
         toVec3() {
-            return vec3.clone([this.x, this.y, 1]);
+            return vec3clone([this.x, this.y, 1]);
         },
         round() {
             this.x = this.x > 0.0 ? Math.floor(this.x + 0.5) : Math.floor(this.x - 0.5);

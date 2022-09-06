@@ -3,7 +3,10 @@
  * @param imageDataContainer {ImageDataContainer} the image to be integrated
  */
 
-export default function computeIntegralImage2(imageWrapper, integralWrapper) {
+import { ImageWrapper } from "quagga";
+
+// TODO: not used?
+export default function computeIntegralImage2(imageWrapper: ImageWrapper, integralWrapper: ImageWrapper) {
     const imageData = imageWrapper.data;
     const width = imageWrapper.size.x;
     const height = imageWrapper.size.y;

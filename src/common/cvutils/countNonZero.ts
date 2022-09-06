@@ -1,4 +1,7 @@
-export default function countNonZero(imageWrapper) {
+import { ImageWrapper } from "quagga";
+
+// TODO: not used?
+export default function countNonZero(imageWrapper: ImageWrapper) {
     let { length } = imageWrapper.data;
     const { data } = imageWrapper;
     let sum = 0;

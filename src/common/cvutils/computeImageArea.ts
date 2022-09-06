@@ -1,6 +1,7 @@
+import { AreaConfig } from '../../locator/test/barcode_locator.spec';
 import _parseCSSDimensionValues from './parseCSSDimensionValues';
 
-export const _dimensionsConverters = {
+export const dimensionsConverters = {
     top(dimension, context) {
         return dimension.unit === '%' ? Math.floor(context.height * (dimension.value / 100)) : null;
     },
@@ -15,13 +16,13 @@ export const _dimensionsConverters = {
     },
 };
 
-export default function computeImageArea(inputWidth, inputHeight, area) {
+export default function computeImageArea(inputWidth: number, inputHeight: number, area: AreaConfig) {
     const context = { width: inputWidth, height: inputHeight };
 
-    const parsedArea = Object.keys(area).reduce((result, key) => {
+    const parsedArea = Object.keys(area).reduce((result, key: keyof AreaConfig) => {
         const value = area[key];
         const parsed = _parseCSSDimensionValues(value);
-        const calculated = _dimensionsConverters[key](parsed, context);
+        const calculated = dimensionsConverters[key](parsed, context);
 
         // eslint-disable-next-line no-param-reassign
         result[key] = calculated;

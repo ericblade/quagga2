@@ -22,6 +22,7 @@
     "@cypress/webpack-preprocessor": "5.12.2",
     "@types/chai": "^4.3.3",
     "@types/gl-vec2": "^1.3.2",
+    "@types/gl-vec3": "^1.1.1",
     "@types/lodash": "^4.14.184",
     "@types/mocha": "^5.2.7",
     "@types/sinon": "^10.0.13",

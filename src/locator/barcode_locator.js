@@ -1,3 +1,4 @@
+// TODO: when converting this to TypeScript, also convert topGeneric
 import * as mat2 from 'gl-mat2';
 import * as vec2 from 'gl-vec2';
 import * as ArrayHelper from '../common/ArrayHelper';
