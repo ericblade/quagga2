@@ -1,8 +1,6 @@
 {
     "upgrade": true,
     "reject": [
-        "mocha",
-        "@types/mocha",
         "source-map-loader"
     ]
 }
