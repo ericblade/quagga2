@@ -41,6 +41,9 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
  * @param {Object} video
  */
 async function initCamera(video: HTMLVideoElement | null, constraints: MediaStreamConstraints): Promise<void> {
+    if (typeof 'getUserMedia' === 'undefined') {
+        throw new Exception('getUserMedia undefined -- upgrade browsers or provide permissions', -1);
+    }
     const stream = await getUserMedia(constraints);
     streamRef = stream;
     if (video) {
