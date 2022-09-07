@@ -1,6 +1,158 @@
+/* eslint-disable no-bitwise */
 import { ImageWrapper } from 'quagga';
 import { Point } from '../../type-definitions/quagga';
+// import { dist } from 'gl-vec2';
 
+// TODO: would it be faster/more correct to ensure that our incoming points are integers already?
+// how do they even get to be dumb floats?
+
+// DDA line tracing from http://www.edepot.com/linedda.html
+// algorithm slightly slower than Bresenham, but can allocate the entire array in advance and
+// overall saves time. Accuracy appears unchanged or better.
+export function getBarcodeLineDDA(imageWrapper: ImageWrapper, p1: Point, p2: Point) {
+    const x = p1.x | 0;
+    const y = p1.y | 0;
+    const x2 = p2.x | 0;
+    const y2 = p2.y | 0;
+    let length = Math.abs(x2 - x);
+    if (Math.abs(y2 - y) > length) length = Math.abs(y2 - y);
+    const xinc = (x2 - x) / length;
+    const yinc = (y2 - y) / length;
+
+    const imageData = imageWrapper.data;
+    const width = imageWrapper.size.x;
+    const line: Array<number> = new Array(length) as Array<number>;
+    line.fill(0);
+    let min = 255;
+    let max = 0;
+    let counter = 0;
+
+    function setPixel(a: number, b: number) {
+        const value = imageData[b * width + a];
+        min = Math.min(min, value);
+        max = Math.max(max, value);
+        line[counter] = value;
+        counter += 1;
+    }
+
+    let thisX = x + 0.5;
+    let thisY = y + 0.5;
+    for (let i = 1; i <= length; ++i) {
+        setPixel(thisX | 0, thisY | 0);
+        thisX += xinc;
+        thisY += yinc;
+    }
+    return {
+        line,
+        min,
+        max,
+    };
+}
+
+// EFLA-D method is faster overall, but fails on 4 more tests than Bresenham's
+export function getBarcodeLineEFLAD(imageWrapper: ImageWrapper, p1: Point, p2: Point, accuracyBits = 16) {
+    const x = p1.x | 0;
+    const y = p1.y | 0;
+    const x2 = p2.x | 0;
+    const y2 = p2.y | 0;
+
+    let shortLen = y2 - y;
+    let longLen = x2 - x;
+    const yLonger = Math.abs(shortLen) > Math.abs(longLen);
+    if (yLonger) {
+        [shortLen, longLen] = [longLen, shortLen];
+    }
+    const endVal = longLen;
+    const incrementVal = longLen < 0 ? -1 : 1;
+    if (incrementVal === -1) {
+        longLen = -longLen;
+    }
+    const decInc = (longLen === 0) ? 0 : (shortLen << accuracyBits) / longLen;
+
+    const imageData = imageWrapper.data;
+    const width = imageWrapper.size.x;
+    // eslint-disable-next-line no-bitwise
+    // const distance = Math.ceil(dist([x, y], [x2, y2]));
+    const line: Array<number> = new Array(Math.abs(endVal)) as Array<number>;
+    let min = 255;
+    let max = 0;
+    let counter = 0;
+
+    function setPixel(a: number, b: number) {
+        const value = imageData[b * width + a];
+        min = Math.min(min, value);
+        max = Math.max(max, value);
+        line[counter] = value;
+        counter += 1;
+    }
+
+    let j = 0;
+    if (yLonger) {
+        for (let i = 0; i !== endVal; i += incrementVal) {
+            // eslint-disable-next-line no-bitwise
+            setPixel(x + (j >> accuracyBits), y + i);
+            j += decInc;
+        }
+    } else {
+        for (let i = 0; i !== endVal; i += incrementVal) {
+            // eslint-disable-next-line no-bitwise
+            setPixel(x + i, y + (j >> accuracyBits));
+            j += decInc;
+        }
+    }
+
+    return {
+        line,
+        min,
+        max,
+    };
+}
+
+// this version is slightly more true to Bresenham's original,
+// almost immeasureably faster than the original implementation below this.
+export function getBarcodeLineNew(imageWrapper: ImageWrapper, p1: Point, p2: Point) {
+    let { x: x0, y: y0 } = p1;
+    let { x: x1, y: y1 } = p2;
+    // eslint-disable-next-line no-bitwise
+    x0 |= 0; x1 |= 0; y0 |= 0; y1 |= 0;
+
+    const dx = Math.abs(x1 - x0);
+    const dy = Math.abs(y1 - y0);
+    const sx = (x0 < x1) ? 1 : -1;
+    const sy = (y0 < y1) ? 1 : -1;
+
+    const imageData = imageWrapper.data;
+    const width = imageWrapper.size.x;
+
+    let err = dx - dy;
+    let min = 255;
+    let max = 0;
+    const line: Array<number> = [];
+
+    function setPixel(a: number, b: number) {
+        const value = imageData[b * width + a];
+        min = value < min ? value : min;
+        max = value > max ? value : max;
+        line.push(value);
+    }
+    while (true) {
+        setPixel(x0, y0);
+        if ((x0 === x1) && (y0 === y1)) break;
+        const e2 = 2 * err;
+        if (e2 > -dy) {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dx) {
+            err += dx; y0 += sy;
+        }
+    }
+    return {
+        line,
+        min,
+        max,
+    };
+}
 const Slope = {
     DIR: {
         UP: 1,

@@ -15,7 +15,9 @@ import EANReader from '../reader/ean_reader';
 import I2of5Reader from '../reader/i2of5_reader';
 import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
-import { getBarcodeLine, toBinaryLine } from './bresenham';
+// import { getBarcodeLineEFLAD as getBarcodeLine, toBinaryLine } from './bresenham';
+// import { getBarcodeLineNew as getBarcodeLine, toBinaryLine } from './bresenham';
+import { getBarcodeLineDDA as getBarcodeLine, toBinaryLine } from './bresenham';
 
 const READERS = {
     code_128_reader: Code128Reader,
