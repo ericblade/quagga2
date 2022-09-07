@@ -144,6 +144,7 @@ export abstract class BarcodeReader {
     }
 
     public decodePattern(pattern: Array<number>) {
+        // console.trace();
         // console.warn('* decodePattern', pattern);
         this._row = pattern;
         // console.warn('* decodePattern calling decode', typeof this, this.constructor, this.FORMAT, JSON.stringify(this));

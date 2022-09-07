@@ -1,4 +1,5 @@
-const Bresenham = {};
+import { ImageWrapper } from 'quagga';
+import { Point } from '../../type-definitions/quagga';
 
 const Slope = {
     DIR: {
@@ -15,26 +16,27 @@ const Slope = {
  * @param {Object} p2 The end point {x,y}
  * @returns {line, min, max}
  */
-Bresenham.getBarcodeLine = function (imageWrapper, p1, p2) {
-    /* eslint-disable no-bitwise */
-    let x0 = p1.x | 0;
-    let y0 = p1.y | 0;
-    let x1 = p2.x | 0;
-    let y1 = p2.y | 0;
-    /* eslint-disable no-bitwise */
+export function getBarcodeLine(imageWrapper: ImageWrapper, p1: Point, p2: Point) {
+    let { x: x0, y: y0 } = p1;
+    let { x: x1, y: y1 } = p2;
+
+    // eslint-disable-next-line no-bitwise
+    x0 |= 0; x1 |= 0; y0 |= 0; y1 |= 0;
+    // unsure why truncate doesn't work identical to |= 0 above.
+
     const steep = Math.abs(y1 - y0) > Math.abs(x1 - x0);
     let error;
     let y;
     let tmp;
     let x;
-    const line = [];
+    const line: Array<number> = [];
     const imageData = imageWrapper.data;
     const width = imageWrapper.size.x;
     let val;
     let min = 255;
     let max = 0;
 
-    function read(a, b) {
+    function read(a: number, b: number) {
         val = imageData[b * width + a];
         min = val < min ? val : min;
         max = val > max ? val : max;
@@ -82,17 +84,20 @@ Bresenham.getBarcodeLine = function (imageWrapper, p1, p2) {
         min,
         max,
     };
-};
+}
 
 /**
  * Converts the result from getBarcodeLine into a binary representation
  * also considering the frequency and slope of the signal for more robust results
  * @param {Object} result {line, min, max}
  */
-Bresenham.toBinaryLine = function (result) {
-    const { min } = result;
-    const { max } = result;
-    const { line } = result;
+interface ToBinaryLineParams {
+    line: Array<number>,
+    max: number,
+    min: number,
+}
+
+export function toBinaryLine({ line, max, min }: ToBinaryLineParams) {
     let slope;
     let slope2;
     const center = min + (max - min) / 2;
@@ -135,6 +140,7 @@ Bresenham.toBinaryLine = function (result) {
     });
 
     for (j = extrema[0].pos; j < extrema[1].pos; j++) {
+        // eslint-disable-next-line no-param-reassign
         line[j] = line[j] > center ? 0 : 1;
     }
 
@@ -147,6 +153,7 @@ Bresenham.toBinaryLine = function (result) {
         }
 
         for (j = extrema[i].pos; j < extrema[i + 1].pos; j++) {
+            // eslint-disable-next-line no-param-reassign
             line[j] = line[j] > threshold ? 0 : 1;
         }
     }
@@ -155,11 +162,12 @@ Bresenham.toBinaryLine = function (result) {
         line,
         threshold,
     };
-};
+}
 
 /**
  * Used for development only
  */
+/*
 Bresenham.debug = {
     printFrequency(line, canvas) {
         let i;
@@ -193,5 +201,4 @@ Bresenham.debug = {
         }
     },
 };
-
-export default Bresenham;
+*/

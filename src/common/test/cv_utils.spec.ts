@@ -144,7 +144,6 @@ describe('CV Utils', () => {
                 bottom: '0%',
                 left: '0%',
             });
-
             expect(result).to.deep.equal(expected);
         });
     });

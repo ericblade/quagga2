@@ -15,7 +15,7 @@ import EANReader from '../reader/ean_reader';
 import I2of5Reader from '../reader/i2of5_reader';
 import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
-import Bresenham from './bresenham';
+import { getBarcodeLine, toBinaryLine } from './bresenham';
 
 const READERS = {
     code_128_reader: Code128Reader,
@@ -185,20 +185,22 @@ export default {
         function tryDecode(line) {
             let result = null;
             let i;
-            const barcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, line[0], line[1]);
+            const barcodeLine = getBarcodeLine(inputImageWrapper, line[0], line[1]);
 
             if (ENV.development && config.debug.showFrequency) {
                 ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
-                Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
+                // TODO: dig out Bresenham debug and convert it properly and reenable in this file
+                // Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 
-            Bresenham.toBinaryLine(barcodeLine);
+            toBinaryLine(barcodeLine);
 
             if (ENV.development && config.debug.showPattern) {
-                Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
+                // Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
             }
 
             for (i = 0; i < _barcodeReaders.length && result === null; i++) {
+                // console.trace();
                 result = _barcodeReaders[i].decodePattern(barcodeLine.line);
             }
             if (result === null) {
@@ -249,8 +251,8 @@ export default {
 
         function getLineLength(line) {
             return Math.sqrt(
-                Math.pow(Math.abs(line[1].y - line[0].y), 2)
-                + Math.pow(Math.abs(line[1].x - line[0].x), 2),
+                Math.abs(line[1].y - line[0].y) ** 2
+                + Math.abs(line[1].x - line[0].x) ** 2,
             );
         }
 

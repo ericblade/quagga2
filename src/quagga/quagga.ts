@@ -197,6 +197,7 @@ export default class Quagga {
 
     async locateAndDecode(): Promise<void> {
         const boxes = this.getBoundingBoxes();
+        // console.warn('* locateAndDecode boxes=', JSON.stringify(boxes));
         if (boxes) {
             const decodeResult = (await this.context.decoder.decodeFromBoundingBoxes(boxes)) || {};
             decodeResult.boxes = boxes;
