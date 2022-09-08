@@ -83,7 +83,8 @@
     "build": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
-    "upgrade-deps": "npx npm-check-updates --doctor"
+    "upgrade-deps": "npx npm-check-updates --doctor",
+    "validate-asm": "npx validate-asm src/locator/skeletonizer.js"
   },
   "repository": {
     "type": "git",

@@ -8,20 +8,20 @@ function Skeletonizer(stdlib, foreign, buffer) {
 
     const images = new stdlib.Uint8Array(buffer);
     const size = foreign.size | 0;
-    const { imul } = stdlib.Math;
+    const imul = stdlib.Math.imul;
 
     function erode(inImagePtr, outImagePtr) {
-        inImagePtr |= 0;
-        outImagePtr |= 0;
+        inImagePtr = inImagePtr | 0;
+        outImagePtr = outImagePtr | 0;
 
-        let v = 0;
-        let u = 0;
-        let sum = 0;
-        let yStart1 = 0;
-        let yStart2 = 0;
-        let xStart1 = 0;
-        let xStart2 = 0;
-        let offset = 0;
+        var v = 0,
+            u = 0,
+            sum = 0,
+            yStart1 = 0,
+            yStart2 = 0,
+            xStart1 = 0,
+            xStart2 = 0,
+            offset = 0;
 
         for (v = 1; (v | 0) < ((size - 1) | 0); v = (v + 1) | 0) {
             offset = (offset + size) | 0;
@@ -42,12 +42,13 @@ function Skeletonizer(stdlib, foreign, buffer) {
                 }
             }
         }
+        return;
     }
 
     function subtract(aImagePtr, bImagePtr, outImagePtr) {
-        aImagePtr |= 0;
-        bImagePtr |= 0;
-        outImagePtr |= 0;
+        aImagePtr = aImagePtr | 0;
+        bImagePtr = bImagePtr | 0;
+        outImagePtr = outImagePtr | 0;
 
         let length = 0;
 
@@ -60,9 +61,9 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function bitwiseOr(aImagePtr, bImagePtr, outImagePtr) {
-        aImagePtr |= 0;
-        bImagePtr |= 0;
-        outImagePtr |= 0;
+        aImagePtr = aImagePtr | 0;
+        bImagePtr = bImagePtr | 0;
+        outImagePtr = outImagePtr | 0;
 
         let length = 0;
 
@@ -75,7 +76,7 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function countNonZero(imagePtr) {
-        imagePtr |= 0;
+        imagePtr = imagePtr | 0;
 
         let sum = 0;
         let length = 0;
@@ -91,8 +92,8 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function init(imagePtr, value) {
-        imagePtr |= 0;
-        value |= 0;
+        imagePtr = imagePtr | 0;
+        value = value | 0;
 
         let length = 0;
 
@@ -105,8 +106,8 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function dilate(inImagePtr, outImagePtr) {
-        inImagePtr |= 0;
-        outImagePtr |= 0;
+        inImagePtr = inImagePtr | 0;
+        outImagePtr = outImagePtr | 0;
 
         let v = 0;
         let u = 0;
@@ -139,8 +140,8 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function memcpy(srcImagePtr, dstImagePtr) {
-        srcImagePtr |= 0;
-        dstImagePtr |= 0;
+        srcImagePtr = srcImagePtr | 0;
+        dstImagePtr = dstImagePtr | 0;
 
         let length = 0;
 
@@ -153,7 +154,7 @@ function Skeletonizer(stdlib, foreign, buffer) {
     }
 
     function zeroBorder(imagePtr) {
-        imagePtr |= 0;
+        imagePtr = imagePtr | 0;
 
         let x = 0;
         let y = 0;
@@ -198,9 +199,9 @@ function Skeletonizer(stdlib, foreign, buffer) {
         } while (!done);
     }
     return {
-        skeletonize,
+        skeletonize: skeletonize
     };
 }
 /* @preserve ASM END */
-export default Skeletonizer;
+module.exports = Skeletonizer;
 /* eslint-enable eqeqeq */
