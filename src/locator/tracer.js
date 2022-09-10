@@ -15,7 +15,7 @@ const Tracer = {
             let y;
             let x;
 
-            for (i = 0; i < 7; i++) {
+            for (i = 0; i < searchDirections.length; i++) {
                 y = current.cy + searchDirections[current.dir][0];
                 x = current.cx + searchDirections[current.dir][1];
                 pos = y * width + x;
