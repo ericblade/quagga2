@@ -12,9 +12,10 @@ export default function halfSample(inImgWrapper: ImageWrapper, outImgWrapper: Im
     let topRowIdx = 0;
     let bottomRowIdx = inWidth;
     const endIdx = inImg.length;
-    const outWidth = inWidth / 2;
+    const outWidth = Math.trunc(inWidth / 2);
     let outImgIdx = 0;
     while (bottomRowIdx < endIdx) {
+        const nextTopRowIdx = topRowIdx + inWidth;
         for (let i = 0; i < outWidth; i++) {
             outImg[outImgIdx] = Math.floor(
                 (inImg[topRowIdx] + inImg[topRowIdx + 1] + inImg[bottomRowIdx] + inImg[bottomRowIdx + 1]) / 4,
@@ -22,6 +23,10 @@ export default function halfSample(inImgWrapper: ImageWrapper, outImgWrapper: Im
             outImgIdx++;
             topRowIdx += 2;
             bottomRowIdx += 2;
+        }
+        if (nextTopRowIdx !== topRowIdx) {
+            topRowIdx++;
+            bottomRowIdx++;
         }
         topRowIdx += inWidth;
         bottomRowIdx += inWidth;

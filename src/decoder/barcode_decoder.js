@@ -165,8 +165,9 @@ export default {
 
             // check if inside image
             extendLine(ext);
-            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0])
-                    || !inputImageWrapper.inImageWithBorder(line[1]))) {
+            const lineWidth = Math.abs(line[1].x - line[0].x);
+            while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0], 1)
+                    || !inputImageWrapper.inImageWithBorder(line[1], 1))) {
                 // eslint-disable-next-line no-param-reassign
                 ext -= Math.ceil(ext / 2);
                 extendLine(-ext);

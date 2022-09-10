@@ -8,3 +8,4 @@ import '../../src/quagga/test/transform.spec.ts';
 import '../../test/integration/integration.spec.ts';
 import '../../src/common/test/image_wrapper.spec.ts';
 import '../../src/test/quagga.spec.ts';
+import '../../src/common/cvutils/test/halfSample.spec';
