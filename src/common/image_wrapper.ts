@@ -48,11 +48,6 @@ class ImageWrapper implements SparseImageWrapper {
     // tests if a position is within the image, extended out by a border on each side
     inImageWithBorder(imgRef: XYSize, border: PositiveNumber = 0): boolean {
         assertNumberPositive(border);
-        // TODO: code_128 starts failing miserably when i only allow imgRef to contain positive numbers.
-        // TODO: this doesn't make much sense to me, why does it go negative?  Tests are not affected by
-        // returning false, but the whole code_128 reader blows up when i throw on negative imgRef.
-        // assertNumberPositive(imgRef.x);
-        // assertNumberPositive(imgRef.y);
         return (imgRef.x >= 0)
             && (imgRef.y >= 0)
             && (imgRef.x < (this.size.x + (border * 2)))
