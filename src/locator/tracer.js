@@ -15,7 +15,7 @@ const Tracer = {
             let y;
             let x;
 
-            for (i = 0; i < 7; i++) {
+            for (i = 0; i < searchDirections.length; i++) {
                 y = current.cy + searchDirections[current.dir][0];
                 x = current.cx + searchDirections[current.dir][1];
                 pos = y * width + x;
@@ -63,6 +63,9 @@ const Tracer = {
                 Cv.next = P;
                 P.next = null;
                 Cv = P;
+
+                let totalPixelCount = imageWrapper.size.x * imageWrapper.size.y;
+                let pixelCounter = 0;
                 do {
                     current.dir = (current.dir + 6) % 8;
                     trace(current, color, label, edgelabel);
@@ -79,7 +82,7 @@ const Tracer = {
                         Cv.y = current.cy;
                     }
                     ldir = current.dir;
-                } while (current.cx !== sx || current.cy !== sy);
+                } while ((current.cx !== sx || current.cy !== sy) && ++pixelCounter < totalPixelCount);
                 Fv.prev = Cv.prev;
                 Cv.prev.next = Fv;
             }
