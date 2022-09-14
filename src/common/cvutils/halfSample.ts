@@ -1,4 +1,4 @@
-import { ImageWrapper } from "quagga";
+import { ImageWrapper } from 'quagga';
 
 /**
  * @param inImg {ImageWrapper} input image to be sampled
@@ -17,7 +17,7 @@ export default function halfSample(inImgWrapper: ImageWrapper, outImgWrapper: Im
     while (bottomRowIdx < endIdx) {
         for (let i = 0; i < outWidth; i++) {
             outImg[outImgIdx] = Math.floor(
-                (inImg[topRowIdx] + inImg[topRowIdx + 1] + inImg[bottomRowIdx] + inImg[bottomRowIdx + 1]) / 4
+                (inImg[topRowIdx] + inImg[topRowIdx + 1] + inImg[bottomRowIdx] + inImg[bottomRowIdx + 1]) / 4,
             );
             outImgIdx++;
             topRowIdx += 2;
