@@ -3,7 +3,7 @@
 // import { clone as v2clone } from 'gl-vec2';
 // import { clone as v3clone } from 'gl-vec3';
 import Cluster2 from './cluster';
-import bitwiseOr from './cvutils/bitwiseOr';
+import { bitwiseOr, bitwiseAnd, bitwiseXor, bitwiseNot }from './cvutils/bitwise';
 import calculatePatchSize from './cvutils/calculatePatchSize';
 import computeBinaryImage from './cvutils/computeBinaryImage';
 import computeGray from './cvutils/computeGray';
@@ -151,6 +151,9 @@ export const ERODE = 2;
 
 export {
     bitwiseOr,
+    bitwiseXor,
+    bitwiseNot,
+    bitwiseAnd,
     calculatePatchSize,
     computeBinaryImage,
     computeGray,
