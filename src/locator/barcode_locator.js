@@ -107,10 +107,6 @@ function boxFromPatches(patches) {
     let j;
     let patch;
     let transMat;
-    let minx = _binaryImageWrapper.size.x;
-    let miny = _binaryImageWrapper.size.y;
-    let maxx = -_binaryImageWrapper.size.x;
-    let maxy = -_binaryImageWrapper.size.y;
     let box;
     let scale;
 
@@ -145,24 +141,23 @@ function boxFromPatches(patches) {
         }
     }
 
+    // let minx = _binaryImageWrapper.size.x;
+    // let miny = _binaryImageWrapper.size.y;
+    // let maxx = -_binaryImageWrapper.size.x;
+    // let maxy = -_binaryImageWrapper.size.y;
+    let minx = Infinity;
+    let maxx = -Infinity;
+    let miny = Infinity;
+    let maxy = -Infinity;
     // find bounding box
-    for (i = 0; i < patches.length; i++) {
-        patch = patches[i];
+    patches.forEach((patch) => {
         for (j = 0; j < 4; j++) {
-            if (patch.box[j][0] < minx) {
-                minx = patch.box[j][0];
-            }
-            if (patch.box[j][0] > maxx) {
-                maxx = patch.box[j][0];
-            }
-            if (patch.box[j][1] < miny) {
-                miny = patch.box[j][1];
-            }
-            if (patch.box[j][1] > maxy) {
-                maxy = patch.box[j][1];
-            }
+            minx = Math.min(minx, patch.box[j][0]);
+            maxx = Math.max(maxx, patch.box[j][0]);
+            miny = Math.min(miny, patch.box[j][1]);
+            maxy = Math.max(maxy, patch.box[j][1]);
         }
-    }
+    });
 
     box = [[minx, miny], [maxx, miny], [maxx, maxy], [minx, maxy]];
 
