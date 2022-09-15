@@ -27,9 +27,6 @@ function base(op: Operation) {
                 case Operation.Xor:
                     cImageData[length] = aImageData[length] ^ bImageData[length];
                     break;
-                case Operation.Not:
-                    cImageData[length] = ~aImageData[length];
-                    break;
                 default:
                     throw new Error('internal error in bitwise parameters');
                     break;
