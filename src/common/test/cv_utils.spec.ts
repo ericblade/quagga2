@@ -1,33 +1,16 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import calculatePatchSize, { PatchSize } from '../cvutils/calculatePatchSize';
 import computeImageArea, { dimensionsConverters } from '../cvutils/computeImageArea';
-import imageRef from '../cvutils/imageRef';
+import ImageRef from '../cvutils/ImageRef';
 import parseCSSDimensionValues from '../cvutils/parseCSSDimensionValues';
 
 describe('CV Utils', () => {
-    describe('imageRef', () => {
+    describe('ImageRef', () => {
         it('gets the image Reference for a coordinate', () => {
-            const res = imageRef(1, 2);
+            const res = new ImageRef(1, 2);
             expect(res.x).to.equal(1);
             expect(res.y).to.equal(2);
             expect(res.toVec2()[0]).to.equal(1);
-        });
-    });
-
-    describe('calculatePatchSize', () => {
-        it('should not throw an error in case of valid image size', () => {
-            const expected = { x: 32, y: 32 };
-            const patchSize = calculatePatchSize(PatchSize.medium, { x: 640, y: 480 });
-
-            expect(patchSize).to.deep.equal(expected);
-        });
-
-        it('should thow an error if image size it not valid', () => {
-            const expected = { x: 32, y: 32 };
-            const patchSize = calculatePatchSize(PatchSize.medium, { x: 640, y: 480 });
-
-            expect(patchSize).to.deep.equal(expected);
         });
     });
 

@@ -20,7 +20,7 @@ import grayArrayFromContext from './cvutils/grayArrayFromContext';
 import grayArrayFromImage from './cvutils/grayArrayFromImage';
 import halfSample from './cvutils/halfSample';
 import hsv2rgb from './cvutils/hsv2rgb';
-import imageRef from './cvutils/imageRef';
+import ImageRef from './cvutils/ImageRef';
 import loadImageArray from './cvutils/loadImageArray';
 import otsuThreshold from './cvutils/otsuThreshold';
 import sharpenLine from './cvutils/sharpenLine';
@@ -170,7 +170,7 @@ export {
     grayArrayFromImage,
     halfSample,
     hsv2rgb,
-    imageRef,
+    ImageRef,
     loadImageArray,
     otsuThreshold,
     sharpenLine,

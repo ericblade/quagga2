@@ -39,8 +39,11 @@ export default function calculatePatchSize(patchSize: PatchSize, imgSize: ImageD
                 found = divisors[i];
             }
         }
-        if (desiredPatchSize / found < nrOfPatchesList[nrOfPatchesIdx + 1] / nrOfPatchesList[nrOfPatchesIdx]
-            && desiredPatchSize / found > nrOfPatchesList[nrOfPatchesIdx - 1] / nrOfPatchesList[nrOfPatchesIdx]) {
+        const patchSizeDivided = desiredPatchSize / found;
+        if (
+            patchSizeDivided < nrOfPatchesList[nrOfPatchesIdx + 1] / nrOfPatchesList[nrOfPatchesIdx]
+            && patchSizeDivided > nrOfPatchesList[nrOfPatchesIdx - 1] / nrOfPatchesList[nrOfPatchesIdx]
+        ) {
             return { x: found, y: found };
         }
         return null;

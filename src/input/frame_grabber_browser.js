@@ -3,7 +3,7 @@
 
 import computeGray from '../common/cvutils/computeGray';
 import grayAndHalfSampleFromCanvasData from '../common/cvutils/grayAndHalfSampleFromCanvasData';
-import imageRef from '../common/cvutils/imageRef';
+import ImageRef from '../common/cvutils/ImageRef';
 
 const TO_RADIANS = Math.PI / 180;
 
@@ -25,11 +25,12 @@ function adjustCanvasSize(canvas, targetSize) {
 const FrameGrabber = {};
 
 FrameGrabber.create = function (inputStream, canvas) {
+    console.warn('**** ImageRef=', ImageRef);
     const _that = {};
     const _streamConfig = inputStream.getConfig();
-    const _videoSize = imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+    const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
     const _canvasSize = inputStream.getCanvasSize();
-    const _size = imageRef(inputStream.getWidth(), inputStream.getHeight());
+    const _size = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
     const topRight = inputStream.getTopRight();
     const _sx = topRight.x;
     const _sy = topRight.y;

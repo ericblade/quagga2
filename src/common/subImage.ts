@@ -1,5 +1,6 @@
 import ImageWrapper from './image_wrapper';
-import type { ImageRef, SparseImageWrapper, XYSize } from '../../type-definitions/quagga.d';
+import type { SparseImageWrapper, XYSize } from '../../type-definitions/quagga.d';
+import type { ImageRef } from './cv_utils';
 
 // A window into a specific area of an ImageWrapper
 export class SubImage {

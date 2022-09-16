@@ -16,13 +16,16 @@ export default Quagga;
 // contextual meaning.  This allows us to create a type that is branded by name, and therefore these variables cannot be directly
 // mixed up with each other, without explicitly forcing it to happen.  Good.
 export interface XYObject<T extends string> {
+    type?: T;
     x: number;
     y: number;
-    type: T;
 }
 
-// TODO: fill this in from cv_utils#imageRef
-export type ImageRef = XYObject<'ImageRef'>;
+interface ImageRef extends XYObject<'ImageRef'> {
+    round(): ImageRef;
+    toVec2(): [number, number];
+    toVec3(): [number, number, number];
+}
 
 export type XYSize = XYObject<'XYSize'>;
 

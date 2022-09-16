@@ -7,7 +7,7 @@ import calculatePatchSize from '../common/cvutils/calculatePatchSize';
 import computeImageArea from '../common/cvutils/computeImageArea';
 import halfSample from '../common/cvutils/halfSample';
 import hsv2rgb from '../common/cvutils/hsv2rgb';
-import imageRef from '../common/cvutils/imageRef';
+import ImageRef from '../common/cvutils/ImageRef';
 import otsuThreshold from '../common/cvutils/otsuThreshold';
 import topGeneric from '../common/cvutils/topGeneric';
 import ImageDebug from '../common/image_debug';
@@ -341,12 +341,12 @@ function similarMoments(moments) {
 }
 
 function skeletonize(x, y) {
-    _binaryImageWrapper.subImageAsCopy(_subImageWrapper, imageRef(x, y));
+    _binaryImageWrapper.subImageAsCopy(_subImageWrapper, new ImageRef(x, y));
     _skeletonizer.skeletonize();
 
     // Show skeleton if requested
     if (ENV.development && _config.debug.showSkeleton) {
-        _skelImageWrapper.overlay(_canvasContainer.dom.binary, 360, imageRef(x, y));
+        _skelImageWrapper.overlay(_canvasContainer.dom.binary, 360, new ImageRef(x, y));
     }
 }
 

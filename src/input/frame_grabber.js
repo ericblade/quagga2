@@ -1,22 +1,21 @@
 // NOTE FOR ANYONE IN HERE IN THE FUTURE: This module is used when the module is built for use in Node.
 // Webpack.config.js explicitly REPLACES this module with the file called frame_grabber_browser when it is packing the Browser distribution.
 
-const { imageRef, computeGray } = require("../common/cv_utils");
+const { computeGray } = require("../common/cv_utils");
+const { default: ImageRef } = require('../common/cvutils/ImageRef');
 const Ndarray = require('ndarray');
 const { d2: Interp2D } = require('ndarray-linear-interpolate');
 
 // import { d2 as Interp2D } from 'ndarray-linear-interpolate';
 // import computeGray from "../common/cvutils/computeGray";
-// import imageRef from "../common/cvutils/imageRef";
 // import Ndarray from 'ndarray';
 
 const FrameGrabber = {};
-
 FrameGrabber.create = function (inputStream, canvas) {
     const _that = {};
-    const _videoSize = imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+    const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
     const _canvasSize = inputStream.getCanvasSize();
-    const _size = imageRef(inputStream.getWidth(), inputStream.getHeight());
+    const _size = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
     const _topRight = inputStream.getTopRight();
     let _data = new Uint8Array(_size.x * _size.y);
     const _grayData = new Uint8Array(_videoSize.x * _videoSize.y);
