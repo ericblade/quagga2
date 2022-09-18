@@ -1,13 +1,13 @@
-import { XYSize, Point } from '../../../type-definitions/quagga.d';
+import { XYSize, Point } from '../../../type-definitions/quagga';
 
-type EventHandler = (arg?: any) => void;
+export type EventName = 'canrecord' | 'ended';
 
 export type EventHandlerList = {
-    [index: string]: Array<EventHandler>;
+    [key in EventName]?: Array<EventListener>;
 };
 
 export interface InputStream {
-    addEventListener(event: string, f: (args?: any) => void, bool?: boolean): void;
+    addEventListener(event: string, f: EventListener, bool?: boolean): void;
     clearEventHandlers(): void;
     ended(): boolean;
     getCanvasSize(): XYSize;
@@ -27,7 +27,7 @@ export interface InputStream {
     setInputStream(config: any): void;
     setTopRight(topRight: Point): void;
     setWidth(width: number): void;
-    trigger(eventName: any, args?: any): void;
+    trigger(eventName: EventName, args?: any): void;
 }
 
 type VideoStreamFactory = (video: HTMLVideoElement) => InputStream;
@@ -39,3 +39,5 @@ export interface InputStreamFactory {
     createLiveStream: LiveStreamFactory;
     createVideoStream: VideoStreamFactory;
 }
+
+export const EVENTNAMES: ReadonlyArray<EventName> = ['canrecord', 'ended'] as const;

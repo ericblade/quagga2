@@ -4,7 +4,7 @@ import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder, { BarcodeReaderClass } from '../decoder/barcode_decoder';
 import CameraAccess from '../input/camera_access';
-import FrameGrabber from '../input/frame_grabber.js';
+import FrameGrabber from '../input/frame_grabber';
 import InputStream from '../input/input_stream/input_stream';
 import BarcodeLocator from '../locator/barcode_locator';
 import { QuaggaContext } from '../QuaggaContext';
@@ -108,9 +108,8 @@ export default class Quagga {
             inputStream.setAttribute('preload', 'auto');
             inputStream.setInputStream(this.context.config.inputStream);
             inputStream.addEventListener('canrecord', this.canRecord.bind(undefined, callback));
+            this.context.inputStream = inputStream;
         }
-
-        this.context.inputStream = inputStream;
     }
 
     getBoundingBoxes(): Array<Array<number>> | null {
@@ -219,14 +218,16 @@ export default class Quagga {
                 this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
                 if (this.context.framegrabber.grab()) {
                     if (!workersUpdated) {
-                        this.locateAndDecode();
+                        // eslint-disable-next-line no-void
+                        void this.locateAndDecode();
                     }
                 }
             }
         } else {
             this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
             this.context.framegrabber.grab();
-            this.locateAndDecode();
+            // eslint-disable-next-line no-void
+            void this.locateAndDecode();
         }
     };
 

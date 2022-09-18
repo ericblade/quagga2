@@ -1,30 +1,46 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import ImageLoader from '../image_loader';
 import { XYSize, Point } from '../../../type-definitions/quagga.d';
-import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
+import ImageLoader from '../image_loader';
+import {
+    InputStreamFactory, InputStream, EventHandlerList, EventName, EVENTNAMES,
+} from './input_stream_base';
 
 const inputStreamFactory: InputStreamFactory = {
     createVideoStream(video): InputStream {
-        let _config: { size: number; type: string } | null = null;
-        const _eventNames = ['canrecord', 'ended'];
-        const _eventHandlers: EventHandlerList = {};
-        let _calculatedWidth: number;
-        let _calculatedHeight: number;
-        const _topRight: Point = { x: 0, y: 0, type: 'Point' };
-        const _canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
+        let videoStreamConfig: { size: number; type: string } | null = null;
+        const EventHandlers: EventHandlerList = {};
+        let calculatedWidth: number;
+        let calculatedHeight: number;
+        const topRight: Point = { x: 0, y: 0, type: 'Point' };
+        const canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
 
         function initSize(): void {
             const width = video.videoWidth;
             const height = video.videoHeight;
 
-            // eslint-disable-next-line no-nested-ternary
-            _calculatedWidth = _config?.size ? width / height > 1 ? _config.size : Math.floor((width / height) * _config.size) : width;
-            // eslint-disable-next-line no-nested-ternary
-            _calculatedHeight = _config?.size ? width / height > 1 ? Math.floor((height / width) * _config.size) : _config.size : height;
+            if (videoStreamConfig?.size) {
+                if (width / height > 1) {
+                    calculatedWidth = videoStreamConfig.size;
+                } else {
+                    calculatedWidth = Math.floor((width / height) * videoStreamConfig.size);
+                }
+            } else {
+                calculatedWidth = width;
+            }
 
-            _canvasSize.x = _calculatedWidth;
-            _canvasSize.y = _calculatedHeight;
+            if (videoStreamConfig?.size) {
+                if (width / height > 1) {
+                    calculatedHeight = Math.floor((height / width) * videoStreamConfig.size);
+                } else {
+                    calculatedHeight = videoStreamConfig.size;
+                }
+            } else {
+                calculatedHeight = height;
+            }
+
+            canvasSize.x = calculatedWidth;
+            canvasSize.y = calculatedHeight;
         }
         const inputStream: InputStream = {
             getRealWidth() {
@@ -36,24 +52,24 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             getWidth() {
-                return _calculatedWidth;
+                return calculatedWidth;
             },
 
             getHeight() {
-                return _calculatedHeight;
+                return calculatedHeight;
             },
 
             setWidth(width) {
-                _calculatedWidth = width;
+                calculatedWidth = width;
             },
 
             setHeight(height) {
-                _calculatedHeight = height;
+                calculatedHeight = height;
             },
 
             setInputStream(config) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                _config = config;
+                videoStreamConfig = config;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 this.setAttribute('src', (typeof config.src !== 'undefined') ? config.src : '');
             },
@@ -63,10 +79,10 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             getConfig() {
-                return _config;
+                return videoStreamConfig;
             },
 
-            setAttribute(name, value) {
+            setAttribute(name: string, value: string) {
                 if (video) {
                     video.setAttribute(name, value);
                 }
@@ -82,25 +98,25 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             setCurrentTime(time) {
-                if (_config?.type !== 'LiveStream') {
+                if (videoStreamConfig?.type !== 'LiveStream') {
                     this.setAttribute('currentTime', time.toString());
                 }
             },
 
-            addEventListener(event, f, bool) {
-                if (_eventNames.indexOf(event) !== -1) {
-                    if (!_eventHandlers[event]) {
-                        _eventHandlers[event] = [];
+            addEventListener(event: EventName, f: EventListener, bool?: boolean | EventListenerOptions) {
+                if (EVENTNAMES.indexOf(event) !== -1) {
+                    if (!EventHandlers[event]) {
+                        EventHandlers[event] = [];
                     }
-                    _eventHandlers[event].push(f);
+                    EventHandlers[event]?.push(f);
                 } else {
                     video.addEventListener(event, f, bool);
                 }
             },
 
             clearEventHandlers() {
-                _eventNames.forEach((eventName) => {
-                    const handlers = _eventHandlers[eventName];
+                EVENTNAMES.forEach((eventName) => {
+                    const handlers = EventHandlers[eventName];
                     if (handlers && handlers.length > 0) {
                         handlers.forEach((handler) => {
                             video.removeEventListener(eventName, handler);
@@ -109,37 +125,38 @@ const inputStreamFactory: InputStreamFactory = {
                 });
             },
 
-            trigger(eventName, args) {
+            trigger(eventName: EventName, args) {
                 let j;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                const handlers = _eventHandlers[eventName];
+                const handlers = EventHandlers[eventName];
 
                 if (eventName === 'canrecord') {
                     initSize();
                 }
                 if (handlers && handlers.length > 0) {
                     for (j = 0; j < handlers.length; j++) {
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
                         handlers[j].apply(inputStream, args);
                     }
                 }
             },
 
-            setTopRight(topRight) {
-                _topRight.x = topRight.x;
-                _topRight.y = topRight.y;
+            setTopRight(newTopRight: Point) {
+                topRight.x = newTopRight.x;
+                topRight.y = newTopRight.y;
             },
 
             getTopRight() {
-                return _topRight;
+                return topRight;
             },
 
             setCanvasSize(size) {
-                _canvasSize.x = size.x;
-                _canvasSize.y = size.y;
+                canvasSize.x = size.x;
+                canvasSize.y = size.y;
             },
 
             getCanvasSize() {
-                return _canvasSize;
+                return canvasSize;
             },
 
             getFrame() {
@@ -159,7 +176,7 @@ const inputStreamFactory: InputStreamFactory = {
         return that;
     },
     createImageStream(): InputStream {
-        let _config: { size: number; sequence: any } | null = null;
+        let imageStreamConfig: { sequence: any; size: number; } | null = null;
 
         let width = 0;
         let height = 0;
@@ -173,14 +190,13 @@ const inputStreamFactory: InputStreamFactory = {
         let ended = false;
         let calculatedWidth: number;
         let calculatedHeight: number;
-        const _eventNames = ['canrecord', 'ended'];
-        const _eventHandlers: EventHandlerList = {};
-        const _topRight: Point = { x: 0, y: 0, type: 'Point' };
-        const _canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
+        const EventHandlers: EventHandlerList = {};
+        const topRight: Point = { x: 0, y: 0, type: 'Point' };
+        const canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
 
         function loadImages(): void {
             loaded = false;
-            ImageLoader.load(baseUrl, (imgs: Array<{ tags: any; img: HTMLImageElement}>) => {
+            ImageLoader.load(baseUrl, (imgs: Array<{ img: HTMLImageElement; tags: any; }>) => {
                 imgArray = imgs;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (imgs[0].tags && imgs[0].tags.orientation) {
@@ -199,28 +215,45 @@ const inputStreamFactory: InputStreamFactory = {
                     width = imgs[0].img.width;
                     height = imgs[0].img.height;
                 }
-                // eslint-disable-next-line no-nested-ternary
-                calculatedWidth = _config?.size ? width / height > 1 ? _config.size : Math.floor((width / height) * _config.size) : width;
-                // eslint-disable-next-line no-nested-ternary
-                calculatedHeight = _config?.size ? width / height > 1 ? Math.floor((height / width) * _config.size) : _config.size : height;
-                _canvasSize.x = calculatedWidth;
-                _canvasSize.y = calculatedHeight;
+
+                if (imageStreamConfig?.size) {
+                    if (width / height > 1) {
+                        calculatedWidth = imageStreamConfig.size;
+                    } else {
+                        calculatedWidth = Math.floor((width / height) * imageStreamConfig.size);
+                    }
+                } else {
+                    calculatedWidth = width;
+                }
+
+                if (imageStreamConfig?.size) {
+                    if (width / height > 1) {
+                        calculatedHeight = Math.floor((height / width) * imageStreamConfig.size);
+                    } else {
+                        calculatedHeight = imageStreamConfig.size;
+                    }
+                } else {
+                    calculatedHeight = height;
+                }
+
+                canvasSize.x = calculatedWidth;
+                canvasSize.y = calculatedHeight;
                 loaded = true;
                 frameIdx = 0;
                 setTimeout(() => {
                     // eslint-disable-next-line @typescript-eslint/no-use-before-define
                     publishEvent('canrecord', []);
                 }, 0);
-            }, offset, size, _config?.sequence);
+            }, offset, size, imageStreamConfig?.sequence);
         }
 
-        function publishEvent(eventName: string, args: Array<any>): void {
+        function publishEvent(eventName: EventName, args: Array<any>): void {
             let j;
-            const handlers = _eventHandlers[eventName];
+            const handlers = EventHandlers[eventName];
 
             if (handlers && handlers.length > 0) {
                 for (j = 0; j < handlers.length; j++) {
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                    // eslint-disable-next-line @typescript-eslint/no-use-before-define, max-len, @typescript-eslint/no-unsafe-argument
                     handlers[j].apply(inputStream, args as any); // TODO: typescript complains that any[] is not valid for a second arg for apply?!
                 }
             }
@@ -260,7 +293,7 @@ const inputStreamFactory: InputStreamFactory = {
 
             setInputStream(stream) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                _config = stream;
+                imageStreamConfig = stream;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 if (stream.sequence === false) {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
@@ -282,7 +315,7 @@ const inputStreamFactory: InputStreamFactory = {
             setAttribute() {},
 
             getConfig() {
-                return _config;
+                return imageStreamConfig;
             },
 
             pause() {
@@ -297,35 +330,35 @@ const inputStreamFactory: InputStreamFactory = {
                 frameIdx = time;
             },
 
-            addEventListener(event, f) {
-                if (_eventNames.indexOf(event) !== -1) {
-                    if (!_eventHandlers[event]) {
-                        _eventHandlers[event] = [];
+            addEventListener(event: EventName, f) {
+                if (EVENTNAMES.indexOf(event) !== -1) {
+                    if (!EventHandlers[event]) {
+                        EventHandlers[event] = [];
                     }
-                    _eventHandlers[event].push(f);
+                    EventHandlers[event]?.push(f);
                 }
             },
 
             clearEventHandlers() {
-                Object.keys(_eventHandlers).forEach((ind) => delete _eventHandlers[ind]);
+                EVENTNAMES.forEach((ind) => delete EventHandlers[ind]);
             },
 
-            setTopRight(topRight) {
-                _topRight.x = topRight.x;
-                _topRight.y = topRight.y;
+            setTopRight(newTopRight: Point) {
+                topRight.x = newTopRight.x;
+                topRight.y = newTopRight.y;
             },
 
             getTopRight() {
-                return _topRight;
+                return topRight;
             },
 
-            setCanvasSize(canvasSize) {
-                _canvasSize.x = canvasSize.x;
-                _canvasSize.y = canvasSize.y;
+            setCanvasSize(newCanvasSize: XYSize) {
+                canvasSize.x = newCanvasSize.x;
+                canvasSize.y = newCanvasSize.y;
             },
 
             getCanvasSize() {
-                return _canvasSize;
+                return canvasSize;
             },
 
             getFrame() {

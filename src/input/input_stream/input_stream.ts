@@ -3,8 +3,10 @@
 // webpack.config.js *replaces* this with input_stream_browser.ts when the bundle is being built for browser.
 
 import GetPixels from 'get-pixels';
-import { InputStreamFactory, InputStream, EventHandlerList } from './input_stream.d';
 import { Point, XYSize } from '../../../type-definitions/quagga.d';
+import {
+    InputStreamFactory, InputStream, EventHandlerList, EventName, EVENTNAMES,
+} from './input_stream_base';
 
 const inputStreamFactory: InputStreamFactory = {
     createVideoStream(): never {
@@ -14,7 +16,7 @@ const inputStreamFactory: InputStreamFactory = {
         throw new Error('createLiveStream not available');
     },
     createImageStream(): InputStream {
-        let _config: { mime: string; size: number; src: any } | null = null;
+        let imageStreamConfig: { mime: string; size: number; src: any } | null = null;
 
         let width = 0;
         let height = 0;
@@ -26,10 +28,9 @@ const inputStreamFactory: InputStreamFactory = {
         const ended = false;
         let calculatedWidth: number;
         let calculatedHeight: number;
-        const _eventNames = ['canrecord', 'ended'];
-        const _eventHandlers: EventHandlerList = {};
-        const _topRight: Point = { x: 0, y: 0, type: 'Point' };
-        const _canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
+        const EventHandlers: EventHandlerList = {};
+        const topRight: Point = { x: 0, y: 0, type: 'Point' };
+        const canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
         /* eslint-disable no-unused-vars */ // false eslint errors? weird.
         // @ts-ignore
         let size = 0;
@@ -42,49 +43,50 @@ const inputStreamFactory: InputStreamFactory = {
         function loadImages(): void {
             loaded = false;
             /* eslint-disable new-cap */
-            GetPixels(baseUrl, _config?.mime, (err, pixels) => {
+            GetPixels(baseUrl, imageStreamConfig?.mime, (err, pixels) => {
                 if (err) {
                     console.error('**** quagga loadImages error:', err);
                     throw new Error('error decoding pixels in loadImages');
                 }
                 loaded = true;
                 if (ENV.development) {
-                    console.log('* InputStreamNode pixels.shape', pixels.shape);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    console.log('* InputStreamNode pixels.shape', pixels?.shape);
                 }
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 frame = pixels;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                 [width, height] = pixels.shape;
                 // eslint-disable-next-line no-nested-ternary
-                calculatedWidth = _config?.size
+                calculatedWidth = imageStreamConfig?.size
                     ? width / height > 1
-                        ? _config.size
-                        : Math.floor((width / height) * _config.size)
+                        ? imageStreamConfig.size
+                        : Math.floor((width / height) * imageStreamConfig.size)
                     : width;
                 // eslint-disable-next-line no-nested-ternary
-                calculatedHeight = _config?.size
+                calculatedHeight = imageStreamConfig?.size
                     ? width / height > 1
-                        ? Math.floor((height / width) * _config.size)
-                        : _config.size
+                        ? Math.floor((height / width) * imageStreamConfig.size)
+                        : imageStreamConfig.size
                     : height;
 
-                _canvasSize.x = calculatedWidth;
-                _canvasSize.y = calculatedHeight;
+                canvasSize.x = calculatedWidth;
+                canvasSize.y = calculatedHeight;
 
                 setTimeout(() => {
                     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    publishEvent('canrecord', []);
+                    publishEvent('canrecord', [new Event('canrecord')]);
                 }, 0);
             });
         }
 
-        function publishEvent(eventName: string, args: Array<any>): void {
-            const handlers = _eventHandlers[eventName];
+        function publishEvent(eventName: EventName, args: [evt: Event]): void {
+            const handlers = EventHandlers[eventName];
 
             if (handlers && handlers.length > 0) {
                 for (let j = 0; j < handlers.length; j++) {
                     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    handlers[j].apply(inputStream, args as any);
+                    handlers[j].apply(inputStream, args);
                 }
             }
         }
@@ -119,9 +121,9 @@ const inputStreamFactory: InputStreamFactory = {
 
             setInputStream(stream) {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-                _config = stream;
+                imageStreamConfig = stream;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-                baseUrl = _config?.src;
+                baseUrl = imageStreamConfig?.src;
                 size = 1;
                 loadImages();
             },
@@ -133,7 +135,7 @@ const inputStreamFactory: InputStreamFactory = {
             setAttribute() {},
 
             getConfig() {
-                return _config;
+                return imageStreamConfig;
             },
 
             pause() {
@@ -148,36 +150,35 @@ const inputStreamFactory: InputStreamFactory = {
                 frameIdx = time;
             },
 
-            addEventListener(event, f) {
-                if (_eventNames.indexOf(event) !== -1) {
-                    if (!_eventHandlers[event]) {
-                        _eventHandlers[event] = [];
+            addEventListener(event: EventName, f) {
+                if (EVENTNAMES.indexOf(event) !== -1) {
+                    if (!EventHandlers[event]) {
+                        EventHandlers[event] = [];
                     }
-                    _eventHandlers[event].push(f);
+                    EventHandlers[event]?.push(f);
                 }
             },
 
             clearEventHandlers() {
-                Object.keys(_eventHandlers).forEach((ind) => delete _eventHandlers[ind]);
+                EVENTNAMES.forEach((ev) => delete EventHandlers[ev]);
             },
 
-
-            setTopRight(topRight) {
-                _topRight.x = topRight.x;
-                _topRight.y = topRight.y;
+            setTopRight(newTopRight) {
+                topRight.x = newTopRight.x;
+                topRight.y = newTopRight.y;
             },
 
             getTopRight() {
-                return _topRight;
+                return topRight;
             },
 
             setCanvasSize(sz) {
-                _canvasSize.x = sz.x;
-                _canvasSize.y = sz.y;
+                canvasSize.x = sz.x;
+                canvasSize.y = sz.y;
             },
 
             getCanvasSize() {
-                return _canvasSize;
+                return canvasSize;
             },
 
             getFrame() {

@@ -1,4 +1,6 @@
-import { Point, QuaggaJSConfigObject, QuaggaJSReaderConfig, XYSize } from '../../type-definitions/quagga';
+import {
+    Point, QuaggaJSConfigObject, QuaggaJSReaderConfig, XYSize,
+} from '../../type-definitions/quagga';
 // import ImageDebug, { DebugPath } from '../common/image_debug';
 import ImageWrapper from '../common/image_wrapper';
 import TwoOfFiveReader from '../reader/2of5_reader';

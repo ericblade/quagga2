@@ -1,6 +1,6 @@
 import { clone } from 'gl-vec2';
 import ImageWrapper from '../common/image_wrapper';
-import type { InputStream } from '../input/input_stream/input_stream.d';
+import type { InputStream } from '../input/input_stream/input_stream_base';
 import BarcodeLocator from '../locator/barcode_locator';
 
 type BufferReturn = {

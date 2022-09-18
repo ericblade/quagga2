@@ -55,7 +55,7 @@
         "@typescript-eslint/indent": ["error", 4],
         "key-spacing": ["warn", { "beforeColon": false, "afterColon": true }],
         "keyword-spacing": [ "error", { "after": true }],
-        "max-len" : ["warn", 120],
+        "max-len" : ["warn", 140],
         "max-params": ["error", 7],
         "new-parens": "error",
         "no-array-constructor": "error",
