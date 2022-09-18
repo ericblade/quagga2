@@ -1,8 +1,8 @@
 // NOTE FOR ANYONE IN HERE IN THE FUTURE: This module is used when the module is built for use in Node.
 // Webpack.config.js explicitly REPLACES this module with the file called frame_grabber_browser when it is packing the Browser distribution.
 
-const { computeGray } = require("../common/cv_utils");
 const { default: ImageRef } = require('../common/cvutils/ImageRef');
+const { default: computeGray } = require('../common/cvutils/computeGray');
 const Ndarray = require('ndarray');
 const { d2: Interp2D } = require('ndarray-linear-interpolate');
 

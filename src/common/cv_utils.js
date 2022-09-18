@@ -3,33 +3,33 @@
 // import { clone as v2clone } from 'gl-vec2';
 // import { clone as v3clone } from 'gl-vec3';
 import Cluster2 from './cluster';
-import { bitwiseOr, bitwiseAnd, bitwiseXor, bitwiseNot } from './cvutils/bitwise';
-import calculatePatchSize from './cvutils/calculatePatchSize';
-import computeBinaryImage from './cvutils/computeBinaryImage';
-import computeGray from './cvutils/computeGray';
-import computeHistogram from './cvutils/computeHistogram';
-import computeImageArea from './cvutils/computeImageArea';
-import computeIntegralImage from './cvutils/computeIntegralImage';
-import computeIntegralImage2 from './cvutils/computeIntegralImage2';
-import countNonZero from './cvutils/countNonZero';
-import determineOtsuThreshold from './cvutils/determineOtsuThreshold';
-import dilate from './cvutils/dilate';
-import erode from './cvutils/erode';
-import grayAndHalfSampleFromCanvasData from './cvutils/grayAndHalfSampleFromCanvasData';
-import grayArrayFromContext from './cvutils/grayArrayFromContext';
-import grayArrayFromImage from './cvutils/grayArrayFromImage';
-import halfSample from './cvutils/halfSample';
-import hsv2rgb from './cvutils/hsv2rgb';
-import ImageRef from './cvutils/ImageRef';
-import loadImageArray from './cvutils/loadImageArray';
-import otsuThreshold from './cvutils/otsuThreshold';
-import sharpenLine from './cvutils/sharpenLine';
-import subtract from './cvutils/subtract';
-import thresholdImage from './cvutils/thresholdImage';
-import topGeneric from './cvutils/topGeneric';
 
-// export const vec2 = { clone: v2clone };
-// export const vec3 = { clone: v3clone };
+export {
+    bitwiseOr, bitwiseAnd, bitwiseXor, bitwiseNot,
+} from './cvutils/bitwise';
+export { default as calculatePatchSize } from './cvutils/calculatePatchSize';
+export { default as computeBinaryImage } from './cvutils/computeBinaryImage';
+export { default as computeGray } from './cvutils/computeGray';
+export { default as computeHistogram } from './cvutils/computeHistogram';
+export { default as computeImageArea } from './cvutils/computeImageArea';
+export { default as computeIntegralImage } from './cvutils/computeIntegralImage';
+export { default as computeIntegralImage2 } from './cvutils/computeIntegralImage2';
+export { default as countNonZero } from './cvutils/countNonZero';
+export { default as determineOtsuThreshold } from './cvutils/determineOtsuThreshold';
+export { default as dilate } from './cvutils/dilate';
+export { default as erode } from './cvutils/erode';
+export { default as grayAndHalfSampleFromCanvasData } from './cvutils/grayAndHalfSampleFromCanvasData';
+export { default as grayArrayFromContext } from './cvutils/grayArrayFromContext';
+export { default as grayArrayFromImage } from './cvutils/grayArrayFromImage';
+export { default as halfSample } from './cvutils/halfSample';
+export { default as hsv2rgb } from './cvutils/hsv2rgb';
+export { default as ImageRef } from './cvutils/ImageRef';
+export { default as loadImageArray } from './cvutils/loadImageArray';
+export { default as otsuThreshold } from './cvutils/otsuThreshold';
+export { default as sharpenLine } from './cvutils/sharpenLine';
+export { default as subtract } from './cvutils/subtract';
+export { default as thresholdImage } from './cvutils/thresholdImage';
+export { default as topGeneric } from './cvutils/topGeneric';
 
 // TODO: there is a separate module for Cluster -- are one of them removeable?
 export function cluster(points, threshold, property) {
@@ -148,33 +148,3 @@ export const Tracer = {
 
 export const DILATE = 1;
 export const ERODE = 2;
-
-export {
-    bitwiseOr,
-    bitwiseXor,
-    bitwiseNot,
-    bitwiseAnd,
-    calculatePatchSize,
-    computeBinaryImage,
-    computeGray,
-    computeHistogram,
-    computeImageArea,
-    computeIntegralImage,
-    computeIntegralImage2,
-    countNonZero,
-    determineOtsuThreshold,
-    dilate,
-    erode,
-    grayAndHalfSampleFromCanvasData,
-    grayArrayFromContext,
-    grayArrayFromImage,
-    halfSample,
-    hsv2rgb,
-    ImageRef,
-    loadImageArray,
-    otsuThreshold,
-    sharpenLine,
-    subtract,
-    thresholdImage,
-    topGeneric,
-};
