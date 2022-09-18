@@ -2,12 +2,12 @@
 // to let us know when the video started playing.  Now, it does.  So, we shouldn't need to run this
 // odd waitForVideo() function that polls to see if the video has started.
 import pick from 'lodash/pick';
+import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
+import Exception from '../quagga/Exception';
 import type {
     MediaTrackConstraintsWithDeprecated,
     QuaggaJSCameraAccess as CameraAccessType,
 } from '../../type-definitions/quagga.d';
-import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
-import Exception from '../quagga/Exception';
 
 let streamRef: MediaStream | null;
 
@@ -118,7 +118,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         return new Promise<void>((resolve) => {
             setTimeout(() => {
                 if (tracks && tracks.length) {
-                    tracks[0].stop();
+                    tracks.forEach((track) => track.stop());
                 }
                 streamRef = null;
                 QuaggaJSCameraAccess.requestedVideoElement = null;
@@ -138,7 +138,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
             // @ts-ignore // typescript doesn't know the torch property
-            await track.applyConstraints({ advanced: [{ torch: false }] });
+            await track.applyConstraints({ torch: false });
         }
     },
     async enableTorch() {
@@ -147,7 +147,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
             // @ts-ignore // typescript doesn't know the torch property
-            await track.applyConstraints({ advanced: [{ torch: true }] });
+            await track.applyConstraints({ torch: true });
         }
     },
 };
