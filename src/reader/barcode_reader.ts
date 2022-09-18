@@ -55,10 +55,6 @@ export interface Barcode {
 export abstract class BarcodeReader {
     _row: Array<number> = [];
 
-    config: BarcodeReaderConfig = {};
-
-    supplements: Array<BarcodeReader> = [];
-
     SINGLE_CODE_ERROR = 0;
 
     FORMAT: BarcodeFormat = 'unknown';
@@ -77,12 +73,8 @@ export abstract class BarcodeReader {
         };
     }
 
-    constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
+    constructor(public config: BarcodeReaderConfig, public supplements: Array<BarcodeReader> = []) {
         this._row = [];
-        this.config = config || {};
-        if (supplements) {
-            this.supplements = supplements;
-        }
     }
 
     protected _nextUnset(line: ReadonlyArray<number>, start = 0): number {
@@ -226,10 +218,10 @@ export abstract class BarcodeReader {
     }
 
     // override/implement this in your custom readers.
-    protected decodeImage(imageWrapper: ImageWrapper): QuaggaJSResultObject | null {
+    public decodeImage(imageWrapper: ImageWrapper): Promise<QuaggaJSResultObject | null> {
         // eslint-disable-next-line no-void
         void imageWrapper;
-        return null;
+        return Promise.resolve(null);
     }
 }
 

@@ -156,6 +156,7 @@ export interface Barcode {
     start: number;
     startInfo: BarcodePosition;
     supplement?: Barcode;
+    threshold?: number;
 }
 
 export interface ThresholdSize {

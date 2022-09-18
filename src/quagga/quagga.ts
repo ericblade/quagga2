@@ -2,7 +2,7 @@ import { clone } from 'gl-vec2';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
-import BarcodeDecoder from '../decoder/barcode_decoder';
+import BarcodeDecoder, { BarcodeReaderClass } from '../decoder/barcode_decoder';
 import CameraAccess from '../input/camera_access';
 import FrameGrabber from '../input/frame_grabber.js';
 import InputStream from '../input/input_stream/input_stream';
@@ -37,7 +37,7 @@ export default class Quagga {
             return;
         }
         this.initBuffers(imageWrapper);
-        this.context.decoder = BarcodeDecoder.create(this.context.config.decoder, this.context.inputImageWrapper);
+        this.context.decoder = BarcodeDecoder.create(this.context.config.decoder, this.context.inputImageWrapper as ImageWrapper);
     }
 
     getViewPort(): Element | null {
@@ -264,20 +264,23 @@ export default class Quagga {
         QWorkers.adjustWorkerPool(0);
         if (this.context.config?.inputStream && this.context.config.inputStream.type === 'LiveStream') {
             await CameraAccess.release();
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             this.context.inputStream.clearEventHandlers();
         }
     }
 
     setReaders(readers: Array<QuaggaJSReaderConfig>): void {
         if (this.context.decoder) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             this.context.decoder.setReaders(readers);
         }
         QWorkers.setReaders(readers);
     }
 
-    registerReader(name: string, reader: QuaggaJSReaderConfig): void {
+    registerReader(name: string, reader: BarcodeReaderClass): void {
         BarcodeDecoder.registerReader(name, reader);
         if (this.context.decoder) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
             this.context.decoder.registerReader(name, reader);
         }
         QWorkers.registerReader(name, reader);

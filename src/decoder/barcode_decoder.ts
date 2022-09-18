@@ -1,5 +1,8 @@
-import ImageDebug from '../common/image_debug';
+import { Point, QuaggaJSConfigObject, QuaggaJSReaderConfig, XYSize } from '../../type-definitions/quagga';
+// import ImageDebug, { DebugPath } from '../common/image_debug';
+import ImageWrapper from '../common/image_wrapper';
 import TwoOfFiveReader from '../reader/2of5_reader';
+import BarcodeReader, { Barcode, BarcodeReaderConfig } from '../reader/barcode_reader';
 import CodabarReader from '../reader/codabar_reader';
 import Code128Reader from '../reader/code_128_reader';
 import Code32Reader from '../reader/code_32_reader';
@@ -15,7 +18,9 @@ import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
 import { getBarcodeLineDDA as getBarcodeLine, toBinaryLine } from './bresenham';
 
-const READERS = {
+export type BarcodeReaderClass = new (config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) => BarcodeReader;
+
+const READERS: Record<string, BarcodeReaderClass> = {
     code_128_reader: Code128Reader,
     ean_reader: EANReader,
     ean_5_reader: EAN5Reader,
@@ -32,12 +37,23 @@ const READERS = {
     code_32_reader: Code32Reader,
 };
 
+interface InternalCanvas {
+    frequency: CanvasRenderingContext2D | HTMLCanvasElement | null,
+    overlay: CanvasRenderingContext2D | HTMLCanvasElement | null,
+    pattern: CanvasRenderingContext2D | HTMLCanvasElement | null,
+}
+
+interface InternalCanvasCache {
+    ctx: InternalCanvas,
+    dom: InternalCanvas,
+}
+
 export default {
-    registerReader: (name, reader) => {
+    registerReader: (name: string, reader: BarcodeReaderClass) => {
         READERS[name] = reader;
     },
-    create(config, inputImageWrapper) {
-        const _canvas = {
+    create(config: QuaggaJSConfigObject['decoder'], inputImageWrapper: ImageWrapper) {
+        const internalCanvas: InternalCanvasCache = {
             ctx: {
                 frequency: null,
                 pattern: null,
@@ -49,47 +65,50 @@ export default {
                 overlay: null,
             },
         };
-        const _barcodeReaders = [];
-
-        initCanvas();
-        initReaders();
-        initConfig();
+        const barcodeReaders: Array<BarcodeReader> = [];
 
         function initCanvas() {
+            // TODO: holy wow, this function's variable reuse, as well as the types for InternalCanvasCache are a big mess
             if (ENV.development && typeof document !== 'undefined') {
                 const $debug = document.querySelector('#debug.detection');
-                _canvas.dom.frequency = document.querySelector('canvas.frequency');
-                if (!_canvas.dom.frequency) {
-                    _canvas.dom.frequency = document.createElement('canvas');
-                    _canvas.dom.frequency.className = 'frequency';
+                internalCanvas.dom.frequency = document.querySelector<HTMLCanvasElement>('canvas.frequency');
+                if (!internalCanvas.dom.frequency) {
+                    internalCanvas.dom.frequency = document.createElement('canvas');
+                    internalCanvas.dom.frequency.className = 'frequency';
                     if ($debug) {
-                        $debug.appendChild(_canvas.dom.frequency);
+                        $debug.appendChild(internalCanvas.dom.frequency);
                     }
                 }
-                _canvas.ctx.frequency = _canvas.dom.frequency.getContext('2d');
+                internalCanvas.ctx.frequency = internalCanvas.dom.frequency.getContext('2d');
 
-                _canvas.dom.pattern = document.querySelector('canvas.patternBuffer');
-                if (!_canvas.dom.pattern) {
-                    _canvas.dom.pattern = document.createElement('canvas');
-                    _canvas.dom.pattern.className = 'patternBuffer';
+                internalCanvas.dom.pattern = document.querySelector<HTMLCanvasElement>('canvas.patternBuffer');
+                if (!internalCanvas.dom.pattern) {
+                    internalCanvas.dom.pattern = document.createElement('canvas');
+                    internalCanvas.dom.pattern.className = 'patternBuffer';
                     if ($debug) {
-                        $debug.appendChild(_canvas.dom.pattern);
+                        $debug.appendChild(internalCanvas.dom.pattern);
                     }
                 }
-                _canvas.ctx.pattern = _canvas.dom.pattern.getContext('2d');
+                internalCanvas.ctx.pattern = internalCanvas.dom.pattern.getContext('2d');
 
-                _canvas.dom.overlay = document.querySelector('canvas.drawingBuffer');
-                if (_canvas.dom.overlay) {
-                    _canvas.ctx.overlay = _canvas.dom.overlay.getContext('2d');
+                internalCanvas.dom.overlay = document.querySelector<HTMLCanvasElement>('canvas.drawingBuffer');
+                if (internalCanvas.dom.overlay) {
+                    internalCanvas.ctx.overlay = internalCanvas.dom.overlay.getContext('2d');
                 }
             }
         }
 
         function initReaders() {
+            if (!config) {
+                throw new Error('quagga configuration error: no configuration!');
+            }
+            if (!config.readers) {
+                throw new Error('quagga configuration error: no readers defined!');
+            }
             config.readers.forEach((readerConfig) => {
                 let reader;
-                let configuration = {};
-                let supplements = [];
+                let configuration: QuaggaJSReaderConfig['config'] | Record<string, never> = {};
+                let supplements: Array<BarcodeReader> = [];
 
                 if (typeof readerConfig === 'object') {
                     reader = readerConfig.format;
@@ -101,19 +120,22 @@ export default {
                     console.log('Before registering reader: ', reader);
                 }
                 if (configuration.supplements) {
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                     supplements = configuration
-                        .supplements.map((supplement) => new READERS[supplement]());
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+                        .supplements.map((supplement) => new READERS[supplement](configuration));
                 }
                 try {
-                    const readerObj = new READERS[reader](configuration, supplements);
-                    _barcodeReaders.push(readerObj);
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call
+                    const readerObj = (new READERS[reader as string](configuration, supplements));
+                    barcodeReaders.push(readerObj);
                 } catch (err) {
                     console.error('* Error constructing reader ', reader, err);
                     throw err;
                 }
             });
             if (ENV.development) {
-                console.log(`Registered Readers: ${_barcodeReaders
+                console.log(`Registered Readers: ${barcodeReaders
                     .map((reader) => JSON.stringify({ format: reader.FORMAT, config: reader.config }))
                     .join(', ')}`);
             }
@@ -123,18 +145,20 @@ export default {
             if (ENV.development && typeof document !== 'undefined') {
                 let i;
                 const vis = [{
-                    node: _canvas.dom.frequency,
-                    prop: config.debug.showFrequency,
+                    node: internalCanvas.dom.frequency,
+                    prop: config?.debug?.showFrequency,
                 }, {
-                    node: _canvas.dom.pattern,
-                    prop: config.debug.showPattern,
+                    node: internalCanvas.dom.pattern,
+                    prop: config?.debug?.showPattern,
                 }];
 
                 for (i = 0; i < vis.length; i++) {
                     if (vis[i].prop === true) {
-                        vis[i].node.style.display = 'block';
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        (vis[i].node as HTMLCanvasElement).style.display = 'block';
                     } else {
-                        vis[i].node.style.display = 'none';
+                        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                        (vis[i].node as HTMLCanvasElement).style.display = 'none';
                     }
                 }
             }
@@ -145,8 +169,8 @@ export default {
          * @param {Array} line
          * @param {Number} angle
          */
-        function getExtendedLine(line, angle, ext) {
-            function extendLine(amount) {
+        function getExtendedLine(line: Array<XYSize>, angle: number, ext: number) {
+            function extendLine(amount: number) {
                 const extension = {
                     y: amount * Math.sin(angle),
                     x: amount * Math.cos(angle),
@@ -161,7 +185,6 @@ export default {
 
             // check if inside image
             extendLine(ext);
-            const lineWidth = Math.abs(line[1].x - line[0].x);
             while (ext > 1 && (!inputImageWrapper.inImageWithBorder(line[0], 1)
                     || !inputImageWrapper.inImageWithBorder(line[1], 1))) {
                 // eslint-disable-next-line no-param-reassign
@@ -171,7 +194,7 @@ export default {
             return line;
         }
 
-        function getLine(box) {
+        function getLine(box: Array<Array<number>>) {
             return [{
                 x: (box[1][0] - box[0][0]) / 2 + box[0][0],
                 y: (box[1][1] - box[0][1]) / 2 + box[0][1],
@@ -181,34 +204,33 @@ export default {
             }];
         }
 
-        function tryDecode(line) {
-            let result = null;
-            let i;
+        function tryDecode(line: Array<Point>) {
             const barcodeLine = getBarcodeLine(inputImageWrapper, line[0], line[1]);
 
-            if (ENV.development && config.debug.showFrequency) {
-                ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
+            if (ENV.development && config?.debug?.showFrequency) {
+                // TODO: rewrite ImageDebug to deal with typings properly
+                // ImageDebug.drawPath(line, { x: 'x', y: 'y' }, internalCanvas.ctx.overlay, { color: 'red', lineWidth: 3 });
                 // TODO: dig out Bresenham debug and convert it properly and reenable in this file
                 // Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 
-            toBinaryLine(barcodeLine);
+            const binaryLine = toBinaryLine(barcodeLine);
 
-            if (ENV.development && config.debug.showPattern) {
+            if (ENV.development && config?.debug?.showPattern) {
                 // Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
             }
 
-            for (i = 0; i < _barcodeReaders.length && result === null; i++) {
-                // console.trace();
-                result = _barcodeReaders[i].decodePattern(barcodeLine.line);
+            let result: Barcode | null = null;
+            if (barcodeReaders.some((reader) => {
+                result = reader.decodePattern(binaryLine.line);
+                return result !== null;
+            })) {
+                return {
+                    codeResult: result,
+                    barcodeLine: binaryLine,
+                };
             }
-            if (result === null) {
-                return null;
-            }
-            return {
-                codeResult: result,
-                barcodeLine,
-            };
+            return null;
         }
 
         /**
@@ -218,8 +240,8 @@ export default {
          * @param {Array} line
          * @param {Number} lineAngle
          */
-        function tryDecodeBruteForce(box, line, lineAngle) {
-            const sideLength = Math.sqrt(Math.pow(box[1][0] - box[0][0], 2) + Math.pow((box[1][1] - box[0][1]), 2));
+        function tryDecodeBruteForce(box: Array<Array<number>>, line: Array<Point>, lineAngle: number) {
+            const sideLength = Math.sqrt(((box[1][0] - box[0][0]) ** 2) + ((box[1][1] - box[0][1]) ** 2));
             let i;
             const slices = 16;
             let result = null;
@@ -248,17 +270,19 @@ export default {
             return result;
         }
 
-        function getLineLength(line) {
+        function getLineLength(line: Array<Point>) {
             return Math.sqrt(
                 Math.abs(line[1].y - line[0].y) ** 2
                 + Math.abs(line[1].x - line[0].x) ** 2,
             );
         }
 
-        async function decodeFromImage(imageWrapper) {
+        async function decodeFromImage(imageWrapper: ImageWrapper) {
             let result = null;
-            for (const reader of _barcodeReaders) {
+            // eslint-disable-next-line no-restricted-syntax
+            for (const reader of barcodeReaders) {
                 if (reader.decodeImage) {
+                    // eslint-disable-next-line no-await-in-loop
                     result = await reader.decodeImage(imageWrapper);
                     if (result) {
                         break;
@@ -273,14 +297,14 @@ export default {
          * @param {Object} box The area to search in
          * @returns {Object} the result {codeResult, line, angle, pattern, threshold}
          */
-        function decodeFromBoundingBox(box) {
+        function decodeFromBoundingBox(box: Array<Array<number>>) {
             let line;
-            const ctx = _canvas.ctx.overlay;
+            const ctx = internalCanvas.ctx.overlay;
             let result;
 
             if (ENV.development) {
-                if (config.debug.drawBoundingBox && ctx) {
-                    ImageDebug.drawPath(box, { x: 0, y: 1 }, ctx, { color: 'blue', lineWidth: 2 });
+                if (config?.debug?.drawBoundingBox && ctx) {
+                    // ImageDebug.drawPath(box, { x: 0, y: 1 }, ctx as CanvasRenderingContext2D, { color: 'blue', lineWidth: 2 });
                 }
             }
 
@@ -292,17 +316,17 @@ export default {
                 return null;
             }
 
-            result = tryDecode(line);
+            result = tryDecode(line as unknown as Array<Point>); // TODO fix this
             if (result === null) {
-                result = tryDecodeBruteForce(box, line, lineAngle);
+                result = tryDecodeBruteForce(box, line as unknown as Array<Point>, lineAngle);
             }
 
             if (result === null) {
                 return null;
             }
 
-            if (ENV.development && result && config.debug.drawScanline && ctx) {
-                ImageDebug.drawPath(line, { x: 'x', y: 'y' }, ctx, { color: 'red', lineWidth: 3 });
+            if (ENV.development && result && config?.debug?.drawScanline && ctx) {
+                // ImageDebug.drawPath(line, { x: 'x', y: 'y' }, ctx, { color: 'red', lineWidth: 3 });
             }
 
             return {
@@ -310,23 +334,29 @@ export default {
                 line,
                 angle: lineAngle,
                 pattern: result.barcodeLine.line,
+                // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 threshold: result.barcodeLine.threshold,
             };
         }
 
+        initCanvas();
+        initReaders();
+        initConfig();
+
         return {
-            decodeFromBoundingBox(box) {
+            decodeFromBoundingBox(box: Array<Array<number>>) {
                 return decodeFromBoundingBox(box);
             },
-            decodeFromBoundingBoxes(boxes) {
+            decodeFromBoundingBoxes(boxes: Array<Array<Array<number>>>) {
                 let i; let result;
                 const barcodes = [];
-                const { multiple } = config;
+                const multiple = config?.multiple;
 
                 for (i = 0; i < boxes.length; i++) {
                     const box = boxes[i];
                     result = decodeFromBoundingBox(box) || {};
-                    result.box = box;
+                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                    (result as any).box = box; // TODO
 
                     if (multiple) {
                         barcodes.push(result);
@@ -339,20 +369,23 @@ export default {
                     barcodes,
                 };
             },
-            async decodeFromImage(imageWrapperIn) {
+            async decodeFromImage(imageWrapperIn: ImageWrapper) {
                 const result = await decodeFromImage(imageWrapperIn);
                 return result;
             },
-            registerReader(name, reader) {
+            registerReader(name: string, reader: BarcodeReaderClass) {
                 if (READERS[name]) {
-                    throw new Error('cannot register existing reader', name);
+                    throw new Error(`cannot register existing reader ${name}`);
                 }
                 READERS[name] = reader;
             },
-            setReaders(readers) {
+            setReaders(readers: Array<QuaggaJSReaderConfig>) {
+                if (!config) {
+                    throw new Error('setReaders called before initialization');
+                }
                 // eslint-disable-next-line no-param-reassign
                 config.readers = readers;
-                _barcodeReaders.length = 0;
+                barcodeReaders.length = 0;
                 initReaders();
             },
         };
