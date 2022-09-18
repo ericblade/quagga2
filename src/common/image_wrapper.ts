@@ -1,4 +1,4 @@
-import { clone } from 'gl-vec2';
+import { clone as vec2clone } from 'gl-vec2';
 import {
     XYSize,
     TypedArrayConstructor,
@@ -9,8 +9,6 @@ import {
 } from '../../type-definitions/quagga.d';
 import * as ArrayHelper from './ArrayHelper';
 import hsv2rgb from './cvutils/hsv2rgb';
-
-const vec2 = { clone };
 
 type PositiveNumber = number;
 function assertNumberPositive(val: number): asserts val is PositiveNumber {
@@ -197,7 +195,7 @@ class ImageWrapper implements SparseImageWrapper {
                     label.theta += 180;
                 }
                 label.rad = tmp > PI ? tmp - PI : tmp;
-                label.vec = vec2.clone([Math.cos(tmp), Math.sin(tmp)]);
+                label.vec = vec2clone([Math.cos(tmp), Math.sin(tmp)]);
                 result.push(label);
             }
         }

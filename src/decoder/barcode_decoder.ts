@@ -1,5 +1,3 @@
-/* eslint-disable import/no-cycle */
-
 import ImageDebug from '../common/image_debug';
 import TwoOfFiveReader from '../reader/2of5_reader';
 import CodabarReader from '../reader/codabar_reader';
@@ -15,8 +13,6 @@ import EANReader from '../reader/ean_reader';
 import I2of5Reader from '../reader/i2of5_reader';
 import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
-// import { getBarcodeLineEFLAD as getBarcodeLine, toBinaryLine } from './bresenham';
-// import { getBarcodeLineNew as getBarcodeLine, toBinaryLine } from './bresenham';
 import { getBarcodeLineDDA as getBarcodeLine, toBinaryLine } from './bresenham';
 
 const READERS = {

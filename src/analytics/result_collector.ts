@@ -1,4 +1,3 @@
-import ImageDebug from '../common/image_debug';
 import {
     QuaggaJSCodeResult,
     QuaggaJSResultCollector,
@@ -6,6 +5,7 @@ import {
     XYSize,
     QuaggaImageData,
 } from '../../type-definitions/quagga.d';
+import ImageDebug from '../common/image_debug';
 
 function contains(codeResult: QuaggaJSCodeResult, list: Array<QuaggaJSCodeResult>): boolean {
     return list && list.some((item) => {
