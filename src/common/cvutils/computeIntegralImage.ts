@@ -2,8 +2,7 @@ import { ImageWrapper } from 'quagga';
 
 export default function computeIntegralImage(imageWrapper: ImageWrapper, integralWrapper: ImageWrapper) {
     const imageData = imageWrapper.data;
-    const width = imageWrapper.size.x;
-    const height = imageWrapper.size.y;
+    const { x: width, y: height } = imageWrapper.size;
     const integralImageData = integralWrapper.data;
     let sum = 0;
 

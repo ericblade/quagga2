@@ -146,6 +146,7 @@
     "node": ">= 10.0"
   },
   "dependencies": {
+    "fast_array_intersect": "^1.1.0",
     "get-pixels": "^3.3.3",
     "gl-mat2": "^1.0.1",
     "gl-vec2": "^1.3.0",
@@ -171,8 +172,7 @@
       ".ts",
       ".tsx"
     ],
-    "require": [
-    ],
+    "require": [],
     "reporter": [
       "text-summary",
       "html"

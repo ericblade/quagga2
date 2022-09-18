@@ -1,3 +1,4 @@
+/* eslint-disable no-bitwise */
 import { ImageWrapper } from "quagga";
 
 export default function computeHistogram(imageWrapper: ImageWrapper, bitsPerPixel = 8) {
