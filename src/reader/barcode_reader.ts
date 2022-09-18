@@ -1,7 +1,7 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 // eslint-disable-next-line import/no-cycle
-import { ImageWrapper } from 'quagga';
+import ImageWrapper from '../image_wrapper';
 import { QuaggaJSResultObject } from '../../type-definitions/quagga';
 import * as ArrayHelper from '../common/ArrayHelper';
 

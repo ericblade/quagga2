@@ -1,4 +1,4 @@
-import { ImageWrapper } from 'quagga';
+import ImageWrapper from '../image_wrapper';
 import determineOtsuThreshold from './determineOtsuThreshold';
 import thresholdImage from './thresholdImage';
 

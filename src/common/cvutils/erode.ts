@@ -1,12 +1,11 @@
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 export default function erode(inImageWrapper: ImageWrapper, outImageWrapper: ImageWrapper) {
+    const { data: inImageData } = inImageWrapper;
+    const { data: outImageData } = outImageWrapper;
+    const { y: height, x: width } = inImageWrapper.size;
     let v;
     let u;
-    const inImageData = inImageWrapper.data;
-    const outImageData = outImageWrapper.data;
-    const height = inImageWrapper.size.y;
-    const width = inImageWrapper.size.x;
     let sum;
     let yStart1;
     let yStart2;

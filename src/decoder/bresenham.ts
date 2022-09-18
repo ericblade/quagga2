@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { ImageWrapper } from 'quagga';
+import ImageWrapper from '../image_wrapper';
 import { Point } from '../../type-definitions/quagga';
 // import { dist } from 'gl-vec2';
 

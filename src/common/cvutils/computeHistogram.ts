@@ -1,5 +1,5 @@
 /* eslint-disable no-bitwise */
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 export default function computeHistogram(imageWrapper: ImageWrapper, bitsPerPixel = 8) {
     const imageData = imageWrapper.data;

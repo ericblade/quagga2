@@ -1,4 +1,4 @@
-import { ImageWrapper } from 'quagga';
+import ImageWrapper from '../image_wrapper';
 
 export default function computeIntegralImage(imageWrapper: ImageWrapper, integralWrapper: ImageWrapper) {
     const imageData = imageWrapper.data;

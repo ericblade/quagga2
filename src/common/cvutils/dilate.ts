@@ -1,13 +1,12 @@
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 // TODO: not used?
 export default function dilate(inImageWrapper: ImageWrapper, outImageWrapper: ImageWrapper) {
     let v;
     let u;
-    const inImageData = inImageWrapper.data;
-    const outImageData = outImageWrapper.data;
-    const height = inImageWrapper.size.y;
-    const width = inImageWrapper.size.x;
+    const { data: inImageData } = inImageWrapper;
+    const { data: outImageData } = outImageWrapper;
+    const { y: height, x: width } = inImageWrapper.size;
     let sum;
     let yStart1;
     let yStart2;

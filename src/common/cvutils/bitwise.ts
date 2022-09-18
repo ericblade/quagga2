@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 // TODO: Not used?
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 enum Operation {
     Or,

@@ -1,13 +1,12 @@
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 // TODO: not used?
 export default function countNonZero(imageWrapper: ImageWrapper) {
-    let { length } = imageWrapper.data;
     const { data } = imageWrapper;
-    let sum = 0;
-
-    while (length--) {
-        sum += data[length];
-    }
-    return sum;
+    (data as number[]).reduce<number>((pv, cv) => {
+        if (cv !== 0) {
+            return pv + 1;
+        }
+        return pv;
+    }, 0);
 }

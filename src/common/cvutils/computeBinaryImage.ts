@@ -1,5 +1,5 @@
 // TODO: not used?
-import { ImageWrapper } from 'quagga';
+import ImageWrapper from '../image_wrapper';
 import computeIntegralImage from './computeIntegralImage';
 
 // local thresholding

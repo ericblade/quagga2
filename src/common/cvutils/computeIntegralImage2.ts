@@ -3,7 +3,7 @@
  * @param imageDataContainer {ImageDataContainer} the image to be integrated
  */
 
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 // TODO: not used?
 export default function computeIntegralImage2(imageWrapper: ImageWrapper, integralWrapper: ImageWrapper) {

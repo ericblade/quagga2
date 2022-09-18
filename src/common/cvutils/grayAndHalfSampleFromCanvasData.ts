@@ -8,8 +8,8 @@ export default function grayAndHalfSampleFromCanvasData<T extends ImageDataArray
 ) {
     let topRowIdx = 0;
     let bottomRowIdx = size.x;
-    const endIdx = Math.floor(canvasData.length / 4);
-    const outWidth = size.x / 2;
+    const endIdx = Math.ceil(canvasData.length / 4);
+    const outWidth = Math.ceil(size.x / 2);
     let outImgIdx = 0;
     const inWidth = size.x;
     let i;

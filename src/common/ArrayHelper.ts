@@ -1,26 +1,16 @@
 /* eslint-disable no-param-reassign */
-import { TypedArray } from '../../type-definitions/quagga';
+import { ImageDataArray } from '../../type-definitions/quagga';
 
-export function init(arr: TypedArray | Array<number>, val: number) {
+export function init(arr: ImageDataArray, val: number) {
     arr.fill(val);
 }
 
-export function maxIndex(arr: Array<number>) {
-    let max = 0;
-    for (let i = 0; i < arr.length; i++) {
-        if (arr[i] > arr[max]) {
-            max = i;
-        }
-    }
-    return max;
+export function maxIndex(arr: ImageDataArray) {
+    const max = Math.max(...arr);
+    return arr.indexOf(max);
 }
 
-export function sum(arr: Array<number> | TypedArray): number {
-    let { length } = arr;
-    let arrSum = 0;
-
-    while (length--) {
-        arrSum += arr[length];
-    }
-    return arrSum;
+export function sum(arr: ImageDataArray): number {
+    // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+    return (arr as number[]).reduce<number>((pv: number, cv: number) => (pv + cv), 0);
 }

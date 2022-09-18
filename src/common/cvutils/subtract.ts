@@ -1,4 +1,4 @@
-import { ImageWrapper } from "quagga";
+import ImageWrapper from '../image_wrapper';
 
 // TODO: not used?
 export default function subtract(aImageWrapper: ImageWrapper, bImageWrapper: ImageWrapper, resultImageWrapper = aImageWrapper) {
