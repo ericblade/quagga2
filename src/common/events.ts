@@ -1,10 +1,13 @@
 type EventName = string;
+type CallbackFunction = <T>(x: T) => void;
 
 interface Subscription {
     async?: boolean;
-    callback: Function;
+    callback: CallbackFunction;
     once?: boolean;
 }
+
+type SubscriptionOrCallback = Subscription | CallbackFunction;
 
 interface EventData {
     subscribers: Array<Subscription>;
@@ -15,10 +18,10 @@ interface Events {
 }
 
 interface EventInterface {
-    subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void;
+    once(event: EventName, callback: CallbackFunction, async?: boolean): void;
     publish(eventName: EventName, data?: never): void;
-    once(event: EventName, callback: Function, async?: boolean): void;
-    unsubscribe(eventName?: EventName, callback?: Function | Subscription): void;
+    subscribe(event: EventName, callback: SubscriptionOrCallback, async?: boolean): void;
+    unsubscribe(eventName?: EventName, callback?: SubscriptionOrCallback): void;
 }
 
 export default (function EventInterface(): EventInterface {
@@ -47,7 +50,7 @@ export default (function EventInterface(): EventInterface {
         }
     }
 
-    function _subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void {
+    function subscribeInternal(event: EventName, callback: SubscriptionOrCallback, async?: boolean): void {
         let subscription;
 
         if (typeof callback === 'function') {
@@ -66,8 +69,8 @@ export default (function EventInterface(): EventInterface {
     }
 
     return {
-        subscribe(event: EventName, callback: Function | Subscription, async?: boolean): void {
-            return _subscribe(event, callback, async);
+        subscribe(event: EventName, callback: SubscriptionOrCallback, async?: boolean): void {
+            return subscribeInternal(event, callback, async);
         },
         publish(eventName: EventName, data?: never): void {
             const event = getEvent(eventName);
@@ -86,14 +89,14 @@ export default (function EventInterface(): EventInterface {
                 publishSubscription(subscriber, data as never);
             });
         },
-        once(event: EventName, callback: Function, async = false): void {
-            _subscribe(event, {
+        once(event: EventName, callback: CallbackFunction, async = false): void {
+            subscribeInternal(event, {
                 callback,
                 async,
                 once: true,
             });
         },
-        unsubscribe(eventName?: EventName, callback?: Function | Subscription): void {
+        unsubscribe(eventName?: EventName, callback?: SubscriptionOrCallback): void {
             if (eventName) {
                 const event = getEvent(eventName);
                 if (event && callback) {

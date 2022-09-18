@@ -1,9 +1,9 @@
 /* eslint-disable no-unused-vars */
 /* eslint-disable class-methods-use-this */
 // eslint-disable-next-line import/no-cycle
-import ImageWrapper from '../image_wrapper';
 import { QuaggaJSResultObject } from '../../type-definitions/quagga';
 import * as ArrayHelper from '../common/ArrayHelper';
+import ImageWrapper from '../common/image_wrapper';
 
 // for some reason this throws a shadow error on itself?!
 // eslint-disable-next-line no-shadow

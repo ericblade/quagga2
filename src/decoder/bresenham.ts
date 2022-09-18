@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
-import ImageWrapper from '../image_wrapper';
 import { Point } from '../../type-definitions/quagga';
+import ImageWrapper from '../common/image_wrapper';
 // import { dist } from 'gl-vec2';
 
 // TODO: would it be faster/more correct to ensure that our incoming points are integers already?
