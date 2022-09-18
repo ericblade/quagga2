@@ -1,5 +1,7 @@
-import BarcodeReader, { BarcodeReaderConfig, BarcodeInfo, BarcodePosition, Barcode } from './barcode_reader';
 import merge from 'lodash/merge';
+import BarcodeReader, {
+    BarcodeReaderConfig, BarcodeInfo, BarcodePosition, Barcode,
+} from './barcode_reader';
 
 // const CODE_L_START = 0;
 const CODE_G_START = 10;
@@ -36,7 +38,9 @@ const AVG_CODE_ERROR = 0.48;
 
 class EANReader extends BarcodeReader {
     FORMAT = 'ean_13';
+
     SINGLE_CODE_ERROR = 0.70;
+
     STOP_PATTERN = [1, 1, 1]; // TODO: does this need to be in the class?
 
     constructor(config?: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
@@ -48,7 +52,7 @@ class EANReader extends BarcodeReader {
         const bestMatch: BarcodePosition = {
             error: Number.MAX_VALUE,
             start: 0,
-            end: 0
+            end: 0,
         };
         const epsilon = AVG_CODE_ERROR;
         // console.warn('* findPattern', pattern, offset, isWhite, tryHarder, epsilon);
@@ -104,8 +108,8 @@ class EANReader extends BarcodeReader {
         const bestMatch: BarcodeInfo = {
             error: Number.MAX_VALUE,
             code: -1,
-            start: start,
-            end: start
+            start,
+            end: start,
         };
         const epsilon = AVG_CODE_ERROR;
         let isWhite = !this._row[offset];
@@ -117,7 +121,7 @@ class EANReader extends BarcodeReader {
             // console.warn('* decodeCode after length');
         }
 
-        let found = false;
+        const found = false;
         for (let i = offset; i < this._row.length; i++) {
             if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
@@ -137,9 +141,9 @@ class EANReader extends BarcodeReader {
                     }
                     // console.warn('* return bestMatch', JSON.stringify(bestMatch));
                     return bestMatch;
-                } else {
-                    counterPos++;
                 }
+                counterPos++;
+
                 counter[counterPos] = 1;
                 isWhite = !isWhite;
             }
@@ -229,7 +233,7 @@ class EANReader extends BarcodeReader {
         decodedCodes.push(middlePattern);
 
         for (let i = 0; i < 6; i++) {
-            middlePattern = this._decodeCode(middlePattern!.end, CODE_G_START);
+            middlePattern = this._decodeCode(middlePattern.end, CODE_G_START);
             // console.warn('* decodeCode=', JSON.stringify(middlePattern));
 
             if (!middlePattern) {
@@ -299,7 +303,7 @@ class EANReader extends BarcodeReader {
         for (let i = 0; i < this.supplements.length; i++) {
             // console.warn('* extensions loop', i, this.supplements[i], this.supplements[i]._decode);
             try {
-                let result = this.supplements[i].decode(this._row, startInfo.end);
+                const result = this.supplements[i].decode(this._row, startInfo.end);
                 // console.warn('* decode result=', result);
                 if (result !== null) {
                     return {
@@ -326,7 +330,7 @@ class EANReader extends BarcodeReader {
         const result = new Array<number>();
         const decodedCodes = new Array<BarcodeInfo | BarcodePosition>();
         let resultInfo: Barcode | {} = {};
-        let startInfo = this._findStart();
+        const startInfo = this._findStart();
 
         if (!startInfo) {
             return null;
@@ -334,7 +338,7 @@ class EANReader extends BarcodeReader {
 
         let code: BarcodePosition | BarcodeInfo | null = {
             start: startInfo.start,
-            end: startInfo.end
+            end: startInfo.end,
         };
         decodedCodes.push(code);
 
@@ -372,7 +376,7 @@ class EANReader extends BarcodeReader {
             const lastCode = supplement.decodedCodes[supplement.decodedCodes.length - 1] as BarcodeInfo;
             const endInfo = {
                 start: lastCode.start + (((lastCode.end - lastCode.start) / 2) | 0),
-                end: lastCode.end
+                end: lastCode.end,
             };
 
             if (!this._verifyTrailingWhitespace(endInfo)) {
@@ -381,7 +385,7 @@ class EANReader extends BarcodeReader {
 
             resultInfo = {
                 supplement,
-                code: result.join('') + supplement.code
+                code: result.join('') + supplement.code,
             };
         }
 

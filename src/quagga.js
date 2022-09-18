@@ -1,14 +1,13 @@
 import merge from 'lodash/merge';
-import ImageWrapper from './common/image_wrapper';
-import BarcodeDecoder from './decoder/barcode_decoder';
-import * as Readers from './reader/index';
-import Events from './common/events';
-import CameraAccess from './input/camera_access';
-import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
+import Events from './common/events';
+import ImageDebug from './common/image_debug';
+import ImageWrapper from './common/image_wrapper';
 import Config from './config/config';
-
+import BarcodeDecoder from './decoder/barcode_decoder';
+import CameraAccess from './input/camera_access';
 import Quagga from './quagga/quagga';
+import * as Readers from './reader/index';
 
 const instance = new Quagga();
 const _context = instance.context;
