@@ -7,6 +7,8 @@ quagga2
 
 [![Rate on Openbase](https://badges.openbase.io/js/rating/@ericblade/quagga2.svg)](https://openbase.io/js/@ericblade/quagga2?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
 
+[![kandi X-Ray](https://kandi.openweaver.com/badges/xray.svg)](https://kandi.openweaver.com/typescript/ericblade/quagga2)
+
 This is a fork of the original QuaggaJS library, that will be maintained until such time as the
 original author and maintainer returns, or it has been completely replaced by built-in browser and
 node functionality.
