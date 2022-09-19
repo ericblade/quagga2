@@ -98,6 +98,9 @@ export default class Quagga {
         const { type: inputType, constraints } = this.context.config.inputStream;
         const { video, inputStream } = setupInputStream(inputType, this.getViewPort(), InputStream);
 
+        if (!inputStream) {
+            throw new Error(`unable to initialize inputStream of type ${inputType}`);
+        }
         if (inputType === 'LiveStream' && video) {
             CameraAccess.request(video, constraints)
                 .then(() => inputStream.trigger('canrecord'))

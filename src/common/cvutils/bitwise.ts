@@ -28,8 +28,7 @@ function base(op: Operation) {
                     cImageData[length] = aImageData[length] ^ bImageData[length];
                     break;
                 default:
-                    throw new Error('internal error in bitwise parameters');
-                    break;
+                    ((x: never) => x)(op);
             }
         }
     };

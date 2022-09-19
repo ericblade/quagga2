@@ -1,33 +1,37 @@
+import { InputStream } from '../input/input_stream/input_stream_base';
 import type { InputStreamType } from '../../type-definitions/quagga.d';
-import type { InputStreamFactory } from 'input/input_stream/input_stream_base';
+import type { InputStreamFactory } from '../input/input_stream/input_stream_base';
 
-export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, inputStreamFactory: InputStreamFactory) {
+interface InputStreamReturn {
+    inputStream: InputStream | null;
+    video: HTMLVideoElement | null;
+}
+
+export default function setupInputStream(type: InputStreamType = 'LiveStream', viewport: Element | null, inputStreamFactory: InputStreamFactory): InputStreamReturn {
+    const ret: InputStreamReturn = { inputStream: null, video: null };
     switch (type) {
-        case 'VideoStream': {
-            const video = document.createElement('video');
-            return {
-                video,
-                inputStream: inputStreamFactory.createVideoStream(video),
-            };
-        }
+        case 'VideoStream':
+            ret.video = document.createElement('video');
+            ret.inputStream = inputStreamFactory.createVideoStream(ret.video);
+            break;
         case 'ImageStream':
-            return { inputStream: inputStreamFactory.createImageStream() };
-        case 'LiveStream': {
-            let video: HTMLVideoElement | null = null;
+            ret.video = null;
+            ret.inputStream = inputStreamFactory.createImageStream();
+            break;
+        case 'LiveStream':
             if (viewport) {
-                video = viewport.querySelector('video');
-                if (!video) {
-                    video = document.createElement('video');
-                    viewport.appendChild(video);
+                ret.video = viewport.querySelector('video');
+                if (!ret.video) {
+                    ret.video = document.querySelector('video');
+                    if (ret.video) {
+                        viewport.appendChild(ret.video);
+                    }
                 }
             }
-            return {
-                video,
-                inputStream: inputStreamFactory.createLiveStream(video as HTMLVideoElement),
-            };
-        }
+            ret.inputStream = ret.video ? inputStreamFactory.createLiveStream(ret.video) : null;
+            break;
         default:
-            console.error(`* setupInputStream invalid type ${type}`);
-            return { video: null, inputStream: null };
+            ((x: never) => x)(type);
     }
+    return ret;
 }
