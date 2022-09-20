@@ -14,6 +14,7 @@ const inputStreamFactory: InputStreamFactory = {
         throw new Error('createLiveStream not available');
     },
     createImageStream(): InputStream {
+        // console.warn('* InputStreamNode createImageStream');
         let _config: { mime: string; size: number; src: any } | null = null;
 
         let width = 0;

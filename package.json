@@ -63,7 +63,7 @@
     "coverage:node": "// DOES NOT WORK YET // npx cross-env NODE_ENV=test BUILD_ENV=development nyc --no-clean ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.*",
     "coverage": "npm run cypress:run",
     "cypress:open": "npx cross-env NODE_ENV=development BUILD_ENV=development cypress open --env BUILD_ENV=development",
-    "cypress:run": "npx cross-env NODE_ENV=test BUILD_ENV=development cypress run --env BUILD_ENV=development",
+    "cypress:run": "npx cross-env NODE_ENV=development BUILD_ENV=development cypress run --env BUILD_ENV=development",
     "test:browser-specific": "NOT WORKING -- something like npx cypress run --config testFiles=[browser]",
     "test:browser-universal": "NOT WORKING -- something like npx cypress run --config testFiles=[universal]",
     "test:browser-all": "npm run cypress:run",

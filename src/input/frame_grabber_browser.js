@@ -27,6 +27,7 @@ function adjustCanvasSize(canvas, targetSize) {
 const FrameGrabber = {};
 
 FrameGrabber.create = function (inputStream, canvas) {
+    // console.warn('*** FrameGrabberBrowser create');
     const _that = {};
     const _streamConfig = inputStream.getConfig();
     const _videoSize = imageRef(inputStream.getRealWidth(), inputStream.getRealHeight());

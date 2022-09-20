@@ -3,12 +3,16 @@ import DevConfig from './config.dev';
 import NodeConfig from './config.node';
 import ProdConfig from './config.prod';
 
-// @ts-ignore // TODO: this produces a bizarre typescript error
-// eslint-disable-next-line no-nested-ternary
-const QuaggaConfig: QuaggaJSConfigObject = ENV.development
-    ? DevConfig
-    : ENV.node
-        ? NodeConfig
-        : ProdConfig;
+const ExportConfig: QuaggaJSConfigObject = (() => {
+    let QuaggaConfig: QuaggaJSConfigObject;
+    if (typeof ENV === 'undefined' || ENV.development) {
+        QuaggaConfig = DevConfig;
+    } else if (ENV.node) {
+        QuaggaConfig = NodeConfig;
+    } else {
+        QuaggaConfig = ProdConfig;
+    }
+    return QuaggaConfig;
+})();
 
-export default QuaggaConfig;
+export default ExportConfig;
