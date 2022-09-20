@@ -6,6 +6,7 @@ import { InputStreamFactory, InputStream, EventHandlerList } from './input_strea
 
 const inputStreamFactory: InputStreamFactory = {
     createVideoStream(video): InputStream {
+        console.warn('**** InputStreamBrowser createVideoStream');
         let _config: { size: number; type: string } | null = null;
         const _eventNames = ['canrecord', 'ended'];
         const _eventHandlers: EventHandlerList = {};
@@ -149,6 +150,7 @@ const inputStreamFactory: InputStreamFactory = {
         return inputStream;
     },
     createLiveStream(video): InputStream {
+        console.warn('**** InputStreamBrowser createLiveStream');
         if (video) {
             video.setAttribute('autoplay', 'true');
         }
@@ -159,6 +161,7 @@ const inputStreamFactory: InputStreamFactory = {
         return that;
     },
     createImageStream(): InputStream {
+        // console.warn('**** InputStreamBrowser createImageStream');
         let _config: { size: number; sequence: any } | null = null;
 
         let width = 0;

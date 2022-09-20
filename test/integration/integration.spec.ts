@@ -3,7 +3,8 @@
 // a single image to be returned.
 // TODO: write a test that allows for locate: false and locator configs to be tested.
 
-import Quagga from '../../src/quagga';
+// import Quagga from '../../src/quagga';
+import Quagga from '../../';
 import { QuaggaJSConfigObject } from '../../type-definitions/quagga';
 import { expect } from 'chai';
 import ExternalCode128Reader from '../../src/reader/code_128_reader';
