@@ -25,7 +25,7 @@ function adjustCanvasSize(canvas, targetSize) {
 const FrameGrabber = {};
 
 FrameGrabber.create = function (inputStream, canvas) {
-    console.warn('**** ImageRef=', ImageRef);
+    // console.warn('*** FrameGrabberBrowser create');
     const _that = {};
     const _streamConfig = inputStream.getConfig();
     const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
@@ -71,7 +71,8 @@ FrameGrabber.create = function (inputStream, canvas) {
      * The image-data is converted to gray-scale and then half-sampled if configured.
      */
     _that.grab = function () {
-        const doHalfSample = _streamConfig.halfSample;
+        // const doHalfSample = _streamConfig.halfSample;
+        const doHalfSample = false;
         const frame = inputStream.getFrame();
         let drawable = frame;
         let drawAngle = 0;

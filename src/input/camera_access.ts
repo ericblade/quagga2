@@ -121,7 +121,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         return new Promise<void>((resolve) => {
             setTimeout(() => {
                 if (tracks && tracks.length) {
-                    tracks[0].stop();
+                    tracks.forEach((track) => track.stop());
                 }
                 streamRef = null;
                 QuaggaJSCameraAccess.requestedVideoElement = null;
@@ -140,6 +140,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: should we acquire camera access even if there's no current camera open?
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
+            // @ts-ignore // typescript doesn't know the torch property
             await track.applyConstraints({ torch: false });
         }
     },
@@ -148,6 +149,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: should we acquire camera access even if there's no current camera open?
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
+            // @ts-ignore // typescript doesn't know the torch property
             await track.applyConstraints({ torch: true });
         }
     },

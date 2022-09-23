@@ -166,6 +166,7 @@ const inputStreamFactory: InputStreamFactory = {
         return inputStream;
     },
     createLiveStream(video): InputStream {
+        console.warn('**** InputStreamBrowser createLiveStream');
         if (video) {
             video.setAttribute('autoplay', 'true');
         }

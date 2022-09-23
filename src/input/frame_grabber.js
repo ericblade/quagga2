@@ -12,6 +12,7 @@ const { d2: Interp2D } = require('ndarray-linear-interpolate');
 
 const FrameGrabber = {};
 FrameGrabber.create = function (inputStream, canvas) {
+    // console.warn('*** FrameGrabberNode create()');
     const _that = {};
     const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
     const _canvasSize = inputStream.getCanvasSize();
