@@ -21,5 +21,6 @@ module.exports = (env, argv) => {
     config.output.path = __dirname + '/../lib';
     config.output.filename = 'quagga.js';
     config.mode = 'production';
+    config.devtool = undefined;
     return config;
 }
