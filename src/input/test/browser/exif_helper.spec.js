@@ -2,7 +2,7 @@ import {
     findTagsInObjectURL,
     findTagsInBuffer,
     base64ToArrayBuffer,
-} from '../../exif_helper';
+} from '../../exif';
 
 
 const fixtures = {
