@@ -1,9 +1,9 @@
-export { base64ToArrayBuffer } from './base64ToArrayBuffer';
-export { findTagsInBuffer } from './findTagsInBuffer';
-export { findTagsInObjectURL } from './findTagsInObjectURL';
-export { getStringFromBuffer } from './getStringFromBuffer';
-export { objectURLToBlob } from './objectURLToBlob';
-export { readEXIFData } from './readEXIFData';
-export { readTags } from './readTags';
-export { readTagValue } from './readTagValue';
-export { readToBuffer } from './readToBuffer';
+export { default as base64ToArrayBuffer } from './base64ToArrayBuffer';
+export { default as findTagsInBuffer } from './findTagsInBuffer';
+export { default as findTagsInObjectURL } from './findTagsInObjectURL';
+export { default as getStringFromBuffer } from './getStringFromBuffer';
+export { default as objectURLToBlob } from './objectURLToBlob';
+export { default as readEXIFData } from './readEXIFData';
+export { default as readTags } from './readTags';
+export { default as readTagValue } from './readTagValue';
+export { default as readToBuffer } from './readToBuffer';

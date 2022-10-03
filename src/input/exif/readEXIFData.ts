@@ -1,7 +1,7 @@
-import { getStringFromBuffer } from './getStringFromBuffer';
-import { readTags } from './readTags';
+import getStringFromBuffer from './getStringFromBuffer';
+import readTags from './readTags';
 
-export function readEXIFData(file: DataView, start: number, exifTags: Record<number, string>) {
+export default function readEXIFData(file: DataView, start: number, exifTags: Record<number, string>) {
     if (getStringFromBuffer(file, start, 4) !== 'Exif') {
         return false;
     }
@@ -29,5 +29,3 @@ export function readEXIFData(file: DataView, start: number, exifTags: Record<num
     const tags = readTags(file, tiffOffset, tiffOffset + firstIFDOffset, exifTags, bigEnd);
     return tags;
 }
-
-export default readEXIFData;

@@ -3,11 +3,11 @@
 // need to port any part of this that doesn't work in Node to node?
 
 import { AvailableTags } from './constants';
-import { findTagsInBuffer } from './findTagsInBuffer';
-import { objectURLToBlob } from './objectURLToBlob';
-import { readToBuffer } from './readToBuffer';
+import findTagsInBuffer from './findTagsInBuffer';
+import objectURLToBlob from './objectURLToBlob';
+import readToBuffer from './readToBuffer';
 
-export function findTagsInObjectURL(src: string, tags = AvailableTags) {
+export default function findTagsInObjectURL(src: string, tags = AvailableTags) {
     if (/^blob:/i.test(src)) {
         return objectURLToBlob(src)
             .then(readToBuffer)
@@ -15,5 +15,3 @@ export function findTagsInObjectURL(src: string, tags = AvailableTags) {
     }
     return Promise.resolve(null);
 }
-
-export default findTagsInObjectURL;

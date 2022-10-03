@@ -1,7 +1,7 @@
 import { AvailableTags, ExifTags } from './constants';
-import { readEXIFData } from './readEXIFData';
+import readEXIFData from './readEXIFData';
 
-export function findTagsInBuffer(file: ArrayBufferLike, selectedTags = AvailableTags) {
+export default function findTagsInBuffer(file: ArrayBufferLike, selectedTags = AvailableTags) {
     const dataView = new DataView(file);
     const length = file.byteLength;
     const exifTags = selectedTags.reduce<Record<number, string>>((result, selectedTag) => {
@@ -33,5 +33,3 @@ export function findTagsInBuffer(file: ArrayBufferLike, selectedTags = Available
 
     return false;
 }
-
-export default findTagsInBuffer;

@@ -1,4 +1,4 @@
-export function readToBuffer(blob: Blob): Promise<string | ArrayBuffer | null | undefined> {
+export default function readToBuffer(blob: Blob): Promise<string | ArrayBuffer | null | undefined> {
     return new Promise((resolve) => {
         const fileReader = new FileReader();
         fileReader.onload = function onload(e) {
@@ -7,5 +7,3 @@ export function readToBuffer(blob: Blob): Promise<string | ArrayBuffer | null | 
         fileReader.readAsArrayBuffer(blob);
     });
 }
-
-export default readToBuffer;

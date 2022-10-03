@@ -1,6 +1,6 @@
-import { readTagValue } from './readTagValue';
+import readTagValue from './readTagValue';
 
-export function readTags(file: DataView, tiffStart: number, dirStart: number, strings: Record<number, string>, bigEnd: boolean) {
+export default function readTags(file: DataView, tiffStart: number, dirStart: number, strings: Record<number, string>, bigEnd: boolean) {
     const entries = file.getUint16(dirStart, !bigEnd);
     const tags: Record<string, number | null> = {};
 
@@ -13,5 +13,3 @@ export function readTags(file: DataView, tiffStart: number, dirStart: number, st
     }
     return tags;
 }
-
-export default readTags;
