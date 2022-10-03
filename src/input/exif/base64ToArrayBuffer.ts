@@ -1,4 +1,4 @@
-export function base64ToArrayBuffer(dataUrl) {
+export default function base64ToArrayBuffer(dataUrl: string) {
     const base64 = dataUrl.replace(/^data:([^;]+);base64,/gmi, '');
     const binary = atob(base64);
     const len = binary.length;

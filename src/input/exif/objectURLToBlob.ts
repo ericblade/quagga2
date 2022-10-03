@@ -1,4 +1,4 @@
-export function objectURLToBlob(url) {
+export default function objectURLToBlob(url: string) {
     return new Promise((resolve, reject) => {
         const http = new XMLHttpRequest();
         http.open('GET', url, true);
