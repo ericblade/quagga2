@@ -10,7 +10,7 @@ import readToBuffer from './readToBuffer';
 export default function findTagsInObjectURL(src: string, tags = AvailableTags) {
     if (/^blob:/i.test(src)) {
         return objectURLToBlob(src)
-            .then(readToBuffer)
+            .then((blob: Blob) => readToBuffer(blob))
             .then((buffer) => findTagsInBuffer(buffer as ArrayBufferLike, tags)); // TODO: BAD TYPING
     }
     return Promise.resolve(null);
