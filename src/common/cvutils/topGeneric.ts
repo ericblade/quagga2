@@ -1,15 +1,19 @@
-export default function topGeneric(list, top, scoreFunc) {
-    let i; let minIdx = 0; let min = 0; const queue = []; let score; let hit; let
-        pos;
+interface QueueItem<T> {
+    item: null | T
+    score: number,
+}
 
-    for (i = 0; i < top; i++) {
-        queue[i] = {
-            score: 0,
-            item: null,
-        };
-    }
+export default function topGeneric<T>(this: any, list: ArrayLike<T>, top: number, scoreFunc: (x: T) => number) {
+    let minIdx = 0;
+    let min = 0;
+    let score;
+    let hit;
+    let pos;
 
-    for (i = 0; i < list.length; i++) {
+    const queue = new Array<QueueItem<T>>(top);
+    queue.fill({ score: 0, item: null });
+
+    for (let i = 0; i < list.length; i++) {
         score = scoreFunc.apply(this, [list[i]]);
         if (score > min) {
             hit = queue[minIdx];
