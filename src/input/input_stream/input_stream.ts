@@ -2,8 +2,10 @@
 // FOR ANYONE IN HERE IN THE FUTURE: This is the default input_stream module used for the Node bundle.
 // webpack.config.js *replaces* this with input_stream_browser.ts when the bundle is being built for browser.
 
-import GetPixels from 'get-pixels';
-import { Point, XYSize } from '../../../type-definitions/quagga.d';
+import getPixels from 'get-pixels';
+import { NdArray } from 'ndarray';
+import { IFrame } from 'input/frame_grabber';
+import { InputStreamConfig, Point, XYSize } from '../../../type-definitions/quagga.d';
 import {
     InputStreamFactory, InputStream, EventHandlerList, EventName, EVENTNAMES,
 } from './input_stream_base';
@@ -21,9 +23,7 @@ const inputStreamFactory: InputStreamFactory = {
         let width = 0;
         let height = 0;
         let loaded = false;
-        // TODO: frame should be a type NdArray, but NdArray doesn't have ts definitions
-        // TODO: there is a ts-ndarray that might work, though
-        let frame: any = null;
+        let frame: NdArray<Uint8Array> | IFrame | null = null;
         let baseUrl: string;
         const ended = false;
         let calculatedWidth: number;
@@ -43,7 +43,8 @@ const inputStreamFactory: InputStreamFactory = {
         function loadImages(): void {
             loaded = false;
             /* eslint-disable new-cap */
-            GetPixels(baseUrl, imageStreamConfig?.mime, (err, pixels) => {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-call
+            getPixels(baseUrl, imageStreamConfig?.mime ?? '', (err: Error | null, pixels: NdArray<Uint8Array>) => {
                 if (err) {
                     console.error('**** quagga loadImages error:', err);
                     throw new Error('error decoding pixels in loadImages');
@@ -135,7 +136,7 @@ const inputStreamFactory: InputStreamFactory = {
             setAttribute() {},
 
             getConfig() {
-                return imageStreamConfig;
+                return imageStreamConfig as InputStreamConfig; // TODO: deal with this "as"
             },
 
             pause() {

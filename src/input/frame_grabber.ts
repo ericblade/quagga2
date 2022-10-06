@@ -1,105 +1,132 @@
 // NOTE FOR ANYONE IN HERE IN THE FUTURE: This module is used when the module is built for use in Node.
 // Webpack.config.js explicitly REPLACES this module with the file called frame_grabber_browser when it is packing the Browser distribution.
 
-const { default: ImageRef } = require('../common/cvutils/ImageRef');
-const { default: computeGray } = require('../common/cvutils/computeGray');
-const Ndarray = require('ndarray');
-const { d2: Interp2D } = require('ndarray-linear-interpolate');
+// ALSO NOTE: @types/ndarray works like garbage in vscode. I have no idea why.
 
-// import { d2 as Interp2D } from 'ndarray-linear-interpolate';
-// import computeGray from "../common/cvutils/computeGray";
-// import Ndarray from 'ndarray';
+import Ndarray from 'ndarray';
+import { d2 as Interp2D } from 'ndarray-linear-interpolate';
+import computeGray from '../common/cvutils/computeGray';
+import ImageRef from '../common/cvutils/ImageRef';
+import { InputStream } from './input_stream/input_stream_base';
 
-const FrameGrabber = {};
-FrameGrabber.create = function (inputStream, canvas) {
-    // console.warn('*** FrameGrabberNode create()');
-    const _that = {};
-    const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
-    const _canvasSize = inputStream.getCanvasSize();
-    const _size = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
-    const _topRight = inputStream.getTopRight();
-    let _data = new Uint8Array(_size.x * _size.y);
-    const _grayData = new Uint8Array(_videoSize.x * _videoSize.y);
-    const _canvasData = new Uint8Array(_canvasSize.x * _canvasSize.y);
-    /* eslint-disable new-cap */
-    const _grayImageArray = Ndarray(_grayData, [_videoSize.y, _videoSize.x]).transpose(1, 0);
-    const _canvasImageArray = Ndarray(_canvasData, [_canvasSize.y, _canvasSize.x]).transpose(1, 0);
-    const _targetImageArray = _canvasImageArray
-        .hi(_topRight.x + _size.x, _topRight.y + _size.y)
-        .lo(_topRight.x, _topRight.y);
-    const _stepSizeX = _videoSize.x / _canvasSize.x;
-    const _stepSizeY = _videoSize.y / _canvasSize.y;
-
-    if (ENV.development) {
-        console.log('FrameGrabber', JSON.stringify({
-            videoSize: _grayImageArray.shape,
-            canvasSize: _canvasImageArray.shape,
-            stepSize: [_stepSizeX, _stepSizeY],
-            size: _targetImageArray.shape,
-            topRight: _topRight,
-        }));
+export interface IFrame {
+    data: Uint8Array,
+    img?: CanvasImageSource,
+    tags?: {
+        orientation?: number
     }
+}
 
-    /**
-     * Uses the given array as frame-buffer
-     */
-    _that.attachData = function (data) {
-        _data = data;
-    };
+interface IFrameGrabber {
+    attachData: (data: Uint8Array) => void,
+    getData: () => Uint8Array,
+    getSize: () => ImageRef,
+    grab: () => boolean,
+    // TODO: frame?!
+    scaleAndCrop: (frame: IFrame) => void,
+}
 
-    /**
-     * Returns the used frame-buffer
-     */
-    _that.getData = function () {
-        return _data;
-    };
+interface IFrameGrabberFactory {
+    create: (inputStream: InputStream, canvas?: HTMLCanvasElement) => IFrameGrabber
+}
 
-    /**
-     * Fetches a frame from the input-stream and puts into the frame-buffer.
-     * The image-data is converted to gray-scale and then half-sampled if configured.
-     */
-    _that.grab = function () {
-        const frame = inputStream.getFrame();
+const Factory: IFrameGrabberFactory = {
+    create(inputStream) {
+        const videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+        const canvasSize = inputStream.getCanvasSize();
+        const size = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
+        const topRight = inputStream.getTopRight();
+        let internalData = new Uint8Array(size.x * size.y);
+        const grayData = new Uint8Array(videoSize.x * videoSize.y);
+        const canvasData = new Uint8Array(canvasSize.x * canvasSize.y);
 
-        if (frame) {
-            this.scaleAndCrop(frame);
-            return true;
-        }
-        return false;
-    };
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const grayImageArray = Ndarray(grayData, [videoSize.y, videoSize.x]).transpose(1, 0);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const canvasImageArray = Ndarray(canvasData, [canvasSize.y, canvasSize.x]).transpose(1, 0);
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
+        const targetImageArray = canvasImageArray
+            .hi(topRight.x + size.x, topRight.y + size.y)
+            .lo(topRight.x, topRight.y);
+        const stepSizeX = videoSize.x / canvasSize.x;
+        const stepSizeY = videoSize.y / canvasSize.y;
 
-    // eslint-disable-next-line
-    _that.scaleAndCrop = function(frame) {
-        // 1. compute full-sized gray image
-        computeGray(frame.data, _grayData);
-
-        // 2. interpolate
-        for (let y = 0; y < _canvasSize.y; y++) {
-            for (let x = 0; x < _canvasSize.x; x++) {
-                // eslint-disable-next-line no-bitwise
-                _canvasImageArray.set(x, y, (Interp2D(_grayImageArray, x * _stepSizeX, y * _stepSizeY)) | 0);
-            }
-        }
-
-        // targetImageArray must be equal to targetSize
-        if (_targetImageArray.shape[0] !== _size.x
-            || _targetImageArray.shape[1] !== _size.y) {
-            throw new Error('Shapes do not match!');
+        if (ENV.development) {
+            console.log('FrameGrabber', JSON.stringify({
+                videoSize: grayImageArray.shape,
+                canvasSize: canvasImageArray.shape,
+                stepSize: [stepSizeX, stepSizeY],
+                size: targetImageArray.shape,
+                topRight,
+            }));
         }
 
-        // 3. crop
-        for (let y = 0; y < _size.y; y++) {
-            for (let x = 0; x < _size.x; x++) {
-                _data[y * _size.x + x] = _targetImageArray.get(x, y);
-            }
-        }
-    };
+        /**
+         * Uses the given array as frame-buffer
+         */
+        const frameGrabber: IFrameGrabber = {
+            attachData(data) {
+                internalData = data;
+            },
 
-    _that.getSize = function () {
-        return _size;
-    };
+            /**
+             * Returns the used frame-buffer
+             */
+            getData() {
+                return internalData;
+            },
 
-    return _that;
+            /**
+             * Fetches a frame from the input-stream and puts into the frame-buffer.
+             * The image-data is converted to gray-scale and then half-sampled if configured.
+             */
+            grab() {
+                const frame = inputStream.getFrame() as IFrame;
+
+                if (frame) {
+                    this.scaleAndCrop(frame);
+                    return true;
+                }
+                return false;
+            },
+
+            // eslint-disable-next-line
+            scaleAndCrop: function(frame) {
+                // 1. compute full-sized gray image
+                computeGray(frame.data, grayData);
+
+                // 2. interpolate
+                for (let y = 0; y < canvasSize.y; y++) {
+                    for (let x = 0; x < canvasSize.x; x++) {
+                        // eslint-disable-next-line no-bitwise, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+                        canvasImageArray.set(x, y, (Interp2D(grayImageArray, x * stepSizeX, y * stepSizeY)) | 0);
+                    }
+                }
+
+                // targetImageArray must be equal to targetSize
+                // eslint-disable-next-line no-bitwise, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+                if (targetImageArray.shape[0] !== size.x
+                    // eslint-disable-next-line no-bitwise, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+                    || targetImageArray.shape[1] !== size.y) {
+                    throw new Error('Shapes do not match!');
+                }
+
+                // 3. crop
+                for (let y = 0; y < size.y; y++) {
+                    for (let x = 0; x < size.x; x++) {
+                        // eslint-disable-next-line no-bitwise, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment
+                        internalData[y * size.x + x] = targetImageArray.get(x, y);
+                    }
+                }
+            },
+
+            getSize() {
+                return size;
+            },
+        };
+
+        return frameGrabber;
+    },
 };
 
-module.exports = FrameGrabber;
+export default Factory;

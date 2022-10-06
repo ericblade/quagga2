@@ -4,7 +4,7 @@ import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder, { BarcodeReaderClass } from '../decoder/barcode_decoder';
 import CameraAccess from '../input/camera_access';
-import FrameGrabber from '../input/frame_grabber';
+import FrameGrabberFactory from '../input/frame_grabber';
 import InputStream from '../input/input_stream/input_stream';
 import BarcodeLocator from '../locator/barcode_locator';
 import { QuaggaContext } from '../QuaggaContext';
@@ -71,7 +71,7 @@ export default class Quagga {
         }
         BarcodeLocator.checkImageConstraints(this.context.inputStream, this.context.config?.locator);
         this.initCanvas();
-        this.context.framegrabber = FrameGrabber.create(
+        this.context.framegrabber = FrameGrabberFactory.create(
             this.context.inputStream,
             this.context.canvasContainer.dom.image,
         );

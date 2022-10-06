@@ -1,4 +1,4 @@
-import { findTagsInObjectURL } from './exif/findTagsInObjectURL';
+import findTagsInObjectURL from './exif/findTagsInObjectURL';
 
 const ImageLoader = {};
 ImageLoader.load = function (directory, callback, offset, size, sequence) {

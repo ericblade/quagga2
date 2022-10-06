@@ -1,4 +1,6 @@
-import { XYSize, Point } from '../../../type-definitions/quagga';
+import { NdArray } from 'ndarray';
+import { XYSize, Point, InputStreamConfig } from '../../../type-definitions/quagga';
+import { IFrame } from '../frame_grabber';
 
 export type EventName = 'canrecord' | 'ended';
 
@@ -11,8 +13,8 @@ export interface InputStream {
     clearEventHandlers(): void;
     ended(): boolean;
     getCanvasSize(): XYSize;
-    getConfig(): any;
-    getFrame(): any;
+    getConfig(): InputStreamConfig;
+    getFrame(): CanvasImageSource | NdArray<Uint8Array> | IFrame | null;
     getHeight(): number;
     getRealHeight(): number;
     getRealWidth(): number;

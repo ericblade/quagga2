@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { XYSize, Point } from '../../../type-definitions/quagga.d';
+import { XYSize, Point, InputStreamConfig } from '../../../type-definitions/quagga.d';
 import ImageLoader from '../image_loader';
 import {
     InputStreamFactory, InputStream, EventHandlerList, EventName, EVENTNAMES,
@@ -79,7 +79,7 @@ const inputStreamFactory: InputStreamFactory = {
             },
 
             getConfig() {
-                return videoStreamConfig;
+                return videoStreamConfig as InputStreamConfig; // TODO
             },
 
             setAttribute(name: string, value: string) {
@@ -316,7 +316,7 @@ const inputStreamFactory: InputStreamFactory = {
             setAttribute() {},
 
             getConfig() {
-                return imageStreamConfig;
+                return imageStreamConfig as InputStreamConfig; // TODO
             },
 
             pause() {

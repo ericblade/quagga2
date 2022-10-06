@@ -1,124 +1,157 @@
 // NOTE FOR ANYONE IN HERE IN THE FUTURE:
 // webpack.config.js replaces the frame_grabber module with THIS module when it is building for a Browser environment.
 
+// TODO: This file has a lot of absolutely bizarre typings that come from the original code reusing the same variables for multiple different things.
+// TODO: This needs to be detangled and handled.
+
+import { XYSize } from '../../type-definitions/quagga';
 import computeGray from '../common/cvutils/computeGray';
 import grayAndHalfSampleFromCanvasData from '../common/cvutils/grayAndHalfSampleFromCanvasData';
 import ImageRef from '../common/cvutils/ImageRef';
+import { InputStream } from './input_stream/input_stream_base';
 
 const TO_RADIANS = Math.PI / 180;
 
-function adjustCanvasSize(canvas, targetSize) {
+export interface IFrame {
+    data: Uint8Array,
+    img?: CanvasImageSource,
+    tags?: {
+        orientation?: number
+    }
+}
+
+interface IFrameGrabber {
+    attachData: (data: Uint8Array) => void,
+    getData: () => Uint8Array,
+    getSize: () => ImageRef,
+    grab: () => boolean,
+    // TODO: frame?!
+    scaleAndCrop: (frame: IFrame) => void,
+}
+
+interface IFrameGrabberFactory {
+    create: (inputStream: InputStream, canvas?: HTMLCanvasElement) => IFrameGrabber
+}
+
+function adjustCanvasSize(canvas: HTMLCanvasElement, targetSize: XYSize) {
     if (canvas.width !== targetSize.x) {
         if (ENV.development) {
             console.log('WARNING: canvas-size needs to be adjusted');
         }
+        // eslint-disable-next-line no-param-reassign
         canvas.width = targetSize.x;
     }
     if (canvas.height !== targetSize.y) {
         if (ENV.development) {
             console.log('WARNING: canvas-size needs to be adjusted');
         }
+        // eslint-disable-next-line no-param-reassign
         canvas.height = targetSize.y;
     }
 }
 
-const FrameGrabber = {};
+const FrameGrabber: IFrameGrabberFactory = {
 
-FrameGrabber.create = function (inputStream, canvas) {
-    // console.warn('*** FrameGrabberBrowser create');
-    const _that = {};
-    const _streamConfig = inputStream.getConfig();
-    const _videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
-    const _canvasSize = inputStream.getCanvasSize();
-    const _size = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
-    const topRight = inputStream.getTopRight();
-    const _sx = topRight.x;
-    const _sy = topRight.y;
-    let _canvas;
-    let _ctx = null;
-    let _data = null;
+    create(inputStream, canvas = document.createElement('canvas')): IFrameGrabber {
+        // console.warn('*** FrameGrabberBrowser create');
+        const streamConfig = inputStream.getConfig();
+        const videoSize = new ImageRef(inputStream.getRealWidth(), inputStream.getRealHeight());
+        const canvasSize = inputStream.getCanvasSize();
+        const internalSize = new ImageRef(inputStream.getWidth(), inputStream.getHeight());
+        const topRight = inputStream.getTopRight();
+        const sx = topRight.x;
+        const sy = topRight.y;
+        const internalCanvas = canvas;
+        internalCanvas.width = canvasSize.x;
+        internalCanvas.height = canvasSize.y;
+        const context = internalCanvas.getContext('2d');
+        let data = new Uint8Array(internalSize.x * internalSize.y);
 
-    _canvas = canvas || document.createElement('canvas');
-    _canvas.width = _canvasSize.x;
-    _canvas.height = _canvasSize.y;
-    _ctx = _canvas.getContext('2d');
-    _data = new Uint8Array(_size.x * _size.y);
-    if (ENV.development) {
-        console.log('FrameGrabber', JSON.stringify({
-            size: _size,
-            topRight,
-            videoSize: _videoSize,
-            canvasSize: _canvasSize,
-        }));
-    }
+        if (ENV.development) {
+            console.log('FrameGrabber', JSON.stringify({
+                size: internalSize,
+                topRight,
+                videoSize,
+                canvasSize,
+            }));
+        }
 
-    /**
-     * Uses the given array as frame-buffer
-     */
-    _that.attachData = function (data) {
-        _data = data;
-    };
+        /**
+         * Uses the given array as frame-buffer
+         */
+        const that: IFrameGrabber = {
+            scaleAndCrop() {
+                // TODO: this did not exist in the browser version of this but does in the node version. is it useful here?
+            },
+            attachData(dataIn) {
+                data = dataIn;
+            },
 
-    /**
-     * Returns the used frame-buffer
-     */
-    _that.getData = function () {
-        return _data;
-    };
+            /**
+             * Returns the used frame-buffer
+             */
+            getData() {
+                return data;
+            },
 
-    /**
-     * Fetches a frame from the input-stream and puts into the frame-buffer.
-     * The image-data is converted to gray-scale and then half-sampled if configured.
-     */
-    _that.grab = function () {
-        // const doHalfSample = _streamConfig.halfSample;
-        const doHalfSample = false;
-        const frame = inputStream.getFrame();
-        let drawable = frame;
-        let drawAngle = 0;
-        let ctxData;
-        if (drawable) {
-            adjustCanvasSize(_canvas, _canvasSize);
-            if (_streamConfig.type === 'ImageStream') {
-                drawable = frame.img;
-                if (frame.tags && frame.tags.orientation) {
-                    switch (frame.tags.orientation) {
-                        case 6:
-                            drawAngle = 90 * TO_RADIANS;
-                            break;
-                        case 8:
-                            drawAngle = -90 * TO_RADIANS;
-                            break;
+            /**
+             * Fetches a frame from the input-stream and puts into the frame-buffer.
+             * The image-data is converted to gray-scale and then half-sampled if configured.
+             */
+            grab() {
+                const doHalfSample = streamConfig.halfSample;
+                const frame = inputStream.getFrame();
+                let drawable = frame;
+                let drawAngle = 0;
+                let ctxData;
+                if (frame) {
+                    adjustCanvasSize(internalCanvas, canvasSize);
+                    if (streamConfig.type === 'ImageStream' && (frame as IFrame).img) {
+                        drawable = (frame as IFrame).img ?? null;
+                        if ((frame as IFrame)?.tags && (frame as IFrame)?.tags?.orientation) {
+                            switch ((frame as IFrame)?.tags?.orientation) {
+                                case 6:
+                                    drawAngle = 90 * TO_RADIANS;
+                                    break;
+                                case 8:
+                                    drawAngle = -90 * TO_RADIANS;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+
+                    if (drawAngle !== 0) {
+                        context?.translate(canvasSize.x / 2, canvasSize.y / 2);
+                        context?.rotate(drawAngle);
+                        context?.drawImage(drawable as CanvasImageSource, -canvasSize.y / 2, -canvasSize.x / 2, canvasSize.y, canvasSize.x);
+                        context?.rotate(-drawAngle);
+                        context?.translate(-canvasSize.x / 2, -canvasSize.y / 2);
+                    } else {
+                        context?.drawImage(drawable as CanvasImageSource, 0, 0, canvasSize.x, canvasSize.y);
+                    }
+
+                    ctxData = context?.getImageData(sx, sy, internalSize.x, internalSize.y).data;
+                    if (ctxData) {
+                        if (doHalfSample) {
+                            grayAndHalfSampleFromCanvasData(ctxData as unknown as Uint8Array, internalSize, data);
+                        } else {
+                            computeGray(ctxData, data, streamConfig);
+                        }
+                        return true;
                     }
                 }
-            }
+                return false;
+            },
 
-            if (drawAngle !== 0) {
-                _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
-                _ctx.rotate(drawAngle);
-                _ctx.drawImage(drawable, -_canvasSize.y / 2, -_canvasSize.x / 2, _canvasSize.y, _canvasSize.x);
-                _ctx.rotate(-drawAngle);
-                _ctx.translate(-_canvasSize.x / 2, -_canvasSize.y / 2);
-            } else {
-                _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);
-            }
+            getSize() {
+                return internalSize;
+            },
+        };
 
-            ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
-            if (doHalfSample) {
-                grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
-            } else {
-                computeGray(ctxData, _data, _streamConfig);
-            }
-            return true;
-        }
-        return false;
-    };
-
-    _that.getSize = function () {
-        return _size;
-    };
-
-    return _that;
+        return that;
+    },
 };
 
 export default FrameGrabber;

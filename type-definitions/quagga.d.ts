@@ -778,6 +778,7 @@ export interface InputStreamArea {
 export interface InputStreamConfig {
     area?: InputStreamArea;
     constraints?: MediaTrackConstraints;
+    halfSample?: boolean;
     mime?: string;
     name?: string; // "Live"
     sequence?: boolean;
