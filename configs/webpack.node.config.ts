@@ -1,26 +1,27 @@
-var webpack = require('webpack'),
-    path = require('path');
+import * as webpack from 'webpack';
+import * as path from 'path';
+import config, { type ConfigurationFactory } from './webpack.config';
 
-const config = require('./webpack.config.js')();
-
-module.exports = (env, argv) => {
-    config.externals = [
+const Factory: ConfigurationFactory = (env, argv): webpack.Configuration => {
+    const newConfig = config(env, argv);
+    newConfig.externals = [
         'get-pixels',
         'gl-matrix',
         'lodash',
         'ndarray',
         'ndarray-linear-interpolate',
     ];
-    config.output.libraryTarget = 'commonjs';
-    config.output.library = undefined;
-    config.plugins = [
+    newConfig.output = { ...newConfig.output, libraryTarget: 'commonjs', library: undefined };
+    newConfig.plugins = [
         new webpack.DefinePlugin({
-            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
+            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV ?? 'development')),
         }),
     ];
-    config.output.path = __dirname + '/../lib';
-    config.output.filename = 'quagga.js';
-    config.mode = 'production';
-    config.devtool = undefined;
-    return config;
+    newConfig.output.path = __dirname + '/../lib';
+    newConfig.output.filename = 'quagga.js';
+    newConfig.mode = 'production';
+    newConfig.devtool = undefined;
+    return newConfig;
 }
+
+export default Factory;

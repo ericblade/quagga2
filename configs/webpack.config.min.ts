@@ -1,20 +1,17 @@
-const webpack = require('webpack');
-const config = require('./webpack.config.js')();
+import * as webpack from 'webpack';
+import config, { type ConfigurationFactory } from './webpack.config';
 
-module.exports = (env, argv) => {
+const Factory: ConfigurationFactory = (env, argv): webpack.Configuration => {
+    const newConfig = config(env, argv);
+    const additionalPlugins = [new webpack.LoaderOptionsPlugin({ minimize: true, debug: false })];
+    newConfig.plugins = [...newConfig.plugins ?? [], ...additionalPlugins];
 
-    config.plugins = config.plugins.concat([
-        new webpack.LoaderOptionsPlugin({
-            minimize: true,
-            debug: false,
-        }),
-    ]);
+    newConfig.optimization = { ...newConfig.optimization, minimize: true };
+    newConfig.output = { ...newConfig.output, filename: 'quagga.min.js', sourceMapFilename: '' };
 
-    config.optimization.minimize = true;
-    config.output.filename = 'quagga.min.js';
+    newConfig.devtool = undefined;
+    newConfig.mode = 'production';
+    return newConfig;
+};
 
-    config.output.sourceMapFilename = '';
-    config.devtool = undefined;
-    config.mode = 'production';
-    return config;
-}
+export default Factory;

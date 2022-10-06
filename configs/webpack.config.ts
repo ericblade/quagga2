@@ -1,7 +1,11 @@
-const webpack = require('webpack');
-const path = require('path');
+import * as webpack from 'webpack';
+import * as path from 'node:path';
+// TODO: There's no actual reason to have the dev server is there?  We should be able to just remove the options and prune the package?
+import 'webpack-dev-server';
 
-const defaultConfig = {
+export type ConfigurationFactory = (env: Record<string, any>, args: Record<string, any>) => webpack.Configuration;
+
+const defaultConfig: webpack.Configuration = {
     entry: [
         './src/quagga.js',
     ],
@@ -38,12 +42,11 @@ const defaultConfig = {
         filename: 'quagga.js',
     },
     devServer: {
-        contentBase: './',
         hot: true,
     },
     plugins: [
         new webpack.DefinePlugin({
-            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
+            ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV ?? 'development')),
         }),
         new webpack.NormalModuleReplacementPlugin(/..\/input\/frame_grabber/, '../input/frame_grabber_browser'),
         new webpack.NormalModuleReplacementPlugin(/^..\/input\/input_stream\/input_stream/, '../input/input_stream/input_stream_browser'),
@@ -54,6 +57,8 @@ const defaultConfig = {
     mode: 'development',
 };
 
-module.exports = (env, argv) => {
+const Factory: ConfigurationFactory = (env, argv) => {
     return defaultConfig;
-}
+};
+
+export default Factory;

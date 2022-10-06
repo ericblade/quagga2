@@ -38,5 +38,10 @@
     ],
     "exclude": [
         "**/browser/*.spec.*"
-    ]
+    ],
+    "ts-node": {
+        "compilerOptions": {
+            "module": "CommonJS"
+        }
+    }
 }
