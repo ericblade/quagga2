@@ -530,30 +530,38 @@ export interface QuaggaJSStatic {
     /**
      * Constructs used for debugging purposes
      */
-    ImageDebug: {
-        drawPath: QuaggaJSDebugDrawPath;
-        drawRect: QuaggaJSDebugDrawRect;
-    };
+    ImageDebug: IImageDebug;
     ImageWrapper: ImageWrapper;
 
     /**
      * an object Quagga uses for drawing and processing, useful for calling code
      * when debugging
      */
-    canvas: {
-        ctx: {
-            image: CanvasRenderingContext2D;
-            overlay: CanvasRenderingContext2D;
-        };
-        dom: {
-            image: HTMLCanvasElement;
-            overlay: HTMLCanvasElement;
-        };
-    };
+    canvas: ICanvasInformation;
 
     CameraAccess: QuaggaJSCameraAccess;
 }
 
+interface IImageDebug {
+    drawPath: QuaggaJSDebugDrawPath;
+    drawRect: QuaggaJSDebugDrawRect;
+}
+/**
+ * an object Quagga uses for drawing and processing, useful for calling code
+ * when debugging
+ */
+
+interface ICanvasInformation {
+    ctx: {
+        image: CanvasRenderingContext2D;
+        overlay: CanvasRenderingContext2D;
+    };
+    dom: {
+        binary?: HTMLCanvasElement | CanvasRenderingContext2D;
+        image: HTMLCanvasElement;
+        overlay: HTMLCanvasElement;
+    };
+}
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
@@ -788,8 +796,88 @@ export interface InputStreamConfig {
     type?: InputStreamType; // "LiveStream"
 }
 
+export interface IDecoderDebugConfig {
+    drawBoundingBox?: boolean;
+    drawScanline?: boolean;
+    showFrequency?: boolean;
+    showPattern?: boolean;
+}
+
+export interface IDecoderConfig {
+    debug?: IDecoderDebugConfig;
+    /**
+     * The multiple property tells the decoder if it should continue decoding after finding a valid barcode.
+     * If multiple is set to true, the results will be returned as an array of result objects.
+     * Each object in the array will have a box, and may have a codeResult
+     * depending on the success of decoding the individual box.
+     */
+    multiple?: boolean;
+    readers?: Array<QuaggaJSReaderConfig | string>;
+}
+
+export interface ILocatorDebugConfig {
+    /**
+ * @default false
+ */
+    showCanvas?: boolean;
+
+    /**
+     * @default false
+     */
+    showPatches?: boolean;
+
+    /**
+     * @default false
+     */
+    showFoundPatches?: boolean;
+
+    /**
+     * @default false
+     */
+    showSkeleton?: boolean;
+
+    /**
+     * @default false
+     */
+    showLabels?: boolean;
+
+    /**
+     * @default false
+     */
+    showPatchLabels?: boolean;
+
+    /**
+     * @default false
+     */
+    showRemainingPatchLabels?: boolean;
+
+    boxFromPatches?: {
+        /**
+         * @default false
+         */
+        showTransformed?: boolean;
+
+        /**
+         * @default false
+         */
+        showTransformedBox?: boolean;
+
+        /**
+         * @default false
+         */
+        showBB?: boolean;
+    };
+}
+
+export interface ILocatorConfig {
+    debug?: ILocatorDebugConfig;
+    halfSample?: boolean;
+    patchSize?: PatchSize;
+}
+
 export interface QuaggaJSConfigObject {
-    debug?: boolean; // false
+    debug?: boolean;
+    decoder?: IDecoderConfig;
     /**
      * This top-level property controls the scan-frequency of the video-stream.
      * It’s optional and defines the maximum number of scans per second.
@@ -799,123 +887,21 @@ export interface QuaggaJSConfigObject {
     frequency?: number;
     inputStream?: InputStreamConfig;
     locate?: boolean; // true
+    locator?: ILocatorConfig;
+
     /**
      * The image path to load from, or a data url
      * Ex: '/test/fixtures/code_128/image-001.jpg'
      * or: 'data:image/jpg;base64,' + data
      */
     src?: string | Uint8Array | Buffer;
-
-    decoder?: {
-        /**
-         * @default [ "code_128_reader" ]
-         */
-        readers?: (QuaggaJSReaderConfig | string)[];
-
-        debug?: {
-            /**
-             * @default false
-             */
-            drawBoundingBox?: boolean;
-
-            /**
-             * @default false
-             */
-            showFrequency?: boolean;
-
-            /**
-             * @default false
-             */
-            drawScanline?: boolean;
-
-            /**
-             * @default false
-             */
-            showPattern?: boolean;
-        };
-
-        /**
-         * The multiple property tells the decoder if it should continue decoding after finding a valid barcode.
-         * If multiple is set to true, the results will be returned as an array of result objects.
-         * Each object in the array will have a box, and may have a codeResult
-         * depending on the success of decoding the individual box.
-         */
-        multiple?: boolean;
-    };
-
-    locator?: {
-        /**
-         * @default true
-         */
-        halfSample?: boolean;
-
-        /**
-         * @default "medium"
-         * Available values: x-small, small, medium, large, x-large
-         */
-        patchSize?: PatchSize;
-
-        debug?: {
-            /**
-             * @default false
-             */
-            showCanvas?: boolean;
-
-            /**
-             * @default false
-             */
-            showPatches?: boolean;
-
-            /**
-             * @default false
-             */
-            showFoundPatches?: boolean;
-
-            /**
-             * @default false
-             */
-            showSkeleton?: boolean;
-
-            /**
-             * @default false
-             */
-            showLabels?: boolean;
-
-            /**
-             * @default false
-             */
-            showPatchLabels?: boolean;
-
-            /**
-             * @default false
-             */
-            showRemainingPatchLabels?: boolean;
-
-            boxFromPatches?: {
-                /**
-                 * @default false
-                 */
-                showTransformed?: boolean;
-
-                /**
-                 * @default false
-                 */
-                showTransformedBox?: boolean;
-
-                /**
-                 * @default false
-                 */
-                showBB?: boolean;
-            };
-        };
-    };
 }
 
 export interface QuaggaJSReaderConfig {
-    format: string;
     config: {
         supplements: string[];
     };
+    format: string;
 }
 
 export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
