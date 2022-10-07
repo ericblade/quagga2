@@ -8,10 +8,10 @@ import computeImageArea from '../common/cvutils/computeImageArea';
 import halfSample from '../common/cvutils/halfSample';
 import hsv2rgb from '../common/cvutils/hsv2rgb';
 import ImageRef from '../common/cvutils/ImageRef';
-import otsuThreshold from '../common/cvutils/otsuThreshold';
 import topGeneric from '../common/cvutils/topGeneric';
 import ImageDebug from '../common/image_debug';
 import ImageWrapper from '../common/image_wrapper';
+import binarizeImage from './binarizeImage';
 import Rasterizer from './rasterizer';
 import skeletonizer from './skeletonizer';
 import Tracer from './tracer';
@@ -181,17 +181,6 @@ function boxFromPatches(patches) {
     }
 
     return box;
-}
-
-/**
- * Creates a binary image of the current image
- */
-function binarizeImage() {
-    otsuThreshold(_currentImageWrapper, _binaryImageWrapper);
-    _binaryImageWrapper.zeroBorder();
-    if (ENV.development && _config.debug.showCanvas) {
-        _binaryImageWrapper.show(_canvasContainer.dom.binary, 255);
-    }
 }
 
 /**
@@ -524,7 +513,7 @@ export default {
             halfSample(_inputImageWrapper, _currentImageWrapper);
         }
 
-        binarizeImage();
+        binarizeImage(_currentImageWrapper, _binaryImageWrapper, _config, _canvasContainer);
         const patchesFound = findPatches();
         // return unless 5% or more patches are found
         if (patchesFound.length < _numPatches.x * _numPatches.y * 0.05) {
