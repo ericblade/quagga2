@@ -388,7 +388,7 @@ function describePatch(moments, patchPos, x, y) {
             avg = 0;
             // determine the similarity of the moments
             for (k = 0; k < matchingMoments.length; k++) {
-                avg += matchingMoments[k].rad;
+                avg += matchingMoments[k]?.rad ?? 0;
             }
 
             // Only two of the moments are allowed not to fit into the equation
