@@ -440,7 +440,7 @@ function rasterizeAngularSimilarity(patchesFound) {
                 return i;
             }
         }
-        return _patchLabelGrid.length;
+        return _patchLabelGrid.data.length;
     }
 
     function trace(currentIdx) {
