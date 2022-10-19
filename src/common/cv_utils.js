@@ -1,12 +1,10 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-bitwise */
-import { clone as v2clone } from 'gl-vec2';
-import { clone as v3clone } from 'gl-vec3';
-import Cluster2 from './cluster';
+import { glMatrix, vec2, vec3 } from 'gl-matrix';
 import ArrayHelper from './array_helper';
+import Cluster2 from './cluster';
 
-const vec2 = { clone: v2clone };
-const vec3 = { clone: v3clone };
+glMatrix.setMatrixArrayType(Array);
 
 /**
  * @param x x-coordinate
