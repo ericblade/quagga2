@@ -4,6 +4,7 @@
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
 import { PatchSize } from "common/cvutils/calculatePatchSize";
+import { vec2 } from 'gl-matrix';
 
 // import SubImage from '../src/common/subImage';
 // import ImageWrapper from '../src/common/image_wrapper';
@@ -45,13 +46,13 @@ export type WrapperIndexMapping = {
 export type Moment = {
     m00: number;
     m01: number;
+    m02: number;
     m10: number;
     m11: number;
-    m02: number;
     m20: number;
-    theta: number;
     rad: number;
-    vec?: Array<number>;
+    theta: number;
+    vec?: vec2;
 };
 
 export class ImageWrapper {

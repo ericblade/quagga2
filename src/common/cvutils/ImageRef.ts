@@ -1,15 +1,14 @@
-import { clone as vec2clone } from 'gl-vec2';
-import { clone as vec3clone } from 'gl-vec3';
+import { vec2, vec3 } from 'gl-matrix';
 
 export default class ImageRef {
     constructor(public x: number, public y: number) {}
 
     toVec2() {
-        return vec2clone([this.x, this.y]);
+        return vec2.clone([this.x, this.y]);
     }
 
     toVec3() {
-        return vec3clone([this.x, this.y, 1]);
+        return vec3.clone([this.x, this.y, 1]);
     }
 
     round() {

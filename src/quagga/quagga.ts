@@ -1,4 +1,4 @@
-import { clone } from 'gl-vec2';
+import { glMatrix, vec2 } from 'gl-matrix';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
@@ -15,6 +15,8 @@ import _initCanvas from './initCanvas';
 import * as QWorkers from './qworker';
 import setupInputStream from './setupInputStream';
 import { moveLine, moveBox } from './transform';
+
+glMatrix.setMatrixArrayType(Array);
 
 export default class Quagga {
     context: QuaggaContext = new QuaggaContext();
@@ -118,10 +120,10 @@ export default class Quagga {
     getBoundingBoxes(): Array<Array<number>> | null {
         return this.context.config?.locate ? BarcodeLocator.locate()
             : [[
-                clone(this.context.boxSize[0]),
-                clone(this.context.boxSize[1]),
-                clone(this.context.boxSize[2]),
-                clone(this.context.boxSize[3]),
+                vec2.clone(this.context.boxSize[0]),
+                vec2.clone(this.context.boxSize[1]),
+                vec2.clone(this.context.boxSize[2]),
+                vec2.clone(this.context.boxSize[3]),
             ]];
     }
 

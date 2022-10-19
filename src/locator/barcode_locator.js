@@ -1,8 +1,9 @@
 // TODO: when converting this to TypeScript, also convert topGeneric
-import * as mat2 from 'gl-mat2';
-import * as vec2 from 'gl-vec2';
+import { glMatrix, vec2, mat2 } from 'gl-matrix';
 import * as ArrayHelper from '../common/ArrayHelper';
-import { cluster } from '../common/cv_utils';
+import {
+    cluster,
+} from '../common/cv_utils';
 import calculatePatchSize from '../common/cvutils/calculatePatchSize';
 import computeImageArea from '../common/cvutils/computeImageArea';
 import halfSample from '../common/cvutils/halfSample';
@@ -15,6 +16,8 @@ import binarizeImage from './binarizeImage';
 import Rasterizer from './rasterizer';
 import skeletonizer from './skeletonizer';
 import Tracer from './tracer';
+
+glMatrix.setMatrixArrayType(Array);
 
 let _config;
 let _currentImageWrapper;

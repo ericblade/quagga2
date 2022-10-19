@@ -1,20 +1,16 @@
-import { clone } from 'gl-vec2';
+import { glMatrix, vec2 } from 'gl-matrix';
 import ImageWrapper from '../common/image_wrapper';
 import type { InputStream } from '../input/input_stream/input_stream_base';
 import BarcodeLocator from '../locator/barcode_locator';
 
-type BufferReturn = {
-    // boxSize should be like [[ number, number], ...] but clone's signature doesn't seem to allow that
-    boxSize: Array<Array<number>>;
-    inputImageWrapper: ImageWrapper;
-};
+glMatrix.setMatrixArrayType(Array);
 
 // TODO: need typescript def for BarcodeLocator
 export default function initBuffers(
     inputStream: InputStream,
     imageWrapper: ImageWrapper | undefined,
     locator: any,
-): BufferReturn {
+) {
     const inputImageWrapper = imageWrapper || new ImageWrapper({
         x: inputStream.getWidth(),
         y: inputStream.getHeight(),
@@ -25,10 +21,10 @@ export default function initBuffers(
         console.log(`image wrapper size ${inputImageWrapper.size}`);
     }
     const boxSize = [
-        clone([0, 0]),
-        clone([0, inputImageWrapper.size.y]),
-        clone([inputImageWrapper.size.x, inputImageWrapper.size.y]),
-        clone([inputImageWrapper.size.x, 0]),
+        vec2.clone([0, 0]),
+        vec2.clone([0, inputImageWrapper.size.y]),
+        vec2.clone([inputImageWrapper.size.x, inputImageWrapper.size.y]),
+        vec2.clone([inputImageWrapper.size.x, 0]),
     ];
     BarcodeLocator.init(inputImageWrapper, locator);
     return { inputImageWrapper, boxSize };

@@ -1,7 +1,5 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-bitwise */
-// import { clone as v2clone } from 'gl-vec2';
-// import { clone as v3clone } from 'gl-vec3';
 import Cluster2 from './cluster';
 
 export {
