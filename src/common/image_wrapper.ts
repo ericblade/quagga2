@@ -1,4 +1,4 @@
-import { clone } from 'gl-vec2';
+import { glMatrix, vec2 } from 'gl-matrix';
 import {
     XYSize,
     TypedArrayConstructor,
@@ -10,7 +10,7 @@ import {
 import ArrayHelper from './array_helper';
 import { hsv2rgb } from './cv_utils';
 
-const vec2 = { clone };
+glMatrix.setMatrixArrayType(Array);
 
 type PositiveNumber = number;
 function assertNumberPositive(val: number): asserts val is PositiveNumber {
