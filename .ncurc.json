@@ -6,6 +6,7 @@
         "webpack",
         "webpack-cli",
         "cypress",
+        "babel-loader",
         "source-map-loader"
     ]
 }
