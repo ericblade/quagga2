@@ -222,6 +222,7 @@ class ImageWrapper implements SparseImageWrapper {
 
     // Display this ImageWrapper in a given Canvas element at the specified scale
     show(canvas: HTMLCanvasElement, scale = 1.0): void {
+        console.warn('* imagewrapper show getcontext 2d');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Unable to get canvas context');
@@ -248,6 +249,7 @@ class ImageWrapper implements SparseImageWrapper {
         const whiteRgb = [255, 255, 255];
         const blackRgb = [0, 0, 0];
         let result = [];
+        console.warn('* imagewrapper overlay getcontext 2d');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Unable to get canvas context');

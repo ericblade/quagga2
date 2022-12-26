@@ -44,6 +44,7 @@ FrameGrabber.create = function (inputStream, canvas) {
     _canvas = canvas || document.createElement('canvas');
     _canvas.width = _canvasSize.x;
     _canvas.height = _canvasSize.y;
+    console.warn('*** frame_grabber_browser: willReadFrequently=', willReadFrequently, 'canvas=', _canvas);
     _ctx = _canvas.getContext('2d', { willReadFrequently: !!willReadFrequently }); // double not because we have an optional bool that needs to pass as a bool
     _data = new Uint8Array(_size.x * _size.y);
     if (ENV.development) {

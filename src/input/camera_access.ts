@@ -137,7 +137,14 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: should we acquire camera access even if there's no current camera open?
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
-            await track.applyConstraints({ advanced: [{ torch: false }] } as MediaTrackConstraintSet);
+            try {
+                await track.applyConstraints({ advanced: [{ torch: false }] } as MediaTrackConstraintSet);
+            } catch (err) {
+                if (err instanceof OverconstrainedError) {
+                    console.warn('quagga2/CameraAccess: Torch not supported on this device');
+                }
+                throw err;
+            }
         }
     },
     async enableTorch() {
@@ -145,7 +152,14 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         // TODO: should we acquire camera access even if there's no current camera open?
         // TODO: what happens on iOS or another device where torch isn't supported at all? Should we throw an error?
         if (track) {
-            await track.applyConstraints({ advanced: [{ torch: true }] } as MediaTrackConstraintSet);
+            try {
+                await track.applyConstraints({ advanced: [{ torch: true }] } as MediaTrackConstraintSet);
+            } catch (err) {
+                if (err instanceof OverconstrainedError) {
+                    console.warn('quagga2/CameraAccess: Torch not supported on this device');
+                }
+                throw err;
+            }
         }
     },
 };

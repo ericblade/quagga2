@@ -703,6 +703,7 @@ export interface QuaggaJSResultCollector {
     create?(param: QuaggaJSResultCollector): QuaggaJSResultCollector;
 
     getResults?(): QuaggaJSCodeResult[];
+    willReadFrequently?: boolean;
 }
 
 /**
@@ -913,7 +914,7 @@ export interface QuaggaJSConfigObject {
          * Available values: x-small, small, medium, large, x-large
          */
         patchSize?: string;
-
+        willReadFrequently?: boolean;
         debug?: {
             /**
              * @default false
