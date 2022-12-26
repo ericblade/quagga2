@@ -119,7 +119,7 @@ export interface BarcodeReaderConfig {
 
 export enum BarcodeDirection {
     Forward = 1,
-    Reverse = -1
+    Reverse = -1,
 }
 type BarcodeFormat = string;
 
@@ -129,11 +129,11 @@ export interface BarcodeCorrection {
 }
 
 export interface BarcodePosition {
-    start: number;
-    startCounter?: number;
     end: number;
     endCounter?: number;
     error?: number;
+    start: number;
+    startCounter?: number;
 }
 
 export interface BarcodeInfo extends BarcodePosition {
@@ -156,18 +156,18 @@ export interface Barcode {
 }
 
 export interface ThresholdSize {
-    size: number;
     counts: number;
-    min: number;
     max: number;
+    min: number;
+    size: number;
 }
 
 export interface Threshold {
-    space: {
+    bar: {
         narrow: ThresholdSize;
         wide: ThresholdSize;
     };
-    bar: {
+    space: {
         narrow: ThresholdSize;
         wide: ThresholdSize;
     };
@@ -176,14 +176,17 @@ export interface Threshold {
 export declare module Readers {
     export abstract class BarcodeReader {
         _row: Array<number>;
+
         SINGLE_CODE_ERROR: number;
+
         FORMAT: BarcodeFormat;
+
         CONFIG_KEYS: BarcodeReaderConfig;
 
         static get Exception(): {
-            StartNotFoundException: string;
             CodeNotFoundException: string;
             PatternNotFoundException: string;
+            StartNotFoundException: string;
         };
 
         constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
@@ -209,7 +212,9 @@ export declare module Readers {
 
     export class TwoOfFiveReader extends BarcodeReader {
         FORMAT: string;
+
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
 
         decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
@@ -259,17 +264,29 @@ export declare module Readers {
 
     export class Code128Reader extends BarcodeReader {
         CODE_SHIFT: number;
+
         CODE_C: number;
+
         CODE_B: number;
+
         CODE_A: number;
+
         START_CODE_A: number;
+
         START_CODE_B: number;
+
         START_CODE_C: number;
+
         STOP_CODE: number;
+
         CODE_PATTERN: number[][];
+
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
+
         FORMAT: string;
+
         MODULE_INDICES: {
             bar: number[];
             space: number[];
@@ -288,16 +305,6 @@ export declare module Readers {
         protected _verifyTrailingWhitespace(endInfo: BarcodeInfo): BarcodeInfo | null;
     }
 
-    export class Code32Reader extends Code39Reader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
-
-        protected _decodeCode32(code: string): string | null;
-
-        protected _checkChecksum(code: string): boolean;
-    }
-
     export class Code39Reader extends BarcodeReader {
         FORMAT: string;
 
@@ -312,6 +319,16 @@ export declare module Readers {
         protected _patternToChar(pattern: number): string | null;
 
         protected _verifyTrailingWhitespace(lastStart: number, nextStart: number, counters: Uint16Array): boolean;
+    }
+
+    export class Code32Reader extends Code39Reader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: BarcodePosition): Barcode | null;
+
+        protected _decodeCode32(code: string): string | null;
+
+        protected _checkChecksum(code: string): boolean;
     }
 
     export class Code39VINReader extends Code39Reader {
@@ -342,24 +359,6 @@ export declare module Readers {
         protected _verifyChecksums(charArray: Array<string>): boolean;
     }
 
-    export class EAN2Reader extends EANReader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: number): Barcode | null;
-    }
-
-    export class EAN5Reader extends EANReader {
-        FORMAT: string;
-
-        decode(row?: Array<number>, start?: number): Barcode | null;
-    }
-
-    export class EAN8Reader extends EANReader {
-        FORMAT: string;
-
-        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
-    }
-
     export class EANReader extends BarcodeReader {
         FORMAT: string;
         SINGLE_CODE_ERROR: number;
@@ -384,13 +383,37 @@ export declare module Readers {
         protected _checksum(result: Array<number>): boolean;
     }
 
+    export class EAN2Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN5Reader extends EANReader {
+        FORMAT: string;
+
+        decode(row?: Array<number>, start?: number): Barcode | null;
+    }
+
+    export class EAN8Reader extends EANReader {
+        FORMAT: string;
+
+        protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
+    }
+
     export class I2of5Reader extends BarcodeReader {
         SINGLE_CODE_ERROR: number;
+
         AVG_CODE_ERROR: number;
+
         START_PATTERN: number[];
+
         STOP_PATTERN: number[];
+
         CODE_PATTERN: number[][];
+
         MAX_CORRECTION_FACTOR: number;
+
         FORMAT: string;
 
         constructor(opts: BarcodeReaderConfig);
@@ -418,7 +441,9 @@ export declare module Readers {
 
     export class UPCEReader extends EANReader {
         CODE_FREQUENCY: number[][];
+
         STOP_PATTERN: number[];
+
         FORMAT: string;
 
         protected _decodePayload(inCode: BarcodePosition, result: Array<number>, decodedCodes: Array<BarcodePosition>): BarcodeInfo | null;
@@ -768,6 +793,13 @@ export interface QuaggaJSConfigObject {
          */
         type?: InputStreamType;
 
+        /**
+         * Use canvas.getContext('2d', { willReadFrequently: true }) for browser frame grabber operations
+         * @default false
+         * ... defaulting false because historically this wasn't an option, so i don't want to change behavior
+         */
+        willReadFrequently?: boolean;
+
         target?: Element | string;
 
         constraints?: MediaTrackConstraints;
@@ -939,16 +971,16 @@ export interface QuaggaJSConfigObject {
 }
 
 export interface QuaggaJSReaderConfig {
-    format: string;
     config: {
         supplements: string[];
     };
+    format: string;
 }
 
 export interface MediaTrackConstraintsWithDeprecated extends MediaTrackConstraints {
+    facing?: string;
     maxAspectRatio?: number; // i don't see this in the documentation anywhere, but it's in the original test suite...
     minAspectRatio?: number;
-    facing?: string;
 }
 
 export type TypedArrayConstructor =

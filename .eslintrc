@@ -42,6 +42,7 @@
         "wrap-iife": [ "error", "outside" ],
         "import/no-named-as-default": "off",
         "@typescript-eslint/restrict-template-expressions": "off",
+        "@typescript-eslint/prefer-namespace-keyword": "off",
         // STYLE
         "brace-style": ["error", "1tbs"],
         "comma-spacing": ["error", { "before": false, "after": true }],
