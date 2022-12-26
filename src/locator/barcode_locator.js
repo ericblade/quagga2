@@ -94,7 +94,9 @@ function initCanvas() {
     if (ENV.development && _config.debug.showCanvas === true) {
         document.querySelector('#debug').appendChild(_canvasContainer.dom.binary);
     }
-    _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext('2d');
+    const willReadFrequently = !!_config.willReadFrequently;
+    console.warn('* initCanvas willReadFrequently', willReadFrequently, _config);
+    _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext('2d', { willReadFrequently });
     _canvasContainer.dom.binary.width = _binaryImageWrapper.size.x;
     _canvasContainer.dom.binary.height = _binaryImageWrapper.size.y;
 }

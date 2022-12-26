@@ -68,6 +68,7 @@ export default {
                         $debug.appendChild(_canvas.dom.frequency);
                     }
                 }
+                console.warn('* barcode decoder initCanvas getcontext 2d');
                 _canvas.ctx.frequency = _canvas.dom.frequency.getContext('2d');
 
                 _canvas.dom.pattern = document.querySelector('canvas.patternBuffer');

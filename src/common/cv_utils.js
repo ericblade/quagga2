@@ -563,6 +563,7 @@ export function loadImageArray(src, callback, canvas = document && document.crea
         canvas.width = this.width;
         // eslint-disable-next-line no-param-reassign
         canvas.height = this.height;
+        console.warn('* loadImageArray getContext 2d');
         const ctx = canvas.getContext('2d');
         ctx.drawImage(this, 0, 0);
         const array = new Uint8Array(this.width * this.height);

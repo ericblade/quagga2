@@ -1,6 +1,6 @@
 import { QuaggaContext, CanvasContainer } from 'QuaggaContext';
-import type { XYSize } from '../../type-definitions/quagga.d';
 import getViewPort from './getViewPort';
+import type { XYSize } from '../../type-definitions/quagga.d';
 
 function findOrCreateCanvas(selector: string, className: string) {
     let canvas: HTMLCanvasElement | null = document.querySelector(selector);
@@ -11,16 +11,17 @@ function findOrCreateCanvas(selector: string, className: string) {
     return canvas;
 }
 
-function getCanvasAndContext(selector: string, className: string) {
+function getCanvasAndContext(selector: string, className: string, options: { willReadFrequently: boolean }) {
     const canvas = findOrCreateCanvas(selector, className);
-    const context = canvas.getContext('2d');
+    console.warn('* initCanvas getCanvasAndContext');
+    const context = canvas.getContext('2d', { willReadFrequently: options.willReadFrequently });
     return { canvas, context };
 }
 
-function initCanvases(canvasSize: XYSize): CanvasContainer | null {
+function initCanvases(canvasSize: XYSize, { willReadFrequently }: { willReadFrequently: boolean }): CanvasContainer | null {
     if (typeof document !== 'undefined') {
-        const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer');
-        const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer');
+        const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer', { willReadFrequently });
+        const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently });
 
         // eslint-disable-next-line no-multi-assign
         image.canvas.width = overlay.canvas.width = canvasSize.x;
@@ -45,7 +46,7 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const viewport = getViewPort(context?.config?.inputStream?.target);
     const type = context?.config?.inputStream?.type;
     if (!type) return null;
-    const container = initCanvases(context.inputStream.getCanvasSize());
+    const container = initCanvases(context.inputStream.getCanvasSize(), { willReadFrequently: !!context?.config?.inputStream?.willReadFrequently });
     if (!container) return { dom: { image: null, overlay: null }, ctx: { image: null, overlay: null } };
 
     const { dom } = container;

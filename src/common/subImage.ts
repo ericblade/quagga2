@@ -30,6 +30,7 @@ export class SubImage {
 
     // Displays the {SubImage} in a given canvas at a given scale
     show(canvas: HTMLCanvasElement, scale = 1.0): void {
+        console.warn('* subImage.show getcontext 2d');
         const ctx = canvas.getContext('2d');
         if (!ctx) {
             throw new Error('Unable to get canvas context');

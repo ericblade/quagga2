@@ -1,5 +1,5 @@
 import ImageDebug from '../common/image_debug';
-import {
+import type {
     QuaggaJSCodeResult,
     QuaggaJSResultCollector,
     QuaggaJSResultCollectorFilterFunction,
@@ -29,7 +29,7 @@ interface ResultCollector {
 export default {
     create(config: QuaggaJSResultCollector): ResultCollector {
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d') as CanvasRenderingContext2D;
+        const ctx = canvas.getContext('2d', { willReadFrequently: !!config.willReadFrequently }) as CanvasRenderingContext2D;
         const results: Array<QuaggaJSCodeResult> = [];
         let capacity = config.capacity ?? 20;
         const capture = config.capture === true;
