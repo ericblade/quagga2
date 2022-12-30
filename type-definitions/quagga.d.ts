@@ -3,6 +3,7 @@
 // Project: http://serratus.github.io/quaggaJS/
 // Definitions by: Cam Birch, Peter Horwood aka Madman Pierre, Dan Manastireanu <https://github.com/danmana>
 
+import { READERS } from 'decoder/barcode_decoder';
 import { vec2 } from 'gl-matrix';
 
 // import SubImage from '../src/common/subImage';
@@ -870,7 +871,7 @@ export interface QuaggaJSConfigObject {
         /**
          * @default [ "code_128_reader" ]
          */
-        readers?: (QuaggaJSReaderConfig | string)[];
+        readers?: (QuaggaJSReaderConfig | QuaggaJSCodeReader)[];
 
         debug?: {
             /**
@@ -1005,3 +1006,5 @@ export type TypedArray =
     | Uint32Array
     | Float32Array
     | Float64Array;
+
+export type QuaggaJSCodeReader = keyof typeof READERS;
