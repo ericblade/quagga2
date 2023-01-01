@@ -17,7 +17,7 @@ import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
 import Bresenham from './bresenham';
 
-export const READERS = {
+const READERS = {
     code_128_reader: Code128Reader,
     ean_reader: EANReader,
     ean_5_reader: EAN5Reader,
