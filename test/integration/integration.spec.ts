@@ -355,6 +355,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             { 'name': 'image-008.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
             { 'name': 'image-009.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
             { 'name': 'image-010.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
+            { 'name': 'image-011.jpg', result: '11169', format: 'code_93' },
         ]
     );
 });
