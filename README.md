@@ -209,7 +209,7 @@ You can build the library yourself by simply cloning the repo and typing:
 or using Docker:
 
 ```console
-> docker build --tag quagg2/build .
+> docker build --tag quagga2/build .
 > docker run -v $(pwd):/quagga2 quagga2/build npm install
 > docker run -v $(pwd):/quagga2 quagga2/build npm run build
 ```
