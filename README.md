@@ -33,6 +33,10 @@ Please see <https://github.com/julienboulay/ngx-barcode-scanner> or <https://git
 
 Please see <https://github.com/ptc-iot-sharing/ThingworxBarcodeScannerWidget>
 
+## Using Vue?
+
+Please see <https://github.com/DevinNorgarb/vue-quagga-2>
+
 ## What is QuaggaJS?
 
 QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real-
