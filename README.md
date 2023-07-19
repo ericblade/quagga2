@@ -1,5 +1,4 @@
-quagga2
-=======
+# quagga2
 
 [![Rolling Versions](https://img.shields.io/badge/Rolling%20Versions-Enabled-brightgreen)](https://rollingversions.com/ericblade/quagga2)
 
@@ -11,13 +10,14 @@ This is a fork of the original QuaggaJS library, that will be maintained until s
 original author and maintainer returns, or it has been completely replaced by built-in browser and
 node functionality.
 
-- [Changelog](CHANGELOG.md)
+- [Changelog](https://github.com/ericblade/quagga2/releases)
 - [Browser Support](#browser-support)
 - [Installing](#installing)
 - [Getting Started](#gettingstarted)
 - [Using with React](#usingwithreact)
-- [Using External Readers](#usingexternalreaders)
+- [Using External Readers](#usingwithexternalreaders)
 - [API](#api)
+- [CameraAccess API](#cameraaccess-api)
 - [Configuration](#configobject)
 - [Tips & Tricks](#tipsandtricks)
 
@@ -80,7 +80,6 @@ of the used Web-APIs for each mode:
 
 The following APIs need to be implemented in your browser:
 
-- [webworkers](http://caniuse.com/#feat=webworkers)
 - [canvas](http://caniuse.com/#feat=canvas)
 - [typedarrays](http://caniuse.com/#feat=typedarrays)
 - [bloburls](http://caniuse.com/#feat=bloburls)
@@ -155,11 +154,11 @@ You can get the `quagga.js` file in the following ways:
 
 By [installing the npm module](https://github.com/ericblade/quagga2#npm) and copying the `quagga.js` file from the `dist` folder.
 
-<p align="center">(OR)</p>
+(OR)
 
 You can also build the library yourself and copy `quagga.js` file from the `dist` folder(refer to the [building](https://github.com/ericblade/quagga2#building) section for more details)
 
-<p align="center">(OR)</p>
+(OR)
 
 You can include the following script tags with  CDN links:
 
@@ -239,13 +238,13 @@ file any more.
 If you are working on a project that includes quagga, but you need to use a development version of
 quagga, then you can run from the quagga directory:
 
-```
+```bash
 npm install && npm run build && npm link
 ```
 
 then from the other project directory that needs this quagga, do
 
-```
+```bash
 npm link @ericblade/quagga2
 ```
 
@@ -414,6 +413,45 @@ empty.
 }
 ```
 
+## <a name="cameraaccess-api">CameraAccess API</a>
+
+Quagga2 exposes a CameraAccess API that is available for performing some shortcut access to commonly
+used camera functions.  This API is available as `Quagga.CameraAccess` and is documented below.
+
+## CameraAccess.request(HTMLVideoElement | null, MediaTrackConstraints?)
+
+Will attempt to initialize the camera and start playback given the specified video element.  Camera
+is selected by the browser based on the MediaTrackConstraints supplied.  If no video element is
+supplied, the camera will be initialized but invisible.  This is mostly useful for probing that the
+camera is available, or probing to make sure that permissions are granted by the user.
+This function will return a Promise that resolves when completed, or rejects on error.
+
+## CameraAccess.release()
+
+If a video element is known to be running, this will pause the video element, then return a Promise
+that when resolved will have stopped all tracks in the video element, and released all resources.
+
+## CameraAccess.enumerateVideoDevices()
+
+This will send out a call to navigator.mediaDevices.enumerateDevices(), filter out any mediadevices
+that do not have a kind of 'videoinput', and resolve the promise with an array of MediaDeviceInfo.
+
+## CameraAccess.getActiveStreamLabel()
+
+Returns the label for the active video track
+
+## CameraAccess.getActiveTrack()
+
+Returns the MediaStreamTrack for the active video track
+
+## CameraAccess.disableTorch()
+
+Turns off Torch. (Camera Flash)  Resolves when complete, throws on error.  Does not work on iOS devices of at least version 16.4 and earlier.  May or may not work on later versions.
+
+## CameraAccess
+
+Turns on Torch. (Camera Flash)  Resolves when complete, throws on error.  Does not work on iOS devices of at least version 16.4 and earlier.  May or may not work on later versions.
+
 ## <a name="configobject">Configuration</a>
 
 The configuration that ships with QuaggaJS covers the default use-cases and can
@@ -424,7 +462,6 @@ high-level properties:
 
 ```javascript
 {
-  numOfWorkers: 4,
   locate: true,
   inputStream: {...},
   frequency: 10,
@@ -433,21 +470,6 @@ high-level properties:
   debug: false,
 }
 ```
-
-### numOfWorkers
-
-NOTE: As of quagga2 v0.0.13, numOfWorkers has been *disabled*.  The library needs a major restructuring
-to properly handle Worker threads, and that restructuring is on-going at the moment, to solve other
-problems as well.  It will be re-enabled in the future.  As a result, the numOfWorkers setting is ALWAYS 0.
-
-~~QuaggaJS supports web-workers out of the box and runs with `4` workers in its
-default configuration. The number should align with the number of cores
-available in your targeted devices.~~
-
-~~In case you don't know the number upfront, or if the variety of devices is
-too big, you can either use `navigator.hardwareConcurrency` (see
-[here](https://wiki.whatwg.org/wiki/Navigator_HW_Concurrency)) where available
-or make use of [core-estimator](https://github.com/oftn/core-estimator).~~
 
 ### locate
 
@@ -706,7 +728,7 @@ A growing collection of tips & tricks to improve the various aspects of Quagga.
 ### Working with Cordova / PhoneGap?
 
 If you're having issues getting a mobile device to run Quagga using Cordova, you might try the code
-here: [Original Repo Issue #94 Comment][https://github.com/serratus/quaggaJS/issues/94#issuecomment-571478711]
+here: [Original Repo Issue #94 Comment][issue-94-comment]
 
 ```javascript
 let permissions = cordova.plugins.permissions; permissions.checkPermission(permissions.CAMERA,
@@ -862,3 +884,4 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 [i2of5_wiki]: https://en.wikipedia.org/wiki/Interleaved_2_of_5
 [enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
 [reactExample]: https://github.com/ericblade/quagga2-react-example
+[issue-94-comment]: https://github.com/serratus/quaggajs/issues/94#issuecomment-571478711
