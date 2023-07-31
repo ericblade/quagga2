@@ -17,7 +17,7 @@ if (typeof it.allowFail === 'undefined') {
             return Promise.resolve().then(() => {
                 return callback.apply(this, arguments);
             }).catch((err) => {
-                console.trace('* error during test', err);
+                console.trace('* error during test', title, err);
                 this.skip();
             });
         });
@@ -39,6 +39,28 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                 expect(result.codeResult).to.be.an('Object');
                 expect(result.codeResult.code).to.equal(sample.result);
                 expect(result.codeResult.format).to.equal(sample.format);
+                expect(Quagga.canvas).to.be.an('Object');
+                expect(Quagga.canvas.dom).to.be.an('Object');
+                expect(Quagga.canvas.ctx).to.be.an('Object');
+            });
+        });
+    });
+}
+
+// run test that should not fail but no barcode is in the images
+function runNoCodeTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string }>) {
+    describe(`Not decoding ${name}`, () => {
+        testSet.forEach((sample) => {
+            it('should run without error', async function() {
+                this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
+                const thisConfig = {
+                    ...config,
+                    src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/${name}/${sample.name}`,
+                };
+                const result = await Quagga.decodeSingle(thisConfig);
+                expect(result).to.be.an('Array');
+                expect(result).to.be.empty;                
+                // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                 expect(Quagga.canvas).to.be.an('Object');
                 expect(Quagga.canvas.dom).to.be.an('Object');
                 expect(Quagga.canvas.ctx).to.be.an('Object');
@@ -406,6 +428,34 @@ describe('External Reader Test, using stock code_128 reader', () => {
                 // read this one -- it works only with inputStream size set to 1600 presently, but
                 // other samples break at that high a size.
                 // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
+            ]
+        );
+    });
+});
+
+describe('Canvas Update Test, avoid DOMException', () => {
+    describe('works', () => {
+        runNoCodeTest(
+            'no_code',
+            generateConfig({
+                decoder: {
+                    readers: ['code_128_reader', 'ean_reader'],
+                },
+                inputStream: {
+                    constraints: {
+                        width: NaN,
+                        height: NaN
+                    },
+                    singleChannel: false,
+                },
+                locate: false,
+                locator: {
+                    halfSample: true,
+                    patchSize: 'x-large'
+                }
+            }),
+            [
+                { 'name': 'image-001.jpg', 'result': null, format: 'code_128' },
             ]
         );
     });
