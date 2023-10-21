@@ -76,7 +76,7 @@
     "build:dev": "npx cross-env NODE_ENV=development BUILD_ENV=development webpack --config configs/webpack.config.js",
     "build:prod": "npx cross-env NODE_ENV=production BUILD_ENV=production webpack --config configs/webpack.config.min.js",
     "build:node": "npx cross-env NODE_ENV=production BABEL_ENV=commonjs BUILD_ENV=node webpack --config configs/webpack.node.config.js",
-    "build": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider npm run build",
+    "build": "npx cross-env NODE_OPTIONS=--openssl-legacy-provider npm run build-old",
     "build-old": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
