@@ -39,8 +39,7 @@ Please see <https://github.com/DevinNorgarb/vue-quagga-2>
 
 ## What is QuaggaJS?
 
-QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real-
-time localization and decoding of various types of barcodes such as __EAN__,
+QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real-time localization and decoding of various types of barcodes such as __EAN__,
 __CODE 128__, __CODE 39__, __EAN 8__, __UPC-A__, __UPC-C__, __I2of5__,
 __2of5__, __CODE 93__, __CODE 32__ and __CODABAR__. The library is also capable of using
 `getUserMedia` to get direct access to the user's camera stream. Although the
@@ -545,7 +544,7 @@ CPU power are of concern.
 
 QuaggaJS usually runs in a two-stage manner (`locate` is set to `true`) where,
 after the barcode is located, the decoding process starts. Decoding is the
-process of converting the bars into its true meaning. Most of the configuration
+process of converting the bars into their true meaning. Most of the configuration
 options within the `decoder` are for debugging/visualization purposes only.
 
 ```javascript
