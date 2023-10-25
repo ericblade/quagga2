@@ -58,8 +58,9 @@ function runNoCodeTest(name: string, config: QuaggaJSConfigObject, testSet: Arra
                     src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/${name}/${sample.name}`,
                 };
                 const result = await Quagga.decodeSingle(thisConfig);
-                expect(result).to.be.an('Array');
-                expect(result).to.be.empty;                
+                expect(result).to.be.an('Object');
+                expect(result.barcodes).to.be.an('array');
+                expect(result.barcodes).to.be.empty;
                 // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                 expect(Quagga.canvas).to.be.an('Object');
                 expect(Quagga.canvas.dom).to.be.an('Object');

@@ -1,6 +1,6 @@
 {
   "name": "@ericblade/quagga2",
-  "version": "1.8.3",
+  "version": "1.8.4",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
   "types": "type-definitions/quagga.d.ts",
@@ -137,7 +137,8 @@
     "Ben Khoo <khoobks@gmail.com>",
     "Andy Edinborough <andy@edinborough.org>",
     "Claudio Cocciarelli <claudiococciarelli@gmail.com>",
-    "Hadrien Foucault <hadrien.foucault@gmail.com>"
+    "Hadrien Foucault <hadrien.foucault@gmail.com>",
+    "ghevge <ghevge@github.com>"
   ],
   "license": "MIT",
   "engines": {
