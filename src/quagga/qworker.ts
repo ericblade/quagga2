@@ -142,8 +142,12 @@ export function initWorker(config: QuaggaJSConfigObject, inputStream: any, cb: F
         } else if (e.data.event === 'processed') {
             workerThread.imageData = new Uint8Array(e.data.imageData);
             workerThread.busy = false;
-            // TODO: how to thread publishResult into here?
-            // publishResult(e.data.result, workerThread.imageData);
+            // TODO: how to thread publishResult into here? TypeScript says it's not here. https://github.com/ericblade/quagga2/issues/466#issuecomment-1724248080 says it's necessary?
+            // @ts-ignore
+            if (typeof publishResult !== 'undefined') {
+                // @ts-ignore
+                publishResult(e.data.result, workerThread.imageData);
+            }
         } else if (e.data.event === 'error') {
             if (ENV.development) {
                 console.log('Worker error: ' + e.data.message);
