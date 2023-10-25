@@ -190,7 +190,8 @@ export default class Quagga {
         if (result && this.context.onUIThread) {
             this.transformResult(result);
             this.addResult(result, imageData);
-            resultToPublish = result.barcodes || result;
+            // @ts-ignore
+            resultToPublish = result?.barcodes?.length > 0 ? result.barcodes : result;
         }
 
         Events.publish('processed', resultToPublish as never);
