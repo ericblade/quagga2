@@ -33,7 +33,7 @@
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.3.10",
-    "core-js": "^3.33.1",
+    "core-js": "^3.38.0",
     "cross-env": "^7.0.3",
     "cypress": "^13.1.0",
     "eslint": "^8.52.0",
@@ -145,7 +145,6 @@
     "node": ">= 10.0"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
     "get-pixels": "^3.3.3",
     "gl-matrix": "^3.4.3",
     "lodash": "^4.17.21",
