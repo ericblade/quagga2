@@ -1,5 +1,5 @@
 {
-  "name": "@ericblade/quagga2",
+  "name": "@tamsrud/quagga2",
   "version": "1.8.4",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
@@ -80,14 +80,15 @@
     "build-old": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
-    "upgrade-deps": "npx npm-check-updates --doctor"
+    "upgrade-deps": "npx npm-check-updates --doctor",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ericblade/quagga2.git"
+    "url": "https://github.com/tamsrud/quagga2.git"
   },
   "bugs": {
-    "url": "https://github.com/ericblade/quagga2/issues"
+    "url": "https://github.com/tamsrud/quagga2/issues"
   },
   "keywords": [
     "quagga2",
@@ -138,7 +139,8 @@
     "Andy Edinborough <andy@edinborough.org>",
     "Claudio Cocciarelli <claudiococciarelli@gmail.com>",
     "Hadrien Foucault <hadrien.foucault@gmail.com>",
-    "ghevge <ghevge@github.com>"
+    "ghevge <ghevge@github.com>",
+    "Tomas Hals Amsrud <tamsrud@gmail.com>"
   ],
   "license": "MIT",
   "engines": {
