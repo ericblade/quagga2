@@ -71,8 +71,8 @@ const inputStreamFactory: InputStreamFactory = {
                 const client = parsedUrl.protocol === 'https:' ? https : http;
 
                 client.get(url, (response) => {
-                    if (response.statusCode !== 200) {
-                        reject(new Error(`Failed to fetch ${url}: ${response.statusCode}`));
+                    if (!response.statusCode || response.statusCode < 200 || response.statusCode >= 300) {
+                        reject(new Error(`Failed to fetch ${url}: ${response.statusCode || 'unknown status'}`));
                         return;
                     }
 
@@ -194,7 +194,7 @@ const inputStreamFactory: InputStreamFactory = {
                 return ended;
             },
 
-            setAttribute() {},
+            setAttribute() { },
 
             getConfig() {
                 return _config;
