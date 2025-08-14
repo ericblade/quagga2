@@ -146,11 +146,11 @@
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "get-pixels": "^3.3.3",
     "gl-matrix": "^3.4.3",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
-    "ndarray-linear-interpolate": "^1.0.0"
+    "ndarray-linear-interpolate": "^1.0.0",
+    "ndarray-pixels": "^5.0.1"
   },
   "nyc": {
     "include": [
