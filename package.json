@@ -141,7 +141,7 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">= 10.0"
+    "node": ">= 20.0"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
