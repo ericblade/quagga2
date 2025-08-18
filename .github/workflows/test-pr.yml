@@ -37,9 +37,6 @@ jobs:
     - name: run all code tests
       run: npm test
     - name: test package import
-      run: |
-        npm install ts-node @std/esm
-        npm run test:import
+      run: npm run test:import
     - name: test package require
-      run: |
-        npm run test:require
+      run: npm run test:require
