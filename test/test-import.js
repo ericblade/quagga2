@@ -1,8 +1,15 @@
-import { describe, it } from 'mocha';
-import { expect } from 'chai';
-import Q from '../lib/quagga.js';
+const { describe, it } = require('mocha');
+const { expect } = require('chai');
 
 describe('testing node import', () => {
+    let Q;
+    
+    before(async () => {
+        // Use dynamic import to load the ES module
+        const module = await import('../lib/quagga.js');
+        Q = module.default;
+    });
+    
     it('import works', () => {
         expect(Q).to.be.an('object');
         expect(Q.init).to.be.a('function');

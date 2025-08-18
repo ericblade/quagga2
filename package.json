@@ -67,7 +67,7 @@
     "test:browser-specific": "NOT WORKING -- something like npx cypress run --config testFiles=[browser]",
     "test:browser-universal": "NOT WORKING -- something like npx cypress run --config testFiles=[universal]",
     "test:browser-all": "npm run cypress:run",
-    "test:import": "mocha test/test-import.mjs",
+    "test:import": "mocha test/test-import.js",
     "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/integration.spec.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
