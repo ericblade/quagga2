@@ -36,6 +36,8 @@ jobs:
       run: npm run test:module
     - name: run all code tests
       run: npm test
+      env:
+        NODE_OPTIONS: --openssl-legacy-provider
     - name: test package import
       run: |
         npm install ts-node @std/esm
