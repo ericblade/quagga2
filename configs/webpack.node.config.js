@@ -4,11 +4,16 @@ var webpack = require('webpack'),
 module.exports = require('./webpack.config.js');
 
 module.exports.externals = [
+    'fs',
+    'http',
+    'https',
+    'url',
     'get-pixels',
     'gl-matrix',
     'lodash',
     'ndarray',
     'ndarray-linear-interpolate',
+    'ndarray-pixels',
 ];
 module.exports.output.libraryTarget = 'commonjs';
 module.exports.output.library = undefined;
