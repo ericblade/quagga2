@@ -46,7 +46,9 @@ module.exports = {
             ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
         }),
         new webpack.NormalModuleReplacementPlugin(/..\/input\/frame_grabber/, '../input/frame_grabber_browser.js'),
-        new webpack.NormalModuleReplacementPlugin(/^..\/input\/input_stream\/input_stream/, '../input/input_stream/input_stream_browser'),
+        new webpack.NormalModuleReplacementPlugin(/input_stream[/\\]input_stream$/, (resource) => {
+            resource.request = resource.request.replace(/input_stream$/, 'input_stream_browser');
+        }),
     ],
     optimization: {
         minimize: false,

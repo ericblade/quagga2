@@ -1,4 +1,4 @@
-name: Test Pull Requests To Master (Node 20+)
+name: Test Pull Requests To Master (Node 17.0+)
 
 on:
   push:
@@ -37,6 +37,9 @@ jobs:
     - name: run all code tests
       run: npm test
     - name: test package import
-      run: npm run test:import
+      run: |
+        npm install ts-node @std/esm
+        npm run test:import
     - name: test package require
-      run: npm run test:require
+      run: |
+        npm run test:require
