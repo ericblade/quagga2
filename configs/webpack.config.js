@@ -10,11 +10,27 @@ module.exports = {
         rules: [
             {
                 test: /\.(t|j)sx?$/,
+                exclude: /node_modules/,
                 use: { loader: 'babel-loader' },
+            },
+            {
+                test: /\.js$/,
+                include: /node_modules\/sinon/,
+                use: { 
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                targets: { browsers: ['last 2 versions'] }
+                            }]
+                        ]
+                    }
+                },
             },
             {
                 enforce: 'pre',
                 test: /\.(t|j)sx?$/,
+                exclude: /node_modules/,
                 loader: 'source-map-loader',
             },
         ],
