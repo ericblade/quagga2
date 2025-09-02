@@ -147,7 +147,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "get-pixels": "^3.3.3",
-    "gl-matrix": "^3.4.3",
+    "gl-matrix": "^3.4.4",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
     "ndarray-linear-interpolate": "^1.0.0"
