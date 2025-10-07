@@ -1,7 +1,5 @@
-import * as Mocha from 'mocha';
-const { describe, it } = Mocha.default;
-import * as Chai from 'chai';
-const { expect } = Chai.default;
+import { describe, it } from 'mocha';
+import { expect } from 'chai';
 import Q from '../lib/quagga.js';
 
 describe('testing node import', () => {

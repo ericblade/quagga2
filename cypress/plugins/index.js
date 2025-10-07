@@ -20,15 +20,15 @@ const webpack = require('@cypress/webpack-preprocessor');
 module.exports = (on, config) => {
     config.env = config.env || {};
     config.env.BUILD_ENV = 'production';
-    if (process.env.NODE_ENV === 'test') {
+    
+    if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
         const webpackOptions = {
             webpackOptions: require('../../configs/webpack.config'),
             watchOptions: {},
         };
         on('file:preprocessor', webpack(webpackOptions));
-        // on('file:preprocessor', webpack());
-        // require('@cypress/code-coverage/task')(on, config);
     }
+    
     // on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'));
     return config;
 };

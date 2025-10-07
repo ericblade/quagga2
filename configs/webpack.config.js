@@ -10,11 +10,27 @@ module.exports = {
         rules: [
             {
                 test: /\.(t|j)sx?$/,
+                exclude: /node_modules/,
                 use: { loader: 'babel-loader' },
+            },
+            {
+                test: /\.js$/,
+                include: /node_modules\/sinon/,
+                use: { 
+                    loader: 'babel-loader',
+                    options: {
+                        presets: [
+                            ['@babel/preset-env', {
+                                targets: { browsers: ['last 2 versions'] }
+                            }]
+                        ]
+                    }
+                },
             },
             {
                 enforce: 'pre',
                 test: /\.(t|j)sx?$/,
+                exclude: /node_modules/,
                 loader: 'source-map-loader',
             },
         ],
@@ -46,7 +62,9 @@ module.exports = {
             ENV: require(path.join(__dirname, './env/', process.env.BUILD_ENV)),
         }),
         new webpack.NormalModuleReplacementPlugin(/..\/input\/frame_grabber/, '../input/frame_grabber_browser.js'),
-        new webpack.NormalModuleReplacementPlugin(/^..\/input\/input_stream\/input_stream/, '../input/input_stream/input_stream_browser'),
+        new webpack.NormalModuleReplacementPlugin(/input_stream[/\\]input_stream$/, (resource) => {
+            resource.request = resource.request.replace(/input_stream$/, 'input_stream_browser');
+        }),
     ],
     optimization: {
         minimize: false,

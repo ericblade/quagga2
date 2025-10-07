@@ -43,7 +43,6 @@
     "eslint-plugin-import": "^2.28.1",
     "eslint-plugin-jsx-a11y": "^6.7.1",
     "eslint-plugin-typescript-sort-keys": "^2.1.0",
-    "esm": "^3.2.25",
     "mocha": "^5.2.0",
     "nyc": "^15.1.0",
     "sinon": "^17.0.0",
@@ -68,7 +67,7 @@
     "test:browser-specific": "NOT WORKING -- something like npx cypress run --config testFiles=[browser]",
     "test:browser-universal": "NOT WORKING -- something like npx cypress run --config testFiles=[universal]",
     "test:browser-all": "npm run cypress:run",
-    "test:import": "mocha -r esm test/test-import.js",
+    "test:import": "mocha test/test-import.mjs",
     "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/integration.spec.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
@@ -142,15 +141,15 @@
   ],
   "license": "MIT",
   "engines": {
-    "node": ">= 10.0"
+    "node": ">= 20.0"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
-    "get-pixels": "^3.3.3",
     "gl-matrix": "^3.4.3",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
-    "ndarray-linear-interpolate": "^1.0.0"
+    "ndarray-linear-interpolate": "^1.0.0",
+    "ndarray-pixels": "^5.0.1"
   },
   "nyc": {
     "include": [
