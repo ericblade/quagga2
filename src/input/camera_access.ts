@@ -61,7 +61,7 @@ async function initCamera(video: HTMLVideoElement | null, constraints: MediaStre
 
 function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): MediaTrackConstraints {
     const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
-        'aspectRatio', 'deviceId']);
+        'aspectRatio', 'deviceId', 'frameRate']);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined'
             && videoConstraints.minAspectRatio > 0) {
