@@ -1,5 +1,5 @@
 {
-  "name": "@tamsrud/quagga2",
+  "name": "@maritech-as/quagga2",
   "version": "1.8.4",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
