@@ -1,15 +1,18 @@
 var webpack = require('webpack'),
     path = require('path');
 
-module.exports = require('./webpack.config.js');
+const baseConfig = require('./webpack.config.js');
 
-module.exports.externals = [
-    'get-pixels',
-    'gl-matrix',
-    'lodash',
-    'ndarray',
-    'ndarray-linear-interpolate',
-];
+module.exports = {
+    ...baseConfig,
+    externals: [
+        'fs',
+        'http',
+        'https',
+        'url',
+        'ndarray-pixels',
+    ],
+};
 module.exports.output.libraryTarget = 'commonjs';
 module.exports.output.library = undefined;
 module.exports.plugins = [
