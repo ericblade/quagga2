@@ -1,5 +1,5 @@
 {
-  "name": "@ericblade/quagga2",
+  "name": "@maritech-as/quagga2",
   "version": "1.8.4",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
@@ -33,7 +33,7 @@
     "babel-plugin-add-module-exports": "^1.0.4",
     "babel-plugin-istanbul": "^6.1.1",
     "chai": "^4.3.10",
-    "core-js": "^3.33.1",
+    "core-js": "^3.38.0",
     "cross-env": "^7.0.3",
     "cypress": "^13.1.0",
     "eslint": "^8.52.0",
@@ -79,14 +79,15 @@
     "build-old": "npm run check-types && npm run build:dev && npm run build:prod && npm run build:node",
     "watch": "npx cross-env BUILD_ENV=development webpack --watch",
     "lint": "eslint src",
-    "upgrade-deps": "npx npm-check-updates --doctor"
+    "upgrade-deps": "npx npm-check-updates --doctor",
+    "prepare": "npm run build"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/ericblade/quagga2.git"
+    "url": "https://github.com/Maritech-AS/quagga2.git"
   },
   "bugs": {
-    "url": "https://github.com/ericblade/quagga2/issues"
+    "url": "https://github.com/Maritech-AS/quagga2/issues"
   },
   "keywords": [
     "quagga2",
@@ -137,7 +138,8 @@
     "Andy Edinborough <andy@edinborough.org>",
     "Claudio Cocciarelli <claudiococciarelli@gmail.com>",
     "Hadrien Foucault <hadrien.foucault@gmail.com>",
-    "ghevge <ghevge@github.com>"
+    "ghevge <ghevge@github.com>",
+    "Tomas Hals Amsrud <tamsrud@gmail.com>"
   ],
   "license": "MIT",
   "engines": {
