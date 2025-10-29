@@ -146,7 +146,6 @@
     "node": ">= 20.0"
   },
   "dependencies": {
-    "@babel/polyfill": "^7.12.1",
     "gl-matrix": "^3.4.3",
     "lodash": "^4.17.21",
     "ndarray": "^1.0.19",
