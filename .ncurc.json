@@ -3,12 +3,15 @@
     "reject": [
         "@cypress/code-coverage",
         "@cypress/webpack-preprocessor",
-        "@types/mocha",
         "babel-loader",
+        "chai",
         "cypress",
         "eslint",
         "mocha",
+        "sinon-chai",
         "source-map-loader",
+        "@types/mocha",
+        "@types/sinon-chai",
         "webpack-cli",
         "webpack"
     ]
