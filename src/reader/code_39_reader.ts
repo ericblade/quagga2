@@ -133,7 +133,7 @@ class Code39Reader extends BarcodeReader {
         let decodedChar;
         let lastStart: number;
         do {
-            counters = this._toCounters(nextStart, counters) as any;
+            counters = this._toCounters(nextStart, counters) as Uint16Array<ArrayBuffer>;
             const pattern = this._toPattern(counters);
             if (pattern < 0) {
                 return null;
