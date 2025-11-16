@@ -10,7 +10,10 @@ module.exports = {
         rules: [
             {
                 test: /\.js$/,
-                include: path.resolve('./node_modules/sinon'),
+                include: [
+                    path.resolve('./node_modules/sinon'),
+                    path.resolve('./node_modules/@sinonjs')
+                ],
                 loader: 'babel-loader',
                 options: {
                     presets: [
