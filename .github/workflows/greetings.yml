@@ -1,15 +1,26 @@
 name: Greetings
 
-on: [pull_request, issues]
+on:
+  pull_request:
+    types:
+      - opened
+  issues:
+    types:
+      - opened
+
+permissions:
+  issues: write
+  pull-requests: write
 
 jobs:
   greeting:
+    name: Greeting first time issues or contributors
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/first-interaction@v1
+    - uses: actions/first-interaction@v3
       with:
-        repo-token: ${{ secrets.GITHUB_TOKEN }}
-        issue-message: 'Thank you for filing an issue! Please be patient. :-) Dont forget to add yourself to the contributors array in package.json! Have a great day!'
-        pr-message: 'Thank you for issuing a pull request! Open source works best when we all work together! Please make sure you have added yourself to the contributors array in package.json. Have a great day!'
+        # repo-token: ${{ secrets.GITHUB_TOKEN }}
+        issue_message: 'Thank you for filing an issue! Please be patient. :-) If you dont hear from anyone within a few days, please ping, I have a day job and a family that keeps me busy, and I sometimes miss Github notifications. Have a great day!'
+        pr_message: 'Thank you for issuing a pull request! Open source works best when we all work together! Please make sure you have added yourself to the contributors array in package.json. If you dont hear from anyone within a few days, please ping, I have a day job and a family that keeps me busy, and I sometimes miss Github notifications. Have a great day!'
 
 # this maybe could be modified to actually compare the contributors array and warn them if they aren't in contributors every time they contribute...

@@ -1,12 +1,18 @@
 {
     "upgrade": true,
     "reject": [
-        "mocha",
-        "@types/mocha",
-        "webpack",
-        "webpack-cli",
-        "cypress",
+        "@cypress/code-coverage",
+        "@cypress/webpack-preprocessor",
         "babel-loader",
-        "source-map-loader"
+        "chai",
+        "cypress",
+        "eslint",
+        "mocha",
+        "sinon-chai",
+        "source-map-loader",
+        "@types/mocha",
+        "@types/sinon-chai",
+        "webpack-cli",
+        "webpack"
     ]
 }

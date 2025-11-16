@@ -9,23 +9,28 @@ module.exports = {
     module: {
         rules: [
             {
+                test: /\.js$/,
+                include: [
+                    path.resolve('./node_modules/sinon'),
+                    path.resolve('./node_modules/@sinonjs')
+                ],
+                loader: 'babel-loader',
+                options: {
+                    presets: [
+                        ['@babel/preset-env', {
+                            targets: { browsers: ['last 2 versions'] }
+                        }]
+                    ],
+                    plugins: [
+                        '@babel/plugin-proposal-optional-chaining',
+                        '@babel/plugin-proposal-nullish-coalescing-operator'
+                    ]
+                }
+            },
+            {
                 test: /\.(t|j)sx?$/,
                 exclude: /node_modules/,
                 use: { loader: 'babel-loader' },
-            },
-            {
-                test: /\.js$/,
-                include: /node_modules\/sinon/,
-                use: { 
-                    loader: 'babel-loader',
-                    options: {
-                        presets: [
-                            ['@babel/preset-env', {
-                                targets: { browsers: ['last 2 versions'] }
-                            }]
-                        ]
-                    }
-                },
             },
             {
                 enforce: 'pre',

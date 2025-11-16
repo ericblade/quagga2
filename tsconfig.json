@@ -5,10 +5,10 @@
         "noImplicitAny": true/* Raise error on expressions and declarations with an implied 'any' type. */,
         "allowSyntheticDefaultImports": true /* Allow default imports from modules with no default export. This does not affect code emit, just typechecking. */,
         "sourceMap": true /* Generates corresponding '.map' file. */,
-        "target": "es2015" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
+        "target": "ES6" /* Specify ECMAScript target version: 'ES3' (default), 'ES5', 'ES2015', 'ES2016', 'ES2017', 'ES2018', 'ES2019' or 'ESNEXT'. */,
         "jsx": "react" /* Specify JSX code generation: 'preserve', 'react-native', or 'react'. */,
         "lib": [
-            "es2015",
+            "ES6",
             "dom"
         ] /* Specify library files to be included in the compilation. */,
         "types": [

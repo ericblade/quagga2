@@ -184,7 +184,7 @@ class Code93Reader extends BarcodeReader {
         let lastStart;
         let decodedChar: string | null;
         do {
-            counters = this._toCounters(nextStart, counters) as Uint16Array;
+            counters = this._toCounters(nextStart, counters) as Uint16Array<ArrayBuffer>;
             const pattern = this._toPattern(counters);
             if (pattern < 0) {
                 return null;
