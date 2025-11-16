@@ -6,6 +6,10 @@
         "webpack",
         "webpack-cli",
         "cypress",
+        "@cypress/webpack-preprocessor",
+        "@cypress/code-coverage",
+        "@typescript-eslint/eslint-plugin",
+        "@typescript-eslint/parser",
         "babel-loader",
         "source-map-loader"
     ]

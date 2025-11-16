@@ -233,7 +233,7 @@ class ImageWrapper implements SparseImageWrapper {
         canvas.width = this.size.x;
         // eslint-disable-next-line no-param-reassign
         canvas.height = this.size.y;
-        const newFrame = new ImageData(data, frame.width, frame.height);
+        const newFrame = new ImageData(data as any, frame.width, frame.height);
         ctx.putImageData(newFrame, 0, 0);
     }
 
