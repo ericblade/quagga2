@@ -1,16 +1,15 @@
 {
     "upgrade": true,
     "reject": [
-        "mocha",
-        "@types/mocha",
-        "webpack",
-        "webpack-cli",
-        "cypress",
-        "@cypress/webpack-preprocessor",
         "@cypress/code-coverage",
-        "@typescript-eslint/eslint-plugin",
-        "@typescript-eslint/parser",
+        "@cypress/webpack-preprocessor",
+        "@types/mocha",
         "babel-loader",
-        "source-map-loader"
+        "cypress",
+        "eslint",
+        "mocha",
+        "source-map-loader",
+        "webpack-cli",
+        "webpack"
     ]
 }
