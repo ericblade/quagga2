@@ -120,11 +120,11 @@ export default class Quagga {
     getBoundingBoxes(): Array<Array<number>> | null {
         return this.context.config?.locate ? BarcodeLocator.locate()
             : [[
-                ...(vec2.clone(this.context.boxSize[0]) as number[]),
-                ...(vec2.clone(this.context.boxSize[1]) as number[]),
-                ...(vec2.clone(this.context.boxSize[2]) as number[]),
-                ...(vec2.clone(this.context.boxSize[3]) as number[]),
-            ]];
+                vec2.clone(this.context.boxSize[0]),
+                vec2.clone(this.context.boxSize[1]),
+                vec2.clone(this.context.boxSize[2]),
+                vec2.clone(this.context.boxSize[3]),
+            ]] as unknown as Array<Array<number>>;
     }
 
     // TODO: need a typescript type for result here.
