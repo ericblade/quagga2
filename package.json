@@ -55,7 +55,14 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12"
+    "webpack-cli": "^3.3.12",
+    "@babel/polyfill": "^7.12.1",
+    "gl-matrix": "^3.4.4",
+    "lodash": "^4.17.21",
+    "ndarray": "^1.0.19",
+    "ndarray-linear-interpolate": "^1.0.0",
+    "ndarray-pixels": "^5.0.1"
+
   },
   "directories": {
     "doc": "doc"
@@ -147,14 +154,6 @@
   "license": "MIT",
   "engines": {
     "node": ">= 20.0"
-  },
-  "dependencies": {
-    "@babel/polyfill": "^7.12.1",
-    "gl-matrix": "^3.4.4",
-    "lodash": "^4.17.21",
-    "ndarray": "^1.0.19",
-    "ndarray-linear-interpolate": "^1.0.0",
-    "ndarray-pixels": "^5.0.1"
   },
   "nyc": {
     "include": [
