@@ -149,6 +149,34 @@ This file controls which packages `npm-check-updates` can upgrade:
 - **Browser tests**: `npm run cypress:run`
 - **Full suite**: `npm run build-and-test`
 
+### Test File Organization
+
+Tests follow a strict directory structure based on platform compatibility:
+
+1. **Universal tests** - `src/**/test/*.spec.{ts,js}`
+   - Run in both Node.js AND browsers (via Cypress)
+   - Must be imported in `cypress/e2e/universal.cy.ts`
+   - Should not use Node.js-specific APIs (no `process`, `fs`, etc.)
+   - Examples: algorithm tests, data structure tests, pure logic
+
+2. **Node.js-only tests** - `src/**/test/node/*.spec.{ts,js}`
+   - Run only in Node.js via `npm run test:node`
+   - Can use Node.js-specific APIs (`process`, `fs`, etc.)
+   - NOT imported in Cypress test files
+   - Examples: CLI tests, file I/O tests, Node.js API tests
+
+3. **Browser-only tests** - `src/**/test/browser/*.spec.{ts,js}`
+   - Run only in browsers via Cypress
+   - Must be imported in `cypress/e2e/browser.cy.ts`
+   - Can use browser-specific APIs (DOM, WebGL, MediaDevices, etc.)
+   - Examples: camera access tests, DOM manipulation tests
+
+**When adding a new test file:**
+- Place in appropriate directory based on platform requirements
+- If universal, import it in `cypress/e2e/universal.cy.ts`
+- If browser-only, import it in `cypress/e2e/browser.cy.ts`
+- If Node.js-only, no import needed (picked up by glob pattern)
+
 ### Coverage
 
 - Coverage reports go to `coverage/` directory
