@@ -190,6 +190,5 @@
     "access": "public"
   },
   "dependencies": {
-    "asm.js": "^0.0.2"
   }
 }
