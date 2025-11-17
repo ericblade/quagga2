@@ -49,10 +49,10 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const type = context?.config?.inputStream?.type;
     if (!type) return null;
     const container = initCanvases(
-        context.inputStream.getCanvasSize(), 
-        { 
+        context.inputStream.getCanvasSize(),
+        {
             willReadFrequently: !!context?.config?.inputStream?.willReadFrequently,
-            debug: context?.config?.locator?.debug 
+            debug: context?.config?.locator?.debug
         }
     );
     if (!container) return { dom: { image: null, overlay: null }, ctx: { image: null, overlay: null } };
