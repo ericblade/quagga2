@@ -68,7 +68,7 @@ function initBuffers() {
         new Uint8Array(skeletonImageData, _patchSize.x * _patchSize.y * 3, _patchSize.x * _patchSize.y),
         undefined, true);
     _skeletonizer = skeletonizer(
-        (typeof window !== 'undefined') ? window : (typeof self !== 'undefined') ? self : global,
+        { Math, Uint8Array },
         { size: _patchSize.x },
         skeletonImageData,
     );
