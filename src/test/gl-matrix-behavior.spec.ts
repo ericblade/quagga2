@@ -99,7 +99,6 @@ describe('gl-matrix behavior verification', () => {
 
     describe('mat2 operations', () => {
         it('should create and copy matrices', () => {
-            const matrix = mat2.create();
             const angle = Math.PI / 2; // 90 degrees
             const rotation = [
                 Math.cos(angle), Math.sin(angle),
