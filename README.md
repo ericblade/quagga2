@@ -507,7 +507,10 @@ The `inputStream` property defines the sources of images/videos within QuaggaJS.
     left: "0%",   // left offset
     bottom: "0%"  // bottom offset
   },
-  singleChannel: false // true: only the red color-channel is read
+  singleChannel: false, // true: only the red color-channel is read
+  debug: {
+    showImageDetails: false // logs frame grabber info and canvas size adjustments to console
+  }
 }
 ```
 
@@ -556,7 +559,8 @@ options within the `decoder` are for debugging/visualization purposes only.
       drawBoundingBox: false,
       showFrequency: false,
       drawScanline: false,
-      showPattern: false
+      showPattern: false,
+      printReaderInfo: false // logs reader registration and initialization to console
   }
   multiple: false
 }
@@ -644,6 +648,8 @@ Only two properties are relevant for the use in Quagga (`halfSample` and
     showLabels: false,
     showPatchLabels: false,
     showRemainingPatchLabels: false,
+    showPatchSize: false, // logs calculated patch size to console
+    showImageDetails: false, // logs image wrapper size and canvas details to console
     boxFromPatches: {
       showTransformed: false,
       showTransformedBox: false,

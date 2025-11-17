@@ -1,7 +1,7 @@
 import { findTagsInObjectURL } from './exif_helper';
 
 const ImageLoader = {};
-ImageLoader.load = function (directory, callback, offset, size, sequence) {
+ImageLoader.load = function (directory, callback, offset, size, sequence, config) {
     const htmlImagesSrcArray = new Array(size);
     const htmlImagesArray = new Array(htmlImagesSrcArray.length);
     let i;
@@ -36,8 +36,8 @@ ImageLoader.load = function (directory, callback, offset, size, sequence) {
             }
         }
         if (notloadedImgs.length === 0) {
-            if (ENV.development) {
-                console.log('Images loaded');
+            if (ENV.development && config?.debug?.showImageDetails) {
+                console.log(`Images loaded: ${htmlImagesArray.length} image${htmlImagesArray.length !== 1 ? 's' : ''} from ${sequence === false ? directory : directory + ' (sequence)'}`);
             }
             if (sequence === false) {
                 findTagsInObjectURL(directory, ['orientation'])

@@ -26,7 +26,7 @@ FrameGrabber.create = function (inputStream, canvas) {
     const _stepSizeX = _videoSize.x / _canvasSize.x;
     const _stepSizeY = _videoSize.y / _canvasSize.y;
 
-    if (ENV.development) {
+    if (ENV.development && _streamConfig.debug?.showImageDetails) {
         console.log('FrameGrabber', JSON.stringify({
             videoSize: _grayImageArray.shape,
             canvasSize: _canvasImageArray.shape,

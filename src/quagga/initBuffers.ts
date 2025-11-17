@@ -15,7 +15,7 @@ export default function initBuffers(
         type: 'XYSize',
     });
 
-    if (ENV.development) {
+    if (ENV.development && (locator as any).config?.debug?.showImageDetails) {
         console.log(`image wrapper size ${inputImageWrapper.size}`);
     }
     const boxSize = [

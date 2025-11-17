@@ -11,17 +11,19 @@ function findOrCreateCanvas(selector: string, className: string) {
     return canvas;
 }
 
-function getCanvasAndContext(selector: string, className: string, options: { willReadFrequently: boolean }) {
+function getCanvasAndContext(selector: string, className: string, options: { willReadFrequently: boolean; debug?: any }) {
     const canvas = findOrCreateCanvas(selector, className);
-    console.warn('* initCanvas getCanvasAndContext');
+    if (ENV.development && options.debug?.showImageDetails) {
+        console.warn('* initCanvas getCanvasAndContext');
+    }
     const context = canvas.getContext('2d', { willReadFrequently: options.willReadFrequently });
     return { canvas, context };
 }
 
-function initCanvases(canvasSize: XYSize, { willReadFrequently }: { willReadFrequently: boolean }): CanvasContainer | null {
+function initCanvases(canvasSize: XYSize, { willReadFrequently, debug }: { willReadFrequently: boolean; debug?: any }): CanvasContainer | null {
     if (typeof document !== 'undefined') {
-        const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer', { willReadFrequently });
-        const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently });
+        const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer', { willReadFrequently, debug });
+        const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
 
         // eslint-disable-next-line no-multi-assign
         image.canvas.width = overlay.canvas.width = canvasSize.x;
@@ -46,7 +48,13 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const viewport = getViewPort(context?.config?.inputStream?.target);
     const type = context?.config?.inputStream?.type;
     if (!type) return null;
-    const container = initCanvases(context.inputStream.getCanvasSize(), { willReadFrequently: !!context?.config?.inputStream?.willReadFrequently });
+    const container = initCanvases(
+        context.inputStream.getCanvasSize(), 
+        { 
+            willReadFrequently: !!context?.config?.inputStream?.willReadFrequently,
+            debug: context?.config?.locator?.debug 
+        }
+    );
     if (!container) return { dom: { image: null, overlay: null }, ctx: { image: null, overlay: null } };
 
     const { dom } = container;
