@@ -1,4 +1,4 @@
-import { glMatrix, vec2, mat2 } from 'gl-matrix';
+import { vec2, mat2 } from 'gl-matrix';
 import ImageWrapper from '../common/image_wrapper';
 import {
     calculatePatchSize,
@@ -15,8 +15,6 @@ import ImageDebug from '../common/image_debug';
 import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
-
-glMatrix.setMatrixArrayType(Array);
 
 let _config;
 let _currentImageWrapper;

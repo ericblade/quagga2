@@ -1,9 +1,8 @@
 // TODO: cluster.js and cv_utils.js are pretty tightly intertwined, making for a complex conversion
 // into typescript. be warned. :-)
 
-import { glMatrix, vec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 
-glMatrix.setMatrixArrayType(Array);
 /**
  * Creates a cluster for grouping similar orientations of datapoints
  */

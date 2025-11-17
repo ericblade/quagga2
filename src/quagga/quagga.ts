@@ -1,4 +1,4 @@
-import { glMatrix, vec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
@@ -15,8 +15,6 @@ import _initCanvas from './initCanvas';
 import * as QWorkers from './qworker';
 import setupInputStream from './setupInputStream';
 import { moveLine, moveBox } from './transform';
-
-glMatrix.setMatrixArrayType(Array);
 
 export default class Quagga {
     context: QuaggaContext = new QuaggaContext();

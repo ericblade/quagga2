@@ -1,10 +1,8 @@
 /* eslint-disable no-mixed-operators */
 /* eslint-disable no-bitwise */
-import { glMatrix, vec2, vec3 } from 'gl-matrix';
+import { vec2, vec3 } from 'gl-matrix';
 import ArrayHelper from './array_helper';
 import Cluster2 from './cluster';
-
-glMatrix.setMatrixArrayType(Array);
 
 /**
  * @param x x-coordinate
