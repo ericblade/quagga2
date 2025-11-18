@@ -10,6 +10,13 @@ This is a fork of the original QuaggaJS library, that will be maintained until s
 original author and maintainer returns, or it has been completely replaced by built-in browser and
 node functionality.
 
+## 📚 Documentation
+
+**[Complete Documentation](https://ericblade.github.io/quagga2/)** - Tutorials, guides, API reference, and more
+(UNDER CONSTRUCTION!!!)
+
+Quick links from this README:
+
 - [Changelog](https://github.com/ericblade/quagga2/releases)
 - [Browser Support](#browser-support)
 - [Installing](#installing)
