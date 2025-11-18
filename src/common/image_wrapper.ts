@@ -1,4 +1,4 @@
-import { glMatrix, vec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import {
     XYSize,
     TypedArrayConstructor,
@@ -9,8 +9,6 @@ import {
 } from '../../type-definitions/quagga.d';
 import ArrayHelper from './array_helper';
 import { hsv2rgb } from './cv_utils';
-
-glMatrix.setMatrixArrayType(Array);
 
 type PositiveNumber = number;
 function assertNumberPositive(val: number): asserts val is PositiveNumber {

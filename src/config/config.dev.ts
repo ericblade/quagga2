@@ -18,6 +18,9 @@ const DevConfig: QuaggaJSConfigObject = {
             bottom: '0%',
         },
         singleChannel: false, // true: only the red color-channel is read
+        debug: {
+            showImageDetails: false, // logs frame grabber info, canvas size adjustments
+        },
     },
     locate: true,
     numOfWorkers: 0,
@@ -30,6 +33,7 @@ const DevConfig: QuaggaJSConfigObject = {
             showFrequency: false,
             drawScanline: false,
             showPattern: false,
+            printReaderInfo: false, // logs reader registration and initialization
         },
     },
     locator: {
@@ -43,6 +47,8 @@ const DevConfig: QuaggaJSConfigObject = {
             showLabels: false,
             showPatchLabels: false,
             showRemainingPatchLabels: false,
+            showPatchSize: false, // logs calculated patch size
+            showImageDetails: false, // logs image wrapper size, canvas details
             boxFromPatches: {
                 showTransformed: false,
                 showTransformedBox: false,

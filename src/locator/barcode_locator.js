@@ -1,4 +1,4 @@
-import { glMatrix, vec2, mat2 } from 'gl-matrix';
+import { vec2, mat2 } from 'gl-matrix';
 import ImageWrapper from '../common/image_wrapper';
 import {
     calculatePatchSize,
@@ -15,8 +15,6 @@ import ImageDebug from '../common/image_debug';
 import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
-
-glMatrix.setMatrixArrayType(Array);
 
 let _config;
 let _currentImageWrapper;
@@ -70,7 +68,7 @@ function initBuffers() {
         new Uint8Array(skeletonImageData, _patchSize.x * _patchSize.y * 3, _patchSize.x * _patchSize.y),
         undefined, true);
     _skeletonizer = skeletonizer(
-        (typeof window !== 'undefined') ? window : (typeof self !== 'undefined') ? self : global,
+        { Math, Uint8Array },
         { size: _patchSize.x },
         skeletonImageData,
     );
@@ -95,7 +93,9 @@ function initCanvas() {
         document.querySelector('#debug').appendChild(_canvasContainer.dom.binary);
     }
     const willReadFrequently = !!_config.willReadFrequently;
-    console.warn('* initCanvas willReadFrequently', willReadFrequently, _config);
+    if (ENV.development && _config.debug?.showCanvas) {
+        console.warn('* initCanvas willReadFrequently', willReadFrequently, _config);
+    }
     _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext('2d', { willReadFrequently });
     _canvasContainer.dom.binary.width = _binaryImageWrapper.size.x;
     _canvasContainer.dom.binary.height = _binaryImageWrapper.size.y;
@@ -578,7 +578,7 @@ export default {
         };
 
         patchSize = calculatePatchSize(config.patchSize, size);
-        if (ENV.development) {
+        if (ENV.development && config.debug?.showPatchSize) {
             console.log(`Patch-Size: ${JSON.stringify(patchSize)}`);
         }
 

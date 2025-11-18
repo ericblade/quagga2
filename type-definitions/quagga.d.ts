@@ -841,6 +841,13 @@ export interface QuaggaJSConfigObject {
         singleChannel?: boolean;
         size?: number;
         sequence?: boolean;
+        debug?: {
+            /**
+             * @default false
+             * Logs frame grabber info, canvas size adjustments, and image loading details
+             */
+            showImageDetails?: boolean;
+        };
     };
 
     /**
@@ -892,6 +899,12 @@ export interface QuaggaJSConfigObject {
              * @default false
              */
             showPattern?: boolean;
+
+            /**
+             * @default false
+             * Logs reader registration and initialization to console
+             */
+            printReaderInfo?: boolean;
         };
 
         /**
@@ -950,6 +963,18 @@ export interface QuaggaJSConfigObject {
              * @default false
              */
             showRemainingPatchLabels?: boolean;
+
+            /**
+             * @default false
+             * Logs calculated patch size to console
+             */
+            showPatchSize?: boolean;
+
+            /**
+             * @default false
+             * Logs image wrapper size and canvas details to console
+             */
+            showImageDetails?: boolean;
 
             boxFromPatches?: {
                 /**

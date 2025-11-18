@@ -18,6 +18,7 @@
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
     "@babel/plugin-proposal-optional-chaining": "^7.21.0",
     "@babel/plugin-transform-runtime": "^7.28.5",
+    "@babel/polyfill": "^7.12.1",
     "@babel/preset-env": "^7.28.5",
     "@babel/preset-typescript": "^7.28.5",
     "@babel/runtime": "^7.28.4",
@@ -34,8 +35,8 @@
     "@typescript-eslint/parser": "^7.18.0",
     "babel-loader": "^8.2.5",
     "babel-plugin-add-module-exports": "^1.0.4",
-    "chai": "^4.3.10",
     "babel-plugin-istanbul": "^7.0.1",
+    "chai": "^4.3.10",
     "core-js": "^3.46.0",
     "cross-env": "^10.1.0",
     "cypress": "^13.1.0",
@@ -46,23 +47,21 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-typescript-sort-keys": "^3.3.0",
+    "gl-matrix": "^3.4.4",
+    "lodash": "^4.17.21",
     "mocha": "^5.2.0",
+    "ndarray": "^1.0.19",
+    "ndarray-linear-interpolate": "^1.0.0",
+    "ndarray-pixels": "^5.0.1",
+    "nyc": "^17.1.0",
     "sinon": "^21.0.0",
     "sinon-chai": "^3.7.0",
-    "nyc": "^17.1.0",
     "source-map-loader": "^1.1.1",
     "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
     "webpack": "^4.44.2",
-    "webpack-cli": "^3.3.12",
-    "@babel/polyfill": "^7.12.1",
-    "gl-matrix": "^3.4.4",
-    "lodash": "^4.17.21",
-    "ndarray": "^1.0.19",
-    "ndarray-linear-interpolate": "^1.0.0",
-    "ndarray-pixels": "^5.0.1"
-
+    "webpack-cli": "^3.3.12"
   },
   "directories": {
     "doc": "doc"
@@ -189,5 +188,7 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
   }
 }

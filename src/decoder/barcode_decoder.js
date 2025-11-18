@@ -68,7 +68,9 @@ export default {
                         $debug.appendChild(_canvas.dom.frequency);
                     }
                 }
-                console.warn('* barcode decoder initCanvas getcontext 2d');
+                if (ENV.development && config.debug?.printReaderInfo) {
+                    console.warn('* barcode decoder initCanvas getcontext 2d');
+                }
                 _canvas.ctx.frequency = _canvas.dom.frequency.getContext('2d');
 
                 _canvas.dom.pattern = document.querySelector('canvas.patternBuffer');
@@ -100,7 +102,7 @@ export default {
                 } else if (typeof readerConfig === 'string') {
                     reader = readerConfig;
                 }
-                if (ENV.development) {
+                if (ENV.development && config.debug?.printReaderInfo) {
                     console.log('Before registering reader: ', reader);
                 }
                 if (configuration.supplements) {
@@ -115,7 +117,7 @@ export default {
                     throw err;
                 }
             });
-            if (ENV.development) {
+            if (ENV.development && config.debug?.printReaderInfo) {
                 console.log(`Registered Readers: ${_barcodeReaders
                     .map((reader) => JSON.stringify({ format: reader.FORMAT, config: reader.config }))
                     .join(', ')}`);

@@ -214,7 +214,7 @@ const inputStreamFactory: InputStreamFactory = {
                     // eslint-disable-next-line @typescript-eslint/no-use-before-define
                     publishEvent('canrecord', []);
                 }, 0);
-            }, offset, size, _config?.sequence);
+            }, offset, size, _config?.sequence, _config);
         }
 
         function publishEvent(eventName: string, args: Array<any>): void {

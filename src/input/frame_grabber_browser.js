@@ -9,15 +9,15 @@ import {
 
 const TO_RADIANS = Math.PI / 180;
 
-function adjustCanvasSize(canvas, targetSize) {
+function adjustCanvasSize(canvas, targetSize, debug) {
     if (canvas.width !== targetSize.x) {
-        if (ENV.development) {
+        if (ENV.development && debug?.showImageDetails) {
             console.log('WARNING: canvas-size needs to be adjusted');
         }
         canvas.width = targetSize.x;
     }
     if (canvas.height !== targetSize.y) {
-        if (ENV.development) {
+        if (ENV.development && debug?.showImageDetails) {
             console.log('WARNING: canvas-size needs to be adjusted');
         }
         canvas.height = targetSize.y;
@@ -44,10 +44,12 @@ FrameGrabber.create = function (inputStream, canvas) {
     _canvas = canvas || document.createElement('canvas');
     _canvas.width = _canvasSize.x;
     _canvas.height = _canvasSize.y;
-    console.warn('*** frame_grabber_browser: willReadFrequently=', willReadFrequently, 'canvas=', _canvas);
+    if (ENV.development && _streamConfig.debug?.showImageDetails) {
+        console.warn('*** frame_grabber_browser: willReadFrequently=', willReadFrequently, 'canvas=', _canvas);
+    }
     _ctx = _canvas.getContext('2d', { willReadFrequently: !!willReadFrequently }); // double not because we have an optional bool that needs to pass as a bool
     _data = new Uint8Array(_size.x * _size.y);
-    if (ENV.development) {
+    if (ENV.development && _streamConfig.debug?.showImageDetails) {
         console.log('FrameGrabber', JSON.stringify({
             size: _size,
             topRight,
@@ -81,7 +83,7 @@ FrameGrabber.create = function (inputStream, canvas) {
         let drawAngle = 0;
         let ctxData;
         if (drawable) {
-            adjustCanvasSize(_canvas, _canvasSize);
+            adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
             if (_streamConfig.type === 'ImageStream') {
                 drawable = frame.img;
                 if (frame.tags && frame.tags.orientation) {

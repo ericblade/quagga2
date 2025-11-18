@@ -1,9 +1,7 @@
-import { glMatrix, vec2 } from 'gl-matrix';
+import { vec2 } from 'gl-matrix';
 import ImageWrapper from '../common/image_wrapper';
 import type { InputStream } from '../input/input_stream/input_stream.d';
 import BarcodeLocator from '../locator/barcode_locator';
-
-glMatrix.setMatrixArrayType(Array);
 
 // TODO: need typescript def for BarcodeLocator
 export default function initBuffers(
@@ -17,7 +15,7 @@ export default function initBuffers(
         type: 'XYSize',
     });
 
-    if (ENV.development) {
+    if (ENV.development && (locator as any).config?.debug?.showImageDetails) {
         console.log(`image wrapper size ${inputImageWrapper.size}`);
     }
     const boxSize = [
