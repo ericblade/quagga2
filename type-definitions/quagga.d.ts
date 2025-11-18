@@ -785,11 +785,6 @@ export interface QuaggaJSConfigObject {
 
     inputStream?: {
         /**
-         * @default "Live"
-         */
-        name?: string;
-
-        /**
          * @default "LiveStream"
          */
         type?: InputStreamType;

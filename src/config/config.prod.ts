@@ -2,7 +2,6 @@ import { QuaggaJSConfigObject } from '../../type-definitions/quagga.d';
 
 const ProdConfig: QuaggaJSConfigObject = {
     inputStream: {
-        name: 'Live',
         type: 'LiveStream',
         constraints: {
             width: 640,
