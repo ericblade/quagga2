@@ -102,7 +102,7 @@ const QuaggaJSStaticInterface = {
                 size: 800,
                 src: config.src,
             },
-            numOfWorkers: (ENV.development && config.debug) ? 0 : 1,
+            numOfWorkers: (typeof ENV !== 'undefined' && ENV.development && config.debug) ? 0 : 1,
             locator: {
                 halfSample: false,
             },
