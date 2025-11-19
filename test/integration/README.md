@@ -39,19 +39,24 @@ runDecoderTest('code_128', generateConfig(), [
 
 As of the latest update:
 - **185 tests passing in Node** (will fail the build if they break)
-- **26 tests marked with both `allowFailInNode` and `allowFailInBrowser`** (can fail in both environments)
+- **20 tests marked with both `allowFailInNode` and `allowFailInBrowser`** (can fail in both environments)
 - **2 tests marked with `allowFailInBrowser` only** (must pass in Node, can fail in browser)
+- **7 tests marked with `allowFailInNode` only** (must pass in browser, can fail in Node)
 
 ### Tests marked with both allowFailInNode and allowFailInBrowser:
-- **code_39**: 2 tests (image-005, image-011)
-- **code_39_vin**: 8 tests (image-002, 003, 004, 005, 007, 008, 009, 010)
-- **code_32**: 5 tests (image-2, 3, 6, 7, 8)
-- **ean_8**: 1 test (image-004 - gets wrong result)
+- **code_39_vin**: 7 tests (image-002, 004, 005, 007, 008, 009, 010)
+- **code_32**: 1 test (image-6)
+- **ean_8**: 1 test (image-004)
 - **codabar**: 1 test (image-008)
 - **External Reader code_128**: 1 test (image-004)
 
 ### Tests marked with `allowFailInBrowser` only:
 - **code_128**: 2 tests (image-003, image-004 - pass in Node, fail in browser)
+
+### Tests marked with `allowFailInNode` only:
+- **code_39**: 2 tests (image-005, image-011 - pass in browser, fail in Node)
+- **code_39_vin**: 1 test (image-003 - passes in browser, fails in Node)
+- **code_32**: 4 tests (image-2, 3, 7, 8 - pass in browser, fail in Node)
 
 ### Decoders with all tests passing (no failure flags):
 - ✅ ean (10 tests)
@@ -143,10 +148,14 @@ CI runs integration tests in **both Cypress (browser) and ts-node (Node.js)**. S
 **Tests that fail in browser but pass in Node** (using `allowFailInBrowser` only):
 - code_128 image-003, image-004
 
-**Tests that fail in both environments** (using both `allowFailInNode` and `allowFailInBrowser`):
+**Tests that fail in Node but pass in browser** (using `allowFailInNode` only):
 - code_39 image-005, image-011
-- code_39_vin image-002, 003, 004, 005, 007, 008, 009, 010
-- code_32 image-2, 3, 6, 7, 8
+- code_39_vin image-003
+- code_32 image-2, 3, 7, 8
+
+**Tests that fail in both environments** (using both `allowFailInNode` and `allowFailInBrowser`):
+- code_39_vin image-002, 004, 005, 007, 008, 009, 010
+- code_32 image-6
 - ean_8 image-004
 - codabar image-008
 - External Reader code_128 image-004

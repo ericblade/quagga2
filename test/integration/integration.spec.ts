@@ -173,14 +173,14 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
             { 'name': 'image-003.jpg', 'result': 'CODE39', format: 'code_39' },
             { 'name': 'image-004.jpg', 'result': 'QUAGGAJS', format: 'code_39' },
-            { 'name': 'image-005.jpg', 'result': 'CODE39', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
+            { 'name': 'image-005.jpg', 'result': 'CODE39', format: 'code_39', allowFailInNode: true },
             { 'name': 'image-006.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
             { 'name': 'image-007.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
             { 'name': 'image-008.jpg', 'result': 'CODE39', format: 'code_39' },
             { 'name': 'image-009.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
             // TODO: image 10 in this set appears to be dependent upon #191
             { 'name': 'image-010.jpg', 'result': 'CODE39', format: 'code_39' },
-            { 'name': 'image-011.jpg', 'result': '4', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
+            { 'name': 'image-011.jpg', 'result': '4', format: 'code_39', allowFailInNode: true },
         ]);
     runDecoderTest(
         'code_39_vin',
@@ -200,7 +200,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             { name: 'image-001.jpg', result: '2HGFG1B86BH501831', format: 'code_39_vin' },
             { name: 'image-002.jpg', result: 'JTDKB20U887718156', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
             // image-003 only works on the second run of a decode of it and only in browser?! wtf?
-            { name: 'image-003.jpg', result: 'JM1BK32G071773697', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+            { name: 'image-003.jpg', result: 'JM1BK32G071773697', format: 'code_39_vin', allowFailInNode: true },
             { name: 'image-004.jpg', result: 'WDBTK75G94T028954', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
             { name: 'image-005.jpg', result: '3VW2K7AJ9EM381173', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
             { name: 'image-006.jpg', result: 'JM1BL1H4XA1335663', format: 'code_39_vin' },
@@ -228,13 +228,13 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         }),
         [
             { name: 'image-1.jpg', result: 'A123456788', format: 'code_32_reader' },
-            { name: 'image-2.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-3.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
+            { name: 'image-2.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
+            { name: 'image-3.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
             { name: 'image-4.jpg', result: 'A935776043', format: 'code_32_reader' },
             { name: 'image-5.jpg', result: 'A935776043', format: 'code_32_reader' },
             { name: 'image-6.jpg', result: 'A012745182', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-7.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
+            { name: 'image-7.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
+            { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
             { name: 'image-9.jpg', result: 'A015896018', format: 'code_32_reader' },
             { name: 'image-10.jpg', result: 'A015896018', format: 'code_32_reader' },
         ]
