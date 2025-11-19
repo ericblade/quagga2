@@ -135,7 +135,7 @@ export function initWorker(config: QuaggaJSConfigObject, inputStream: any, cb: F
             URL.revokeObjectURL(blobURL);
             workerThread.busy = false;
             workerThread.imageData = new Uint8Array(e.data.imageData);
-            if (ENV.development) {
+            if (typeof ENV !== 'undefined' && ENV.development) {
                 console.log('Worker initialized');
             }
             cb(workerThread);
@@ -149,7 +149,7 @@ export function initWorker(config: QuaggaJSConfigObject, inputStream: any, cb: F
                 publishResult(e.data.result, workerThread.imageData);
             }
         } else if (e.data.event === 'error') {
-            if (ENV.development) {
+            if (typeof ENV !== 'undefined' && ENV.development) {
                 console.log('Worker error: ' + e.data.message);
             }
         }
@@ -171,7 +171,7 @@ export function adjustWorkerPool(capacity: number, config?: QuaggaJSConfigObject
         const workersToTerminate = workerPool.slice(increaseBy);
         workersToTerminate.forEach(function (workerThread) {
             workerThread.worker.terminate();
-            if (ENV.development) {
+            if (typeof ENV !== 'undefined' && ENV.development) {
                 console.log('Worker terminated!');
             }
         });

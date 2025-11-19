@@ -13,7 +13,7 @@ function findOrCreateCanvas(selector: string, className: string) {
 
 function getCanvasAndContext(selector: string, className: string, options: { willReadFrequently: boolean; debug?: any }) {
     const canvas = findOrCreateCanvas(selector, className);
-    if (ENV.development && options.debug?.showImageDetails) {
+    if (typeof ENV !== 'undefined' && ENV.development && options.debug?.showImageDetails) {
         console.warn('* initCanvas getCanvasAndContext');
     }
     const context = canvas.getContext('2d', { willReadFrequently: options.willReadFrequently });

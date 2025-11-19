@@ -89,11 +89,11 @@ function initCanvas() {
     }
     _canvasContainer.dom.binary = document.createElement('canvas');
     _canvasContainer.dom.binary.className = 'binaryBuffer';
-    if (ENV.development && _config.debug.showCanvas === true) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showCanvas === true) {
         document.querySelector('#debug').appendChild(_canvasContainer.dom.binary);
     }
     const willReadFrequently = !!_config.willReadFrequently;
-    if (ENV.development && _config.debug?.showCanvas) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug?.showCanvas) {
         console.warn('* initCanvas willReadFrequently', willReadFrequently, _config);
     }
     _canvasContainer.ctx.binary = _canvasContainer.dom.binary.getContext('2d', { willReadFrequently });
@@ -123,7 +123,7 @@ function boxFromPatches(patches) {
     for (i = 0; i < patches.length; i++) {
         patch = patches[i];
         overAvg += patch.rad;
-        if (ENV.development && _config.debug.showPatches) {
+        if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showPatches) {
             ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary, { color: 'red' });
         }
     }
@@ -144,7 +144,7 @@ function boxFromPatches(patches) {
             vec2.transformMat2(patch.box[j], patch.box[j], transMat);
         }
 
-        if (ENV.development && _config.debug.boxFromPatches.showTransformed) {
+        if (typeof ENV !== 'undefined' && ENV.development && _config.debug.boxFromPatches.showTransformed) {
             ImageDebug.drawPath(patch.box, { x: 0, y: 1 }, _canvasContainer.ctx.binary, { color: '#99ff00', lineWidth: 2 });
         }
     }
@@ -170,7 +170,7 @@ function boxFromPatches(patches) {
 
     box = [[minx, miny], [maxx, miny], [maxx, maxy], [minx, maxy]];
 
-    if (ENV.development && _config.debug.boxFromPatches.showTransformedBox) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.boxFromPatches.showTransformedBox) {
         ImageDebug.drawPath(box, { x: 0, y: 1 }, _canvasContainer.ctx.binary, { color: '#ff0000', lineWidth: 2 });
     }
 
@@ -181,7 +181,7 @@ function boxFromPatches(patches) {
         vec2.transformMat2(box[j], box[j], transMat);
     }
 
-    if (ENV.development && _config.debug.boxFromPatches.showBB) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.boxFromPatches.showBB) {
         ImageDebug.drawPath(box, { x: 0, y: 1 }, _canvasContainer.ctx.binary, { color: '#ff0000', lineWidth: 2 });
     }
 
@@ -198,7 +198,7 @@ function boxFromPatches(patches) {
 function binarizeImage() {
     otsuThreshold(_currentImageWrapper, _binaryImageWrapper);
     _binaryImageWrapper.zeroBorder();
-    if (ENV.development && _config.debug.showCanvas) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showCanvas) {
         _binaryImageWrapper.show(_canvasContainer.dom.binary, 255);
     }
 }
@@ -231,7 +231,7 @@ function findPatches() {
             rasterizer = Rasterizer.create(_skelImageWrapper, _labelImageWrapper);
             rasterResult = rasterizer.rasterize(0);
 
-            if (ENV.development && _config.debug.showLabels) {
+            if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showLabels) {
                 _labelImageWrapper.overlay(_canvasContainer.dom.binary, Math.floor(360 / rasterResult.count),
                     { x, y });
             }
@@ -244,7 +244,7 @@ function findPatches() {
         }
     }
 
-    if (ENV.development && _config.debug.showFoundPatches) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showFoundPatches) {
         for (i = 0; i < patchesFound.length; i++) {
             patch = patchesFound[i];
             ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary,
@@ -317,7 +317,7 @@ function findBoxes(topLabels, maxLabel) {
             boxes.push(box);
 
             // draw patch-labels if requested
-            if (ENV.development && _config.debug.showRemainingPatchLabels) {
+            if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showRemainingPatchLabels) {
                 for (j = 0; j < patches.length; j++) {
                     patch = patches[j];
                     hsv[0] = (topLabels[i].label / (maxLabel + 1)) * 360;
@@ -354,7 +354,7 @@ function skeletonize(x, y) {
     _skeletonizer.skeletonize();
 
     // Show skeleton if requested
-    if (ENV.development && _config.debug.showSkeleton) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showSkeleton) {
         _skelImageWrapper.overlay(_canvasContainer.dom.binary, 360, imageRef(x, y));
     }
 }
@@ -504,7 +504,7 @@ function rasterizeAngularSimilarity(patchesFound) {
     }
 
     // draw patch-labels if requested
-    if (ENV.development && _config.debug.showPatchLabels) {
+    if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showPatchLabels) {
         for (j = 0; j < _patchLabelGrid.data.length; j++) {
             if (_patchLabelGrid.data[j] > 0 && _patchLabelGrid.data[j] <= label) {
                 patch = _imageToPatchGrid.data[j];
@@ -578,7 +578,7 @@ export default {
         };
 
         patchSize = calculatePatchSize(config.patchSize, size);
-        if (ENV.development && config.debug?.showPatchSize) {
+        if (typeof ENV !== 'undefined' && ENV.development && config.debug?.showPatchSize) {
             console.log(`Patch-Size: ${JSON.stringify(patchSize)}`);
         }
 

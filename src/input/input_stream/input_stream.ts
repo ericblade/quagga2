@@ -106,7 +106,7 @@ const inputStreamFactory: InputStreamFactory = {
                 const pixels = await getPixels(uint8Data, mimeType);
 
                 loaded = true;
-                if (ENV.development) {
+                if (typeof ENV !== 'undefined' && ENV.development) {
                     console.log('* InputStreamNode pixels.shape', pixels.shape);
                 }
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
