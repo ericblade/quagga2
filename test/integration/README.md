@@ -36,21 +36,21 @@ runDecoderTest('code_39', generateConfig({
 ## Current Test Status
 
 As of the latest update:
-- **185 tests passing** (will fail the build if they break)
-- **26 tests marked with `allowFail: true`** (known failures, marked as pending)
+- **185 tests passing in Node** (will fail the build if they break)
+- **28 tests marked with `allowFail: true`** (known failures in browser/node, marked as pending when they fail)
 
 ### Tests marked with `allowFail`:
+- **code_128**: 2 tests (image-003, image-004 - fail in browser but pass in node)
 - **code_39**: 2 tests (image-005, image-011)
 - **code_39_vin**: 8 tests (image-002, 003, 004, 005, 007, 008, 009, 010)
 - **code_32**: 5 tests (image-2, 3, 6, 7, 8)
-- **ean_8**: 1 test (image-004 - gets wrong result in node)
+- **ean_8**: 1 test (image-004 - gets wrong result)
 - **codabar**: 1 test (image-008)
 - **External Reader code_128**: 1 test (image-004)
 
 ### Decoders with all tests passing (0 allowFail):
 - ✅ ean (10 tests)
 - ✅ ean_extended (10 tests)
-- ✅ code_128 (10 tests)
 - ✅ upc (10 tests)
 - ✅ upc_e (10 tests)
 - ✅ i2of5 (5 tests)
@@ -106,4 +106,9 @@ The default behavior is "tests must pass" to catch regressions early. Only tests
 
 ## Browser vs Node Differences
 
-Some tests behave differently in browser (Cypress) vs Node environments. This is a known issue being investigated. Tests are marked with `allowFail: true` if they fail in the node environment, which is what CI uses for the integration test run.
+Some tests behave differently in browser (Cypress) vs Node environments. This is a known issue being investigated. Tests are marked with `allowFail: true` if they fail in either environment:
+
+- **Tests that fail in browser but pass in node**: code_128 image-003, image-004
+- **Tests that fail in node**: code_39 image-005/011, code_39_vin (multiple), code_32 (multiple), ean_8 image-004, codabar image-008, External Reader code_128 image-004
+
+When a test marked with `allowFail: true` actually passes (e.g., in node), it's counted as passing. When it fails (e.g., in browser), it's marked as "pending" instead of failing the build.
