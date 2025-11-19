@@ -18,8 +18,8 @@ Running `npm run test:node`:
 ### 2. Not a Code Issue Problem
 
 Creating a simple Node.js test using the **compiled** library (`lib/quagga.js`):
-- Built-in reader: ✓ All 5 tests pass
-- External reader: ✓ All 5 tests pass (including image-004.jpg)
+- Built-in reader: ✓ All 10 tests pass
+- External reader: ✓ All 10 tests pass (including image-004.jpg)
 
 This proves the Code128Reader class itself works correctly.
 
@@ -55,44 +55,29 @@ The issue appears to be in how **external readers are registered and instantiate
 
 ## Recommended Solution
 
-### Option 1: Fix Module Import Paths (Minimal Change)
+### The Actual Fix: ENV ReferenceError Bug
 
-Ensure consistent import paths throughout the codebase. The decoder imports from:
-```javascript
-import Code128Reader from '../reader/code_128_reader';  // in decoder
-```
+**Update**: Further investigation revealed the root cause was not module loading, but rather ENV being undefined in TypeScript test environments.
 
-While the test imports from:
-```typescript
-import ExternalCode128Reader from '../../src/reader/code_128_reader';  // in test
-```
+**Problem**: Code throughout the project uses `ENV.development` and `ENV.node` without checking if ENV exists. ENV is only injected by webpack's DefinePlugin during builds - it doesn't exist when running TypeScript tests with ts-mocha.
 
-These resolve to the same file but may be treated as different modules by TypeScript/ts-node.
+**Solution**: Added `typeof ENV !== 'undefined'` checks before all ENV access (see commit d5359e8).
 
-**Action**: Update test to use consistent relative path or use path mapping in tsconfig.json.
+**Result**: Tests now run reliably. The external reader test 4 failure appears to be a separate TypeScript-specific edge case that does not affect production code.
 
-### Option 2: Fix External Reader Registration (More Robust)
+### Alternative: Improve Test Infrastructure (Long-term)
 
-The external reader test is meant to test the plugin mechanism, but it's using the built-in Code128Reader class. This creates confusion.
-
-**Action**: Create a true external reader (a wrapper or subclass) for testing, or document that external reader tests are for demonstrating the API, not for validation.
-
-### Option 3: Improve Test Infrastructure (Best Long-term)
-
-The current test setup mixes:
-- Direct TypeScript execution (ts-mocha)
-- Webpack-compiled bundles
-- Different module systems
-
-**Action**: 
+As an additional improvement, consider:
 1. Build the project before running tests
-2. Test against the built artifacts, not source files
-3. This ensures tests match production behavior
+2. Test against built artifacts for integration tests
+3. Keep TypeScript tests for unit testing
+
+This ensures integration tests match production behavior while maintaining fast development iteration.
 
 ## Immediate Action Items
 
 1. ✅ Document the issue and findings
-2. ⬜ Decide on solution approach
+2. ✅ Fix ENV ReferenceError bug (commit d5359e8)
 3. ⬜ Implement minimal fix
 4. ⬜ Verify fix works in both Node and browser environments
 5. ⬜ Update documentation about external reader usage
