@@ -1,7 +1,9 @@
 # Quagga2 Documentation
 
+
 Welcome to the Quagga2 documentation! Quagga2 is a JavaScript barcode scanner library supporting real-time location (localization) and decoding of various barcode types in both browser and Node.js environments.
 
+![Badge](https://hitscounter.dev/api/hit?url=https%3A%2F%2Fericblade.github.io%2Fquagga2%2F&label=Views+%28Today%2FTotal%29&icon=link&color=%23198754&message=&style=plastic&tz=US%2FEastern)
 [![Join the chat at https://gitter.im/quaggaJS/Lobby](https://badges.gitter.im/quaggaJS/Lobby.svg)](https://gitter.im/quaggaJS/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ## Quick Links
