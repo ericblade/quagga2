@@ -4,76 +4,58 @@
 
 This directory contains integration tests for Quagga2's barcode decoder functionality.
 
-### Test Helpers
+### Test Behavior
 
-#### `it.allowFail()`
+By default, all decoder tests **must pass**. If a test fails, the entire test run fails, alerting developers to regressions.
 
-Used for tests that may fail but should not block the test suite. When a test fails, it will be marked as "pending" instead of causing the test run to fail.
+For tests that are known to fail (inherited test cases or work-in-progress features), you can mark them with `allowFail: true`. These tests will be marked as "pending" instead of causing the test run to fail.
 
-**Usage:**
-```typescript
-it.allowFail('test that might fail', async function() {
-    // test code
-});
-```
+### Test Helper: `it.allowFail()`
 
-This is useful for:
-- Tests inherited from the original codebase that are known to fail
-- Tests for features that are work-in-progress
-- Tests with non-deterministic failures
+The `it.allowFail()` helper is used internally when a test is marked with `allowFail: true`. When a test fails, it will be marked as "pending" instead of causing the test run to fail.
 
-#### `it.mustPass()` ✨ NEW
+### Marking Tests with `allowFail`
 
-Used for tests that are known to pass consistently and should fail if they stop working. When a test fails, it will be reported as a failure, alerting developers that something has broken.
-
-**Usage:**
-```typescript
-it.mustPass('test that must always pass', async function() {
-    // test code
-});
-```
-
-This is useful for:
-- Regression testing - ensuring known-good functionality stays working
-- Critical functionality that must not break
-- Tests that have been verified to work consistently
-
-### Marking Tests with `mustPass`
-
-In the test data structures, you can mark individual test cases with `mustPass: true`:
+In the test data structures, you can mark individual test cases that are expected to fail with `allowFail: true`:
 
 ```typescript
-runDecoderTest('ean', generateConfig(), [
-    { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13', mustPass: true },
-    { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13', mustPass: true },
-    // Test without mustPass will use it.allowFail() by default
-    { 'name': 'image-003.jpg', 'result': '4006209700068', format: 'ean_13' },
+runDecoderTest('code_39', generateConfig({
+    decoder: { readers: ['code_39_reader'] }
+}), [
+    // This test passes and will fail the build if it stops working
+    { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
+    
+    // This test is known to fail - mark it with allowFail
+    { 'name': 'image-005.jpg', 'result': 'CODE39', format: 'code_39', allowFail: true },
+    
+    // This test passes
+    { 'name': 'image-006.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
 ]);
 ```
 
 ## Current Test Status
 
 As of the latest update:
-- **185 tests passing**
-- **26 tests pending** (expected failures, using `it.allowFail()`)
-- **159 tests marked with `mustPass: true`** (will fail if they break)
+- **185 tests passing** (will fail the build if they break)
+- **26 tests marked with `allowFail: true`** (known failures, marked as pending)
 
-### Decoders with all tests marked `mustPass`:
-- ✅ ean (10/10)
-- ✅ ean_extended (10/10)
-- ✅ upc (10/10)
-- ✅ upc_e (10/10)
-- ✅ i2of5 (5/5)
-- ✅ 2of5 (10/10)
-- ✅ code_93 (11/11)
+### Tests marked with `allowFail`:
+- **code_39**: 2 tests (image-005, image-011)
+- **code_39_vin**: 8 tests (image-002, 003, 004, 005, 007, 008, 009, 010)
+- **code_32**: 5 tests (image-2, 3, 6, 7, 8)
+- **ean_8**: 1 test (image-004 - gets wrong result in node)
+- **codabar**: 1 test (image-008)
+- **External Reader code_128**: 1 test (image-004)
 
-### Decoders with some tests marked `mustPass`:
-- ⚠️ code_128: 9/10 (image-004 fails)
-- ⚠️ code_39: 8/10 (images 005, 011 fail)
-- ⚠️ code_39_vin: 3/11 (most tests fail in node environment)
-- ⚠️ code_32: 5/10 (several tests fail)
-- ⚠️ ean_8: 7/8 (image-004 gets wrong result)
-- ⚠️ codabar: 9/10 (image-008 fails)
+### Decoders with all tests passing (0 allowFail):
+- ✅ ean (10 tests)
+- ✅ ean_extended (10 tests)
+- ✅ code_128 (10 tests)
+- ✅ upc (10 tests)
+- ✅ upc_e (10 tests)
+- ✅ i2of5 (5 tests)
+- ✅ 2of5 (10 tests)
+- ✅ code_93 (11 tests)
 
 ## Running Tests
 
@@ -89,41 +71,39 @@ npm run test:browser-all
 
 When adding new decoder test cases:
 
-1. Add the test data to the appropriate `runDecoderTest()` call
+1. Add the test data to the appropriate `runDecoderTest()` call **without** `allowFail`
 2. Run the tests to verify they pass
-3. If the test passes consistently, add `mustPass: true` to the test object
-4. If the test fails or is flaky, leave `mustPass` undefined (will use `it.allowFail()`)
+3. If the test fails and you want to preserve it for future debugging, add `allowFail: true`
+4. If the test passes, leave it without any flag - it will automatically fail the build if it breaks
 
 Example:
 ```typescript
 runDecoderTest('my_decoder', generateConfig(), [
-    // This test is known to work - mark as mustPass
-    { 'name': 'working-image.jpg', 'result': '123456', format: 'my_format', mustPass: true },
+    // This test should work - no flag needed
+    { 'name': 'working-image.jpg', 'result': '123456', format: 'my_format' },
     
-    // This test is flaky or fails - don't mark as mustPass
-    { 'name': 'problematic-image.jpg', 'result': '789012', format: 'my_format' },
+    // This test is known to fail - mark with allowFail
+    { 'name': 'problematic-image.jpg', 'result': '789012', format: 'my_format', allowFail: true },
 ]);
 ```
 
-## Troubleshooting
+## Fixing Failing Tests
 
-### A `mustPass` test is now failing
+When you fix a test that was marked with `allowFail: true`:
 
-If a test marked with `mustPass: true` starts failing, this indicates a regression:
+1. Remove the `allowFail: true` flag from the test
+2. Verify the test passes consistently in both Node and browser environments
+3. The test will now fail the build if it breaks in the future
 
-1. **Investigate the failure** - Check what changed in the codebase
-2. **Fix the regression** - The test was working before, so something broke it
-3. **Only remove `mustPass` as a last resort** - If you determine the test was incorrectly marked or the expected behavior has legitimately changed
+## Design Philosophy
 
-### Converting a failing test to `mustPass`
+The default behavior is "tests must pass" to catch regressions early. Only tests explicitly marked with `allowFail: true` are allowed to fail without breaking the build. This ensures that:
 
-If you fix a failing test:
-
-1. Verify it passes consistently in both Node and browser environments
-2. Add `mustPass: true` to the test object
-3. Remove any comments about it being a known failure
-4. Update this README if it changes the statistics
+- **Regressions are caught immediately** - If a working test breaks, the build fails
+- **Known failures are preserved** - Tests marked with `allowFail` can fail without breaking CI
+- **Minimal flags needed** - Most tests don't need any special marking
+- **Clear intent** - Tests marked with `allowFail` clearly indicate known issues
 
 ## Browser vs Node Differences
 
-Some tests behave differently in browser (Cypress) vs Node environments. This is a known issue being investigated. Tests are currently marked `mustPass: true` based on their Node test results. Comments like `// fails in node` or `// passes only in browser` document these differences.
+Some tests behave differently in browser (Cypress) vs Node environments. This is a known issue being investigated. Tests are marked with `allowFail: true` if they fail in the node environment, which is what CI uses for the integration test run.
