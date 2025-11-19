@@ -24,16 +24,19 @@ if (typeof it.allowFail === 'undefined') {
     };
 }
 
-function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFail?: boolean }>) {
+function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFail?: boolean, allowFailInBrowser?: boolean }>) {
     describe(`Decoder ${name}`, () => {
         testSet.forEach((sample) => {
-            // By default tests must pass. Only use it.allowFail for tests explicitly marked with allowFail: true
-            const testFn = sample.allowFail ? it.allowFail : it;
+            // By default tests must pass. Use it.allowFail for tests explicitly marked with allowFail: true
+            // or allowFailInBrowser: true when running in browser environment
+            const isBrowser = typeof window !== 'undefined';
+            const shouldAllowFail = sample.allowFail || (sample.allowFailInBrowser && isBrowser);
+            const testFn = shouldAllowFail ? it.allowFail : it;
             testFn(`decodes ${sample.name}`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
                 const thisConfig = {
                     ...config,
-                    src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/${name}/${sample.name}`,
+                    src: `${isBrowser ? '/' : ''}test/fixtures/${name}/${sample.name}`,
                 };
                 const result = await Quagga.decodeSingle(thisConfig);
                 // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
@@ -145,8 +148,8 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     }, [
         { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
         { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
-        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128', allowFail: true }, // fails in browser
-        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFail: true }, // fails in browser
+        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128', allowFailInBrowser: true },
+        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFailInBrowser: true },
         { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
