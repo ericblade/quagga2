@@ -58,7 +58,7 @@ export default {
         initConfig();
 
         function initCanvas() {
-            if (ENV.development && typeof document !== 'undefined') {
+            if (typeof ENV !== 'undefined' && ENV.development && typeof document !== 'undefined') {
                 const $debug = document.querySelector('#debug.detection');
                 _canvas.dom.frequency = document.querySelector('canvas.frequency');
                 if (!_canvas.dom.frequency) {
@@ -68,7 +68,7 @@ export default {
                         $debug.appendChild(_canvas.dom.frequency);
                     }
                 }
-                if (ENV.development && config.debug?.printReaderInfo) {
+                if (typeof ENV !== 'undefined' && ENV.development && config.debug?.printReaderInfo) {
                     console.warn('* barcode decoder initCanvas getcontext 2d');
                 }
                 _canvas.ctx.frequency = _canvas.dom.frequency.getContext('2d');
@@ -102,7 +102,7 @@ export default {
                 } else if (typeof readerConfig === 'string') {
                     reader = readerConfig;
                 }
-                if (ENV.development && config.debug?.printReaderInfo) {
+                if (typeof ENV !== 'undefined' && ENV.development && config.debug?.printReaderInfo) {
                     console.log('Before registering reader: ', reader);
                 }
                 if (configuration.supplements) {
@@ -117,7 +117,7 @@ export default {
                     throw err;
                 }
             });
-            if (ENV.development && config.debug?.printReaderInfo) {
+            if (typeof ENV !== 'undefined' && ENV.development && config.debug?.printReaderInfo) {
                 console.log(`Registered Readers: ${_barcodeReaders
                     .map((reader) => JSON.stringify({ format: reader.FORMAT, config: reader.config }))
                     .join(', ')}`);
@@ -125,7 +125,7 @@ export default {
         }
 
         function initConfig() {
-            if (ENV.development && typeof document !== 'undefined') {
+            if (typeof ENV !== 'undefined' && ENV.development && typeof document !== 'undefined') {
                 let i;
                 const vis = [{
                     node: _canvas.dom.frequency,
@@ -190,14 +190,14 @@ export default {
             let i;
             const barcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, line[0], line[1]);
 
-            if (ENV.development && config.debug.showFrequency) {
+            if (typeof ENV !== 'undefined' && ENV.development && config.debug.showFrequency) {
                 ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
                 Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 
             Bresenham.toBinaryLine(barcodeLine);
 
-            if (ENV.development && config.debug.showPattern) {
+            if (typeof ENV !== 'undefined' && ENV.development && config.debug.showPattern) {
                 Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
             }
 
@@ -280,7 +280,7 @@ export default {
             const ctx = _canvas.ctx.overlay;
             let result;
 
-            if (ENV.development) {
+            if (typeof ENV !== 'undefined' && ENV.development) {
                 if (config.debug.drawBoundingBox && ctx) {
                     ImageDebug.drawPath(box, { x: 0, y: 1 }, ctx, { color: 'blue', lineWidth: 2 });
                 }
@@ -303,7 +303,7 @@ export default {
                 return null;
             }
 
-            if (ENV.development && result && config.debug.drawScanline && ctx) {
+            if (typeof ENV !== 'undefined' && ENV.development && result && config.debug.drawScanline && ctx) {
                 ImageDebug.drawPath(line, { x: 'x', y: 'y' }, ctx, { color: 'red', lineWidth: 3 });
             }
 

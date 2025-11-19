@@ -36,7 +36,7 @@ ImageLoader.load = function (directory, callback, offset, size, sequence, config
             }
         }
         if (notloadedImgs.length === 0) {
-            if (ENV.development && config?.debug?.showImageDetails) {
+            if (typeof ENV !== 'undefined' && ENV.development && config?.debug?.showImageDetails) {
                 console.log(`Images loaded: ${htmlImagesArray.length} image${htmlImagesArray.length !== 1 ? 's' : ''} from ${sequence === false ? directory : directory + ' (sequence)'}`);
             }
             if (sequence === false) {

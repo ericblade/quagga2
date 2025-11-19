@@ -18,7 +18,7 @@ function waitForVideo(video: HTMLVideoElement): Promise<void> {
         function checkVideo(): void {
             if (attempts > 0) {
                 if (video.videoWidth > 10 && video.videoHeight > 10) {
-                    if (ENV.development) {
+                    if (typeof ENV !== 'undefined' && ENV.development) {
                         console.log(`* dev: checkVideo found ${video.videoWidth}px x ${video.videoHeight}px`);
                     }
                     resolve();
