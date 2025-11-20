@@ -98,6 +98,10 @@ FrameGrabber.create = function (inputStream, canvas) {
                 }
             }
 
+            // Disable image smoothing to avoid interpolation differences between browser and Node
+            // This makes canvas use nearest-neighbor instead of bilinear interpolation
+            _ctx.imageSmoothingEnabled = false;
+            
             if (drawAngle !== 0) {
                 _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
                 _ctx.rotate(drawAngle);
