@@ -50,7 +50,7 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                 
                 // Store timing data
                 if (halfSampleLabel) {
-                    const key = `${name}`;
+                    const key = name;
                     if (!timingData[key]) {
                         timingData[key] = { withHalfSample: [], withoutHalfSample: [] };
                     }
@@ -573,9 +573,12 @@ describe('Performance Summary', () => {
             console.log(`  halfSample: false - Avg: ${avgWithout}ms, Tests passed: ${passedWithout}`);
             
             if (avgWith !== 'N/A' && avgWithout !== 'N/A') {
-                const diff = ((parseFloat(avgWithout) - parseFloat(avgWith)) / parseFloat(avgWith) * 100).toFixed(1);
-                const faster = parseFloat(diff) > 0 ? 'halfSample: true is faster' : 'halfSample: false is faster';
-                console.log(`  Difference: ${Math.abs(parseFloat(diff))}% (${faster})`);
+                const avgWithNum = parseFloat(avgWith);
+                const avgWithoutNum = parseFloat(avgWithout);
+                const diffPercent = ((avgWithoutNum - avgWithNum) / avgWithNum * 100).toFixed(1);
+                const diffNum = parseFloat(diffPercent);
+                const faster = diffNum > 0 ? 'halfSample: true is faster' : 'halfSample: false is faster';
+                console.log(`  Difference: ${Math.abs(diffNum)}% (${faster})`);
             }
             console.log('');
         }
