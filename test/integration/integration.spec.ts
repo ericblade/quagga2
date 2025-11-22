@@ -34,6 +34,9 @@ const testFailureConfig: { [decoder: string]: { halfSampleTrue?: string[], halfS
     'code_128': {
         halfSampleTrue: ['image-003.jpg', 'image-004.jpg'],
     },
+    'code_32': {
+        halfSampleFalse: ['image-8.jpg'],
+    },
     'ean_8': {
         halfSampleFalse: ['image-009.jpg'],
     },
