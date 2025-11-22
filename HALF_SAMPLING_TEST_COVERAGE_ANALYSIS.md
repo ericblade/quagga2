@@ -63,7 +63,7 @@ locator: {
 ```typescript
 ✅ ean (10 tests)               - halfSample: true (default)
 ✅ ean_extended (10 tests)      - halfSample: true (default)
-✅ code_128 (10 tests)          - halfSample: false (explicitly disabled)
+❌ code_128 (10 tests)          - halfSample: false (explicitly disabled)
 ✅ code_39 (11 tests)           - halfSample: true (default)
 ❌ code_39_vin (11 tests)       - halfSample: false (explicitly disabled)
 ✅ code_32 (10 tests)           - halfSample: true (explicit)
@@ -146,7 +146,7 @@ This is the **critical gap** identified by the PR #585 review comment.
 
 ### 3.1 Critical Gap: Frame Grabber Half-Sampling Path
 
-**File:** `src/input/frame_grabber_browser.js:127-158`
+**File:** `src/input/frame_grabber_browser.js:127-160`
 
 **Issue from PR #585:**
 ```javascript
@@ -155,17 +155,32 @@ const tempCanvas = document.createElement('canvas');
 tempCanvas.width = _videoSize.x;
 tempCanvas.height = _videoSize.y;
 const tempCtx = tempCanvas.getContext('2d');
-tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);
 
-// Lines 142-145: Convert to grayscale
+if (drawAngle !== 0) {
+    tempCtx.translate(_videoSize.x / 2, _videoSize.y / 2);
+    tempCtx.rotate(drawAngle);
+    tempCtx.drawImage(drawable, -_videoSize.y / 2, -_videoSize.x / 2, _videoSize.y, _videoSize.x);
+} else {
+    tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);
+}
+
+// Lines 142-145: Convert to grayscale at original size
 const originalImageData = tempCtx.getImageData(0, 0, _videoSize.x, _videoSize.y).data;
 const grayData = new Uint8Array(_videoSize.x * _videoSize.y);
 computeGray(originalImageData, grayData, _streamConfig);
 
 if (doHalfSample) {
-    // Lines 149-158: REDRAWS the same image to _canvas at scaled size
+    // Lines 149-160: REDRAWS the same image to _canvas at scaled size
     adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
-    _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);
+    if (drawAngle !== 0) {
+        _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
+        _ctx.rotate(drawAngle);
+        _ctx.drawImage(drawable, -_canvasSize.y / 2, -_canvasSize.x / 2, _canvasSize.y, _canvasSize.x);
+        _ctx.rotate(-drawAngle);
+        _ctx.translate(-_canvasSize.x / 2, -_canvasSize.y / 2);
+    } else {
+        _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);
+    }
     const ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
     grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
 }
@@ -319,12 +334,12 @@ The half-sampling feature has **moderate test coverage** through integration tes
 ### Test Coverage Summary
 
 | Component                  | Coverage | Test Type      | Risk if Changed |
-|---------------------------|----------|----------------|-----------------|
-| Integration (end-to-end)  | ✅ Good   | Integration    | Low             |
-| Barcode Locator           | ✅ Good   | Unit           | Low             |
-| cv_utils.halfSample()     | ❌ None   | Unit           | Medium          |
-| Frame Grabber Browser     | ❌ None   | Unit           | **HIGH**        |
-| Performance               | ❌ None   | Benchmark      | Medium          |
+|----------------------------|----------|----------------|-----------------|
+| Integration (end-to-end)   | ✅ Good   | Integration    | Low             |
+| Barcode Locator            | ✅ Good   | Unit           | Low             |
+| cv_utils.halfSample()      | ❌ None   | Unit           | Medium          |
+| Frame Grabber Browser      | ❌ None   | Unit           | **HIGH**        |
+| Performance                | ❌ None   | Benchmark      | Medium          |
 
 ### Recommendation
 
@@ -360,9 +375,9 @@ The duplicate canvas drawing issue is real, but without tests:
 - Review comment: https://github.com/ericblade/quagga2/pull/585#discussion_r2553324620
 
 ### Test Statistics
-- **Total integration tests:** 160
-- **Tests with halfSample enabled:** 109 (68%)
-- **Tests with halfSample disabled:** 51 (32%)
+- **Total integration tests analyzed:** 160
+- **Tests with halfSample enabled:** 109 (68.1%)
+- **Tests with halfSample disabled:** 51 (31.9%)
 - **Unit tests for halfSample path:** 2 (dimension checking only)
 - **Frame grabber unit tests:** 0 ❌
 
