@@ -407,8 +407,8 @@ describe('Parallel decoding works', () => {
 describe('External Reader Test, using test external code_128 reader', () => {
     // NOTE: This test demonstrates the external reader plugin API.
     // There is a known issue where external readers may fail intermittently in TypeScript
-    // test environments (see EXTERNAL_READER_ISSUES.md). The .allowFail mechanism
-    // handles this by skipping failing tests rather than failing the build.
+    // test environments. The .allowFail mechanism handles this by skipping failing tests
+    // rather than failing the build. This issue does not occur in production (compiled code).
     // External readers work correctly in production (compiled code).
     describe('works', () => {
         before(() => {
