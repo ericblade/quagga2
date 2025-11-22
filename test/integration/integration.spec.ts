@@ -26,8 +26,9 @@ if (typeof it.allowFail === 'undefined') {
 // Store timing data for performance comparison
 const timingData: { [key: string]: { withHalfSample: number[], withoutHalfSample: number[] } } = {};
 
-function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string) {
+function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string, fixturePath?: string) {
     const testLabel = halfSampleLabel ? `${name} (${halfSampleLabel})` : name;
+    const actualFixturePath = fixturePath || name;
     describe(`Decoder ${testLabel}`, () => {
         testSet.forEach((sample) => {
             // By default tests must pass in both environments
@@ -41,7 +42,7 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
                 const thisConfig = {
                     ...config,
-                    src: `${isBrowser ? '/' : ''}test/fixtures/${name}/${sample.name}`,
+                    src: `${isBrowser ? '/' : ''}test/fixtures/${actualFixturePath}/${sample.name}`,
                 };
                 const startTime = Date.now();
                 const result = await Quagga.decodeSingle(thisConfig);
@@ -77,11 +78,12 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
 function runDecoderTestBothHalfSample(
     name: string,
     configGenerator: (halfSample: boolean) => QuaggaJSConfigObject,
-    testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>
+    testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>,
+    fixturePath?: string
 ) {
     describe(`Decoder ${name} (both halfSample configurations)`, () => {
-        runDecoderTest(name, configGenerator(true), testSet, 'halfSample: true');
-        runDecoderTest(name, configGenerator(false), testSet, 'halfSample: false');
+        runDecoderTest(name, configGenerator(true), testSet, 'halfSample: true', fixturePath);
+        runDecoderTest(name, configGenerator(false), testSet, 'halfSample: false', fixturePath);
     });
 }
 
@@ -503,7 +505,7 @@ describe('External Reader Test, using test external code_128 reader', () => {
             decoder: {
                 readers: ['external_code_128_reader'],
             },
-        }), externalCode128TestSet);
+        }), externalCode128TestSet, 'code_128'); // Use code_128 fixture path
     });
 });
 
