@@ -147,16 +147,7 @@ These packages are **only used during build/development** and are **not bundled 
 
 ## Overrides
 
-The `overrides` field forces specific versions of transitive dependencies:
-
-```json
-"overrides": {
-  "@cypress/request": "^3.0.9"
-}
-```
-
-- **Purpose**: Security fix for `form-data` vulnerability (CVE in versions < 2.5.4)
-- **Details**: Cypress 13.17.0 bundles `@cypress/request@3.0.0` which depends on vulnerable `form-data@2.3.3`. This override forces `@cypress/request@^3.0.9` which uses safe `form-data@~4.0.4`.
+No package overrides are currently needed. Cypress 13.17.0+ uses `@cypress/request@^3.0.6` which includes the security fix for the `form-data` vulnerability (versions >= 3.0.6 use `form-data@~4.0.0` which is safe).
 
 ---
 
