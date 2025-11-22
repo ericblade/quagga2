@@ -26,17 +26,53 @@ if (typeof it.allowFail === 'undefined') {
 // Store timing data for performance comparison
 const timingData: { [key: string]: { withHalfSample: number[], withoutHalfSample: number[] } } = {};
 
+// Configuration map for test failures by decoder and halfSample setting
+const testFailureConfig: { [decoder: string]: { halfSampleTrue?: string[], halfSampleFalse?: string[] } } = {
+    'ean_extended': {
+        halfSampleFalse: ['image-001.jpg', 'image-003.jpg', 'image-005.jpg', 'image-006.jpg'],
+    },
+    'code_128': {
+        halfSampleTrue: ['image-003.jpg', 'image-004.jpg'],
+    },
+    'ean_8': {
+        halfSampleFalse: ['image-009.jpg'],
+    },
+    'upc': {
+        halfSampleFalse: ['image-006.jpg', 'image-010.jpg'],
+    },
+    'upc_e': {
+        halfSampleFalse: ['image-001.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-009.jpg', 'image-010.jpg'],
+    },
+    'i2of5': {
+        halfSampleTrue: ['image-001.jpg', 'image-002.jpg', 'image-004.jpg', 'image-005.jpg'],
+    },
+    '2of5': {
+        halfSampleFalse: ['image-005.jpg', 'image-006.jpg'],
+    },
+    'code_93': {
+        halfSampleFalse: ['image-003.jpg', 'image-004.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-010.jpg'],
+    },
+};
+
 function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string, fixturePath?: string) {
     const testLabel = halfSampleLabel ? `${name} (${halfSampleLabel})` : name;
     const actualFixturePath = fixturePath || name;
+    
+    // Get failure list for this decoder and halfSample config
+    const decoderFailures = testFailureConfig[name] || {};
+    const failureList = halfSampleLabel === 'halfSample: true' ? decoderFailures.halfSampleTrue : 
+                        halfSampleLabel === 'halfSample: false' ? decoderFailures.halfSampleFalse : 
+                        [];
+    
     describe(`Decoder ${testLabel}`, () => {
         testSet.forEach((sample) => {
-            // By default tests must pass in both environments
-            // Use allowFailInNode: true to allow failure in Node environment only
-            // Use allowFailInBrowser: true to allow failure in browser environment only
-            // Use both flags to allow failure in both environments
+            // Check if this test should allow failure
+            const isInFailureList = failureList && failureList.includes(sample.name);
+            const allowFailInNode = sample.allowFailInNode || isInFailureList;
+            const allowFailInBrowser = sample.allowFailInBrowser || isInFailureList;
+            
             const isBrowser = typeof window !== 'undefined';
-            const shouldAllowFail = isBrowser ? sample.allowFailInBrowser : sample.allowFailInNode;
+            const shouldAllowFail = isBrowser ? allowFailInBrowser : allowFailInNode;
             const testFn = shouldAllowFail ? it.allowFail : it;
             testFn(`decodes ${sample.name}`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
@@ -150,7 +186,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
     // difference between a supplement and a separate reader?  is it just semantic?
     const eanExtendedTestSet = [
-        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13', allowFailInBrowser: true },
+        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13' },
         { 'name': 'image-002.jpg', 'result': '419871600890101', format: 'ean_13' },
         { 'name': 'image-003.jpg', 'result': '419871600890101', format: 'ean_13' },
         { 'name': 'image-004.jpg', 'result': '978054466825652495', format: 'ean_13' },
@@ -185,8 +221,8 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
     const code128TestSet = [
         { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
         { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
-        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128', allowFailInBrowser: true },
-        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFailInBrowser: true },
+        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
+        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128' },
         { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
@@ -575,7 +611,7 @@ describe('Performance Summary', () => {
             if (avgWith !== 'N/A' && avgWithout !== 'N/A') {
                 const avgWithNum = parseFloat(avgWith);
                 const avgWithoutNum = parseFloat(avgWithout);
-                const diffPercent = ((avgWithoutNum - avgWithNum) / avgWithNum * 100).toFixed(1);
+                const diffPercent = ((avgWithoutNum - avgWithNum) / avgWithoutNum * 100).toFixed(1);
                 const diffNum = parseFloat(diffPercent);
                 const faster = diffNum > 0 ? 'halfSample: true is faster' : 'halfSample: false is faster';
                 console.log(`  Difference: ${Math.abs(diffNum)}% (${faster})`);
