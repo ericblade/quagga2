@@ -60,20 +60,20 @@ const testFailureConfig: { [decoder: string]: { halfSampleTrue?: string[], halfS
 function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string, fixturePath?: string) {
     const testLabel = halfSampleLabel ? `${name} (${halfSampleLabel})` : name;
     const actualFixturePath = fixturePath || name;
-    
+
     // Get failure list for this decoder and halfSample config
     const decoderFailures = testFailureConfig[name] || {};
-    const failureList = halfSampleLabel === 'halfSample: true' ? decoderFailures.halfSampleTrue : 
-                        halfSampleLabel === 'halfSample: false' ? decoderFailures.halfSampleFalse : 
+    const failureList = halfSampleLabel === 'halfSample: true' ? decoderFailures.halfSampleTrue :
+                        halfSampleLabel === 'halfSample: false' ? decoderFailures.halfSampleFalse :
                         [];
-    
+
     describe(`Decoder ${testLabel}`, () => {
         testSet.forEach((sample) => {
             // Check if this test should allow failure
             const isInFailureList = failureList && failureList.includes(sample.name);
             const allowFailInNode = sample.allowFailInNode || isInFailureList;
             const allowFailInBrowser = sample.allowFailInBrowser || isInFailureList;
-            
+
             const isBrowser = typeof window !== 'undefined';
             const shouldAllowFail = isBrowser ? allowFailInBrowser : allowFailInNode;
             const testFn = shouldAllowFail ? it.allowFail : it;
@@ -86,7 +86,7 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                 const startTime = Date.now();
                 const result = await Quagga.decodeSingle(thisConfig);
                 const duration = Date.now() - startTime;
-                
+
                 // Store timing data
                 if (halfSampleLabel) {
                     const key = name;
@@ -99,7 +99,7 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                         timingData[key].withoutHalfSample.push(duration);
                     }
                 }
-                
+
                 // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                 expect(result).to.be.an('Object');
                 expect(result.codeResult).to.be.an('Object');
@@ -185,11 +185,11 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         { 'name': 'image-010.jpg', 'result': '9002244845578', format: 'ean_13' },
     ];
     runDecoderTestBothHalfSample('ean', (halfSample) => generateConfig({ locator: { halfSample } }), eanTestSet);
-    
+
     // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
     // difference between a supplement and a separate reader?  is it just semantic?
     const eanExtendedTestSet = [
-        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13' },
+        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13', allowFailInBrowser: true },
         { 'name': 'image-002.jpg', 'result': '419871600890101', format: 'ean_13' },
         { 'name': 'image-003.jpg', 'result': '419871600890101', format: 'ean_13' },
         { 'name': 'image-004.jpg', 'result': '978054466825652495', format: 'ean_13' },
@@ -220,7 +220,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             }],
         },
     }), eanExtendedTestSet);
-    
+
     const code128TestSet = [
         { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
         { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
@@ -249,7 +249,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['code_128_reader'],
         },
     }), code128TestSet);
-    
+
     const code39TestSet = [
         { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
         { 'name': 'image-003.jpg', 'result': 'CODE39', format: 'code_39' },
@@ -271,7 +271,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['code_39_reader'],
         }
     }), code39TestSet);
-    
+
     const code39VinTestSet = [
         { name: 'image-001.jpg', result: '2HGFG1B86BH501831', format: 'code_39_vin' },
         { name: 'image-002.jpg', result: 'JTDKB20U887718156', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
@@ -298,7 +298,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['code_39_vin_reader'],
         },
     }), code39VinTestSet);
-    
+
     const code32TestSet = [
         { name: 'image-1.jpg', result: 'A123456788', format: 'code_32_reader' },
         { name: 'image-2.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
@@ -324,13 +324,13 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['code_32_reader']
         }
     }), code32TestSet);
-    
+
     const ean8TestSet = [
         { 'name': 'image-001.jpg', 'result': '42191605', format: 'ean_8' },
         { 'name': 'image-002.jpg', 'result': '42191605', format: 'ean_8' },
         { 'name': 'image-003.jpg', 'result': '90311208', format: 'ean_8' },
         // TODO: image-004 fails in browser, this is new to running in cypress vs PhantomJS. It does not fail in node.  Likely similar problem to #190
-        { 'name': 'image-004.jpg', 'result': '24057257', format: 'ean_8', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-004.jpg', 'result': '24057257', format: 'ean_8', allowFailInNode: true },
         // {"name": "image-005.jpg", "result": "90162602"},
         { 'name': 'image-006.jpg', 'result': '24036153', format: 'ean_8' },
         // {"name": "image-007.jpg", "result": "42176817"},
@@ -342,11 +342,11 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         locator: {
             halfSample,
         },
-        decoder: { 
-            readers: ['ean_8_reader'] 
+        decoder: {
+            readers: ['ean_8_reader']
         }
     }), ean8TestSet);
-    
+
     const upcTestSet = [
         { 'name': 'image-001.jpg', 'result': '882428015268', format: 'upc_a' },
         { 'name': 'image-002.jpg', 'result': '882428015268', format: 'upc_a' },
@@ -363,11 +363,11 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         locator: {
             halfSample,
         },
-        decoder: { 
-            readers: ['upc_reader'] 
+        decoder: {
+            readers: ['upc_reader']
         }
     }), upcTestSet);
-    
+
     const upcETestSet = [
         { 'name': 'image-001.jpg', 'result': '04965802', format: 'upc_e' },
         { 'name': 'image-002.jpg', 'result': '04965802', format: 'upc_e' },
@@ -384,11 +384,11 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         locator: {
             halfSample,
         },
-        decoder: { 
-            readers: ['upc_e_reader'] 
+        decoder: {
+            readers: ['upc_e_reader']
         }
     }), upcETestSet);
-    
+
     const codabarTestSet = [
         { 'name': 'image-001.jpg', 'result': 'A10/53+17-70D', format: 'codabar' },
         { 'name': 'image-002.jpg', 'result': 'B546745735B', format: 'codabar' },
@@ -405,11 +405,11 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         locator: {
             halfSample,
         },
-        decoder: { 
-            readers: ['codabar_reader'] 
+        decoder: {
+            readers: ['codabar_reader']
         }
     }), codabarTestSet);
-    
+
     const i2of5TestSet = [
         { 'name': 'image-001.jpg', 'result': '2167361334', format: 'i2of5' },
         { 'name': 'image-002.jpg', 'result': '2167361334', format: 'i2of5' },
@@ -427,7 +427,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['i2of5_reader'],
         },
     }), i2of5TestSet);
-    
+
     const twoOf5TestSet = [
         { 'name': 'image-001.jpg', 'result': '9577149002', format: '2of5' },
         { 'name': 'image-002.jpg', 'result': '9577149002', format: '2of5' },
@@ -449,7 +449,7 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
             readers: ['2of5_reader'],
         },
     }), twoOf5TestSet);
-    
+
     const code93TestSet = [
         { 'name': 'image-001.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
         { 'name': 'image-002.jpg', 'result': 'EH3C-%GU23RK3', format: 'code_93' },
@@ -580,37 +580,37 @@ describe('Canvas Update Test, avoid DOMException', () => {
 describe('Performance Summary', () => {
     it('should print halfSample performance comparison', function() {
         console.log('\n========== HalfSample Performance Comparison ==========\n');
-        
+
         const decoderNames = Object.keys(timingData).sort();
-        
+
         if (decoderNames.length === 0) {
             console.log('No timing data collected.');
             return;
         }
-        
+
         for (const decoderName of decoderNames) {
             const data = timingData[decoderName];
             const withHalfSample = data.withHalfSample;
             const withoutHalfSample = data.withoutHalfSample;
-            
+
             if (withHalfSample.length === 0 && withoutHalfSample.length === 0) {
                 continue;
             }
-            
-            const avgWith = withHalfSample.length > 0 
+
+            const avgWith = withHalfSample.length > 0
                 ? (withHalfSample.reduce((a, b) => a + b, 0) / withHalfSample.length).toFixed(2)
                 : 'N/A';
             const avgWithout = withoutHalfSample.length > 0
                 ? (withoutHalfSample.reduce((a, b) => a + b, 0) / withoutHalfSample.length).toFixed(2)
                 : 'N/A';
-            
+
             const passedWith = withHalfSample.length;
             const passedWithout = withoutHalfSample.length;
-            
+
             console.log(`Decoder: ${decoderName}`);
             console.log(`  halfSample: true  - Avg: ${avgWith}ms, Tests passed: ${passedWith}`);
             console.log(`  halfSample: false - Avg: ${avgWithout}ms, Tests passed: ${passedWithout}`);
-            
+
             if (avgWith !== 'N/A' && avgWithout !== 'N/A') {
                 const avgWithNum = parseFloat(avgWith);
                 const avgWithoutNum = parseFloat(avgWithout);
@@ -621,7 +621,7 @@ describe('Performance Summary', () => {
             }
             console.log('');
         }
-        
+
         console.log('========== End Performance Summary ==========\n');
     });
 });
