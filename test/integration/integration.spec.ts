@@ -72,3 +72,53 @@ describe('Canvas Update Test, avoid DOMException', () => {
         );
     });
 });
+
+// Print performance summary after all tests complete
+describe('Performance Summary', () => {
+    it('should print halfSample performance comparison', function() {
+        console.log('\n========== HalfSample Performance Comparison ==========\n');
+        
+        const decoderNames = Object.keys(timingData).sort();
+        
+        if (decoderNames.length === 0) {
+            console.log('No timing data collected.');
+            return;
+        }
+        
+        for (const decoderName of decoderNames) {
+            const data = timingData[decoderName];
+            const withHalfSample = data.withHalfSample;
+            const withoutHalfSample = data.withoutHalfSample;
+            
+            if (withHalfSample.length === 0 && withoutHalfSample.length === 0) {
+                continue;
+            }
+            
+            const avgWith = withHalfSample.length > 0 
+                ? (withHalfSample.reduce((a, b) => a + b, 0) / withHalfSample.length).toFixed(2)
+                : 'N/A';
+            const avgWithout = withoutHalfSample.length > 0
+                ? (withoutHalfSample.reduce((a, b) => a + b, 0) / withoutHalfSample.length).toFixed(2)
+                : 'N/A';
+            
+            const passedWith = withHalfSample.length;
+            const passedWithout = withoutHalfSample.length;
+            
+            console.log(`Decoder: ${decoderName}`);
+            console.log(`  halfSample: true  - Avg: ${avgWith}ms, Tests passed: ${passedWith}`);
+            console.log(`  halfSample: false - Avg: ${avgWithout}ms, Tests passed: ${passedWithout}`);
+            
+            if (avgWith !== 'N/A' && avgWithout !== 'N/A') {
+                const avgWithNum = parseFloat(avgWith);
+                const avgWithoutNum = parseFloat(avgWithout);
+                const diffPercent = ((avgWithoutNum - avgWithNum) / avgWithoutNum * 100).toFixed(1);
+                const diffNum = parseFloat(diffPercent);
+                const faster = diffNum > 0 ? 'halfSample: true is faster' : 'halfSample: false is faster';
+                console.log(`  Difference: ${Math.abs(diffNum)}% (${faster})`);
+            }
+            console.log('');
+        }
+        
+        console.log('========== End Performance Summary ==========\n');
+    });
+});
