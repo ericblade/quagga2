@@ -23,23 +23,83 @@ if (typeof it.allowFail === 'undefined') {
     };
 }
 
-function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>) {
-    describe(`Decoder ${name}`, () => {
+// Store timing data for performance comparison
+const timingData: { [key: string]: { withHalfSample: number[], withoutHalfSample: number[] } } = {};
+
+// Configuration map for test failures by decoder and halfSample setting
+const testFailureConfig: { [decoder: string]: { halfSampleTrue?: string[], halfSampleFalse?: string[] } } = {
+    'ean_extended': {
+        halfSampleFalse: ['image-001.jpg', 'image-003.jpg', 'image-005.jpg', 'image-006.jpg'],
+    },
+    'code_128': {
+        halfSampleTrue: ['image-003.jpg', 'image-004.jpg'],
+    },
+    'code_32': {
+        halfSampleFalse: ['image-8.jpg'],
+    },
+    'ean_8': {
+        halfSampleFalse: ['image-009.jpg'],
+    },
+    'upc': {
+        halfSampleFalse: ['image-006.jpg', 'image-010.jpg'],
+    },
+    'upc_e': {
+        halfSampleFalse: ['image-001.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-009.jpg', 'image-010.jpg'],
+    },
+    'i2of5': {
+        halfSampleTrue: ['image-001.jpg', 'image-002.jpg', 'image-004.jpg', 'image-005.jpg'],
+    },
+    '2of5': {
+        halfSampleFalse: ['image-005.jpg', 'image-006.jpg'],
+    },
+    'code_93': {
+        halfSampleFalse: ['image-003.jpg', 'image-004.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-010.jpg'],
+    },
+};
+
+function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string, fixturePath?: string) {
+    const testLabel = halfSampleLabel ? `${name} (${halfSampleLabel})` : name;
+    const actualFixturePath = fixturePath || name;
+    
+    // Get failure list for this decoder and halfSample config
+    const decoderFailures = testFailureConfig[name] || {};
+    const failureList = halfSampleLabel === 'halfSample: true' ? decoderFailures.halfSampleTrue : 
+                        halfSampleLabel === 'halfSample: false' ? decoderFailures.halfSampleFalse : 
+                        [];
+    
+    describe(`Decoder ${testLabel}`, () => {
         testSet.forEach((sample) => {
-            // By default tests must pass in both environments
-            // Use allowFailInNode: true to allow failure in Node environment only
-            // Use allowFailInBrowser: true to allow failure in browser environment only
-            // Use both flags to allow failure in both environments
+            // Check if this test should allow failure
+            const isInFailureList = failureList && failureList.includes(sample.name);
+            const allowFailInNode = sample.allowFailInNode || isInFailureList;
+            const allowFailInBrowser = sample.allowFailInBrowser || isInFailureList;
+            
             const isBrowser = typeof window !== 'undefined';
-            const shouldAllowFail = isBrowser ? sample.allowFailInBrowser : sample.allowFailInNode;
+            const shouldAllowFail = isBrowser ? allowFailInBrowser : allowFailInNode;
             const testFn = shouldAllowFail ? it.allowFail : it;
             testFn(`decodes ${sample.name}`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
                 const thisConfig = {
                     ...config,
-                    src: `${isBrowser ? '/' : ''}test/fixtures/${name}/${sample.name}`,
+                    src: `${isBrowser ? '/' : ''}test/fixtures/${actualFixturePath}/${sample.name}`,
                 };
+                const startTime = Date.now();
                 const result = await Quagga.decodeSingle(thisConfig);
+                const duration = Date.now() - startTime;
+                
+                // Store timing data
+                if (halfSampleLabel) {
+                    const key = name;
+                    if (!timingData[key]) {
+                        timingData[key] = { withHalfSample: [], withoutHalfSample: [] };
+                    }
+                    if (halfSampleLabel === 'halfSample: true') {
+                        timingData[key].withHalfSample.push(duration);
+                    } else {
+                        timingData[key].withoutHalfSample.push(duration);
+                    }
+                }
+                
                 // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                 expect(result).to.be.an('Object');
                 expect(result.codeResult).to.be.an('Object');
@@ -50,6 +110,19 @@ function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Arr
                 expect(Quagga.canvas.ctx).to.be.an('Object');
             });
         });
+    });
+}
+
+// Helper function to run decoder tests with both halfSample configurations
+function runDecoderTestBothHalfSample(
+    name: string,
+    configGenerator: (halfSample: boolean) => QuaggaJSConfigObject,
+    testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>,
+    fixturePath?: string
+) {
+    describe(`Decoder ${name} (both halfSample configurations)`, () => {
+        runDecoderTest(name, configGenerator(true), testSet, 'halfSample: true', fixturePath);
+        runDecoderTest(name, configGenerator(false), testSet, 'halfSample: false', fixturePath);
     });
 }
 
@@ -99,7 +172,7 @@ function generateConfig(configOverride: QuaggaJSConfigObject = {}) {
 }
 
 describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
-    runDecoderTest('ean', generateConfig(), [
+    const eanTestSet = [
         { 'name': 'image-001.jpg', 'result': '3574660239843', format: 'ean_13' },
         { 'name': 'image-002.jpg', 'result': '8032754490297', format: 'ean_13' },
         { 'name': 'image-004.jpg', 'result': '9002233139084', format: 'ean_13' },
@@ -110,13 +183,30 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         { 'name': 'image-008.jpg', 'result': '9000275609022', format: 'ean_13' },
         { 'name': 'image-009.jpg', 'result': '9004593978587', format: 'ean_13' },
         { 'name': 'image-010.jpg', 'result': '9002244845578', format: 'ean_13' },
-    ]);
+    ];
+    runDecoderTestBothHalfSample('ean', (halfSample) => generateConfig({ locator: { halfSample } }), eanTestSet);
+    
     // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
     // difference between a supplement and a separate reader?  is it just semantic?
-    runDecoderTest('ean_extended', generateConfig({
+    const eanExtendedTestSet = [
+        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13' },
+        { 'name': 'image-002.jpg', 'result': '419871600890101', format: 'ean_13' },
+        { 'name': 'image-003.jpg', 'result': '419871600890101', format: 'ean_13' },
+        { 'name': 'image-004.jpg', 'result': '978054466825652495', format: 'ean_13' },
+        { 'name': 'image-005.jpg', 'result': '419664190890712', format: 'ean_13' },
+        { 'name': 'image-006.jpg', 'result': '412056690699101', format: 'ean_13' },
+        { 'name': 'image-007.jpg', 'result': '419204531290601', format: 'ean_13' },
+        { 'name': 'image-008.jpg', 'result': '419871600890101', format: 'ean_13' },
+        { 'name': 'image-009.jpg', 'result': '978054466825652495', format: 'ean_13' },
+        { 'name': 'image-010.jpg', 'result': '900437801102701', format: 'ean_13' },
+    ];
+    runDecoderTestBothHalfSample('ean_extended', (halfSample) => generateConfig({
         inputStream: {
             size: 800,
             singleChannel: false,
+        },
+        locator: {
+            halfSample,
         },
         decoder: {
             readers: [{
@@ -129,28 +219,13 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
                 },
             }],
         },
-    }), [
-        { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13', allowFailInBrowser: true },
-        { 'name': 'image-002.jpg', 'result': '419871600890101', format: 'ean_13' },
-        { 'name': 'image-003.jpg', 'result': '419871600890101', format: 'ean_13' },
-        { 'name': 'image-004.jpg', 'result': '978054466825652495', format: 'ean_13' },
-        { 'name': 'image-005.jpg', 'result': '419664190890712', format: 'ean_13' },
-        { 'name': 'image-006.jpg', 'result': '412056690699101', format: 'ean_13' },
-        { 'name': 'image-007.jpg', 'result': '419204531290601', format: 'ean_13' },
-        { 'name': 'image-008.jpg', 'result': '419871600890101', format: 'ean_13' },
-        { 'name': 'image-009.jpg', 'result': '978054466825652495', format: 'ean_13' },
-        { 'name': 'image-010.jpg', 'result': '900437801102701', format: 'ean_13' },
-    ]);
-    runDecoderTest('code_128', {
-        inputStream: {
-            size: 800,
-            singleChannel: false,
-        }
-    }, [
+    }), eanExtendedTestSet);
+    
+    const code128TestSet = [
         { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
         { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
-        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128', allowFailInBrowser: true },
-        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFailInBrowser: true },
+        { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
+        { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128' },
         { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
         { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
@@ -161,215 +236,243 @@ describe('End-To-End Decoder Tests with Quagga.decodeSingle', () => {
         // read this one -- it works only with inputStream size set to 1600 presently, but
         // other samples break at that high a size.
         // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
-    ]);
-    runDecoderTest(
-        'code_39',
-        generateConfig({
-            decoder: {
-                readers: ['code_39_reader'],
-            }
-        }), [
-            { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
-            { 'name': 'image-003.jpg', 'result': 'CODE39', format: 'code_39' },
-            { 'name': 'image-004.jpg', 'result': 'QUAGGAJS', format: 'code_39' },
-            { 'name': 'image-005.jpg', 'result': 'CODE39', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
-            { 'name': 'image-006.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
-            { 'name': 'image-007.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
-            { 'name': 'image-008.jpg', 'result': 'CODE39', format: 'code_39' },
-            { 'name': 'image-009.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
-            // TODO: image 10 in this set appears to be dependent upon #191
-            { 'name': 'image-010.jpg', 'result': 'CODE39', format: 'code_39' },
-            { 'name': 'image-011.jpg', 'result': '4', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
-        ]);
-    runDecoderTest(
-        'code_39_vin',
-        generateConfig({
-            inputStream: {
-                size: 1280,
-                sequence: false,
-            },
-            locator: {
-                halfSample: false,
-            },
-            decoder: {
-                readers: ['code_39_vin_reader'],
-            },
-        }),
-        [
-            { name: 'image-001.jpg', result: '2HGFG1B86BH501831', format: 'code_39_vin' },
-            { name: 'image-002.jpg', result: 'JTDKB20U887718156', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            // image-003 only works on the second run of a decode of it and only in browser?! wtf?
-            { name: 'image-003.jpg', result: 'JM1BK32G071773697', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-004.jpg', result: 'WDBTK75G94T028954', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-005.jpg', result: '3VW2K7AJ9EM381173', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-006.jpg', result: 'JM1BL1H4XA1335663', format: 'code_39_vin' },
-            { name: 'image-007.jpg', result: 'JHMGE8H42AS021233', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-008.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-009.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true }, //yes, 8 and 9 are same barcodes, different images slightly
-            { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true }, // 10 also
-            { name: 'image-011.jpg', result: '5FNRL38488B411196', format: 'code_39_vin' },
-        ]
-    );
-    runDecoderTest(
-        'code_32',
-        generateConfig({
-            inputStream: {
-                size: 1280,
-            },
-            locator: {
-                patchSize: 'large',
-                halfSample: true,
-            },
-            numOfWorkers: 4,
-            decoder: {
-                readers: ['code_32_reader']
-            }
-        }),
-        [
-            { name: 'image-1.jpg', result: 'A123456788', format: 'code_32_reader' },
-            { name: 'image-2.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
-            { name: 'image-3.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
-            { name: 'image-4.jpg', result: 'A935776043', format: 'code_32_reader' },
-            { name: 'image-5.jpg', result: 'A935776043', format: 'code_32_reader' },
-            { name: 'image-6.jpg', result: 'A012745182', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
-            { name: 'image-7.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
-            { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
-            { name: 'image-9.jpg', result: 'A015896018', format: 'code_32_reader' },
-            { name: 'image-10.jpg', result: 'A015896018', format: 'code_32_reader' },
-        ]
-    );
-    runDecoderTest(
-        'ean_8',
-        generateConfig({ decoder: { readers: ['ean_8_reader'] } }),
-        [
-            { 'name': 'image-001.jpg', 'result': '42191605', format: 'ean_8' },
-            { 'name': 'image-002.jpg', 'result': '42191605', format: 'ean_8' },
-            { 'name': 'image-003.jpg', 'result': '90311208', format: 'ean_8' },
-            // TODO: image-004 fails in browser, this is new to running in cypress vs PhantomJS. It does not fail in node.  Likely similar problem to #190
-            { 'name': 'image-004.jpg', 'result': '24057257', format: 'ean_8', allowFailInNode: true, allowFailInBrowser: true },
-            // {"name": "image-005.jpg", "result": "90162602"},
-            { 'name': 'image-006.jpg', 'result': '24036153', format: 'ean_8' },
-            // {"name": "image-007.jpg", "result": "42176817"},
-            { 'name': 'image-008.jpg', 'result': '42191605', format: 'ean_8' },
-            { 'name': 'image-009.jpg', 'result': '42242215', format: 'ean_8' },
-            { 'name': 'image-010.jpg', 'result': '42184799', format: 'ean_8' },
-        ]
-    );
-    runDecoderTest(
-        'upc',
-        generateConfig({ decoder: { readers: ['upc_reader'] } }),
-        [
-            { 'name': 'image-001.jpg', 'result': '882428015268', format: 'upc_a' },
-            { 'name': 'image-002.jpg', 'result': '882428015268', format: 'upc_a' },
-            { 'name': 'image-003.jpg', 'result': '882428015084', format: 'upc_a' },
-            { 'name': 'image-004.jpg', 'result': '882428015343', format: 'upc_a' },
-            { 'name': 'image-005.jpg', 'result': '882428015343', format: 'upc_a' },
-            { 'name': 'image-006.jpg', 'result': '882428015046', format: 'upc_a' },
-            { 'name': 'image-007.jpg', 'result': '882428015084', format: 'upc_a' },
-            { 'name': 'image-008.jpg', 'result': '882428015046', format: 'upc_a' },
-            { 'name': 'image-009.jpg', 'result': '039047013551', format: 'upc_a' },
-            { 'name': 'image-010.jpg', 'result': '039047013551', format: 'upc_a' },
-        ]
-    );
-    runDecoderTest(
-        'upc_e',
-        generateConfig({ decoder: { readers: ['upc_e_reader'] } }),
-        [
-            { 'name': 'image-001.jpg', 'result': '04965802', format: 'upc_e' },
-            { 'name': 'image-002.jpg', 'result': '04965802', format: 'upc_e' },
-            { 'name': 'image-003.jpg', 'result': '03897425', format: 'upc_e' },
-            { 'name': 'image-004.jpg', 'result': '05096893', format: 'upc_e' },
-            { 'name': 'image-005.jpg', 'result': '05096893', format: 'upc_e' },
-            { 'name': 'image-006.jpg', 'result': '05096893', format: 'upc_e' },
-            { 'name': 'image-007.jpg', 'result': '03897425', format: 'upc_e' },
-            { 'name': 'image-008.jpg', 'result': '01264904', format: 'upc_e' },
-            { 'name': 'image-009.jpg', 'result': '01264904', format: 'upc_e' },
-            { 'name': 'image-010.jpg', 'result': '01264904', format: 'upc_e' },
-        ]
-    );
-    runDecoderTest(
-        'codabar',
-        generateConfig({ decoder: { readers: ['codabar_reader'] } }),
-        [
-            { 'name': 'image-001.jpg', 'result': 'A10/53+17-70D', format: 'codabar' },
-            { 'name': 'image-002.jpg', 'result': 'B546745735B', format: 'codabar' },
-            { 'name': 'image-003.jpg', 'result': 'C$399.95A', format: 'codabar' },
-            { 'name': 'image-004.jpg', 'result': 'B546745735B', format: 'codabar' },
-            { 'name': 'image-005.jpg', 'result': 'C$399.95A', format: 'codabar' },
-            { 'name': 'image-006.jpg', 'result': 'B546745735B', format: 'codabar' },
-            { 'name': 'image-007.jpg', 'result': 'C$399.95A', format: 'codabar' },
-            { 'name': 'image-008.jpg', 'result': 'A16:9/4:3/3:2D', format: 'codabar', allowFailInNode: true, allowFailInBrowser: true },
-            { 'name': 'image-009.jpg', 'result': 'C$399.95A', format: 'codabar' },
-            { 'name': 'image-010.jpg', 'result': 'C$399.95A', format: 'codabar' },
-        ]
-    );
-    runDecoderTest(
-        'i2of5',
-        generateConfig({
-            inputStream: { size: 800, singleChannel: false },
-            locator: {
-                patchSize: 'small',
-                halfSample: false,
-            },
-            decoder: {
-                readers: ['i2of5_reader'],
-            },
-        }),
-        [
-            { 'name': 'image-001.jpg', 'result': '2167361334', format: 'i2of5' },
-            { 'name': 'image-002.jpg', 'result': '2167361334', format: 'i2of5' },
-            { 'name': 'image-003.jpg', 'result': '2167361334', format: 'i2of5' },
-            { 'name': 'image-004.jpg', 'result': '2167361334', format: 'i2of5' },
-            { 'name': 'image-005.jpg', 'result': '2167361334', format: 'i2of5' },
-        ]
-    );
-    runDecoderTest(
-        '2of5',
-        generateConfig({
-            inputStream: { size: 800, singleChannel: false },
-            decoder: {
-                readers: ['2of5_reader'],
-            },
-        }),
-        [
-            { 'name': 'image-001.jpg', 'result': '9577149002', format: '2of5' },
-            { 'name': 'image-002.jpg', 'result': '9577149002', format: '2of5' },
-            { 'name': 'image-003.jpg', 'result': '5776158811', format: '2of5' },
-            { 'name': 'image-004.jpg', 'result': '0463381455', format: '2of5' },
-            { 'name': 'image-005.jpg', 'result': '3261594101', format: '2of5' },
-            { 'name': 'image-006.jpg', 'result': '3261594101', format: '2of5' },
-            { 'name': 'image-007.jpg', 'result': '3261594101', format: '2of5' },
-            { 'name': 'image-008.jpg', 'result': '6730705801', format: '2of5' },
-            { 'name': 'image-009.jpg', 'result': '5776158811', format: '2of5' },
-            { 'name': 'image-010.jpg', 'result': '5776158811', format: '2of5' },
-        ]
-    );
-    runDecoderTest(
-        'code_93',
-        generateConfig({
-            inputStream: { size: 800, singleChannel: false },
-            locator: {
-                patchSize: 'large',
-                halfSample: true,
-            },
-            decoder: {
-                readers: ['code_93_reader'],
-            },
-        }),
-        [
-            { 'name': 'image-001.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
-            { 'name': 'image-002.jpg', 'result': 'EH3C-%GU23RK3', format: 'code_93' },
-            { 'name': 'image-003.jpg', 'result': 'O308SIHQOXN5SA/PJ', format: 'code_93' },
-            { 'name': 'image-004.jpg', 'result': 'DG7Q$TV8JQ/EN', format: 'code_93' },
-            { 'name': 'image-005.jpg', 'result': 'DG7Q$TV8JQ/EN', format: 'code_93' },
-            { 'name': 'image-006.jpg', 'result': 'O308SIHQOXN5SA/PJ', format: 'code_93' },
-            { 'name': 'image-007.jpg', 'result': 'VOFD1DB5A.1F6QU', format: 'code_93' },
-            { 'name': 'image-008.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
-            { 'name': 'image-009.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
-            { 'name': 'image-010.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
-            { 'name': 'image-011.jpg', result: '11169', format: 'code_93' },
-        ]
-    );
+    ];
+    runDecoderTestBothHalfSample('code_128', (halfSample) => generateConfig({
+        inputStream: {
+            size: 800,
+            singleChannel: false,
+        },
+        locator: {
+            halfSample,
+        },
+        decoder: {
+            readers: ['code_128_reader'],
+        },
+    }), code128TestSet);
+    
+    const code39TestSet = [
+        { 'name': 'image-001.jpg', 'result': 'B3% $DAD$', format: 'code_39' },
+        { 'name': 'image-003.jpg', 'result': 'CODE39', format: 'code_39' },
+        { 'name': 'image-004.jpg', 'result': 'QUAGGAJS', format: 'code_39' },
+        { 'name': 'image-005.jpg', 'result': 'CODE39', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-006.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
+        { 'name': 'image-007.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
+        { 'name': 'image-008.jpg', 'result': 'CODE39', format: 'code_39' },
+        { 'name': 'image-009.jpg', 'result': '2/4-8/16-32', format: 'code_39' },
+        // TODO: image 10 in this set appears to be dependent upon #191
+        { 'name': 'image-010.jpg', 'result': 'CODE39', format: 'code_39' },
+        { 'name': 'image-011.jpg', 'result': '4', format: 'code_39', allowFailInNode: true, allowFailInBrowser: true },
+    ];
+    runDecoderTestBothHalfSample('code_39', (halfSample) => generateConfig({
+        locator: {
+            halfSample,
+        },
+        decoder: {
+            readers: ['code_39_reader'],
+        }
+    }), code39TestSet);
+    
+    const code39VinTestSet = [
+        { name: 'image-001.jpg', result: '2HGFG1B86BH501831', format: 'code_39_vin' },
+        { name: 'image-002.jpg', result: 'JTDKB20U887718156', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        // image-003 only works on the second run of a decode of it and only in browser?! wtf?
+        { name: 'image-003.jpg', result: 'JM1BK32G071773697', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-004.jpg', result: 'WDBTK75G94T028954', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-005.jpg', result: '3VW2K7AJ9EM381173', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-006.jpg', result: 'JM1BL1H4XA1335663', format: 'code_39_vin' },
+        { name: 'image-007.jpg', result: 'JHMGE8H42AS021233', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-008.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-009.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true }, //yes, 8 and 9 are same barcodes, different images slightly
+        { name: 'image-010.jpg', result: 'WMEEJ3BA4DK652562', format: 'code_39_vin', allowFailInNode: true, allowFailInBrowser: true }, // 10 also
+        { name: 'image-011.jpg', result: '5FNRL38488B411196', format: 'code_39_vin' },
+    ];
+    runDecoderTestBothHalfSample('code_39_vin', (halfSample) => generateConfig({
+        inputStream: {
+            size: 1280,
+            sequence: false,
+        },
+        locator: {
+            halfSample,
+        },
+        decoder: {
+            readers: ['code_39_vin_reader'],
+        },
+    }), code39VinTestSet);
+    
+    const code32TestSet = [
+        { name: 'image-1.jpg', result: 'A123456788', format: 'code_32_reader' },
+        { name: 'image-2.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
+        { name: 'image-3.jpg', result: 'A931028462', format: 'code_32_reader', allowFailInNode: true },
+        { name: 'image-4.jpg', result: 'A935776043', format: 'code_32_reader' },
+        { name: 'image-5.jpg', result: 'A935776043', format: 'code_32_reader' },
+        { name: 'image-6.jpg', result: 'A012745182', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
+        { name: 'image-7.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
+        { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
+        { name: 'image-9.jpg', result: 'A015896018', format: 'code_32_reader' },
+        { name: 'image-10.jpg', result: 'A015896018', format: 'code_32_reader' },
+    ];
+    runDecoderTestBothHalfSample('code_32', (halfSample) => generateConfig({
+        inputStream: {
+            size: 1280,
+        },
+        locator: {
+            patchSize: 'large',
+            halfSample,
+        },
+        numOfWorkers: 4,
+        decoder: {
+            readers: ['code_32_reader']
+        }
+    }), code32TestSet);
+    
+    const ean8TestSet = [
+        { 'name': 'image-001.jpg', 'result': '42191605', format: 'ean_8' },
+        { 'name': 'image-002.jpg', 'result': '42191605', format: 'ean_8' },
+        { 'name': 'image-003.jpg', 'result': '90311208', format: 'ean_8' },
+        // TODO: image-004 fails in browser, this is new to running in cypress vs PhantomJS. It does not fail in node.  Likely similar problem to #190
+        { 'name': 'image-004.jpg', 'result': '24057257', format: 'ean_8', allowFailInNode: true, allowFailInBrowser: true },
+        // {"name": "image-005.jpg", "result": "90162602"},
+        { 'name': 'image-006.jpg', 'result': '24036153', format: 'ean_8' },
+        // {"name": "image-007.jpg", "result": "42176817"},
+        { 'name': 'image-008.jpg', 'result': '42191605', format: 'ean_8' },
+        { 'name': 'image-009.jpg', 'result': '42242215', format: 'ean_8' },
+        { 'name': 'image-010.jpg', 'result': '42184799', format: 'ean_8' },
+    ];
+    runDecoderTestBothHalfSample('ean_8', (halfSample) => generateConfig({
+        locator: {
+            halfSample,
+        },
+        decoder: { 
+            readers: ['ean_8_reader'] 
+        }
+    }), ean8TestSet);
+    
+    const upcTestSet = [
+        { 'name': 'image-001.jpg', 'result': '882428015268', format: 'upc_a' },
+        { 'name': 'image-002.jpg', 'result': '882428015268', format: 'upc_a' },
+        { 'name': 'image-003.jpg', 'result': '882428015084', format: 'upc_a' },
+        { 'name': 'image-004.jpg', 'result': '882428015343', format: 'upc_a' },
+        { 'name': 'image-005.jpg', 'result': '882428015343', format: 'upc_a' },
+        { 'name': 'image-006.jpg', 'result': '882428015046', format: 'upc_a' },
+        { 'name': 'image-007.jpg', 'result': '882428015084', format: 'upc_a' },
+        { 'name': 'image-008.jpg', 'result': '882428015046', format: 'upc_a' },
+        { 'name': 'image-009.jpg', 'result': '039047013551', format: 'upc_a' },
+        { 'name': 'image-010.jpg', 'result': '039047013551', format: 'upc_a' },
+    ];
+    runDecoderTestBothHalfSample('upc', (halfSample) => generateConfig({
+        locator: {
+            halfSample,
+        },
+        decoder: { 
+            readers: ['upc_reader'] 
+        }
+    }), upcTestSet);
+    
+    const upcETestSet = [
+        { 'name': 'image-001.jpg', 'result': '04965802', format: 'upc_e' },
+        { 'name': 'image-002.jpg', 'result': '04965802', format: 'upc_e' },
+        { 'name': 'image-003.jpg', 'result': '03897425', format: 'upc_e' },
+        { 'name': 'image-004.jpg', 'result': '05096893', format: 'upc_e' },
+        { 'name': 'image-005.jpg', 'result': '05096893', format: 'upc_e' },
+        { 'name': 'image-006.jpg', 'result': '05096893', format: 'upc_e' },
+        { 'name': 'image-007.jpg', 'result': '03897425', format: 'upc_e' },
+        { 'name': 'image-008.jpg', 'result': '01264904', format: 'upc_e' },
+        { 'name': 'image-009.jpg', 'result': '01264904', format: 'upc_e' },
+        { 'name': 'image-010.jpg', 'result': '01264904', format: 'upc_e' },
+    ];
+    runDecoderTestBothHalfSample('upc_e', (halfSample) => generateConfig({
+        locator: {
+            halfSample,
+        },
+        decoder: { 
+            readers: ['upc_e_reader'] 
+        }
+    }), upcETestSet);
+    
+    const codabarTestSet = [
+        { 'name': 'image-001.jpg', 'result': 'A10/53+17-70D', format: 'codabar' },
+        { 'name': 'image-002.jpg', 'result': 'B546745735B', format: 'codabar' },
+        { 'name': 'image-003.jpg', 'result': 'C$399.95A', format: 'codabar' },
+        { 'name': 'image-004.jpg', 'result': 'B546745735B', format: 'codabar' },
+        { 'name': 'image-005.jpg', 'result': 'C$399.95A', format: 'codabar' },
+        { 'name': 'image-006.jpg', 'result': 'B546745735B', format: 'codabar' },
+        { 'name': 'image-007.jpg', 'result': 'C$399.95A', format: 'codabar' },
+        { 'name': 'image-008.jpg', 'result': 'A16:9/4:3/3:2D', format: 'codabar', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-009.jpg', 'result': 'C$399.95A', format: 'codabar' },
+        { 'name': 'image-010.jpg', 'result': 'C$399.95A', format: 'codabar' },
+    ];
+    runDecoderTestBothHalfSample('codabar', (halfSample) => generateConfig({
+        locator: {
+            halfSample,
+        },
+        decoder: { 
+            readers: ['codabar_reader'] 
+        }
+    }), codabarTestSet);
+    
+    const i2of5TestSet = [
+        { 'name': 'image-001.jpg', 'result': '2167361334', format: 'i2of5' },
+        { 'name': 'image-002.jpg', 'result': '2167361334', format: 'i2of5' },
+        { 'name': 'image-003.jpg', 'result': '2167361334', format: 'i2of5' },
+        { 'name': 'image-004.jpg', 'result': '2167361334', format: 'i2of5' },
+        { 'name': 'image-005.jpg', 'result': '2167361334', format: 'i2of5' },
+    ];
+    runDecoderTestBothHalfSample('i2of5', (halfSample) => generateConfig({
+        inputStream: { size: 800, singleChannel: false },
+        locator: {
+            patchSize: 'small',
+            halfSample,
+        },
+        decoder: {
+            readers: ['i2of5_reader'],
+        },
+    }), i2of5TestSet);
+    
+    const twoOf5TestSet = [
+        { 'name': 'image-001.jpg', 'result': '9577149002', format: '2of5' },
+        { 'name': 'image-002.jpg', 'result': '9577149002', format: '2of5' },
+        { 'name': 'image-003.jpg', 'result': '5776158811', format: '2of5' },
+        { 'name': 'image-004.jpg', 'result': '0463381455', format: '2of5' },
+        { 'name': 'image-005.jpg', 'result': '3261594101', format: '2of5' },
+        { 'name': 'image-006.jpg', 'result': '3261594101', format: '2of5' },
+        { 'name': 'image-007.jpg', 'result': '3261594101', format: '2of5' },
+        { 'name': 'image-008.jpg', 'result': '6730705801', format: '2of5' },
+        { 'name': 'image-009.jpg', 'result': '5776158811', format: '2of5' },
+        { 'name': 'image-010.jpg', 'result': '5776158811', format: '2of5' },
+    ];
+    runDecoderTestBothHalfSample('2of5', (halfSample) => generateConfig({
+        inputStream: { size: 800, singleChannel: false },
+        locator: {
+            halfSample,
+        },
+        decoder: {
+            readers: ['2of5_reader'],
+        },
+    }), twoOf5TestSet);
+    
+    const code93TestSet = [
+        { 'name': 'image-001.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
+        { 'name': 'image-002.jpg', 'result': 'EH3C-%GU23RK3', format: 'code_93' },
+        { 'name': 'image-003.jpg', 'result': 'O308SIHQOXN5SA/PJ', format: 'code_93' },
+        { 'name': 'image-004.jpg', 'result': 'DG7Q$TV8JQ/EN', format: 'code_93' },
+        { 'name': 'image-005.jpg', 'result': 'DG7Q$TV8JQ/EN', format: 'code_93' },
+        { 'name': 'image-006.jpg', 'result': 'O308SIHQOXN5SA/PJ', format: 'code_93' },
+        { 'name': 'image-007.jpg', 'result': 'VOFD1DB5A.1F6QU', format: 'code_93' },
+        { 'name': 'image-008.jpg', 'result': 'WIWV8ETQZ1', format: 'code_93' },
+        { 'name': 'image-009.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
+        { 'name': 'image-010.jpg', 'result': '4SO64P4X8 U4YUU1T-', format: 'code_93' },
+        { 'name': 'image-011.jpg', result: '11169', format: 'code_93' },
+    ];
+    runDecoderTestBothHalfSample('code_93', (halfSample) => generateConfig({
+        inputStream: { size: 800, singleChannel: false },
+        locator: {
+            patchSize: 'large',
+            halfSample,
+        },
+        decoder: {
+            readers: ['code_93_reader'],
+        },
+    }), code93TestSet);
 });
 
 describe('Parallel decoding works', () => {
@@ -414,34 +517,34 @@ describe('External Reader Test, using test external code_128 reader', () => {
         before(() => {
             Quagga.registerReader('external_code_128_reader', TestExternalCode128Reader);
         });
-        runDecoderTest(
-            'code_128',
-            generateConfig({
-                inputStream: {
-                    size: 800,
-                    singleChannel: false,
-                },
-                decoder: {
-                    readers: ['external_code_128_reader'],
-                },
-            }),
-            [
-                { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
-                { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
-                { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
-                { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFailInNode: true, allowFailInBrowser: true },
-                { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
-                { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
-                { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
-                { 'name': 'image-008.jpg', 'result': '1020185021797280784055', format: 'code_128' },
-                { 'name': 'image-009.jpg', 'result': '0001285112001000040801', format: 'code_128' },
-                { 'name': 'image-010.jpg', 'result': '673023', format: 'code_128' },
-                // TODO: need to implement having different inputStream parameters to be able to
-                // read this one -- it works only with inputStream size set to 1600 presently, but
-                // other samples break at that high a size.
-                // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
-            ]
-        );
+        const externalCode128TestSet = [
+            { 'name': 'image-001.jpg', 'result': '0001285112001000040801', format: 'code_128' },
+            { 'name': 'image-002.jpg', 'result': 'FANAVF14617104', format: 'code_128' },
+            { 'name': 'image-003.jpg', 'result': '673023', format: 'code_128' },
+            { 'name': 'image-004.jpg', 'result': '010210150301625334', format: 'code_128', allowFailInNode: true, allowFailInBrowser: true },
+            { 'name': 'image-005.jpg', 'result': '419055603900009001012999', format: 'code_128' },
+            { 'name': 'image-006.jpg', 'result': '419055603900009001012999', format: 'code_128' },
+            { 'name': 'image-007.jpg', 'result': '420957479499907123456123456781', format: 'code_128' },
+            { 'name': 'image-008.jpg', 'result': '1020185021797280784055', format: 'code_128' },
+            { 'name': 'image-009.jpg', 'result': '0001285112001000040801', format: 'code_128' },
+            { 'name': 'image-010.jpg', 'result': '673023', format: 'code_128' },
+            // TODO: need to implement having different inputStream parameters to be able to
+            // read this one -- it works only with inputStream size set to 1600 presently, but
+            // other samples break at that high a size.
+            // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
+        ];
+        runDecoderTestBothHalfSample('code_128_external', (halfSample) => generateConfig({
+            inputStream: {
+                size: 800,
+                singleChannel: false,
+            },
+            locator: {
+                halfSample,
+            },
+            decoder: {
+                readers: ['external_code_128_reader'],
+            },
+        }), externalCode128TestSet, 'code_128'); // Use code_128 fixture path
     });
 });
 
@@ -470,5 +573,55 @@ describe('Canvas Update Test, avoid DOMException', () => {
                 { 'name': 'image-001.jpg', 'result': null, format: 'code_128' },
             ]
         );
+    });
+});
+
+// Print performance summary after all tests complete
+describe('Performance Summary', () => {
+    it('should print halfSample performance comparison', function() {
+        console.log('\n========== HalfSample Performance Comparison ==========\n');
+        
+        const decoderNames = Object.keys(timingData).sort();
+        
+        if (decoderNames.length === 0) {
+            console.log('No timing data collected.');
+            return;
+        }
+        
+        for (const decoderName of decoderNames) {
+            const data = timingData[decoderName];
+            const withHalfSample = data.withHalfSample;
+            const withoutHalfSample = data.withoutHalfSample;
+            
+            if (withHalfSample.length === 0 && withoutHalfSample.length === 0) {
+                continue;
+            }
+            
+            const avgWith = withHalfSample.length > 0 
+                ? (withHalfSample.reduce((a, b) => a + b, 0) / withHalfSample.length).toFixed(2)
+                : 'N/A';
+            const avgWithout = withoutHalfSample.length > 0
+                ? (withoutHalfSample.reduce((a, b) => a + b, 0) / withoutHalfSample.length).toFixed(2)
+                : 'N/A';
+            
+            const passedWith = withHalfSample.length;
+            const passedWithout = withoutHalfSample.length;
+            
+            console.log(`Decoder: ${decoderName}`);
+            console.log(`  halfSample: true  - Avg: ${avgWith}ms, Tests passed: ${passedWith}`);
+            console.log(`  halfSample: false - Avg: ${avgWithout}ms, Tests passed: ${passedWithout}`);
+            
+            if (avgWith !== 'N/A' && avgWithout !== 'N/A') {
+                const avgWithNum = parseFloat(avgWith);
+                const avgWithoutNum = parseFloat(avgWithout);
+                const diffPercent = ((avgWithoutNum - avgWithNum) / avgWithoutNum * 100).toFixed(1);
+                const diffNum = parseFloat(diffPercent);
+                const faster = diffNum > 0 ? 'halfSample: true is faster' : 'halfSample: false is faster';
+                console.log(`  Difference: ${Math.abs(diffNum)}% (${faster})`);
+            }
+            console.log('');
+        }
+        
+        console.log('========== End Performance Summary ==========\n');
     });
 });
