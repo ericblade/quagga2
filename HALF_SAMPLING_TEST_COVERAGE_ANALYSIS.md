@@ -1,8 +1,11 @@
 # Half-Sampling Test Coverage Analysis
 
-**Date:** November 22, 2025  
+**Date:** November 22, 2025 (Original Analysis)  
+**Updated:** November 23, 2025 (See REASSESSMENT_AFTER_IMPROVEMENTS.md)  
 **Context:** Investigation triggered by PR #585 review comment  
 **Issue:** Need to validate half-sampling code path test coverage before making optimizations
+
+> **⚠️ NOTE:** This is the original analysis. After integration test improvements were made, a reassessment was performed. See [REASSESSMENT_AFTER_IMPROVEMENTS.md](./REASSESSMENT_AFTER_IMPROVEMENTS.md) for the current state and updated recommendations.
 
 ## Executive Summary
 
