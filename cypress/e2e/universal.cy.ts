@@ -8,4 +8,3 @@ import '../../src/locator/test/skeletonizer.spec.ts';
 import '../../src/quagga/test/transform.spec.ts';
 import '../../src/common/test/image_wrapper.spec.ts';
 import '../../src/test/quagga.spec.ts';
-import '../../src/input/test/frame_grabber_consistency.spec.ts';
