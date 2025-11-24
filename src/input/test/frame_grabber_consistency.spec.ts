@@ -2,8 +2,9 @@
  * Test to verify that frame_grabber (Node) and frame_grabber_browser produce
  * identical output when given the same input.
  * 
- * This test is expected to FAIL initially - it exists to validate when the 
- * implementations are made consistent.
+ * These tests compare the core scaleAndCrop logic from both implementations.
+ * FINDING: When given identical raw input data, both implementations produce
+ * identical output for typical usage scenarios.
  */
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
