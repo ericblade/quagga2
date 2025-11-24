@@ -1,7 +1,8 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import Ndarray from 'ndarray';
-import Interp2D from 'ndarray-linear-interpolate';
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Interp2D = require('ndarray-linear-interpolate');
 
 /**
  * Browser's bilinear interpolation function (matches ndarray-linear-interpolate behavior)
