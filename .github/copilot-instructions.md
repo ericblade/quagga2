@@ -149,6 +149,42 @@ This file controls which packages `npm-check-updates` can upgrade:
 - **Browser tests**: `npm run cypress:run`
 - **Full suite**: `npm run build-and-test`
 
+#### Running Individual Tests
+
+**Node.js tests (ts-mocha):**
+```bash
+# Run specific test file
+npx ts-mocha -p test/tsconfig.json test/integration/decoders/ean_extended.spec.ts
+
+# Run tests matching a pattern (using --grep)
+npx ts-mocha -p test/tsconfig.json test/integration/decoders/ean_extended.spec.ts --grep "baseline 800"
+
+# Run specific test by combining patterns
+npx ts-mocha -p test/tsconfig.json test/integration/decoders/ean_extended.spec.ts --grep "baseline 800.*image-006"
+```
+
+**Cypress browser tests:**
+```bash
+# Run specific Cypress test file
+npm run cypress:run -- --spec cypress/e2e/ean_extended_quick.cy.ts
+# Run in headed mode (see browser)
+npm run cypress:open
+
+# Run specific test in headed mode
+npx cypress open --e2e --browser electron --config specPattern=cypress/e2e/ean_extended_quick.cy.ts
+```
+
+**Note:**
+- Cypress only supports filtering by spec file using `--spec` by default.
+- Filtering individual tests by pattern (like grep) requires installing a third-party plugin such as `cypress-grep` and additional setup. This is not included in the default project configuration.
+```
+
+**Important Notes:**
+- Always run from the `master/` directory (or appropriate workspace folder)
+- Node tests use ts-mocha with `-p test/tsconfig.json` flag
+- Cypress tests use the npm script which sets `NODE_ENV=development BUILD_ENV=development`
+- For PowerShell, use semicolons `;` not `&` or `&&` to chain commands
+
 ### Test File Organization
 
 Tests follow a strict directory structure based on platform compatibility:
