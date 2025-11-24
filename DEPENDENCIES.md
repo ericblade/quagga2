@@ -112,7 +112,7 @@ These packages are **only used during build/development** and are **not bundled 
 - **`sinon-chai`** (^3.7.0) - Sinon assertions for Chai
 - **`ts-mocha`** (^11.1.0) - TypeScript support for Mocha
 - **`ts-node`** (^10.9.2) - TypeScript execution for Node.js
-- **`cypress`** (^13.1.0) - End-to-end browser testing
+- **`cypress`** (^13.17.0) - End-to-end browser testing
 - **`@cypress/webpack-preprocessor`** (6.0.0) - Webpack integration for Cypress
 - **`@cypress/code-coverage`** (^3.12.4) - Code coverage for Cypress tests
 - **`nyc`** (^17.1.0) - Code coverage tool (Istanbul wrapper)
@@ -147,16 +147,7 @@ These packages are **only used during build/development** and are **not bundled 
 
 ## Overrides
 
-The `overrides` field forces specific versions of transitive dependencies:
-
-```json
-"overrides": {
-  "@cypress/request": "^3.0.9"
-}
-```
-
-- **Purpose**: Security fix for `form-data` vulnerability (CVE in versions < 2.5.4)
-- **Details**: Cypress 13.1.0 bundles `@cypress/request@3.0.0` which depends on vulnerable `form-data@2.3.3`. This override forces `@cypress/request@^3.0.9` which uses safe `form-data@~4.0.4`.
+No package overrides are currently needed. Cypress 13.17.0+ uses `@cypress/request@^3.0.6` which includes the security fix for the `form-data` vulnerability (versions >= 3.0.6 use `form-data@~4.0.0` which is safe).
 
 ---
 
@@ -213,7 +204,7 @@ Some packages are pinned to specific versions due to compatibility issues:
 - **`chai@^4.3.10`** - Pinned to v4 because v5+ and v6+ are ESM-only, incompatible with CommonJS tests
 - **`sinon-chai@^3.7.0`** - Pinned to match `chai@4.x` compatibility
 - **`webpack@^4.44.2`** - Pinned to v4 because v5 requires significant config migration
-- **`cypress@^13.1.0`** - Pinned to v13 for stability
+- **`cypress@^13.17.0`** - Pinned to v13 for stability
 
 These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-check-updates`.
 
@@ -292,4 +283,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-11-16
+Last updated: 2025-11-22

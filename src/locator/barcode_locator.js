@@ -61,7 +61,12 @@ function initBuffers() {
 
     _labelImageWrapper = new ImageWrapper(_patchSize, undefined, Array, true);
 
-    const skeletonImageData = new ArrayBuffer(64 * 1024);
+    // Calculate required buffer size (4 regions for asm.js skeletonizer)
+    const skeletonImageDataSize = _patchSize.x * _patchSize.y * 4;
+    // Round up to next power of 2 for asm.js heap requirement
+    // Use minimum 64KB for optimal asm.js performance (avoids V8 warnings)
+    const bufferSize = Math.max(65536, Math.pow(2, Math.ceil(Math.log2(skeletonImageDataSize))));
+    const skeletonImageData = new ArrayBuffer(bufferSize);
     _subImageWrapper = new ImageWrapper(_patchSize,
         new Uint8Array(skeletonImageData, 0, _patchSize.x * _patchSize.y));
     _skelImageWrapper = new ImageWrapper(_patchSize,

@@ -1,0 +1,17 @@
+window.ENV = { development: true, production: false, node: false };
+
+import '../../test/integration/decoders/ean.spec.ts';
+import '../../test/integration/decoders/ean_extended.spec.ts';
+import '../../test/integration/decoders/code_128.spec.ts';
+import '../../test/integration/decoders/code_39.spec.ts';
+import '../../test/integration/decoders/code_39_vin.spec.ts';
+import '../../test/integration/decoders/code_32.spec.ts';
+import '../../test/integration/decoders/ean_8.spec.ts';
+import '../../test/integration/decoders/upc.spec.ts';
+import '../../test/integration/decoders/upc_e.spec.ts';
+import '../../test/integration/decoders/codabar.spec.ts';
+import '../../test/integration/decoders/i2of5.spec.ts';
+import '../../test/integration/decoders/2of5.spec.ts';
+import '../../test/integration/decoders/code_93.spec.ts';
+import '../../test/integration/external-reader.spec.ts';
+import '../../test/integration/integration.spec.ts';

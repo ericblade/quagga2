@@ -308,18 +308,56 @@ area: {
 
 **Type**: `number` (for `decodeSingle` only)
 
-**Description**: When using `decodeSingle` with file paths, restricts the input image size to this maximum width/height (long side).
+**Default**: Original image dimensions (when omitted)
+
+**Description**: When using `decodeSingle` with file paths, scales the input image so that the longest side (width or height) equals this value, maintaining aspect ratio. When omitted, the original image dimensions are used without any scaling.
+
+**Note on Scaling**: This parameter scales images both up and down. While upscaling typically introduces interpolation artifacts, testing has shown that moderate upscaling can actually **improve** barcode detection accuracy, even with `halfSample:false`. The benefits include:
+
+- **More pixels per bar**: Upscaling provides more pixel data for the locator to analyze
+- **Interpolation smoothing**: Acts as a smoothing filter that can reduce noise and compression artifacts
+- **Integer scaling**: 2x scaling provides clean pixel doubling with minimal artifacts
+- **Works with both halfSample modes**: Benefits seen in both halfSample:true and halfSample:false
+
+**Scaling Guidelines**:
+
+- Start with **2x the original image size** (e.g., 1100px → 2200px) for testing
+- Try 1.25x-1.5x if 2x doesn't work well
+- Performance typically peaks at moderate upscaling (1.25x-2x range)
+- Performance degrades beyond 2.5x due to excessive interpolation artifacts
+- Optimal scaling depends on image quality, compression, and barcode size/condition - not necessarily barcode type
+
+**Recommended approach**: Experiment with different scaling factors. Start with 2x (e.g., 1600-2200 for typical barcode images), then try lower values if needed. The optimal value varies by image content and quality.
 
 **Example**:
 
 ```javascript
+// Scale down a large image
 Quagga.decodeSingle({
-  src: "./large-image.jpg",
+  src: "./large-image.jpg",  // 3000x2000 image
   inputStream: {
-    size: 800  // Scale down to max 800px on long side
+    size: 1600  // Scales down to 1600x1067
+  }
+});
+
+// Use original image size (often a good starting point)
+Quagga.decodeSingle({
+  src: "./medium-image.jpg",  // 1280x720 image
+  inputStream: {
+    // No size specified - uses original 1280x720
+  }
+});
+
+// Upscale for fine details (can improve detection)
+Quagga.decodeSingle({
+  src: "./small-barcode.jpg",  // 1100x658 image with fine barcode
+  inputStream: {
+    size: 1600  // Scales up to 1600x957, may improve detection
   }
 });
 ```
+
+**Performance Note**: Higher values increase processing time. Balance detection accuracy against speed based on your use case. Test different values to find the optimal setting for your specific images.
 
 ### `inputStream.debug`
 

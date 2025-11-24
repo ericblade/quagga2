@@ -643,12 +643,24 @@ export function hsv2rgb(hsv, rgb = [0, 0, 0]) {
 }
 
 export function _computeDivisors(n) {
+    // Handle edge cases
+    // NaN: Not a number - no meaningful divisors
+    // Infinity: Infinite values have no finite divisors
+    // Non-positive: Divisors are typically defined for positive integers only
+    // While negative numbers technically have divisors, returning them would complicate
+    // the API (would need to return both positive and negative divisors, or make assumptions)
+    if (!Number.isFinite(n) || n < 1) {
+        return [];
+    }
+
     const largeDivisors = [];
     const divisors = [];
+    const sqrtN = Math.sqrt(n);
 
-    for (let i = 1; i < Math.sqrt(n) + 1; i++) {
+    for (let i = 1; i <= sqrtN; i++) {
         if (n % i === 0) {
             divisors.push(i);
+            // Only add the complementary divisor if it's different (not a perfect square root)
             if (i !== n / i) {
                 largeDivisors.unshift(Math.floor(n / i));
             }

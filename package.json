@@ -5,9 +5,6 @@
   "main": "lib/quagga.js",
   "types": "type-definitions/quagga.d.ts",
   "browser": "dist/quagga.min.js",
-  "overrides": {
-    "@cypress/request": "^3.0.9"
-  },
   "optionalDependencies": {
     "fsevents": "2.3.3"
   },
@@ -77,10 +74,10 @@
     "test:browser-universal": "NOT WORKING -- something like npx cypress run --config testFiles=[universal]",
     "test:browser-all": "npm run cypress:run",
     "test:import": "mocha test/test-import.mjs",
-    "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/integration.spec.ts",
+    "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
-    "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/integration.spec.ts",
+    "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
     "build-and-test": "npm run build && npm run test",
     "build:dev": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider webpack --config configs/webpack.config.js",
     "build:prod": "npx cross-env NODE_ENV=production BUILD_ENV=production NODE_OPTIONS=--openssl-legacy-provider webpack --config configs/webpack.config.min.js",
