@@ -72,26 +72,25 @@ FrameGrabber.create = function (inputStream, canvas) {
         return _data;
     };
 
-    // Bilinear interpolation for grayscale data (matches ndarray-linear-interpolate behavior)
-    // This implementation returns 0 for out-of-bounds pixels, matching Node's behavior exactly
+    // Bilinear interpolation for grayscale data (to match Node's behavior)
     function bilinearInterpolate(grayData, width, height, x, y) {
-        const ix = Math.floor(x);
-        const fx = x - ix;
-        const s0 = ix >= 0 && ix < width;
-        const s1 = (ix + 1) >= 0 && (ix + 1) < width;
-
-        const iy = Math.floor(y);
-        const fy = y - iy;
-        const t0 = iy >= 0 && iy < height;
-        const t1 = (iy + 1) >= 0 && (iy + 1) < height;
-
-        // Return 0 for out-of-bounds pixels (same as ndarray-linear-interpolate)
-        const w00 = (s0 && t0) ? grayData[iy * width + ix] : 0.0;
-        const w01 = (s0 && t1) ? grayData[(iy + 1) * width + ix] : 0.0;
-        const w10 = (s1 && t0) ? grayData[iy * width + (ix + 1)] : 0.0;
-        const w11 = (s1 && t1) ? grayData[(iy + 1) * width + (ix + 1)] : 0.0;
-
-        return (1.0 - fy) * ((1.0 - fx) * w00 + fx * w10) + fy * ((1.0 - fx) * w01 + fx * w11);
+        const x0 = Math.floor(x);
+        const y0 = Math.floor(y);
+        const x1 = Math.min(x0 + 1, width - 1);
+        const y1 = Math.min(y0 + 1, height - 1);
+        
+        const fx = x - x0;
+        const fy = y - y0;
+        
+        const v00 = grayData[y0 * width + x0];
+        const v10 = grayData[y0 * width + x1];
+        const v01 = grayData[y1 * width + x0];
+        const v11 = grayData[y1 * width + x1];
+        
+        const v0 = v00 * (1 - fx) + v10 * fx;
+        const v1 = v01 * (1 - fx) + v11 * fx;
+        
+        return v0 * (1 - fy) + v1 * fy;
     }
 
     /**
