@@ -9,7 +9,7 @@ describe('Code 32 Decoder Tests', () => {
         { name: 'image-5.jpg', result: 'A935776043', format: 'code_32_reader' },
         { name: 'image-6.jpg', result: 'A012745182', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
         { name: 'image-7.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
-        { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true },
+        { name: 'image-8.jpg', result: 'A029651039', format: 'code_32_reader', allowFailInNode: true, allowFailInBrowser: true },
         { name: 'image-9.jpg', result: 'A015896018', format: 'code_32_reader' },
         { name: 'image-10.jpg', result: 'A015896018', format: 'code_32_reader' },
     ];

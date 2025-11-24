@@ -20,56 +20,15 @@ export const it = Object.assign(
     }
 );
 
-// Configuration map for test failures by decoder and halfSample setting
-export const testFailureConfig: { [decoder: string]: { halfSampleTrue?: string[], halfSampleFalse?: string[] } } = {
-    'ean_extended': {
-        halfSampleFalse: ['image-001.jpg', 'image-003.jpg', 'image-005.jpg', 'image-006.jpg'],
-    },
-    'code_128': {
-        halfSampleTrue: ['image-003.jpg', 'image-004.jpg'],
-    },
-    'code_32': {
-        halfSampleFalse: ['image-8.jpg'],
-    },
-    'ean_8': {
-        halfSampleFalse: ['image-009.jpg'],
-    },
-    'upc': {
-        halfSampleFalse: ['image-006.jpg', 'image-010.jpg'],
-    },
-    'upc_e': {
-        halfSampleFalse: ['image-001.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-009.jpg', 'image-010.jpg'],
-    },
-    'i2of5': {
-        halfSampleTrue: ['image-001.jpg', 'image-002.jpg', 'image-004.jpg', 'image-005.jpg'],
-    },
-    '2of5': {
-        halfSampleFalse: ['image-005.jpg', 'image-006.jpg'],
-    },
-    'code_93': {
-        halfSampleFalse: ['image-003.jpg', 'image-004.jpg', 'image-005.jpg', 'image-007.jpg', 'image-008.jpg', 'image-010.jpg'],
-    },
-};
-
 export function runDecoderTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string, allowFailInNode?: boolean, allowFailInBrowser?: boolean }>, halfSampleLabel?: string, fixturePath?: string) {
     const testLabel = halfSampleLabel ? `${name} (${halfSampleLabel})` : name;
     const actualFixturePath = fixturePath || name;
 
-    // Get failure list for this decoder and halfSample config
-    const decoderFailures = testFailureConfig[name] || {};
-    const failureList = halfSampleLabel === 'halfSample: true' ? decoderFailures.halfSampleTrue :
-                        halfSampleLabel === 'halfSample: false' ? decoderFailures.halfSampleFalse :
-                        [];
-
     describe(`Decoder ${testLabel}`, () => {
         testSet.forEach((sample) => {
-            // Check if this test should allow failure
-            const isInFailureList = failureList && failureList.includes(sample.name);
-            const allowFailInNode = sample.allowFailInNode || isInFailureList;
-            const allowFailInBrowser = sample.allowFailInBrowser || isInFailureList;
-
+            // Use the flags on the test item as the authoritative source
             const isBrowser = typeof window !== 'undefined';
-            const shouldAllowFail = isBrowser ? allowFailInBrowser : allowFailInNode;
+            const shouldAllowFail = isBrowser ? sample.allowFailInBrowser : sample.allowFailInNode;
             const testFn = shouldAllowFail ? it.allowFail : it;
             testFn(`decodes ${sample.name}`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power

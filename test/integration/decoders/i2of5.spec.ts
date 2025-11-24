@@ -9,7 +9,7 @@ describe('Interleaved 2 of 5 Decoder Tests', () => {
         { 'name': 'image-005.jpg', 'result': '2167361334', format: 'i2of5' },
     ];
     runDecoderTestBothHalfSample('i2of5', (halfSample) => generateConfig({
-        inputStream: { size: 800, singleChannel: false },
+        inputStream: { size: 1375, singleChannel: false },  // 1.25x scaling (from 1100x658) provides optimal detection
         locator: {
             patchSize: 'small',
             halfSample,

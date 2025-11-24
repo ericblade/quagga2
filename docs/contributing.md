@@ -30,6 +30,42 @@ implemented any tests that may be needed to test your new code.  If you're not s
 unit test your new code, then go ahead and make that pull request, and we'll try to help you before
 merging.
 
+**Test Structure**:
+
+- Unit tests are in `src/` alongside source files (`.spec.ts` files)
+- Integration tests are in `test/integration/` organized by decoder type
+- See `test/integration/README.md` for detailed information about integration test structure and configuration
+
+**Running Specific Tests**:
+
+```bash
+# All tests (unit + integration, Node + browser)
+npm test
+
+# Node tests only
+npm run test:node
+
+# Browser tests only (requires Cypress)
+npm run test:browser-all
+
+# Integration tests only (Node)
+npx ts-mocha -p test/tsconfig.json test/integration/**/*.spec.ts
+
+# Specific decoder integration tests
+npx ts-mocha -p test/tsconfig.json test/integration/decoders/ean_8.spec.ts
+```
+
+**Adding Integration Tests**:
+
+When adding new test cases to decoder integration tests, tests should pass in both Node and browser
+environments by default. If a test is known to fail in a specific environment, mark it explicitly with:
+
+- `allowFailInNode: true` - Test can fail in Node without failing CI
+- `allowFailInBrowser: true` - Test can fail in browser without failing CI
+- Both flags - Test can fail in both environments
+
+See `test/integration/README.md` for complete details on the test failure marking system.
+
 #### Working on a changed copy of Quagga2 from another repository (ie, developing an external plugin)
 
 If you need to make changes to Quagga2 to support some external code (such as an external reader plugin),
