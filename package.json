@@ -75,6 +75,8 @@
     "test:browser-all": "npm run cypress:run",
     "test:import": "mocha test/test-import.mjs",
     "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
+    "test:node:frame-grabber": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/input/test/node/frame_grabber_grab.spec.ts",
+    "test:browser:frame-grabber": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --env BUILD_ENV=development --spec cypress/e2e/browser.cy.ts",
     "test:require": "mocha test/test-require",
     "test:module": "npm run test:require && npm run test:import",
     "test": "npm run cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
