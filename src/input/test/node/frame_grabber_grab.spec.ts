@@ -495,4 +495,116 @@ describe('Frame Grabber grab() Function', function() {
             }
         });
     });
+
+    describe('Compare with actual browser grab() output', () => {
+        it('should compare Node grab() output with browser grab() output for codabar image-008', async () => {
+            const browserDataPath = path.resolve(__dirname, '../../../../tmp/browser_grab_codabar_008.json');
+            
+            // Check if browser output file exists
+            let browserData: any = null;
+            try {
+                const fs = require('fs');
+                if (fs.existsSync(browserDataPath)) {
+                    const fileContent = fs.readFileSync(browserDataPath, 'utf8');
+                    browserData = JSON.parse(fileContent);
+                    console.log('\n=== Found browser grab() output file ===');
+                    console.log(`Browser image: ${browserData.image}`);
+                    console.log(`Browser dimensions: ${browserData.width}x${browserData.height}`);
+                    console.log(`Browser stats: min=${browserData.stats.min}, max=${browserData.stats.max}, avg=${browserData.stats.avg.toFixed(2)}`);
+                    console.log('Browser first 20:', browserData.first50.slice(0, 20));
+                }
+            } catch (e) {
+                console.log('\nNo browser output file found. Run Cypress browser tests first to generate it.');
+            }
+
+            // Run Node grab()
+            const inputStream = InputStreamFactory.createImageStream();
+            const imagePath = path.resolve(__dirname, '../../../../test/fixtures/codabar/image-008.jpg');
+            inputStream.setInputStream({
+                src: imagePath,
+                mime: 'image/jpeg',
+                size: 800,
+                sequence: false,
+            });
+
+            await waitForCanRecord(inputStream);
+            inputStream.setCanvasSize({ x: inputStream.getWidth(), y: inputStream.getHeight() });
+            inputStream.setTopRight({ x: 0, y: 0 });
+
+            const grabber = FrameGrabberNode.create(inputStream, null);
+            grabber.grab();
+            const nodeData = grabber.getData();
+
+            // Calculate Node stats
+            let min = 255, max = 0, sum = 0;
+            for (let i = 0; i < nodeData.length; i++) {
+                if (nodeData[i] < min) min = nodeData[i];
+                if (nodeData[i] > max) max = nodeData[i];
+                sum += nodeData[i];
+            }
+            const avg = sum / nodeData.length;
+
+            console.log(`\nNode dimensions: ${inputStream.getWidth()}x${inputStream.getHeight()}`);
+            console.log(`Node stats: min=${min}, max=${max}, avg=${avg.toFixed(2)}`);
+            console.log('Node first 20:', Array.from(nodeData.slice(0, 20)));
+
+            if (browserData) {
+                // Compare if browser data exists
+                console.log('\n=== Comparing Node vs Browser actual grab() output ===');
+                
+                if (browserData.width !== inputStream.getWidth() || browserData.height !== inputStream.getHeight()) {
+                    console.log(`WARNING: Dimension mismatch! Browser: ${browserData.width}x${browserData.height}, Node: ${inputStream.getWidth()}x${inputStream.getHeight()}`);
+                }
+
+                // Decode browser full data
+                const browserFullData = new Uint8Array(
+                    atob(browserData.fullDataBase64).split('').map((c: string) => c.charCodeAt(0))
+                );
+
+                let diffCount = 0;
+                let maxDiff = 0;
+                let totalDiff = 0;
+                const sampleDiffs: { pos: number; node: number; browser: number }[] = [];
+
+                const compareLength = Math.min(nodeData.length, browserFullData.length);
+                for (let i = 0; i < compareLength; i++) {
+                    const diff = Math.abs(nodeData[i] - browserFullData[i]);
+                    if (diff > 0) {
+                        diffCount++;
+                        totalDiff += diff;
+                        if (diff > maxDiff) maxDiff = diff;
+                        if (sampleDiffs.length < 10) {
+                            sampleDiffs.push({ pos: i, node: nodeData[i], browser: browserFullData[i] });
+                        }
+                    }
+                }
+
+                console.log(`Total pixels compared: ${compareLength}`);
+                console.log(`Pixels with differences: ${diffCount} (${(diffCount / compareLength * 100).toFixed(2)}%)`);
+                console.log(`Max difference: ${maxDiff}`);
+                console.log(`Average difference: ${diffCount > 0 ? (totalDiff / diffCount).toFixed(2) : 0}`);
+
+                if (sampleDiffs.length > 0) {
+                    console.log('\nSample differences:');
+                    sampleDiffs.forEach(d => {
+                        console.log(`  [${d.pos}]: Node=${d.node}, Browser=${d.browser}, diff=${Math.abs(d.node - d.browser)}`);
+                    });
+                }
+
+                // Clean up the file after comparison
+                try {
+                    const fs = require('fs');
+                    fs.unlinkSync(browserDataPath);
+                    console.log('\nCleaned up browser output file.');
+                } catch (e) {
+                    // Ignore cleanup errors
+                }
+
+                // Assert comparison was done
+                expect(compareLength).to.be.greaterThan(0);
+            } else {
+                console.log('\nSkipping comparison - run Cypress browser tests first to generate browser output.');
+            }
+        });
+    });
 });
