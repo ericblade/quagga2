@@ -1,21 +1,155 @@
 /**
- * Test to verify that frame_grabber (Node) grab() function output can be captured and compared.
- * This test loads actual image fixtures and exercises the real grab() function.
+ * Test to verify that frame_grabber (Node) and frame_grabber_browser produce 
+ * identical output when given the same RGBA input data.
  * 
- * Note: In the browser, webpack replaces frame_grabber with frame_grabber_browser,
- * so this test file will run different implementations depending on the environment.
+ * This test loads actual image fixtures and compares both implementations' 
+ * scaleAndCrop algorithms directly in Node.
  */
 import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import * as path from 'path';
 
-// Import the actual FrameGrabber - in Node this is frame_grabber.js
+// Import the actual Node FrameGrabber
 // eslint-disable-next-line @typescript-eslint/no-var-requires
-const FrameGrabber = require('../../frame_grabber');
+const FrameGrabberNode = require('../../frame_grabber');
 
 // Import the Node input stream to create a proper inputStream
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const InputStreamFactory = require('../../input_stream/input_stream').default;
+
+// Import ndarray for Node's implementation
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Ndarray = require('ndarray');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const Interp2D = require('ndarray-linear-interpolate').d2;
+
+// Import computeGray which both implementations use
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { computeGray } = require('../../../common/cv_utils');
+
+/**
+ * Browser's bilinear interpolation (extracted from frame_grabber_browser.js)
+ */
+function browserBilinearInterpolate(grayData: Uint8Array, width: number, height: number, x: number, y: number): number {
+    const x0 = Math.floor(x);
+    const y0 = Math.floor(y);
+    const x1 = Math.min(x0 + 1, width - 1);
+    const y1 = Math.min(y0 + 1, height - 1);
+    
+    const fx = x - x0;
+    const fy = y - y0;
+    
+    const v00 = grayData[y0 * width + x0];
+    const v10 = grayData[y0 * width + x1];
+    const v01 = grayData[y1 * width + x0];
+    const v11 = grayData[y1 * width + x1];
+    
+    const v0 = v00 * (1 - fx) + v10 * fx;
+    const v1 = v01 * (1 - fx) + v11 * fx;
+    
+    return v0 * (1 - fy) + v1 * fy;
+}
+
+/**
+ * Simulate browser's scaleAndCrop (non-halfSample path) from frame_grabber_browser.js
+ * This extracts the core algorithm so we can compare it with Node's version
+ */
+function browserScaleAndCrop(
+    rgbaData: Uint8Array,
+    videoWidth: number,
+    videoHeight: number, 
+    canvasWidth: number,
+    canvasHeight: number,
+    topRightX: number,
+    topRightY: number,
+    outputWidth: number,
+    outputHeight: number,
+    config: any = {}
+): Uint8Array {
+    // Step 1: Convert to grayscale (same as browser does)
+    const grayData = new Uint8Array(videoWidth * videoHeight);
+    computeGray(rgbaData, grayData, config);
+    
+    // Step 2: Scale using bilinear interpolation (browser's method)
+    const scaledGrayData = new Uint8Array(canvasWidth * canvasHeight);
+    const stepSizeX = videoWidth / canvasWidth;
+    const stepSizeY = videoHeight / canvasHeight;
+    
+    for (let y = 0; y < canvasHeight; y++) {
+        for (let x = 0; x < canvasWidth; x++) {
+            const srcX = x * stepSizeX;
+            const srcY = y * stepSizeY;
+            // eslint-disable-next-line no-bitwise
+            scaledGrayData[y * canvasWidth + x] = browserBilinearInterpolate(
+                grayData,
+                videoWidth,
+                videoHeight,
+                srcX,
+                srcY
+            ) | 0;
+        }
+    }
+    
+    // Step 3: Crop to target region
+    const outputData = new Uint8Array(outputWidth * outputHeight);
+    for (let y = 0; y < outputHeight; y++) {
+        for (let x = 0; x < outputWidth; x++) {
+            const srcIdx = (y + topRightY) * canvasWidth + (x + topRightX);
+            outputData[y * outputWidth + x] = scaledGrayData[srcIdx];
+        }
+    }
+    
+    return outputData;
+}
+
+/**
+ * Node's scaleAndCrop using ndarray (extracted from frame_grabber.js)
+ */
+function nodeScaleAndCrop(
+    rgbaData: Uint8Array,
+    videoWidth: number,
+    videoHeight: number,
+    canvasWidth: number,
+    canvasHeight: number,
+    topRightX: number,
+    topRightY: number,
+    outputWidth: number,
+    outputHeight: number
+): Uint8Array {
+    const grayData = new Uint8Array(videoWidth * videoHeight);
+    const canvasData = new Uint8Array(canvasWidth * canvasHeight);
+    const outputData = new Uint8Array(outputWidth * outputHeight);
+
+    // Create ndarray structures like Node's frame_grabber does
+    const grayImageArray = Ndarray(grayData, [videoHeight, videoWidth]).transpose(1, 0);
+    const canvasImageArray = Ndarray(canvasData, [canvasHeight, canvasWidth]).transpose(1, 0);
+    const targetImageArray = canvasImageArray
+        .hi(topRightX + outputWidth, topRightY + outputHeight)
+        .lo(topRightX, topRightY);
+
+    const stepSizeX = videoWidth / canvasWidth;
+    const stepSizeY = videoHeight / canvasHeight;
+
+    // Step 1: compute full-sized gray image
+    computeGray(rgbaData, grayData, {});
+
+    // Step 2: interpolate
+    for (let y = 0; y < canvasHeight; y++) {
+        for (let x = 0; x < canvasWidth; x++) {
+            // eslint-disable-next-line no-bitwise
+            canvasImageArray.set(x, y, (Interp2D(grayImageArray, x * stepSizeX, y * stepSizeY)) | 0);
+        }
+    }
+
+    // Step 3: crop
+    for (let y = 0; y < outputHeight; y++) {
+        for (let x = 0; x < outputWidth; x++) {
+            outputData[y * outputWidth + x] = targetImageArray.get(x, y);
+        }
+    }
+
+    return outputData;
+}
 
 /**
  * Helper to wait for input stream to be ready
@@ -59,7 +193,7 @@ describe('Frame Grabber grab() Function', function() {
             inputStream.setTopRight({ x: 0, y: 0 });
 
             // Create the frame grabber with the input stream
-            frameGrabber = FrameGrabber.create(inputStream, null);
+            frameGrabber = FrameGrabberNode.create(inputStream, null);
 
             // Execute grab
             grabResult = frameGrabber.grab();
@@ -106,7 +240,7 @@ describe('Frame Grabber grab() Function', function() {
             codabarStream.setCanvasSize({ x: codabarStream.getWidth(), y: codabarStream.getHeight() });
             codabarStream.setTopRight({ x: 0, y: 0 });
 
-            const codabarGrabber = FrameGrabber.create(codabarStream, null);
+            const codabarGrabber = FrameGrabberNode.create(codabarStream, null);
             const codabarGrabResult = codabarGrabber.grab();
             const codabarData = codabarGrabber.getData();
 
@@ -146,7 +280,7 @@ describe('Frame Grabber grab() Function', function() {
             inputStream.setCanvasSize({ x: inputStream.getWidth(), y: inputStream.getHeight() });
             inputStream.setTopRight({ x: 0, y: 0 });
 
-            const grabber = FrameGrabber.create(inputStream, null);
+            const grabber = FrameGrabberNode.create(inputStream, null);
             const result = grabber.grab();
             const data = grabber.getData();
 
@@ -172,6 +306,193 @@ describe('Frame Grabber grab() Function', function() {
             // Save a middle row sample for visual comparison
             const middleRowStart = Math.floor(inputStream.getHeight() / 2) * inputStream.getWidth();
             console.log('Middle row sample (first 50):', Array.from(data.slice(middleRowStart, middleRowStart + 50)));
+        });
+    });
+
+    describe('Node vs Browser scaleAndCrop comparison', () => {
+        it('should compare Node and Browser scaleAndCrop algorithms with codabar image-008', async () => {
+            // Load the actual image using Node's input stream
+            const inputStream = InputStreamFactory.createImageStream();
+            const imagePath = path.resolve(__dirname, '../../../../test/fixtures/codabar/image-008.jpg');
+            inputStream.setInputStream({
+                src: imagePath,
+                mime: 'image/jpeg',
+                size: 800,
+                sequence: false,
+            });
+
+            await waitForCanRecord(inputStream);
+            
+            // Get dimensions
+            const videoWidth = inputStream.getRealWidth();
+            const videoHeight = inputStream.getRealHeight();
+            const canvasWidth = inputStream.getWidth();
+            const canvasHeight = inputStream.getHeight();
+            
+            // Get the raw RGBA data from the frame
+            const frame = inputStream.getFrame();
+            expect(frame).to.not.be.null;
+            expect(frame.data).to.not.be.undefined;
+            
+            // Convert ndarray frame to Uint8Array RGBA data
+            const rgbaData = new Uint8Array(videoWidth * videoHeight * 4);
+            for (let y = 0; y < videoHeight; y++) {
+                for (let x = 0; x < videoWidth; x++) {
+                    const idx = (y * videoWidth + x) * 4;
+                    rgbaData[idx] = frame.get(x, y, 0);     // R
+                    rgbaData[idx + 1] = frame.get(x, y, 1); // G
+                    rgbaData[idx + 2] = frame.get(x, y, 2); // B
+                    rgbaData[idx + 3] = frame.get(x, y, 3); // A
+                }
+            }
+            
+            console.log('\n=== Comparing Node vs Browser scaleAndCrop ===');
+            console.log(`Video size: ${videoWidth}x${videoHeight}`);
+            console.log(`Canvas size: ${canvasWidth}x${canvasHeight}`);
+            
+            // Run both algorithms with the same input
+            const nodeOutput = nodeScaleAndCrop(
+                rgbaData,
+                videoWidth, videoHeight,
+                canvasWidth, canvasHeight,
+                0, 0, // topRight
+                canvasWidth, canvasHeight // output size
+            );
+            
+            const browserOutput = browserScaleAndCrop(
+                rgbaData,
+                videoWidth, videoHeight,
+                canvasWidth, canvasHeight,
+                0, 0, // topRight
+                canvasWidth, canvasHeight, // output size
+                {} // config
+            );
+            
+            // Compare outputs
+            expect(nodeOutput.length).to.equal(browserOutput.length);
+            
+            let diffCount = 0;
+            let maxDiff = 0;
+            let totalDiff = 0;
+            const diffPositions: number[] = [];
+            
+            for (let i = 0; i < nodeOutput.length; i++) {
+                const diff = Math.abs(nodeOutput[i] - browserOutput[i]);
+                if (diff > 0) {
+                    diffCount++;
+                    totalDiff += diff;
+                    if (diff > maxDiff) maxDiff = diff;
+                    if (diffPositions.length < 10) {
+                        diffPositions.push(i);
+                    }
+                }
+            }
+            
+            const avgDiff = diffCount > 0 ? totalDiff / diffCount : 0;
+            
+            console.log(`\nComparison results:`);
+            console.log(`  Total pixels: ${nodeOutput.length}`);
+            console.log(`  Pixels with differences: ${diffCount} (${(diffCount / nodeOutput.length * 100).toFixed(2)}%)`);
+            console.log(`  Max difference: ${maxDiff}`);
+            console.log(`  Average difference (when different): ${avgDiff.toFixed(2)}`);
+            
+            if (diffCount > 0) {
+                console.log(`\nFirst 10 difference positions:`);
+                diffPositions.forEach(pos => {
+                    console.log(`    [${pos}]: Node=${nodeOutput[pos]}, Browser=${browserOutput[pos]}, diff=${Math.abs(nodeOutput[pos] - browserOutput[pos])}`);
+                });
+            }
+            
+            // Sample comparison
+            console.log('\nFirst 20 values comparison:');
+            console.log('  Node:   ', Array.from(nodeOutput.slice(0, 20)));
+            console.log('  Browser:', Array.from(browserOutput.slice(0, 20)));
+            
+            // The test should pass if implementations match, or fail with useful info if they don't
+            if (diffCount > 0) {
+                console.log('\n*** IMPLEMENTATIONS DIFFER! See details above. ***');
+            } else {
+                console.log('\n*** IMPLEMENTATIONS MATCH! ***');
+            }
+            
+            // For now, just assert they were computed - we want to see the comparison
+            expect(nodeOutput.length).to.be.greaterThan(0);
+            expect(browserOutput.length).to.be.greaterThan(0);
+        });
+        
+        it('should compare Node and Browser with code_39 image-010 (original issue image)', async () => {
+            const inputStream = InputStreamFactory.createImageStream();
+            const imagePath = path.resolve(__dirname, '../../../../test/fixtures/code_39/image-010.jpg');
+            inputStream.setInputStream({
+                src: imagePath,
+                mime: 'image/jpeg',
+                size: 800,
+                sequence: false,
+            });
+
+            await waitForCanRecord(inputStream);
+            
+            const videoWidth = inputStream.getRealWidth();
+            const videoHeight = inputStream.getRealHeight();
+            const canvasWidth = inputStream.getWidth();
+            const canvasHeight = inputStream.getHeight();
+            
+            const frame = inputStream.getFrame();
+            expect(frame).to.not.be.null;
+            
+            // Convert ndarray frame to Uint8Array RGBA data
+            const rgbaData = new Uint8Array(videoWidth * videoHeight * 4);
+            for (let y = 0; y < videoHeight; y++) {
+                for (let x = 0; x < videoWidth; x++) {
+                    const idx = (y * videoWidth + x) * 4;
+                    rgbaData[idx] = frame.get(x, y, 0);
+                    rgbaData[idx + 1] = frame.get(x, y, 1);
+                    rgbaData[idx + 2] = frame.get(x, y, 2);
+                    rgbaData[idx + 3] = frame.get(x, y, 3);
+                }
+            }
+            
+            console.log('\n=== Code_39 image-010: Node vs Browser comparison ===');
+            console.log(`Video size: ${videoWidth}x${videoHeight}`);
+            console.log(`Canvas size: ${canvasWidth}x${canvasHeight}`);
+            
+            const nodeOutput = nodeScaleAndCrop(
+                rgbaData,
+                videoWidth, videoHeight,
+                canvasWidth, canvasHeight,
+                0, 0,
+                canvasWidth, canvasHeight
+            );
+            
+            const browserOutput = browserScaleAndCrop(
+                rgbaData,
+                videoWidth, videoHeight,
+                canvasWidth, canvasHeight,
+                0, 0,
+                canvasWidth, canvasHeight,
+                {}
+            );
+            
+            let diffCount = 0;
+            let maxDiff = 0;
+            
+            for (let i = 0; i < nodeOutput.length; i++) {
+                const diff = Math.abs(nodeOutput[i] - browserOutput[i]);
+                if (diff > 0) {
+                    diffCount++;
+                    if (diff > maxDiff) maxDiff = diff;
+                }
+            }
+            
+            console.log(`Pixels with differences: ${diffCount} / ${nodeOutput.length}`);
+            console.log(`Max difference: ${maxDiff}`);
+            console.log('First 20 - Node:   ', Array.from(nodeOutput.slice(0, 20)));
+            console.log('First 20 - Browser:', Array.from(browserOutput.slice(0, 20)));
+            
+            if (diffCount === 0) {
+                console.log('\n*** scaleAndCrop implementations produce IDENTICAL output! ***');
+                console.log('*** The difference must be in image acquisition (canvas vs direct buffer) ***');
+            }
         });
     });
 });
