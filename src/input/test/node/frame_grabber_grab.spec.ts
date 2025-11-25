@@ -8,6 +8,7 @@
 import { describe, it, beforeEach } from 'mocha';
 import { expect } from 'chai';
 import * as path from 'path';
+import * as fs from 'fs';
 
 // Import the actual Node FrameGrabber
 // eslint-disable-next-line @typescript-eslint/no-var-requires
@@ -503,7 +504,6 @@ describe('Frame Grabber grab() Function', function() {
             // Check if browser output file exists
             let browserData: any = null;
             try {
-                const fs = require('fs');
                 if (fs.existsSync(browserDataPath)) {
                     const fileContent = fs.readFileSync(browserDataPath, 'utf8');
                     browserData = JSON.parse(fileContent);
@@ -556,10 +556,9 @@ describe('Frame Grabber grab() Function', function() {
                     console.log(`WARNING: Dimension mismatch! Browser: ${browserData.width}x${browserData.height}, Node: ${inputStream.getWidth()}x${inputStream.getHeight()}`);
                 }
 
-                // Decode browser full data
-                const browserFullData = new Uint8Array(
-                    atob(browserData.fullDataBase64).split('').map((c: string) => c.charCodeAt(0))
-                );
+                // Decode browser full data from base64
+                // Use Buffer for efficient decoding in Node
+                const browserFullData = new Uint8Array(Buffer.from(browserData.fullDataBase64, 'base64'));
 
                 let diffCount = 0;
                 let maxDiff = 0;
@@ -593,7 +592,6 @@ describe('Frame Grabber grab() Function', function() {
 
                 // Clean up the file after comparison
                 try {
-                    const fs = require('fs');
                     fs.unlinkSync(browserDataPath);
                     console.log('\nCleaned up browser output file.');
                 } catch (e) {

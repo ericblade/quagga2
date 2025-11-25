@@ -103,6 +103,14 @@ describe('Browser Frame Grabber grab() Function', function() {
             console.log('Last 20 values:', Array.from(grabData.slice(-20)));
             
             // Write data to file for Node comparison
+            // Use chunked base64 encoding to avoid stack overflow with large arrays
+            let base64 = '';
+            const CHUNK_SIZE = 8192;
+            for (let i = 0; i < grabData.length; i += CHUNK_SIZE) {
+                const chunk = grabData.subarray(i, Math.min(i + CHUNK_SIZE, grabData.length));
+                base64 += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+            }
+            
             const outputData = {
                 image: 'codabar/image-008.jpg',
                 width: imageWidth,
@@ -110,8 +118,9 @@ describe('Browser Frame Grabber grab() Function', function() {
                 stats: { min, max, avg },
                 first50: Array.from(grabData.slice(0, 50)),
                 last50: Array.from(grabData.slice(-50)),
-                // Store full data as base64 to keep file size manageable
-                fullDataBase64: btoa(String.fromCharCode.apply(null, Array.from(grabData))),
+                // Store full data as chunked base64
+                fullDataBase64: base64,
+                dataLength: grabData.length,
             };
             
             // Use Cypress to write the file
@@ -158,6 +167,14 @@ describe('Browser Frame Grabber grab() Function', function() {
             console.log(`Stats: min=${min}, max=${max}, avg=${avg.toFixed(2)}`);
             console.log('First 20 values:', Array.from(grabData.slice(0, 20)));
             
+            // Use chunked base64 encoding to avoid stack overflow with large arrays
+            let base64 = '';
+            const CHUNK_SIZE = 8192;
+            for (let i = 0; i < grabData.length; i += CHUNK_SIZE) {
+                const chunk = grabData.subarray(i, Math.min(i + CHUNK_SIZE, grabData.length));
+                base64 += btoa(String.fromCharCode.apply(null, Array.from(chunk)));
+            }
+            
             const outputData = {
                 image: 'code_39/image-010.jpg',
                 width: imageWidth,
@@ -165,7 +182,8 @@ describe('Browser Frame Grabber grab() Function', function() {
                 stats: { min, max, avg },
                 first50: Array.from(grabData.slice(0, 50)),
                 last50: Array.from(grabData.slice(-50)),
-                fullDataBase64: btoa(String.fromCharCode.apply(null, Array.from(grabData))),
+                fullDataBase64: base64,
+                dataLength: grabData.length,
             };
             
             if (typeof cy !== 'undefined') {
