@@ -177,7 +177,6 @@ npx cypress open --e2e --browser electron --config specPattern=cypress/e2e/ean_e
 **Note:**
 - Cypress only supports filtering by spec file using `--spec` by default.
 - Filtering individual tests by pattern (like grep) requires installing a third-party plugin such as `cypress-grep` and additional setup. This is not included in the default project configuration.
-```
 
 **Important Notes:**
 - Always run from the `master/` directory (or appropriate workspace folder)
