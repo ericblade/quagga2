@@ -879,25 +879,7 @@ calling ``decodeSingle`` with the same configuration as used during recording
 . In order to reproduce the exact same result, you have to make sure to turn
 on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 
-[zxing_github]: https://github.com/zxing/zxing
-[teaser_left]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-located.png
-[teaser_right]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-detected.png
-[caniuse_getusermedia]: http://caniuse.com/#feat=stream
-[cypressUrl]: https://www.cypress.io/
-[sinonUrl]: http://sinonjs.org/
-[chaiUrl]: http://chaijs.com/
-[mochaUrl]: https://github.com/mochajs/mocha
-[code39_wiki]: http://en.wikipedia.org/wiki/Code_39
-[codabar_wiki]: http://en.wikipedia.org/wiki/Codabar
-[upc_wiki]: http://en.wikipedia.org/wiki/Universal_Product_Code
-[ean_8_wiki]: http://en.wikipedia.org/wiki/EAN-8
-[oberhofer_co_how]: http://www.oberhofer.co/how-barcode-localization-works-in-quaggajs/
-[github_examples]: https://serratus.github.io/quaggaJS/examples
-[i2of5_wiki]: https://en.wikipedia.org/wiki/Interleaved_2_of_5
-[enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
-[reactExample]: https://github.com/ericblade/quagga2-react-example
-[issue-94-comment]: https://github.com/serratus/quaggajs/issues/94#issuecomment-571478711
-#### Sequence Mode
+### Sequence Mode
 
 Quagga2 supports loading a sequence of images for batch processing using the `inputStream.sequence` option. When enabled, Quagga will attempt to load images named in the pattern `image-001.jpg`, `image-002.jpg`, etc., from the specified directory.
 
@@ -918,3 +900,22 @@ Quagga.init({
 This will load `/path/to/images/image-001.jpg`, `/path/to/images/image-002.jpg`, `/path/to/images/image-003.jpg` for processing.
 
 Sequence mode is useful for batch testing or processing multiple images with predictable filenames.
+
+[zxing_github]: https://github.com/zxing/zxing
+[teaser_left]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-located.png
+[teaser_right]: https://raw.githubusercontent.com/serratus/quaggaJS/master/doc/img/mobile-detected.png
+[caniuse_getusermedia]: http://caniuse.com/#feat=stream
+[cypressUrl]: https://www.cypress.io/
+[sinonUrl]: http://sinonjs.org/
+[chaiUrl]: http://chaijs.com/
+[mochaUrl]: https://github.com/mochajs/mocha
+[code39_wiki]: http://en.wikipedia.org/wiki/Code_39
+[codabar_wiki]: http://en.wikipedia.org/wiki/Codabar
+[upc_wiki]: http://en.wikipedia.org/wiki/Universal_Product_Code
+[ean_8_wiki]: http://en.wikipedia.org/wiki/EAN-8
+[oberhofer_co_how]: http://www.oberhofer.co/how-barcode-localization-works-in-quaggajs/
+[github_examples]: https://serratus.github.io/quaggaJS/examples
+[i2of5_wiki]: https://en.wikipedia.org/wiki/Interleaved_2_of_5
+[enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
+[reactExample]: https://github.com/ericblade/quagga2-react-example
+[issue-94-comment]: https://github.com/serratus/quaggajs/issues/94#issuecomment-571478711
