@@ -61,15 +61,6 @@ These packages contain code that is **imported by the source code** and **bundle
   - **Files**:
     - `src/input/input_stream/input_stream.ts` - `getPixels()` for image loading
 
-### Polyfills (Deprecated)
-
-- **`@babel/polyfill`** (^7.12.1)
-  - **Status**: ⚠️ **DEPRECATED** by Babel team
-  - **Purpose**: Legacy polyfill for ES6+ features
-  - **Current Usage**: Not directly imported in source code
-  - **Recommendation**: Should be removed in favor of `core-js` + `regenerator-runtime` or Babel's automatic polyfill injection
-  - **Migration Path**: Use `@babel/preset-env` with `useBuiltIns: 'usage'` and explicit `core-js@3`
-
 ---
 
 ## Build & Development Tools
@@ -222,9 +213,8 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 
 ### Known Issues
 
-1. **`@babel/polyfill` is deprecated** - Should migrate to `core-js@3` + `regenerator-runtime`
-2. **Old `mocha` version** - v5.2.0 is from 2018, may have unpatched vulnerabilities
-3. **Webpack 4** - No longer receives updates, consider upgrading to Webpack 5
+1. **Old `mocha` version** - v5.2.0 is from 2018, may have unpatched vulnerabilities
+2. **Webpack 4** - No longer receives updates, consider upgrading to Webpack 5
 
 ### Monitoring
 
@@ -256,7 +246,7 @@ A: `optionalDependencies` are packages that enhance functionality if available b
 
 **Q: Can I remove `@babel/polyfill`?**
 
-A: Yes, but carefully. It's deprecated and not directly imported anymore. Remove it from `package.json` and verify that `@babel/preset-env` is configured to polyfill features automatically via `core-js@3`. Test thoroughly in older browsers (IE11, older Safari) after removal.
+A: **It has been removed.** Investigation in November 2025 confirmed that `@babel/polyfill` was never actually imported or used in the codebase - it was a historical dependency that had no effect. The `@babel/preset-env` configuration with `useBuiltIns: "entry"` requires explicit imports of `core-js` at entry points, but no such imports existed. The `@babel/plugin-transform-runtime` handles async/await via `@babel/runtime`, which is bundled automatically. Removal has no impact on bundle size or functionality.
 
 **Q: Why can't I upgrade `chai` to version 5 or 6?**
 
@@ -283,4 +273,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-11-22
+Last updated: 2025-11-26
