@@ -1,5 +1,10 @@
 import { findTagsInObjectURL } from './exif_helper';
 
+// Exported helper for filename generation
+export function generateImageFilename(directory, num) {
+    return `${directory}image-${num.toString().padStart(3, '0')}.jpg`;
+}
+
 const ImageLoader = {};
 ImageLoader.load = function (directory, callback, offset, size, sequence, config) {
     const htmlImagesSrcArray = new Array(size);
@@ -13,7 +18,7 @@ ImageLoader.load = function (directory, callback, offset, size, sequence, config
     } else {
         for (i = 0; i < htmlImagesSrcArray.length; i++) {
             num = (offset + i);
-            htmlImagesSrcArray[i] = `${directory}image-${(`00${num}`).slice(-3)}.jpg`;
+            htmlImagesSrcArray[i] = generateImageFilename(directory, num);
         }
     }
     htmlImagesArray.notLoaded = [];
@@ -26,7 +31,8 @@ ImageLoader.load = function (directory, callback, offset, size, sequence, config
             if (notloadedImgs[x] === loadedImg) {
                 notloadedImgs.splice(x, 1);
                 for (let y = 0; y < htmlImagesSrcArray.length; y++) {
-                    const imgName = htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf('/'));
+                    // Use encodeURI for matching filenames with spaces and special characters
+                    const imgName = encodeURI(htmlImagesSrcArray[y].substr(htmlImagesSrcArray[y].lastIndexOf('/')));
                     if (loadedImg.src.lastIndexOf(imgName) !== -1) {
                         htmlImagesArray[y] = { img: loadedImg };
                         break;
@@ -64,6 +70,9 @@ ImageLoader.load = function (directory, callback, offset, size, sequence, config
 
 function addOnloadHandler(img, htmlImagesArray) {
     img.onload = function () {
+        htmlImagesArray.loaded(this);
+    };
+    img.onerror = function () {
         htmlImagesArray.loaded(this);
     };
 }

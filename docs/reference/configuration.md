@@ -373,6 +373,38 @@ debug: {
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for details.
 
+### `inputStream.sequence` (ImageStream only)
+
+**Type**: `boolean` (default: `false`)
+
+**Description**: When set to `true` and used with `type: 'ImageStream'`, Quagga will load a sequence of images named `image-001.jpg`, `image-002.jpg`, etc., from the base path specified by `src`, starting at the `offset` index and loading `size` images.
+
+**Note:** Sequence mode currently only supports `.jpg` files. Images with other extensions (e.g., `.png`) will not be loaded. If you need support for other formats, see the related feature request or use single image mode.
+
+**Related Properties:**
+- `inputStream.src`: Base path for images (e.g., `/path/to/images/`)
+- `inputStream.size`: Number of images to load
+- `inputStream.offset`: Starting index (default: 1)
+
+**Example:**
+
+```javascript
+Quagga.init({
+  inputStream: {
+    type: 'ImageStream',
+    src: '/path/to/images/', // Base path for images
+    sequence: true,
+    size: 3, // Number of images to load
+    offset: 1 // Starting index (optional)
+  },
+  decoder: { readers: ['code_128_reader'] }
+});
+```
+
+This will load `/path/to/images/image-001.jpg`, `/path/to/images/image-002.jpg`, `/path/to/images/image-003.jpg`.
+
+Sequence mode is ideal for batch testing or processing multiple images with predictable filenames.
+
 ## Decoder Configuration
 
 Controls barcode detection and decoding behavior.

@@ -897,3 +897,24 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 [enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
 [reactExample]: https://github.com/ericblade/quagga2-react-example
 [issue-94-comment]: https://github.com/serratus/quaggajs/issues/94#issuecomment-571478711
+#### Sequence Mode
+
+Quagga2 supports loading a sequence of images for batch processing using the `inputStream.sequence` option. When enabled, Quagga will attempt to load images named in the pattern `image-001.jpg`, `image-002.jpg`, etc., from the specified directory.
+
+**Example:**
+```javascript
+Quagga.init({
+  inputStream: {
+    type: 'ImageStream',
+    sequence: true,
+    size: 3, // Number of images to load
+    offset: 1, // Starting index (optional)
+    src: '/path/to/images/', // Base path for images
+  },
+  decoder: { readers: ['code_128_reader'] }
+});
+```
+
+This will load `/path/to/images/image-001.jpg`, `/path/to/images/image-002.jpg`, `/path/to/images/image-003.jpg` for processing.
+
+Sequence mode is useful for batch testing or processing multiple images with predictable filenames.
