@@ -909,7 +909,7 @@ Quagga.init({
     sequence: true,
     size: 3, // Number of images to load
     offset: 1, // Starting index (optional)
-    // directory: '/path/to/images/'
+    // src: '/path/to/images/'
   },
   decoder: { readers: ['code_128_reader'] }
 });
