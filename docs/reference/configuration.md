@@ -807,28 +807,4 @@ Quagga.decodeSingle({
 ---
 
 [← Back to Reference](index.md)
-#### Sequence Mode
-
-Quagga2 can load a sequence of images for batch processing using the `inputStream.sequence` option. When set to `true`, Quagga will load images named `image-001.jpg`, `image-002.jpg`, etc., from the specified directory, starting at the `offset` index and loading `size` images.
-
-**Note:** Sequence mode currently only supports `.jpg` files. Images with other extensions (e.g., `.png`) will not be loaded. If you need support for other formats, see the related feature request or use single image mode.
-
-**Example:**
-```javascript
-Quagga.init({
-  inputStream: {
-    type: 'ImageStream',
-    sequence: true,
-    size: 3, // Number of images to load
-    offset: 1, // Starting index (optional)
-    // directory: '/path/to/images/'
-  },
-  decoder: { readers: ['code_128_reader'] }
-});
-```
-
-This will load `/path/to/images/image-001.jpg`, `/path/to/images/image-002.jpg`, `/path/to/images/image-003.jpg`.
-
-Sequence mode is ideal for batch testing or processing multiple images with predictable filenames.
-
 ---
