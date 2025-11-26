@@ -807,4 +807,3 @@ Quagga.decodeSingle({
 ---
 
 [← Back to Reference](index.md)
----
