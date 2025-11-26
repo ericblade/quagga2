@@ -1,3 +1,4 @@
+import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import ImageLoader, { generateImageFilename } from '../../image_loader';
 
