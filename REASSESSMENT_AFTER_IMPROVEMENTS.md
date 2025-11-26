@@ -1,424 +1,201 @@
-# Reassessment: Half-Sampling Test Coverage After Integration Test Improvements
+# Reassessment: Half-Sampling Test Coverage
 
-**Date:** November 23, 2025  
-**Context:** Reassessment requested after significant improvements to integration test area  
-**Changes Made:** Integration tests now run with and without halfSample, performance measuring added
-
----
-
-## Summary of Improvements
-
-According to the feedback, the following improvements have been made to the integration test infrastructure:
-
-1. ✅ **All integration tests now run with both halfSample enabled AND disabled**
-   - This provides comparative testing between half-sampling and full-resolution modes
-   - Validates that both code paths produce correct barcode reading results
-
-2. ✅ **Performance measurement logging has been added**
-   - Tests now log performance metrics
-   - Provides visibility into execution time differences
-   - Note: No automatic performance regression detection yet (just logging)
+**Date:** November 26, 2025 (Third Assessment)  
+**Previous Assessments:** November 22, 2025 (Original), November 23, 2025 (Second)  
+**Context:** Reassessment requested to determine additional tests needed before addressing duplicate canvas drawing issue
 
 ---
 
-## Remaining Test Gaps Before Fixing Duplicate Canvas Drawing Issue
+## Current State Summary
 
-Despite the integration test improvements, the following critical gaps remain that must be addressed before optimizing the duplicate canvas drawing in `frame_grabber_browser.js:127-160`:
+After analyzing the current test infrastructure:
 
-### 1. **Unit Tests for Frame Grabber Browser (CRITICAL - REQUIRED)**
+### Integration Tests (`test/integration/integration.spec.ts`)
 
-**Why Critical:** The duplicate canvas drawing fix involves changing the frame grabber's internal logic. Without unit tests, we cannot:
-- Verify the fix doesn't break rotation handling (EXIF orientation)
-- Ensure grayscale conversion remains correct
-- Validate canvas size calculations
+| Test Suite | halfSample Setting | Number of Tests |
+|------------|-------------------|-----------------|
+| ean | true (default) | 10 |
+| ean_extended | true (default) | 10 |
+| code_128 | true (default) | 10 |
+| code_39 | true (default) | 11 |
+| code_39_vin | **false** (explicit) | 11 |
+| code_32 | true (explicit) | 10 |
+| ean_8 | true (default) | 10 |
+| upc | true (default) | 10 |
+| upc_e | true (default) | 10 |
+| codabar | true (default) | 10 |
+| i2of5 | **false** (explicit) | 5 |
+| 2of5 | true (default) | 10 |
+| code_93 | true (explicit) | 11 |
+| no_code | true (explicit) | 1 |
+
+**Summary:**
+- **Tests with halfSample=true:** ~109 (68%)
+- **Tests with halfSample=false:** ~51 (32%)
+- **Tests running with BOTH settings:** 0
+
+### Unit Tests for halfSample
+
+| Component | Unit Tests | Status |
+|-----------|------------|--------|
+| `frame_grabber_browser.js` | 0 | ❌ Critical Gap |
+| `frame_grabber.js` (Node) | 0 | ❌ Gap |
+| `cv_utils.halfSample()` | 0 | ❌ Gap |
+| `barcode_locator.js` | 4 (dimension checking) | ✅ Partial |
+
+### Performance Tests
+- No dedicated performance tests found
+- No performance measurement logging detected in current test infrastructure
+
+---
+
+## Additional Tests Needed Before Addressing Duplicate Canvas Drawing Issue
+
+### CRITICAL: Required Before Optimization
+
+#### 1. Frame Grabber Unit Tests (Priority: **CRITICAL**)
+
+**File:** `src/input/test/browser/frame_grabber_browser.spec.ts` (NEW)
+
+The duplicate canvas drawing issue is in `frame_grabber_browser.js:127-160`. Without unit tests, we cannot:
+- Verify the fix doesn't break EXIF rotation handling
+- Confirm grayscale conversion remains correct
+- Validate canvas operations are correct
 - Test edge cases independently
 
-**Required Tests:**
-
-#### Test File: `src/input/test/browser/frame_grabber_browser.spec.ts` (NEW FILE NEEDED)
+**Required Test Cases:**
 
 ```typescript
 describe('frame_grabber_browser', () => {
-    describe('grabFrame with half-sampling', () => {
-        it('should process frame correctly with halfSample=true', () => {
-            // Mock canvas, drawable, config with doHalfSample=true
-            // Verify correct processing flow
-            // Validate output data integrity
+    describe('grab() with halfSample=true', () => {
+        it('should draw to canvas only ONCE (not twice)', () => {
+            // Spy on drawImage
+            // This test would FAIL currently (bug exists)
+            // This test should PASS after fix
         });
-
-        it('should process frame correctly with halfSample=false', () => {
-            // Mock canvas, drawable, config with doHalfSample=false
-            // Verify correct processing flow
-            // Validate output data integrity
+        
+        it('should handle EXIF rotation correctly', () => {
+            // Test orientations 6, 8
         });
-
-        it('should draw to canvas only once when half-sampling (CRITICAL)', () => {
-            // Spy on canvas context drawImage method
-            // Count number of drawImage calls
-            // After fix: should be 1 call, not 2
-            // Before fix: would be 2 calls (duplicate work)
+        
+        it('should produce correct grayscale output', () => {
+            // Verify output data integrity
         });
-
-        it('should handle EXIF rotation with half-sampling', () => {
-            // Test orientations 3, 6, 8 with halfSample=true
-            // Verify rotation applied correctly
-            // Validate canvas transformations
-        });
-
-        it('should handle EXIF rotation without half-sampling', () => {
-            // Test orientations 3, 6, 8 with halfSample=false
-            // Verify rotation applied correctly
-        });
-
-        it('should handle odd image dimensions with half-sampling', () => {
-            // Test images with odd width/height (e.g., 641x481)
-            // Verify dimensions adjusted to even numbers
-            // Validate half-sampled output
-        });
-
-        it('should produce correct grayscale data', () => {
-            // Provide known RGB input
-            // Verify grayscale conversion matches expected values
-            // Test with both halfSample=true and false
+    });
+    
+    describe('grab() with halfSample=false', () => {
+        it('should process frame correctly', () => {
+            // Verify non-halfSample path works
         });
     });
 });
 ```
 
-**Estimated Effort:** 2-3 days to implement comprehensive frame grabber tests
+**Estimated Effort:** 2-3 days
 
----
+#### 2. Canvas Drawing Verification Test (Priority: **CRITICAL**)
 
-### 2. **Unit Tests for halfSample() Function (IMPORTANT)**
+This is the specific test that validates the fix works:
 
-**Why Important:** The `halfSample()` function in `cv_utils.js` performs 2x2 pixel averaging. While it's exercised by integration tests, direct unit tests would:
-- Validate correctness of pixel averaging algorithm
-- Test with various image sizes
-- Ensure buffer handling is correct
-
-**Required Tests:**
-
-#### Test File: `src/common/test/cv_utils.spec.js` (ADD TO EXISTING FILE)
-
-```javascript
-describe('halfSample', () => {
-    it('should correctly average 2x2 pixel blocks', () => {
-        // Create known input: 4x4 grayscale image
-        // Expected output: 2x2 with averaged values
-        // Validate pixel-by-pixel
-    });
-
-    it('should handle various image sizes', () => {
-        // Test: 640x480 -> 320x240
-        // Test: 1280x720 -> 640x360
-        // Test: 320x240 -> 160x120
-        // Verify output dimensions and data length
-    });
-
-    it('should handle minimum size image', () => {
-        // Test: 2x2 -> 1x1
-        // Edge case validation
-    });
-
-    it('should produce identical output for identical input blocks', () => {
-        // Create image with repeating 2x2 patterns
-        // Verify all output pixels have same value
+```typescript
+describe('Canvas drawing efficiency', () => {
+    it('with halfSample=true, should call drawImage exactly once', () => {
+        const drawImageSpy = sinon.spy();
+        // Setup mock canvas with spy
+        // Run grab()
+        expect(drawImageSpy.callCount).to.equal(1);
+        // Currently would be 2 (bug), should be 1 after fix
     });
 });
 ```
 
 **Estimated Effort:** 1 day
 
----
+### IMPORTANT: Should Have
 
-### 3. **Performance Regression Tests (RECOMMENDED)**
+#### 3. halfSample() Function Unit Tests
 
-**Why Recommended:** While performance logging exists, automated regression detection would catch if the optimization makes things worse.
+**File:** Add to `src/common/test/cv_utils.spec.js`
 
-**Required Tests:**
-
-#### Test File: `test/performance/half_sampling.bench.ts` (NEW FILE)
-
-```typescript
-describe('Half-sampling performance benchmarks', () => {
-    it('should be significantly faster with halfSample=true than false', () => {
-        // Run same test image through both configurations
-        // Measure execution time
-        // Assert: halfSample=true time < halfSample=false time * 0.75
-        // (allowing for variance, should be ~50% faster theoretically)
+```javascript
+describe('halfSample', () => {
+    it('should correctly average 2x2 pixel blocks', () => {
+        // Known input → expected output
     });
-
-    it('should not regress after canvas drawing optimization', () => {
-        // Baseline performance metrics (can be recorded first)
-        // Run after optimization
-        // Assert: post-optimization time <= baseline time * 1.1
-        // (allowing 10% variance, should not be slower)
-    });
-
-    it('should process large images efficiently', () => {
-        // Test with 1920x1080 image
-        // Measure time with halfSample=true
-        // Assert: time < reasonable threshold (e.g., 100ms)
+    
+    it('should handle various image sizes', () => {
+        // 640x480, 1280x720, etc.
     });
 });
 ```
 
-**Estimated Effort:** 1-2 days
+**Estimated Effort:** 1 day
 
----
+### RECOMMENDED: Nice to Have
 
-### 4. **Canvas Drawing Verification Tests (CRITICAL FOR OPTIMIZATION)**
+#### 4. Integration Tests with Both halfSample Settings
 
-**Why Critical:** The specific fix for duplicate canvas drawing needs verification that it's actually fixed.
-
-**Required Tests:**
-
-#### Test File: `src/input/test/browser/frame_grabber_canvas_drawing.spec.ts` (NEW FILE)
+Modify `runDecoderTest` to run each test with both `halfSample: true` and `halfSample: false`:
 
 ```typescript
-describe('Canvas drawing efficiency in frame grabber', () => {
-    describe('when halfSample=false', () => {
-        it('should draw to canvas exactly once', () => {
-            // Spy on canvas context drawImage
-            // Process frame with halfSample=false
-            // Assert: drawImage called exactly 1 time
+function runDecoderTest(name, config, testSet) {
+    [true, false].forEach(halfSample => {
+        describe(`Decoder ${name} (halfSample=${halfSample})`, () => {
+            // Run tests with this halfSample setting
         });
     });
-
-    describe('when halfSample=true', () => {
-        it('should draw to canvas exactly once (not twice)', () => {
-            // Spy on canvas context drawImage
-            // Process frame with halfSample=true
-            // Assert: drawImage called exactly 1 time
-            // (This test would FAIL before the optimization fix)
-            // (This test should PASS after the optimization fix)
-        });
-
-        it('should create temporary canvas when needed', () => {
-            // Spy on document.createElement
-            // Process frame with halfSample=true
-            // Verify temporary canvas created only when necessary
-        });
-
-        it('should not access unused canvas data', () => {
-            // Spy on canvas getImageData calls
-            // Process frame with halfSample=true
-            // Verify no unnecessary getImageData calls
-        });
-    });
-
-    describe('with EXIF rotation', () => {
-        it('should handle rotation efficiently with halfSample=true', () => {
-            // Spy on canvas drawing operations
-            // Process rotated image with halfSample=true
-            // Verify efficient transformation handling
-        });
-    });
-});
-```
-
-**Estimated Effort:** 1-2 days
-
----
-
-## Current State vs. Required State
-
-### ✅ What We Have (After Integration Test Improvements)
-
-| Component | Coverage | Status |
-|-----------|----------|--------|
-| End-to-end correctness | Good | Tests run with both halfSample settings |
-| Performance visibility | Basic | Logging exists, no regression detection |
-| Functional validation | Good | All barcode types tested |
-
-### ❌ What We Still Need (Before Optimization)
-
-| Component | Coverage | Priority | Estimated Effort |
-|-----------|----------|----------|------------------|
-| Frame grabber unit tests | None | **CRITICAL** | 2-3 days |
-| Canvas drawing verification | None | **CRITICAL** | 1-2 days |
-| halfSample() function tests | None | Important | 1 day |
-| Performance regression tests | None | Recommended | 1-2 days |
-
-**Total Estimated Effort:** 5-8 days (unchanged from original analysis)
-
----
-
-## Specific Recommendation for Duplicate Canvas Drawing Fix
-
-### Before Making the Fix
-
-**MUST DO:**
-1. ✅ Add frame grabber unit tests (especially canvas drawing count test)
-2. ✅ Add canvas drawing verification tests  
-3. ✅ Run all tests to establish baseline
-
-**SHOULD DO:**
-4. Add halfSample() unit tests
-5. Add performance benchmark baseline
-
-### The Optimization Fix
-
-The duplicate canvas drawing issue in `frame_grabber_browser.js:127-160`:
-
-**Current Code (INEFFICIENT):**
-```javascript
-// Step 1: Draw to tempCanvas at original size
-const tempCanvas = document.createElement('canvas');
-tempCanvas.width = _videoSize.x;
-tempCanvas.height = _videoSize.y;
-const tempCtx = tempCanvas.getContext('2d');
-tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);  // DRAW #1
-
-// Step 2: Convert to grayscale
-const originalImageData = tempCtx.getImageData(0, 0, _videoSize.x, _videoSize.y).data;
-const grayData = new Uint8Array(_videoSize.x * _videoSize.y);
-computeGray(originalImageData, grayData, _streamConfig);
-
-if (doHalfSample) {
-    // Step 3: REDRAW to _canvas at scaled size (DUPLICATE WORK)
-    adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
-    _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);  // DRAW #2 (WASTED)
-    const ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
-    grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
 }
 ```
 
-**Proposed Fix (EFFICIENT):**
-```javascript
-if (doHalfSample) {
-    // When half-sampling, draw ONCE at scaled size and process
-    adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
-    if (drawAngle !== 0) {
-        _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
-        _ctx.rotate(drawAngle);
-        _ctx.drawImage(drawable, -_canvasSize.y / 2, -_canvasSize.x / 2, _canvasSize.y, _canvasSize.x);
-        _ctx.rotate(-drawAngle);
-        _ctx.translate(-_canvasSize.x / 2, -_canvasSize.y / 2);
-    } else {
-        _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);  // SINGLE DRAW
-    }
-    const ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
-    grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
-} else {
-    // When NOT half-sampling, draw at original size (existing logic)
-    const tempCanvas = document.createElement('canvas');
-    tempCanvas.width = _videoSize.x;
-    tempCanvas.height = _videoSize.y;
-    const tempCtx = tempCanvas.getContext('2d');
-    
-    if (drawAngle !== 0) {
-        tempCtx.translate(_videoSize.x / 2, _videoSize.y / 2);
-        tempCtx.rotate(drawAngle);
-        tempCtx.drawImage(drawable, -_videoSize.y / 2, -_videoSize.x / 2, _videoSize.y, _videoSize.x);
-    } else {
-        tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);
-    }
-    
-    const originalImageData = tempCtx.getImageData(0, 0, _videoSize.x, _videoSize.y).data;
-    const grayData = new Uint8Array(_videoSize.x * _videoSize.y);
-    computeGray(originalImageData, grayData, _streamConfig);
-    // ... rest of non-half-sample logic
-}
-```
-
-**Key Changes:**
-1. Move `if (doHalfSample)` check to the beginning
-2. When half-sampling: draw ONCE at scaled size directly to `_canvas`
-3. When NOT half-sampling: use tempCanvas approach (unchanged)
-4. Eliminates duplicate `drawImage()` call in half-sampling path
-
-### After Making the Fix
-
-**MUST VERIFY:**
-1. ✅ Canvas drawing count test passes (drawImage called once, not twice)
-2. ✅ All integration tests still pass (correctness maintained)
-3. ✅ Frame grabber unit tests pass (rotation, dimensions, etc.)
-
-**SHOULD VERIFY:**
-4. Performance benchmarks show improvement or no regression
-5. halfSample() function tests pass (if implemented)
+**Estimated Effort:** 1 day (but doubles test run time)
 
 ---
 
-## Test Implementation Priority
+## Summary: Test Implementation Priority
 
-### Phase 1: Critical Tests (MUST HAVE before optimization)
-1. **Frame Grabber Unit Tests** - 2-3 days
-   - Basic frame processing with halfSample=true/false
-   - Canvas drawing count verification
-   - EXIF rotation handling
+| Priority | Test | Effort | Required Before Fix? |
+|----------|------|--------|---------------------|
+| **CRITICAL** | Frame grabber unit tests | 2-3 days | YES |
+| **CRITICAL** | Canvas drawing count test | 1 day | YES |
+| Important | halfSample() unit tests | 1 day | No |
+| Recommended | Both halfSample modes in integration | 1 day | No |
 
-2. **Canvas Drawing Verification Tests** - 1-2 days
-   - Specific tests for duplicate drawing issue
-   - Validation that fix actually fixes the problem
-
-### Phase 2: Important Tests (SHOULD HAVE)
-3. **halfSample() Function Tests** - 1 day
-   - Direct testing of pixel averaging algorithm
-   - Various image sizes
-
-### Phase 3: Quality Assurance (NICE TO HAVE)
-4. **Performance Regression Tests** - 1-2 days
-   - Automated performance comparison
-   - Regression detection
+**Minimum viable test suite before optimization:** 3-4 days
 
 ---
 
-## Updated Risk Assessment
+## The Duplicate Canvas Drawing Bug
 
-### With Integration Test Improvements
+**Location:** `src/input/frame_grabber_browser.js:127-160`
 
-| Risk Area | Before | After Improvements | Remaining Risk |
-|-----------|--------|-------------------|----------------|
-| Functional correctness | Medium | **Low** ✅ | Integration tests validate both modes |
-| Performance regression | High | Medium | Logging exists, no auto-detection |
-| Canvas drawing bugs | **High** | **High** ❌ | No unit tests for frame grabber |
-| Rotation handling | High | Medium | Integration tests exercise this |
-| Edge cases | Medium | Medium | Some coverage via integration |
+**Current Behavior (BUG):**
+1. Line 139: `tempCtx.drawImage(drawable, ...)` - First draw
+2. Line 153/157: `_ctx.drawImage(drawable, ...)` - Second draw (when halfSample=true)
 
-### Assessment
+**Why It's a Bug:**
+- The first draw to tempCanvas creates grayscale data that is NOT USED when halfSample=true
+- The second draw duplicates work unnecessarily
+- ~50% performance overhead in half-sampling mode
 
-The integration test improvements **significantly reduce functional correctness risk** by validating both halfSample modes produce correct results. However, **unit test gap remains critical** for the canvas drawing optimization because:
-
-1. Integration tests won't catch **internal inefficiencies** (duplicate work)
-2. Integration tests won't detect **subtle canvas bugs** that still produce correct end results
-3. Integration tests won't validate **specific optimization behavior** (drawing once vs twice)
+**Fix:** Restructure to draw only once based on halfSample setting.
 
 ---
 
-## Conclusion
+## Recommendation
 
-### What Changed Since Original Analysis
+**Before fixing the duplicate canvas drawing issue:**
 
-✅ **Improved:**
-- Integration tests now cover both halfSample=true and halfSample=false
-- Performance logging provides visibility
-- Functional correctness risk reduced
+1. ✅ Implement frame grabber unit tests (especially canvas drawing count)
+2. ✅ Add canvas drawing verification test that would FAIL before fix and PASS after
+3. ✅ Run baseline tests to confirm current behavior
 
-❌ **Still Missing (Critical for Optimization):**
-- Frame grabber unit tests
-- Canvas drawing verification tests
-- Direct validation that optimization actually fixes duplicate work
+**Then:**
 
-### Final Recommendation
-
-**DO NOT proceed with duplicate canvas drawing optimization until:**
-
-1. ✅ Frame grabber unit tests are implemented (2-3 days)
-2. ✅ Canvas drawing verification tests are implemented (1-2 days)
-3. ✅ Tests establish baseline behavior
-4. ✅ All tests pass
-
-**Then proceed with optimization and verify:**
-
-1. ✅ Canvas drawing count test passes (proof of fix)
-2. ✅ All integration tests still pass (correctness maintained)
-3. ✅ Performance logs show improvement or no regression
-
-**Minimum viable test suite for safe optimization:** Phase 1 tests (3-5 days implementation)
+4. Apply the optimization fix
+5. Verify canvas drawing count test passes (proof of fix)
+6. Verify all integration tests still pass (correctness maintained)
 
 ---
 
-**Updated:** November 23, 2025  
-**Status:** Ready for test implementation before optimization
+**Updated:** November 26, 2025  
+**Status:** Awaiting unit test implementation before optimization
