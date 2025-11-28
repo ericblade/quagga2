@@ -274,6 +274,8 @@ Decodes a single image without using `getUserMedia`. Useful for processing uploa
 
 **Returns**: `void`
 
+**Important - Default Scaling**: `decodeSingle` has a built-in default of `inputStream.size: 800`. This means images larger than 800px on their longest side will be **automatically scaled down to 800px** for processing. The result's `box`, `boxes`, and `line` coordinates are returned in this scaled coordinate space, not the original image dimensions. To preserve the original image size, explicitly set `inputStream.size` to a value larger than your image dimensions.
+
 **Example**:
 
 ```javascript
@@ -283,6 +285,7 @@ Quagga.decodeSingle({
     readers: ["code_128_reader", "ean_reader"]
   },
   locate: true  // Try to locate barcode in image
+  // Note: inputStream.size defaults to 800, so large images are scaled down
 }, function(result) {
   if (result && result.codeResult) {
     console.log("Detected:", result.codeResult.code);
@@ -307,6 +310,7 @@ document.querySelector('#file-input').addEventListener('change', function(e) {
       decoder: {
         readers: ["code_128_reader"]
       }
+      // Default size: 800 applies - image scaled if larger
     }, function(result) {
       if (result && result.codeResult) {
         alert("Barcode: " + result.codeResult.code);
@@ -326,7 +330,7 @@ const Quagga = require('@ericblade/quagga2').default;
 Quagga.decodeSingle({
   src: "./barcode.jpg",
   inputStream: {
-    size: 800  // Restrict width to 800px
+    size: 800  // This is actually the default; shown explicitly here
   },
   decoder: {
     readers: ["code_128_reader"]

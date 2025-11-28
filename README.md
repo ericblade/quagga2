@@ -355,6 +355,13 @@ In contrast to the calls described above, this method does not rely on
 `getUserMedia` and operates on a single image instead. The provided callback
 is the same as in `onDetected` and contains the result `data` object.
 
+**Important**: `decodeSingle` has a built-in default of `inputStream.size: 800`.
+This means images larger than 800px on their longest side are automatically scaled
+down to 800px for processing. The `box`, `boxes`, and `line` coordinates in the
+result are returned in this scaled coordinate space, not the original image
+dimensions. To use a different processing resolution, explicitly set
+`inputStream.size` in your config.
+
 ### Quagga.offProcessed(handler)
 
 In case the `onProcessed` event is no longer relevant, `offProcessed` removes
@@ -761,6 +768,8 @@ Quagga.decodeSingle({
     },
     locate: true, // try to locate the barcode in the image
     src: '/test/fixtures/code_128/image-001.jpg' // or 'data:image/jpg;base64,' + data
+    // Note: inputStream.size defaults to 800, so images larger than 800px
+    // on their longest side are scaled down before processing.
 }, function(result){
     if(result.codeResult) {
         console.log("result", result.codeResult.code);
@@ -784,7 +793,7 @@ Quagga.decodeSingle({
     src: "image-abc-123.jpg",
     numOfWorkers: 0,  // Needs to be 0 when used within node
     inputStream: {
-        size: 800  // restrict input-size to be 800px in width (long-side)
+        size: 800  // This is the default; shown explicitly for clarity
     },
     decoder: {
         readers: ["code_128_reader"] // List of active readers
