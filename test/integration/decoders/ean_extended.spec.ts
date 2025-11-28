@@ -1,8 +1,9 @@
 import { runDecoderTestBothHalfSample, generateConfig } from '../helpers';
 
 describe('EAN Extended Decoder Tests', () => {
-    // TODO: note that the FORMAT reported from a supplement equals the parent. What exactly is the
-    // difference between a supplement and a separate reader?  is it just semantic?
+    // Note: The main result's format is 'ean_13' (the parent barcode format).
+    // The supplement's format is available in result.codeResult.supplement.format
+    // and will correctly be 'ean_2' or 'ean_5' depending on the supplement type.
     const eanExtendedTestSet = [
         { 'name': 'image-001.jpg', 'result': '900437801102701', format: 'ean_13', allowFailInNode: true, allowFailInBrowser: true },
         { 'name': 'image-002.jpg', 'result': '419871600890101', format: 'ean_13' },
