@@ -166,17 +166,17 @@ describe('Barcode Locator', () => {
             expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
         });
 
-        // Test for issue #218: Cannot read property 'x' of null
-        // When calculatePatchSize returns null, checkImageConstraints should throw a descriptive error
-        it('should throw descriptive error when calculatePatchSize returns null', function() {
-            // Use unusual dimensions that may cause calculatePatchSize to return null
+        // Test for issue #218: calculatePatchSize now returns fallback instead of null
+        // checkImageConstraints should succeed with unusual dimensions
+        it('should succeed with unusual dimensions using fallback patch size', function() {
+            // Use unusual dimensions that previously caused calculatePatchSize to return null
             imageSize = { x: 7, y: 11 };  // Small prime dimensions
 
             config.locator!.halfSample = false;
 
-            // This should throw a descriptive error instead of "Cannot read property 'x' of null"
+            // This should succeed now that calculatePatchSize returns a fallback
             expect(() => BarcodeLocator.checkImageConstraints(inputStream, config.locator))
-                .to.throw(Error, /Unable to calculate patch size/);
+                .to.not.throw();
         });
     });
 
@@ -244,11 +244,10 @@ describe('Barcode Locator', () => {
             expect(() => BarcodeLocator.init(largeImageWrapper, locatorConfig)).to.not.throw();
         });
 
-        // Test for issue #218: Cannot read property 'x' of null
-        // When calculatePatchSize returns null, init should throw a descriptive error
-        // instead of crashing with "Cannot read property 'x' of null"
-        it('should throw descriptive error when calculatePatchSize returns null', function() {
-            // Create an image with unusual dimensions that may cause calculatePatchSize to return null
+        // Test for issue #218: calculatePatchSize now returns fallback instead of null
+        // init should succeed with unusual dimensions using fallback patch size
+        it('should succeed with unusual dimensions using fallback patch size', function() {
+            // Create an image with unusual dimensions that previously caused calculatePatchSize to return null
             // Prime numbers are difficult to find common divisors for
             const unusualImageWrapper = {
                 size: { x: 7, y: 11 },  // Small prime dimensions that are hard to divide
@@ -274,9 +273,9 @@ describe('Barcode Locator', () => {
                 },
             });
 
-            // This should throw a descriptive error instead of "Cannot read property 'x' of null"
+            // This should succeed now that calculatePatchSize returns a fallback
             expect(() => BarcodeLocator.init(unusualImageWrapper, locatorConfig))
-                .to.throw(Error, /Unable to calculate patch size/);
+                .to.not.throw();
         });
     });
 });

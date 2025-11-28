@@ -119,15 +119,40 @@ describe('CV Utils', () => {
             expect(patchSize).to.deep.equal(expected);
         });
 
-        // Test for issue #218: calculatePatchSize can return null for certain image dimensions
-        it('should return null for image dimensions that cannot produce valid patch size', () => {
+        // Test for issue #218: calculatePatchSize should return fallback for difficult dimensions
+        it('should return image size as fallback for dimensions that cannot produce optimal patch size', () => {
             // Small prime dimensions are difficult to find common divisors for
-            // This tests the case where calculatePatchSize returns null
+            // The function should fall back to using image size instead of returning null
             const patchSize = calculatePatchSize('medium', { x: 7, y: 11 });
 
-            // The function should return null, not throw an error
-            // Callers are responsible for handling null return value
-            expect(patchSize).to.be.null;
+            // The function should return the image size as fallback
+            expect(patchSize).to.deep.equal({ x: 7, y: 11 });
+        });
+
+        it('should return minimum 1x1 for zero-sized images', () => {
+            // Edge case: zero-sized image should return 1x1 minimum
+            const patchSize = calculatePatchSize('medium', { x: 0, y: 0 });
+
+            expect(patchSize).to.deep.equal({ x: 1, y: 1 });
+        });
+
+        it('should always return a valid object, never null', () => {
+            // Test various edge cases to ensure we always get a valid return
+            const testCases = [
+                { x: 7, y: 11 },    // small primes
+                { x: 1, y: 1 },     // minimum size
+                { x: 0, y: 0 },     // zero size
+                { x: 13, y: 17 },   // larger primes
+            ];
+
+            testCases.forEach(size => {
+                const patchSize = calculatePatchSize('medium', size);
+                expect(patchSize).to.be.an('object');
+                expect(patchSize).to.have.property('x').that.is.a('number');
+                expect(patchSize).to.have.property('y').that.is.a('number');
+                expect(patchSize.x).to.be.at.least(1);
+                expect(patchSize.y).to.be.at.least(1);
+            });
         });
     });
 

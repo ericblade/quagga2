@@ -51,9 +51,6 @@ function initBuffers() {
     }
 
     _patchSize = calculatePatchSize(_config.patchSize, _currentImageWrapper.size);
-    if (!_patchSize) {
-        throw new Error(`Unable to calculate patch size for image dimensions ${_currentImageWrapper.size.x}x${_currentImageWrapper.size.y} with patchSize "${_config.patchSize}". Try adjusting the patchSize or image dimensions.`);
-    }
 
     // eslint-disable-next-line no-bitwise
     _numPatches.x = _currentImageWrapper.size.x / _patchSize.x | 0;
@@ -586,9 +583,6 @@ export default {
         };
 
         patchSize = calculatePatchSize(config.patchSize, size);
-        if (!patchSize) {
-            throw new Error(`Unable to calculate patch size for image dimensions ${size.x}x${size.y} with patchSize "${config.patchSize}". Try adjusting the patchSize or image dimensions.`);
-        }
         if (typeof ENV !== 'undefined' && ENV.development && config.debug?.showPatchSize) {
             console.log(`Patch-Size: ${JSON.stringify(patchSize)}`);
         }
