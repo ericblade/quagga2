@@ -38,7 +38,30 @@ const QuaggaJSStaticInterface = {
         }
         return promise;
     },
-    start: function () {
+    start: function (config, cb) {
+        // If config is provided, call init() then start()
+        if (config) {
+            let promise;
+            if (!cb) {
+                promise = new Promise((resolve, reject) => {
+                    cb = (err) => { err ? reject(err) : resolve(); };
+                });
+            }
+            this.init(config, (err) => {
+                if (err) {
+                    cb(err);
+                    return;
+                }
+                instance.start();
+                cb();
+            });
+            return promise;
+        }
+        // If init() hasn't been completed, throw an error
+        if (!_context.framegrabber) {
+            throw new Error('start() was called before init() completed. '
+                + 'Call init() first, or call start(config) to combine init and start.');
+        }
         return instance.start();
     },
     stop: function () {
