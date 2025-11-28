@@ -52,8 +52,12 @@ const QuaggaJSStaticInterface = {
                     cb(err);
                     return;
                 }
-                instance.start();
-                cb();
+                try {
+                    instance.start();
+                    cb();
+                } catch (startErr) {
+                    cb(startErr);
+                }
             });
             return promise;
         }

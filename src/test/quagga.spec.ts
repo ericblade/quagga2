@@ -2,7 +2,6 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 import QuaggaJSStaticInterface from '../quagga';
-import Quagga from '../quagga/quagga';
 
 const mockQuaggaInstance = {
     context: {},
@@ -27,21 +26,17 @@ describe('src/quagga.js', () => {
 
     describe('start', () => {
         it('throws descriptive error when called without init() and no config provided', () => {
-            // Use a fresh Quagga instance to simulate calling start without init
-            const freshInstance = new Quagga();
-            // The context should not have a framegrabber since init was never called
-            expect(freshInstance.context.framegrabber).to.be.undefined;
+            // Call the actual start() method without any arguments
+            // This should throw because init() was never called (framegrabber is undefined)
+            expect(() => QuaggaJSStaticInterface.start()).to.throw(
+                'start() was called before init() completed. '
+                + 'Call init() first, or call start(config) to combine init and start.'
+            );
+        });
 
-            // Verify the error message is clear and helpful
+        it('error message includes helpful guidance', () => {
             try {
-                // We call the actual start() method from the static interface
-                // which checks the module-level instance's context.
-                // Since the instance is shared across tests, we need to verify
-                // the error condition directly.
-                if (!freshInstance.context.framegrabber) {
-                    throw new Error('start() was called before init() completed. '
-                        + 'Call init() first, or call start(config) to combine init and start.');
-                }
+                QuaggaJSStaticInterface.start();
                 expect.fail('Expected an error to be thrown');
             } catch (err: unknown) {
                 const error = err as Error;
@@ -51,11 +46,23 @@ describe('src/quagga.js', () => {
             }
         });
 
-        it('start function accepts config parameter', () => {
-            // Verify the function signature accepts config
-            expect(typeof QuaggaJSStaticInterface.start).to.equal('function');
-            // The function should accept 0, 1, or 2 parameters
-            expect(QuaggaJSStaticInterface.start.length).to.be.at.most(2);
+        it('start(config) returns a Promise when no callback is provided', () => {
+            // When config is provided without a callback, start should return a Promise
+            const result = QuaggaJSStaticInterface.start({ inputStream: { type: 'ImageStream' } });
+            expect(result).to.be.a('promise');
+            // The promise should reject since init will fail without proper setup
+            // but we're primarily testing the return type here
+        });
+
+        it('start(config, callback) returns undefined when callback is provided', () => {
+            // When config and callback are provided, start should return undefined
+            const result = QuaggaJSStaticInterface.start(
+                { inputStream: { type: 'ImageStream' } },
+                () => {
+                    // Callback will be called (with error since init will fail)
+                }
+            );
+            expect(result).to.equal(undefined);
         });
     });
 });
