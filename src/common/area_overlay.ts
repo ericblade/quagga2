@@ -105,12 +105,12 @@ export function drawAreaIfConfigured(
     const { area, debug } = inputStream;
 
     // Only draw if showArea is enabled and area is defined
-    if (!debug?.showArea || !isAreaDefined(area)) {
+    if (!debug?.showArea || !area || !isAreaDefined(area)) {
         return;
     }
 
     const color = debug.areaColor || 'rgba(0, 255, 0, 0.5)';
     const lineWidth = debug.areaLineWidth || 2;
 
-    drawAreaOverlay(ctx, canvasSize, area!, color, lineWidth);
+    drawAreaOverlay(ctx, canvasSize, area, color, lineWidth);
 }
