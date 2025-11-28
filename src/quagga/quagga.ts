@@ -127,7 +127,7 @@ export default class Quagga {
 
     // TODO: need a typescript type for result here.
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
-    transformResult(result: any): void {
+    transformResult(result: any, transformedBoxes: Set<any> = new Set()): void {
         const topRight = this.context.inputStream.getTopRight();
         const xOffset = topRight.x;
         const yOffset = topRight.y;
@@ -138,22 +138,24 @@ export default class Quagga {
 
         if (result.barcodes) {
             // TODO: BarcodeInfo may not be the right type here.
-            result.barcodes.forEach((barcode: BarcodeInfo) => this.transformResult(barcode));
+            result.barcodes.forEach((barcode: BarcodeInfo) => this.transformResult(barcode, transformedBoxes));
         }
 
         if (result.line && result.line.length === 2) {
             moveLine(result.line, xOffset, yOffset);
         }
 
-        if (result.box) {
+        if (result.box && !transformedBoxes.has(result.box)) {
             moveBox(result.box, xOffset, yOffset);
+            transformedBoxes.add(result.box);
         }
 
         if (result.boxes && result.boxes.length > 0) {
             for (let i = 0; i < result.boxes.length; i++) {
-                // Skip if this box is the same reference as result.box (already transformed above)
-                if (result.boxes[i] !== result.box) {
+                // Skip if this box has already been transformed (either as result.box or through barcodes)
+                if (!transformedBoxes.has(result.boxes[i])) {
                     moveBox(result.boxes[i], xOffset, yOffset);
+                    transformedBoxes.add(result.boxes[i]);
                 }
             }
         }

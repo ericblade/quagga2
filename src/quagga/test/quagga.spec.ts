@@ -99,5 +99,29 @@ describe('src/quagga/quagga.ts', () => {
             expect(result.line[0]).to.deep.include({ x: 110, y: 70 });
             expect(result.line[1]).to.deep.include({ x: 200, y: 250 });
         });
+
+        it('should NOT double-transform when multiple:true and boxes shared between parent and barcodes', () => {
+            // This simulates the multiple:true scenario where:
+            // - Parent result has boxes array
+            // - Each barcode in barcodes has a box that references the same object in boxes
+            const box1: Box = [[0, 0], [320, 0], [320, 240], [0, 240]];
+            const box2: Box = [[10, 10], [310, 10], [310, 230], [10, 230]];
+            const result = {
+                boxes: [box1, box2],  // Parent has all boxes
+                barcodes: [
+                    { box: box1, codeResult: { code: '123' } },  // Same reference as boxes[0]
+                    { box: box2, codeResult: { code: '456' } },  // Same reference as boxes[1]
+                ],
+            };
+
+            quagga.transformResult(result);
+
+            // Each box should only be transformed once (offset by 100, 50)
+            // NOT twice (which would happen if parent.boxes and barcode.box both transform)
+            expect(result.boxes[0]).to.deep.equal([[100, 50], [420, 50], [420, 290], [100, 290]]);
+            expect(result.boxes[1]).to.deep.equal([[110, 60], [410, 60], [410, 280], [110, 280]]);
+            expect(result.barcodes[0].box).to.deep.equal([[100, 50], [420, 50], [420, 290], [100, 290]]);
+            expect(result.barcodes[1].box).to.deep.equal([[110, 60], [410, 60], [410, 280], [110, 280]]);
+        });
     });
 });
