@@ -6,9 +6,10 @@ import Quagga from '../../../quagga';
 
 /**
  * Tests to verify that Data URIs work correctly in the Node.js environment.
- * This is a critical test case as mentioned in GitHub issue regarding Data URL support.
+ * This is a critical test case as mentioned in the GitHub issue regarding Data URL support.
  *
- * The issue (serratus/quaggaJS#433 referenced) questioned whether Data URLs work in browser.
+ * The original issue (serratus/quaggaJS#433) questioned whether Data URLs work in browser.
+ * This file tests Node.js support, while data_uri.spec.ts in the browser folder tests browser support.
  * These tests confirm that Data URIs work correctly in Node.js, validating the Data URL
  * handling code in input_stream.ts (lines 58-67).
  */

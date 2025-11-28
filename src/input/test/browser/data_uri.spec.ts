@@ -3,8 +3,8 @@ import Quagga from '../../../quagga';
 
 /**
  * Tests to verify that Data URIs work correctly in the browser environment.
- * This is a critical test case as mentioned in GitHub issue regarding Data URL support
- * (serratus/quaggaJS#433 referenced in the issue).
+ * This is a critical test case as mentioned in GitHub issue regarding Data URL support.
+ * Referenced in GitHub issue serratus/quaggaJS#433.
  *
  * In the browser, Data URLs are natively supported by the Image element,
  * which is used by image_loader.js. These tests confirm that the integration works.
