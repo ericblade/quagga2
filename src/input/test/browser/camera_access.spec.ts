@@ -28,6 +28,9 @@ describe('CameraAccess (browser)', () => {
         });
     });
 
+    // These tests rely on Cypress providing a fake camera device via Chrome's
+    // --use-fake-ui-for-media-stream and --use-fake-device-for-media-stream flags.
+    // The fake device has the label 'fake_device_0' and supports common resolutions.
     describe('enumerateVideoDevices', () => {
         it('works', async () => {
             // TODO: if someone runs this test in live Chrome with no video devices, it should
@@ -42,7 +45,8 @@ describe('CameraAccess (browser)', () => {
         });
 
         it('works with constraints (no filtering)', async () => {
-            // With constraints that match the fake device, should return the same device
+            // With constraints that the Cypress fake camera device can satisfy,
+            // should return the same device
             const v = await Quagga.CameraAccess.enumerateVideoDevices({ width: 320, height: 240 });
             expect(v).to.be.an('Array').of.length(1);
             expect(v[0]).to.be.an.instanceof(InputDeviceInfo);
@@ -50,8 +54,8 @@ describe('CameraAccess (browser)', () => {
         });
 
         it('works with constraints that filter out devices', async () => {
-            // Request constraints that the fake device cannot satisfy
-            // (very high resolution that typical fake devices don't support)
+            // Request constraints that the Cypress fake camera device cannot satisfy
+            // (very high resolution that Chrome's fake device doesn't support)
             const v = await Quagga.CameraAccess.enumerateVideoDevices({
                 width: { exact: 9999 },
                 height: { exact: 9999 },
@@ -60,7 +64,7 @@ describe('CameraAccess (browser)', () => {
         });
 
         it('works with deprecated constraints', async () => {
-            // Use deprecated constraint syntax
+            // Use deprecated constraint syntax with the Cypress fake camera device
             const v = await Quagga.CameraAccess.enumerateVideoDevices({
                 width: 320,
                 height: 240,
