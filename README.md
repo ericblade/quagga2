@@ -356,11 +356,11 @@ In contrast to the calls described above, this method does not rely on
 is the same as in `onDetected` and contains the result `data` object.
 
 **Important**: `decodeSingle` has a built-in default of `inputStream.size: 800`.
-This means images larger than 800px on their longest side are automatically scaled
-down to 800px for processing. The `box`, `boxes`, and `line` coordinates in the
-result are returned in this scaled coordinate space, not the original image
-dimensions. To use a different processing resolution, explicitly set
-`inputStream.size` in your config.
+This means images are automatically scaled to 800px on their longest side (both
+larger images scaled down AND smaller images scaled up). The `box`, `boxes`, and
+`line` coordinates in the result are returned in this scaled coordinate space,
+not the original image dimensions. To disable scaling and use original dimensions,
+set `inputStream.size` to `0`.
 
 ### Quagga.offProcessed(handler)
 
@@ -768,8 +768,7 @@ Quagga.decodeSingle({
     },
     locate: true, // try to locate the barcode in the image
     src: '/test/fixtures/code_128/image-001.jpg' // or 'data:image/jpg;base64,' + data
-    // Note: inputStream.size defaults to 800, so images larger than 800px
-    // on their longest side are scaled down before processing.
+    // Note: inputStream.size defaults to 800; images are scaled to 800px (up or down).
 }, function(result){
     if(result.codeResult) {
         console.log("result", result.codeResult.code);

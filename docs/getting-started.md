@@ -120,7 +120,7 @@ Quagga.decodeSingle({
   decoder: {
     readers: ["code_128_reader"]
   }
-  // Note: Images larger than 800px are scaled down by default.
+  // Note: Images are scaled to 800px (longest side) by default.
   // See inputStream.size in the Configuration Reference for details.
 }, function(result) {
   if (result && result.codeResult) {
