@@ -191,7 +191,9 @@ export default {
             const barcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, line[0], line[1]);
 
             if (typeof ENV !== 'undefined' && ENV.development && config.debug.showFrequency) {
-                ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
+                if (_canvas.ctx.overlay) {
+                    ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
+                }
                 Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 

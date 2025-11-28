@@ -119,6 +119,14 @@ See [Locator Configuration](#locator-configuration) below for complete details.
 
 **Note**: More fine-grained debug control is available via `inputStream.debug`, `decoder.debug`, and `locator.debug`. See [Debug Flags Guide](../how-to-guides/use-debug-flags.md).
 
+### `canvas`
+
+**Type**: `object`
+
+**Description**: Configuration for canvas elements used by Quagga.
+
+See [Canvas Configuration](#canvas-configuration) below for complete details.
+
 ## inputStream Configuration
 
 Controls the source and properties of the image/video stream.
@@ -655,6 +663,92 @@ debug: {
 ```
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for complete details on all debug options.
+
+## Canvas Configuration
+
+Controls the creation and management of canvas elements.
+
+### Canvas Structure
+
+```javascript
+canvas: {
+  createOverlay: true  // Set to false to disable overlay canvas creation
+}
+```
+
+### `canvas.createOverlay`
+
+**Type**: `boolean`
+
+**Default**: `true`
+
+**Description**: Controls whether Quagga creates the overlay canvas (`drawingBuffer`). The overlay canvas is used for drawing bounding boxes, scan lines, and other visual feedback on top of the video stream.
+
+**When to set `false`**:
+
+- You don't need visual feedback/overlays
+- You want to improve performance
+- You're building a headless/server-side application
+- You want to avoid the CSS complexity of hiding the canvas
+
+**When to keep `true`** (default):
+
+- You want to draw bounding boxes around detected barcodes
+- You want to visualize the scanning process
+- You're using custom drawing in `onProcessed` callbacks
+
+**Example - Disable overlay canvas**:
+
+```javascript
+Quagga.init({
+  canvas: {
+    createOverlay: false  // No overlay canvas created
+  },
+  inputStream: {
+    type: "LiveStream",
+    target: '#scanner'
+  },
+  decoder: {
+    readers: ["code_128_reader"]
+  }
+}, function(err) {
+  if (err) {
+    console.error(err);
+    return;
+  }
+  Quagga.start();
+});
+```
+
+**Important**: When `createOverlay` is `false`:
+
+- `Quagga.canvas.dom.overlay` will be `null`
+- `Quagga.canvas.ctx.overlay` will be `null`
+- You cannot use `Quagga.ImageDebug.drawPath()` with the overlay canvas
+
+**Note about debug flags**: The `decoder.debug.drawBoundingBox` and `decoder.debug.drawScanline` flags only work in development builds and require the overlay canvas to exist. These flags draw on the overlay canvas when it's available.
+
+**Example - Using overlay canvas for drawing**:
+
+```javascript
+// With createOverlay: true (default)
+Quagga.onProcessed(function(result) {
+  const ctx = Quagga.canvas.ctx.overlay;
+  const canvas = Quagga.canvas.dom.overlay;
+  
+  // Check if overlay exists before using
+  if (ctx && canvas) {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    
+    if (result && result.box) {
+      Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, ctx, {
+        color: "green",
+        lineWidth: 2
+      });
+    }
+  }
+});
+```
 
 ## Complete Configuration Examples
 

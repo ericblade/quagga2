@@ -22,7 +22,9 @@ const DevConfig: QuaggaJSConfigObject = {
         },
     },
     locate: true,
-    numOfWorkers: 0,
+    canvas: {
+        createOverlay: true, // set to false to skip creating overlay canvas (drawingBuffer)
+    },
     decoder: {
         readers: [
             'code_128_reader',

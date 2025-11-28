@@ -19,7 +19,9 @@ const ProdConfig: QuaggaJSConfigObject = {
         singleChannel: false, // true: only the red color-channel is read
     },
     locate: true,
-    numOfWorkers: 4,
+    canvas: {
+        createOverlay: true, // set to false to skip creating overlay canvas (drawingBuffer)
+    },
     decoder: {
         readers: [
             'code_128_reader',
