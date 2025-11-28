@@ -20,15 +20,28 @@ function getCanvasAndContext(selector: string, className: string, options: { wil
     return { canvas, context };
 }
 
-function initCanvases(canvasSize: XYSize, { willReadFrequently, debug }: { willReadFrequently: boolean; debug?: any }): CanvasContainer | null {
+interface InitCanvasesOptions {
+    willReadFrequently: boolean;
+    willCreateOverlay: boolean;
+    debug?: any;
+}
+
+function initCanvases(canvasSize: XYSize, { willReadFrequently, willCreateOverlay, debug }: InitCanvasesOptions): CanvasContainer | null {
     if (typeof document !== 'undefined') {
         const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer', { willReadFrequently, debug });
-        const overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
+        image.canvas.width = canvasSize.x;
+        image.canvas.height = canvasSize.y;
 
-        // eslint-disable-next-line no-multi-assign
-        image.canvas.width = overlay.canvas.width = canvasSize.x;
-        // eslint-disable-next-line no-multi-assign
-        image.canvas.height = overlay.canvas.height = canvasSize.y;
+        // Only create overlay canvas if willCreateOverlay is true (default behavior)
+        let overlay: { canvas: HTMLCanvasElement | null; context: CanvasRenderingContext2D | null } = {
+            canvas: null,
+            context: null,
+        };
+        if (willCreateOverlay) {
+            overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
+            overlay.canvas!.width = canvasSize.x;
+            overlay.canvas!.height = canvasSize.y;
+        }
 
         return {
             dom: {
@@ -48,10 +61,15 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const viewport = getViewPort(context?.config?.inputStream?.target);
     const type = context?.config?.inputStream?.type;
     if (!type) return null;
+
+    // Default to true for backwards compatibility
+    const willCreateOverlay = context?.config?.canvas?.willCreateOverlay !== false;
+
     const container = initCanvases(
         context.inputStream.getCanvasSize(),
         {
             willReadFrequently: !!context?.config?.inputStream?.willReadFrequently,
+            willCreateOverlay,
             debug: context?.config?.locator?.debug
         }
     );
@@ -60,10 +78,10 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const { dom } = container;
     if (typeof document !== 'undefined') {
         if (viewport) {
-            if (type === 'ImageStream' && !viewport.contains(dom.image)) {
+            if (type === 'ImageStream' && dom.image && !viewport.contains(dom.image)) {
                 viewport.appendChild(dom.image);
             }
-            if (!viewport.contains(dom.overlay)) {
+            if (dom.overlay && !viewport.contains(dom.overlay)) {
                 viewport.appendChild(dom.overlay);
             }
         }

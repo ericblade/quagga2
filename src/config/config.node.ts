@@ -15,6 +15,9 @@ const NodeConfig: QuaggaJSConfigObject = {
     },
     locate: true,
     numOfWorkers: 0,
+    canvas: {
+        willCreateOverlay: true, // set to false to skip creating overlay canvas (drawingBuffer)
+    },
     decoder: {
         readers: [
             'code_128_reader',

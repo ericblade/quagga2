@@ -463,19 +463,21 @@ Quagga automatically creates and manages two canvas elements for visualization. 
 ```javascript
 Quagga.canvas = {
   dom: {
-    image: HTMLCanvasElement,   // Canvas for processed image data
-    overlay: HTMLCanvasElement  // Transparent canvas for drawing overlays
+    image: HTMLCanvasElement,           // Canvas for processed image data
+    overlay: HTMLCanvasElement | null   // Transparent canvas for drawing overlays
   },
   ctx: {
-    image: CanvasRenderingContext2D,   // Context for image canvas
-    overlay: CanvasRenderingContext2D  // Context for overlay canvas
+    image: CanvasRenderingContext2D,           // Context for image canvas
+    overlay: CanvasRenderingContext2D | null   // Context for overlay canvas
   }
 };
 ```
 
+> **Note**: The overlay canvas can be `null` if `canvas.willCreateOverlay` is set to `false` in the configuration. See [Canvas Configuration](configuration.md#canvas-configuration) for details.
+
 ### Overlay Canvas
 
-The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes and is designed for drawing bounding boxes, scan lines, and other visual feedback.
+The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes (unless `canvas.willCreateOverlay` is `false`) and is designed for drawing bounding boxes, scan lines, and other visual feedback.
 
 **Key characteristics:**
 - Has CSS class `drawingBuffer`
@@ -483,19 +485,23 @@ The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas ele
 - Positioned absolutely over the video/image element
 - Automatically appended to the viewport container
 - Coordinates match the processed image space (no scaling needed)
+- Can be disabled via `canvas.willCreateOverlay: false` for performance
 
 **Accessing the overlay:**
 ```javascript
 const overlay = Quagga.canvas.dom.overlay;
 const overlayCtx = Quagga.canvas.ctx.overlay;
 
-// Clear overlay
-overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
+// Always check if overlay exists before using
+if (overlayCtx && overlay) {
+  // Clear overlay
+  overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
 
-// Draw custom shapes
-overlayCtx.strokeStyle = "red";
-overlayCtx.lineWidth = 3;
-overlayCtx.strokeRect(10, 10, 100, 100);
+  // Draw custom shapes
+  overlayCtx.strokeStyle = "red";
+  overlayCtx.lineWidth = 3;
+  overlayCtx.strokeRect(10, 10, 100, 100);
+}
 ```
 
 ### Image Canvas

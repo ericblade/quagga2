@@ -564,11 +564,11 @@ export interface QuaggaJSStatic {
     canvas: {
         ctx: {
             image: CanvasRenderingContext2D;
-            overlay: CanvasRenderingContext2D;
+            overlay: CanvasRenderingContext2D | null;
         };
         dom: {
             image: HTMLCanvasElement;
-            overlay: HTMLCanvasElement;
+            overlay: HTMLCanvasElement | null;
         };
     };
 
@@ -867,6 +867,19 @@ export interface QuaggaJSConfigObject {
      * resources such as CPU power are of concern.
      */
     frequency?: number;
+
+    /**
+     * Canvas configuration options for controlling overlay and debug canvases.
+     */
+    canvas?: {
+        /**
+         * Whether to create the overlay canvas (drawingBuffer) for drawing bounding boxes
+         * and scan lines. Set to false if you don't need visual feedback and want to
+         * improve performance.
+         * @default true
+         */
+        willCreateOverlay?: boolean;
+    };
 
     decoder?: {
         /**
