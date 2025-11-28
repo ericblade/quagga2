@@ -38,6 +38,12 @@ Choose between front/back cameras on mobile devices or select from multiple USB 
 
 Control focus, zoom, flash/torch, and other camera parameters.
 
+## Drawing & Visualization
+
+### [Working with Box Coordinates](working-with-coordinates.md) 🆕
+
+Understand how `box` and `boxes` coordinates relate to processed vs. original image dimensions, and how to properly scale coordinates for overlay rendering on video elements.
+
 ## Integration
 
 ### [Handle Multiple Barcodes](multiple-barcodes.md) *(Coming Soon)*

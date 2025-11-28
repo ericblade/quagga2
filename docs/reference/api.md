@@ -407,6 +407,19 @@ The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` call
 | `box` | Array | Bounding box coordinates (4 corner points) |
 | `boxes` | Array | All candidate boxes found during localization |
 
+> **Important: Coordinate System**
+>
+> The `box`, `boxes`, and `line` coordinates are returned in **processed canvas coordinates**, not original image/video coordinates. If you're using `inputStream.size` to scale the processing resolution (e.g., for performance), you'll need to scale these coordinates to match your original video/image dimensions.
+>
+> ```javascript
+> // Scale coordinates to original video size
+> const scaleX = video.videoWidth / Quagga.canvas.dom.image.width;
+> const scaleY = video.videoHeight / Quagga.canvas.dom.image.height;
+> const scaledBox = result.box.map(p => [p[0] * scaleX, p[1] * scaleY]);
+> ```
+>
+> See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for complete examples.
+
 ### Checking for Successful Detection
 
 ```javascript
