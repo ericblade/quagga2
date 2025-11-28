@@ -13,8 +13,17 @@
  */
 
 import Quagga from '../../src/quagga';
+import BarcodeDecoder from '../../src/decoder/barcode_decoder';
 import { expect } from 'chai';
 import BarcodeReader, { Barcode, BarcodePosition } from '../../src/reader/barcode_reader';
+
+/**
+ * Helper function to construct fixture paths consistently across browser and Node environments
+ */
+function getFixturePath(folder: string, filename: string): string {
+    const prefix = typeof window !== 'undefined' ? '/' : '';
+    return `${prefix}test/fixtures/${folder}/${filename}`;
+}
 
 // A mock reader that tracks when it's called and can be configured to succeed/fail
 class MockReader extends BarcodeReader {
@@ -79,9 +88,6 @@ describe('Reader Order Tests', () => {
             Quagga.registerReader('mock_first_reader', MockReaderFirst);
             Quagga.registerReader('mock_second_reader', MockReaderSecond);
             Quagga.registerReader('mock_third_reader', MockReaderThird);
-            
-            // Create a decoder with readers in a specific order
-            const BarcodeDecoder = require('../../src/decoder/barcode_decoder').default;
             
             const config = {
                 readers: ['mock_first_reader', 'mock_second_reader', 'mock_third_reader'],
@@ -172,7 +178,7 @@ describe('Priority Behavior with Multiple Readers', () => {
                 readers: ['ean_reader', 'upc_e_reader', 'upc_reader'],
             },
             locate: true,
-            src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/ean/image-001.jpg`,
+            src: getFixturePath('ean', 'image-001.jpg'),
         };
         
         const result = await Quagga.decodeSingle(config);
