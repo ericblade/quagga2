@@ -206,6 +206,25 @@ Quagga2 exports the BarcodeReader prototype, which should also allow you to crea
 reader implementations using the base BarcodeReader implementation inside Quagga2.  The QR reader
 does not make use of this functionality, as QR is not picked up as a barcode in BarcodeReader.
 
+### External Reader Priority
+
+External readers follow the same priority rules as built-in readers. Once registered with
+`Quagga.registerReader()`, an external reader can be placed anywhere in the `readers` array,
+and its position determines when it attempts to decode relative to other readers.
+
+```javascript
+// Register external reader first
+Quagga.registerReader('my_custom_reader', MyCustomReader);
+
+// Use in config - position determines priority
+Quagga.init({
+    decoder: {
+        // External reader tried first, then built-in readers
+        readers: ['my_custom_reader', 'ean_reader', 'code_128_reader']
+    }
+});
+```
+
 ## <a name="Building">Building</a>
 
 You can build the library yourself by simply cloning the repo and typing:
@@ -594,6 +613,26 @@ explicitly define the set of barcodes for their use-case. More decoders means
 more possible clashes, or false-positives. One should take care of the order
 the readers are given, since some might return a value even though it is not
 the correct type (EAN-13 vs. UPC-A).
+
+#### Reader Priority and Order
+
+**Readers are processed in the exact order they appear in the `readers` array.**
+The first reader to successfully decode the barcode wins. This allows you to
+prioritize certain formats over others when multiple formats might match the
+same barcode pattern.
+
+For example, if you know most of your barcodes are EAN-13, place `ean_reader`
+first to ensure it attempts to decode before other readers:
+
+```javascript
+decoder: {
+    readers: ['ean_reader', 'upc_reader', 'upc_e_reader']  // EAN-13 checked first
+}
+```
+
+This is particularly important when dealing with barcode formats that share
+similar patterns (like EAN-13 and UPC-A/UPC-E), where incorrect matches might
+occur if the wrong reader attempts to decode first.
 
 The `multiple` property tells the decoder if it should continue decoding after
 finding a valid barcode.  If multiple is set to `true`, the results will be

@@ -1,5 +1,33 @@
 /* eslint-disable import/no-cycle */
 
+/**
+ * Barcode Decoder Module
+ *
+ * This module handles the decoding of barcodes using configured readers.
+ *
+ * READER ORDER GUARANTEE:
+ * Readers are processed in the exact order they are specified in the `readers`
+ * config array. The first reader to successfully decode the barcode wins.
+ *
+ * Example:
+ *   readers: ['ean_reader', 'upc_e_reader', 'code_128_reader']
+ *
+ * Decoding order:
+ *   1. ean_reader attempts to decode
+ *   2. If ean_reader returns null, upc_e_reader attempts to decode
+ *   3. If upc_e_reader returns null, code_128_reader attempts to decode
+ *   4. First non-null result is returned
+ *
+ * EXTERNAL READERS:
+ * External readers must be registered via registerReader() before use.
+ * Once registered, they follow the same ordering rules as built-in readers.
+ * Their position in the `readers` array determines their priority.
+ *
+ * To prioritize an external reader:
+ *   Quagga.registerReader('my_reader', MyReader);
+ *   config.decoder.readers = ['my_reader', 'ean_reader']; // my_reader tried first
+ */
+
 import ImageDebug from '../common/image_debug';
 import TwoOfFiveReader from '../reader/2of5_reader';
 import CodabarReader from '../reader/codabar_reader';
@@ -35,6 +63,21 @@ const READERS = {
 };
 
 export default {
+    /**
+     * Registers an external/custom barcode reader.
+     * Once registered, the reader can be used in config.readers array.
+     * The reader's position in config.readers determines its decoding priority.
+     *
+     * @param name - The identifier to use in config.readers (e.g., 'my_custom_reader')
+     * @param reader - The reader class (must extend BarcodeReader)
+     *
+     * @example
+     * // Register a custom reader
+     * BarcodeDecoder.registerReader('my_reader', MyCustomReader);
+     *
+     * // Use it with high priority (first in array)
+     * config.decoder.readers = ['my_reader', 'ean_reader', 'code_128_reader'];
+     */
     registerReader: (name, reader) => {
         READERS[name] = reader;
     },
@@ -90,6 +133,11 @@ export default {
             }
         }
 
+        /**
+         * Initializes barcode readers from config.readers array.
+         * Readers are instantiated and stored in the order they appear in config,
+         * which determines their decoding priority (first in array = highest priority).
+         */
         function initReaders() {
             config.readers.forEach((readerConfig) => {
                 let reader;
@@ -185,6 +233,13 @@ export default {
             }];
         }
 
+        /**
+         * Attempts to decode a barcode from a scan line.
+         * Readers are tried in order (as specified in config.readers).
+         * The first reader to return a non-null result wins.
+         * @param {Array} line The scan line to decode
+         * @returns {Object|null} Decoded result or null if no reader succeeded
+         */
         function tryDecode(line) {
             let result = null;
             let i;
@@ -201,6 +256,7 @@ export default {
                 Bresenham.debug.printPattern(barcodeLine.line, _canvas.dom.pattern);
             }
 
+            // Iterate readers in order - first successful decode wins
             for (i = 0; i < _barcodeReaders.length && result === null; i++) {
                 result = _barcodeReaders[i].decodePattern(barcodeLine.line);
             }
@@ -257,8 +313,15 @@ export default {
             );
         }
 
+        /**
+         * Decodes from a full image using readers that support image-based decoding.
+         * Readers are tried in order (as specified in config.readers).
+         * @param {Object} imageWrapper The image to decode
+         * @returns {Object|null} Decoded result or null
+         */
         async function decodeFromImage(imageWrapper) {
             let result = null;
+            // Iterate readers in order - first successful decode wins
             for (const reader of _barcodeReaders) {
                 if (reader.decodeImage) {
                     result = await reader.decodeImage(imageWrapper);
