@@ -112,6 +112,12 @@ export type QuaggaImageData = Array<number>;
 
 export type BarcodeReaderType = string;
 
+/**
+ * Constructor type for a BarcodeReader class.
+ * Used when registering custom readers via registerReader().
+ */
+export type BarcodeReaderConstructor = new (config?: BarcodeReaderConfig, supplements?: Array<Readers.BarcodeReader>) => Readers.BarcodeReader;
+
 export interface BarcodeReaderConfig {
     normalizeBarSpaceWidth?: boolean,
     supplements?: Array<BarcodeReaderType>,
@@ -535,7 +541,7 @@ export interface QuaggaJSStatic {
     ResultCollector: QuaggaJSResultCollector;
     registerResultCollector(resultCollector: QuaggaJSResultCollector): void;
     setReaders(readers: (QuaggaJSReaderConfig | string)[]): void;
-    registerReader(name: string, reader: object): void;
+    registerReader(name: string, reader: BarcodeReaderConstructor): void;
 
     /**
      * In contrast to the calls described
@@ -898,6 +904,10 @@ export interface QuaggaJSConfigObject {
      * It’s optional and defines the maximum number of scans per second.
      * This renders useful for cases where the scan-session is long-running and
      * resources such as CPU power are of concern.
+     *
+     * Note: This specifies a maximum, not an absolute rate. If the system cannot
+     * achieve the requested frequency due to CPU limitations or other factors,
+     * scans will occur as fast as the system allows.
      */
     frequency?: number;
 

@@ -1,5 +1,5 @@
 import { vec2 } from 'gl-matrix';
-import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
+import { QuaggaJSResultObject, QuaggaJSReaderConfig, BarcodeReaderConstructor } from '../../type-definitions/quagga.d';
 import { drawAreaIfConfigured } from '../common/area_overlay';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
@@ -247,6 +247,8 @@ export default class Quagga {
 
     startContinuousUpdate(): void {
         let next: number | null = null;
+        // frequency specifies a maximum rate, not an absolute. If the system cannot
+        // achieve the requested frequency, scans will occur as fast as possible.
         const delay = 1000 / (this.context.config?.frequency || 60);
 
         this.context.stopped = false;
@@ -290,7 +292,7 @@ export default class Quagga {
         QWorkers.setReaders(readers);
     }
 
-    registerReader(name: string, reader: QuaggaJSReaderConfig): void {
+    registerReader(name: string, reader: BarcodeReaderConstructor): void {
         BarcodeDecoder.registerReader(name, reader);
         if (this.context.decoder) {
             this.context.decoder.registerReader(name, reader);

@@ -72,9 +72,11 @@ See [inputStream Configuration](#inputstream-configuration) below for complete d
 
 **Type**: `number` (optional)
 
-**Default**: unlimited
+**Default**: unlimited (processes as fast as possible, limited by `requestAnimationFrame` which typically matches display refresh rate)
 
 **Description**: Maximum scans per second. Controls how often frames are processed.
+
+**Important**: `frequency` specifies a **maximum** rate, not an absolute rate. If the system cannot achieve the requested frequency due to CPU limitations, decoding complexity, or other factors, scans will occur as fast as the system allows. For example, if you set `frequency: 10` but your system can only process 8 scans per second, you will get approximately 8 scans per second.
 
 **Example**:
 

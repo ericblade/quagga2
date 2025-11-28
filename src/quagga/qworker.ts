@@ -3,7 +3,7 @@
  * to refer to until it is re-implemented. We may be able to fix/use some of this.
  */
 
-import { QuaggaJSConfigObject, QuaggaJSReaderConfig } from "../../type-definitions/quagga";
+import { QuaggaJSConfigObject, QuaggaJSReaderConfig, BarcodeReaderConstructor } from "../../type-definitions/quagga";
 
 // TODO: need a typescript interface for FrameGrabber
 
@@ -199,6 +199,6 @@ export function setReaders(readers: Array<QuaggaJSReaderConfig>) {
     workerPool.forEach((workerThread) => workerThread.worker.postMessage({ cmd: 'setReaders', readers }));
 }
 
-export function registerReader(name: string, reader: any) {
+export function registerReader(name: string, reader: BarcodeReaderConstructor) {
     workerPool.forEach((workerThread) => workerThread.worker.postMessage({ cmd: 'registerReader', name, reader }));
 }
