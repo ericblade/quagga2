@@ -478,7 +478,7 @@ readers: [
 ]
 ```
 
-**Important**: Order matters! List most common formats first for better performance.
+**Important**: Readers are processed in the exact order specified. The first reader to successfully decode wins. List most common/expected formats first for better performance and accuracy. See [Reader Priority](readers.md#reader-priority-and-order) for details.
 
 ### `decoder.debug`
 
