@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { describe, it, afterEach } from 'mocha';
+import sinon from 'sinon';
 import QuaggaJSStaticInterface from '../quagga';
 
 const mockQuaggaInstance = {
@@ -10,6 +11,10 @@ const mockQuaggaInstance = {
 };
 
 describe('src/quagga.js', () => {
+    afterEach(() => {
+        sinon.restore();
+    });
+
     describe('init', () => {
         it('returns undefined when callback provided', (done) => {
             // @ts-expect-error
@@ -54,13 +59,26 @@ describe('src/quagga.js', () => {
             // but we're primarily testing the return type here
         });
 
-        it('start(config, callback) returns undefined when callback is provided', () => {
-            // When config and callback are provided, start should return undefined
+        it('start(config, callback) returns undefined and calls callback', (done) => {
+            // Stub init to immediately call its callback with no error
+            const initStub = sinon.stub(QuaggaJSStaticInterface, 'init');
+            initStub.callsFake((_config: unknown, cb: (err?: Error) => void) => {
+                // Simulate successful init by calling callback with no error
+                cb();
+                return undefined;
+            });
+
+            const callback = sinon.spy((err: unknown) => {
+                // Callback should be called after init succeeds
+                // An error is expected because instance.start() will fail without proper setup
+                // but we're verifying the callback is invoked
+                expect(callback.called).to.be.true;
+                done();
+            });
+
             const result = QuaggaJSStaticInterface.start(
                 { inputStream: { type: 'ImageStream' } },
-                () => {
-                    // Callback will be called (with error since init will fail)
-                }
+                callback
             );
             expect(result).to.equal(undefined);
         });
