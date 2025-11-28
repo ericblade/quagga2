@@ -1,6 +1,7 @@
 window.ENV = { development: true, production: false, node: false };
 
 import '../../src/common/test/array_helper.spec.ts';
+import '../../src/common/test/area_overlay.spec.ts';
 import '../../src/common/test/cv_utils.spec';
 import '../../src/common/test/events.spec.ts';
 import '../../src/locator/test/barcode_locator.spec.ts';

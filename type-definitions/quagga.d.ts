@@ -857,6 +857,28 @@ export interface QuaggaJSConfigObject {
              * 'line' that is in the middle half
              */
             bottom?: string;
+
+            /**
+             * Color of the area border. When defined, draws a rectangle on the overlay canvas
+             * showing the scan area boundaries. Requires createOverlay to be true.
+             * Can be any valid CSS color value.
+             * @default undefined (no border drawn)
+             */
+            borderColor?: string;
+
+            /**
+             * Line width of the area border in pixels.
+             * When defined with a value > 0, draws a rectangle on the overlay canvas.
+             * @default undefined (no border drawn)
+             */
+            borderWidth?: number;
+
+            /**
+             * Background color to fill the scan area.
+             * Can be any valid CSS color value (e.g., 'rgba(0, 255, 0, 0.1)' for a light green tint).
+             * @default undefined (no background fill)
+             */
+            backgroundColor?: string;
         };
 
         mime?: string;
@@ -864,6 +886,7 @@ export interface QuaggaJSConfigObject {
         singleChannel?: boolean;
         size?: number;
         sequence?: boolean;
+
         debug?: {
             /**
              * @default false

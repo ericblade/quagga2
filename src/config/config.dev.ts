@@ -15,6 +15,9 @@ const DevConfig: QuaggaJSConfigObject = {
             right: '0%',
             left: '0%',
             bottom: '0%',
+            // borderColor: 'rgba(0, 255, 0, 0.5)', // uncomment to draw area border
+            // borderWidth: 2, // uncomment to draw area border
+            // backgroundColor: 'rgba(0, 255, 0, 0.1)', // uncomment to tint the scan area
         },
         singleChannel: false, // true: only the red color-channel is read
         debug: {
