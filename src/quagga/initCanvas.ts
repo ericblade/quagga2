@@ -38,9 +38,10 @@ function initCanvases(canvasSize: XYSize, { willReadFrequently, willCreateOverla
             context: null,
         };
         if (willCreateOverlay) {
-            overlay = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
-            overlay.canvas!.width = canvasSize.x;
-            overlay.canvas!.height = canvasSize.y;
+            const overlayResult = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
+            overlayResult.canvas.width = canvasSize.x;
+            overlayResult.canvas.height = canvasSize.y;
+            overlay = overlayResult;
         }
 
         return {
@@ -78,7 +79,7 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     const { dom } = container;
     if (typeof document !== 'undefined') {
         if (viewport) {
-            if (type === 'ImageStream' && dom.image && !viewport.contains(dom.image)) {
+            if (type === 'ImageStream' && !viewport.contains(dom.image)) {
                 viewport.appendChild(dom.image);
             }
             if (dom.overlay && !viewport.contains(dom.overlay)) {

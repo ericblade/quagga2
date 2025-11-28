@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
-import { QuaggaContext, CanvasContainer } from '../../QuaggaContext';
+import { QuaggaContext } from '../../QuaggaContext';
 import initCanvas from '../initCanvas';
 
 describe('src/quagga/initCanvas.ts', () => {
