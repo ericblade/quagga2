@@ -140,8 +140,9 @@ export function drawAreaIfConfigured(
         return;
     }
 
-    const borderColor = area.borderColor || 'rgba(0, 255, 0, 0.5)';
-    const borderWidth = area.borderWidth ?? 2;
+    const shouldDrawBorder = area.borderColor !== undefined || area.borderWidth !== undefined;
+    const borderColor = area.borderColor ?? 'rgba(0, 255, 0, 0.5)';
+    const borderWidth = shouldDrawBorder ? (area.borderWidth ?? 2) : 0;
     const backgroundColor = area.backgroundColor;
 
     drawAreaOverlay(ctx, canvasSize, area, borderColor, borderWidth, backgroundColor);

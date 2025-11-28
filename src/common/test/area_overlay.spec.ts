@@ -323,6 +323,8 @@ describe('Area Overlay', () => {
 
             expect((mockCtx.fillRect as sinon.SinonStub).called).to.be.true;
             expect(mockCtx.fillStyle).to.equal('rgba(0, 255, 0, 0.1)');
+            // Should NOT draw border when only backgroundColor is specified
+            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
         });
     });
 });
