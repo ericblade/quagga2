@@ -875,6 +875,10 @@ export interface QuaggaJSConfigObject {
      * It’s optional and defines the maximum number of scans per second.
      * This renders useful for cases where the scan-session is long-running and
      * resources such as CPU power are of concern.
+     *
+     * Note: This specifies a maximum, not an absolute rate. If the system cannot
+     * achieve the requested frequency due to CPU limitations or other factors,
+     * scans will occur as fast as the system allows.
      */
     frequency?: number;
 

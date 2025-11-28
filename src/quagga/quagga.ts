@@ -239,6 +239,8 @@ export default class Quagga {
 
     startContinuousUpdate(): void {
         let next: number | null = null;
+        // frequency specifies a maximum rate, not an absolute. If the system cannot
+        // achieve the requested frequency, scans will occur as fast as possible.
         const delay = 1000 / (this.context.config?.frequency || 60);
 
         this.context.stopped = false;

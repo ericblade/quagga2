@@ -589,6 +589,12 @@ optional and defines the maximum number of scans per second. This renders
 useful for cases where the scan-session is long-running and resources such as
 CPU power are of concern.
 
+Note: `frequency` specifies a maximum, not an absolute rate. If the system
+cannot achieve the requested frequency due to CPU limitations, decoding
+complexity, or other factors, scans will occur as fast as the system allows.
+For example, if you set `frequency: 10` but your system can only process 8
+scans per second, you will get approximately 8 scans per second.
+
 ### decoder
 
 QuaggaJS usually runs in a two-stage manner (`locate` is set to `true`) where,
