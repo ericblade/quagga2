@@ -71,11 +71,14 @@ describe('src/quagga.js', () => {
             const callback = sinon.spy((err: unknown) => {
                 // Callback should be called after init succeeds
                 // An error is expected because instance.start() will fail without proper setup
-                // but we're verifying the callback is invoked
                 expect(callback.called).to.be.true;
+                // Verify that an error was passed to the callback
+                expect(err).to.not.be.undefined;
+                expect(err).to.not.be.null;
                 done();
             });
 
+            // Pass the spy function directly (not invoked) - sinon spies are callable
             const result = QuaggaJSStaticInterface.start(
                 { inputStream: { type: 'ImageStream' } },
                 callback
