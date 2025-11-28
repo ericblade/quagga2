@@ -456,10 +456,30 @@ This function will return a Promise that resolves when completed, or rejects on 
 If a video element is known to be running, this will pause the video element, then return a Promise
 that when resolved will have stopped all tracks in the video element, and released all resources.
 
-## CameraAccess.enumerateVideoDevices()
+## CameraAccess.enumerateVideoDevices(constraints?)
 
 This will send out a call to navigator.mediaDevices.enumerateDevices(), filter out any mediadevices
 that do not have a kind of 'videoinput', and resolve the promise with an array of MediaDeviceInfo.
+
+Optionally, you can pass MediaTrackConstraints to filter devices. When constraints are provided,
+only devices that can satisfy the given constraints will be returned. This is useful for filtering
+out cameras that don't meet your requirements (e.g., eliminating wide-angle cameras).
+
+```javascript
+// Get all video devices
+const devices = await Quagga.CameraAccess.enumerateVideoDevices();
+
+// Get only devices that support minimum resolution
+const hdDevices = await Quagga.CameraAccess.enumerateVideoDevices({
+  width: { min: 1280 },
+  height: { min: 720 }
+});
+
+// Get only back-facing cameras
+const backCameras = await Quagga.CameraAccess.enumerateVideoDevices({
+  facingMode: 'environment'
+});
+```
 
 ## CameraAccess.getActiveStreamLabel()
 

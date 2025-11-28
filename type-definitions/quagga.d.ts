@@ -581,7 +581,17 @@ export interface QuaggaJSStatic {
 export interface QuaggaJSCameraAccess {
     disableTorch(): Promise<void>;
     enableTorch(): Promise<void>;
-    enumerateVideoDevices(): Promise<MediaDeviceInfo[]> | never;
+    /**
+     * Enumerates video input devices, optionally filtering by constraints.
+     * @param videoConstraints Optional constraints to filter devices.
+     * When provided, only devices that satisfy the given constraints will be returned.
+     * This works by attempting to get a media stream for each device with the constraints
+     * and returning only the devices that succeed.
+     * @returns Promise resolving to an array of MediaDeviceInfo for video input devices.
+     */
+    enumerateVideoDevices(
+        videoConstraints?: MediaTrackConstraintsWithDeprecated
+    ): Promise<MediaDeviceInfo[]> | never;
     getActiveStreamLabel(): string;
     getActiveTrack(): MediaStreamTrack | null;
     release(): Promise<void>;

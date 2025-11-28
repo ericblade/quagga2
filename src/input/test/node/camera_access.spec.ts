@@ -16,6 +16,17 @@ describe('CameraAccess (node)', () => {
                 expect(err.code).to.equal(-1);
             }
         });
+
+        it('rejects with constraints parameter', async () => {
+            try {
+                const x = await Quagga.CameraAccess.enumerateVideoDevices({ width: 320 });
+                // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
+                expect(x).to.not.exist;
+            } catch (err: any) {
+                // In node, enumerateDevices is not available, so it should reject
+                expect(err.code).to.equal(-1);
+            }
+        });
     });
 
     describe('request', () => {

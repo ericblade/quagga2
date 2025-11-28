@@ -87,9 +87,56 @@ export function pickConstraints(videoConstraints: MediaTrackConstraintsWithDepre
     return Promise.resolve({ audio: false, video });
 }
 
-async function enumerateVideoDevices(): Promise<Array<MediaDeviceInfo>> {
+/**
+ * Enumerates video input devices, optionally filtering by constraints.
+ * @param videoConstraints Optional constraints to filter devices.
+ * When provided, only devices that satisfy the given constraints will be returned.
+ * This works by attempting to get a media stream for each device with the constraints
+ * and returning only the devices that succeed.
+ * @returns Promise resolving to an array of MediaDeviceInfo for video input devices.
+ */
+async function enumerateVideoDevices(
+    videoConstraints?: MediaTrackConstraintsWithDeprecated,
+): Promise<Array<MediaDeviceInfo>> {
     const devices = await enumerateDevices();
-    return devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput');
+    const videoDevices = devices.filter((device: MediaDeviceInfo) => device.kind === 'videoinput');
+
+    // If no constraints are provided, return all video devices
+    if (!videoConstraints) {
+        return videoDevices;
+    }
+
+    // Filter devices based on constraints by trying to get a media stream for each
+    const constrainedDevices: Array<MediaDeviceInfo> = [];
+
+    // Process constraints but exclude deviceId since we'll set it ourselves for each device
+    const processedConstraints = deprecatedConstraints(videoConstraints);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { deviceId: _, ...constraintsWithoutDeviceId } = processedConstraints;
+
+    for (const device of videoDevices) {
+        try {
+            const constraints: MediaStreamConstraints = {
+                audio: false,
+                video: {
+                    ...constraintsWithoutDeviceId,
+                    deviceId: { exact: device.deviceId },
+                },
+            };
+            const stream = await getUserMedia(constraints);
+            // Stop all tracks immediately after testing
+            stream.getTracks().forEach((track) => track.stop());
+            constrainedDevices.push(device);
+        } catch {
+            // Device doesn't support the constraints, skip it.
+            // This catch is intentionally empty as we're using getUserMedia to test if
+            // each device supports the constraints. Errors here indicate the device
+            // doesn't meet the requirements (OverconstrainedError) or other issues
+            // that mean we should exclude this device from the results.
+        }
+    }
+
+    return constrainedDevices;
 }
 
 function getActiveTrack(): MediaStreamTrack | null {
