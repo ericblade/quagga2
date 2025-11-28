@@ -165,6 +165,19 @@ describe('Barcode Locator', () => {
             expect(((inputStream.setTopRight) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedTopRight);
             expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
         });
+
+        // Test for issue #218: Cannot read property 'x' of null
+        // When calculatePatchSize returns null, checkImageConstraints should throw a descriptive error
+        it('should throw descriptive error when calculatePatchSize returns null', function() {
+            // Use unusual dimensions that may cause calculatePatchSize to return null
+            imageSize = { x: 7, y: 11 };  // Small prime dimensions
+
+            config.locator!.halfSample = false;
+
+            // This should throw a descriptive error instead of "Cannot read property 'x' of null"
+            expect(() => BarcodeLocator.checkImageConstraints(inputStream, config.locator))
+                .to.throw(Error, /Unable to calculate patch size/);
+        });
     });
 
     describe('init', function() {
@@ -229,6 +242,41 @@ describe('Barcode Locator', () => {
 
             // This should not throw an error with the fix in place
             expect(() => BarcodeLocator.init(largeImageWrapper, locatorConfig)).to.not.throw();
+        });
+
+        // Test for issue #218: Cannot read property 'x' of null
+        // When calculatePatchSize returns null, init should throw a descriptive error
+        // instead of crashing with "Cannot read property 'x' of null"
+        it('should throw descriptive error when calculatePatchSize returns null', function() {
+            // Create an image with unusual dimensions that may cause calculatePatchSize to return null
+            // Prime numbers are difficult to find common divisors for
+            const unusualImageWrapper = {
+                size: { x: 7, y: 11 },  // Small prime dimensions that are hard to divide
+                data: new Uint8Array(7 * 11),
+            };
+
+            const locatorConfig = merge({}, QuaggaConfig.locator, {
+                patchSize: 'medium',
+                halfSample: false,
+                debug: {
+                    showCanvas: false,
+                    showPatches: false,
+                    showFoundPatches: false,
+                    showSkeleton: false,
+                    showLabels: false,
+                    showPatchLabels: false,
+                    showRemainingPatchLabels: false,
+                    boxFromPatches: {
+                        showTransformed: false,
+                        showTransformedBox: false,
+                        showBB: false,
+                    },
+                },
+            });
+
+            // This should throw a descriptive error instead of "Cannot read property 'x' of null"
+            expect(() => BarcodeLocator.init(unusualImageWrapper, locatorConfig))
+                .to.throw(Error, /Unable to calculate patch size/);
         });
     });
 });

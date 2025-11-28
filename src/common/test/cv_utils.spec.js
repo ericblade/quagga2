@@ -118,6 +118,17 @@ describe('CV Utils', () => {
 
             expect(patchSize).to.deep.equal(expected);
         });
+
+        // Test for issue #218: calculatePatchSize can return null for certain image dimensions
+        it('should return null for image dimensions that cannot produce valid patch size', () => {
+            // Small prime dimensions are difficult to find common divisors for
+            // This tests the case where calculatePatchSize returns null
+            const patchSize = calculatePatchSize('medium', { x: 7, y: 11 });
+
+            // The function should return null, not throw an error
+            // Callers are responsible for handling null return value
+            expect(patchSize).to.be.null;
+        });
     });
 
     describe('_parseCSSDimensionValues', () => {
