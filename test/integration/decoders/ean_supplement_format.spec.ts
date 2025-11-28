@@ -6,30 +6,34 @@ describe('EAN Supplement Format Tests', () => {
     // Test that verifies the supplement format is correctly returned as 'ean_2' or 'ean_5'
     // rather than inheriting the parent 'ean_13' format
     
+    const baseConfig = {
+        inputStream: {
+            size: 800,
+            singleChannel: false,
+        },
+        locator: {
+            patchSize: 'medium' as const,
+            halfSample: false,
+        },
+        numOfWorkers: 0,
+        decoder: {
+            readers: [{
+                format: 'ean_reader',
+                config: {
+                    supplements: [
+                        'ean_5_reader',
+                        'ean_2_reader',
+                    ],
+                },
+            }],
+        },
+    };
+    
     it('should return ean_2 format for 2-digit supplement', async function() {
         this.timeout(30000);
         
         const config = {
-            inputStream: {
-                size: 800,
-                singleChannel: false,
-            },
-            locator: {
-                patchSize: 'medium' as const,
-                halfSample: false,
-            },
-            numOfWorkers: 0,
-            decoder: {
-                readers: [{
-                    format: 'ean_reader',
-                    config: {
-                        supplements: [
-                            'ean_5_reader',
-                            'ean_2_reader',
-                        ],
-                    },
-                }],
-            },
+            ...baseConfig,
             src: 'test/fixtures/ean_extended/image-002.jpg', // EAN-13 with 2-digit supplement
         };
         
@@ -47,26 +51,7 @@ describe('EAN Supplement Format Tests', () => {
         this.timeout(30000);
         
         const config = {
-            inputStream: {
-                size: 800,
-                singleChannel: false,
-            },
-            locator: {
-                patchSize: 'medium' as const,
-                halfSample: false,
-            },
-            numOfWorkers: 0,
-            decoder: {
-                readers: [{
-                    format: 'ean_reader',
-                    config: {
-                        supplements: [
-                            'ean_5_reader',
-                            'ean_2_reader',
-                        ],
-                    },
-                }],
-            },
+            ...baseConfig,
             src: 'test/fixtures/ean_extended/image-004.jpg', // EAN-13 with 5-digit supplement
         };
         
