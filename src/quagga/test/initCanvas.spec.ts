@@ -41,11 +41,11 @@ describe('src/quagga/initCanvas.ts', () => {
             expect(result).to.be.null;
         });
 
-        it('should respect willCreateOverlay: false config option', () => {
+        it('should respect createOverlay: false config option', () => {
             context.config = {
                 inputStream: { type: 'ImageStream' },
                 canvas: {
-                    willCreateOverlay: false,
+                    createOverlay: false,
                 },
             };
 
@@ -57,10 +57,10 @@ describe('src/quagga/initCanvas.ts', () => {
             expect(result!.ctx.overlay).to.be.null;
         });
 
-        it('should default willCreateOverlay to true when canvas config is not specified', () => {
+        it('should default createOverlay to true when canvas config is not specified', () => {
             context.config = {
                 inputStream: { type: 'ImageStream' },
-                // No canvas config - should default to willCreateOverlay: true
+                // No canvas config - should default to createOverlay: true
             };
 
             const result = initCanvas(context);
@@ -70,11 +70,11 @@ describe('src/quagga/initCanvas.ts', () => {
             expect(result).to.be.an('object');
         });
 
-        it('should default willCreateOverlay to true when canvas.willCreateOverlay is undefined', () => {
+        it('should default createOverlay to true when canvas.createOverlay is undefined', () => {
             context.config = {
                 inputStream: { type: 'ImageStream' },
                 canvas: {
-                    // willCreateOverlay not specified - should default to true
+                    // createOverlay not specified - should default to true
                 },
             };
 

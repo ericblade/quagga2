@@ -473,11 +473,11 @@ Quagga.canvas = {
 };
 ```
 
-> **Note**: The overlay canvas can be `null` if `canvas.willCreateOverlay` is set to `false` in the configuration. See [Canvas Configuration](configuration.md#canvas-configuration) for details.
+> **Note**: The overlay canvas can be `null` if `canvas.createOverlay` is set to `false` in the configuration. See [Canvas Configuration](configuration.md#canvas-configuration) for details.
 
 ### Overlay Canvas
 
-The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes (unless `canvas.willCreateOverlay` is `false`) and is designed for drawing bounding boxes, scan lines, and other visual feedback.
+The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes (unless `canvas.createOverlay` is `false`) and is designed for drawing bounding boxes, scan lines, and other visual feedback.
 
 **Key characteristics:**
 - Has CSS class `drawingBuffer`
@@ -485,7 +485,7 @@ The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas ele
 - Positioned absolutely over the video/image element
 - Automatically appended to the viewport container
 - Coordinates match the processed image space (no scaling needed)
-- Can be disabled via `canvas.willCreateOverlay: false` for performance
+- Can be disabled via `canvas.createOverlay: false` for performance
 
 **Accessing the overlay:**
 ```javascript

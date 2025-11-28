@@ -878,7 +878,7 @@ export interface QuaggaJSConfigObject {
          * improve performance.
          * @default true
          */
-        willCreateOverlay?: boolean;
+        createOverlay?: boolean;
     };
 
     decoder?: {

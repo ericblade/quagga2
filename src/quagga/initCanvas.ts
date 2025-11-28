@@ -22,22 +22,22 @@ function getCanvasAndContext(selector: string, className: string, options: { wil
 
 interface InitCanvasesOptions {
     willReadFrequently: boolean;
-    willCreateOverlay: boolean;
+    createOverlay: boolean;
     debug?: any;
 }
 
-function initCanvases(canvasSize: XYSize, { willReadFrequently, willCreateOverlay, debug }: InitCanvasesOptions): CanvasContainer | null {
+function initCanvases(canvasSize: XYSize, { willReadFrequently, createOverlay, debug }: InitCanvasesOptions): CanvasContainer | null {
     if (typeof document !== 'undefined') {
         const image = getCanvasAndContext('canvas.imgBuffer', 'imgBuffer', { willReadFrequently, debug });
         image.canvas.width = canvasSize.x;
         image.canvas.height = canvasSize.y;
 
-        // Only create overlay canvas if willCreateOverlay is true (default behavior)
+        // Only create overlay canvas if createOverlay is true (default behavior)
         let overlay: { canvas: HTMLCanvasElement | null; context: CanvasRenderingContext2D | null } = {
             canvas: null,
             context: null,
         };
-        if (willCreateOverlay) {
+        if (createOverlay) {
             const overlayResult = getCanvasAndContext('canvas.drawingBuffer', 'drawingBuffer', { willReadFrequently, debug });
             overlayResult.canvas.width = canvasSize.x;
             overlayResult.canvas.height = canvasSize.y;
@@ -64,13 +64,13 @@ export default function initCanvas(context: QuaggaContext): CanvasContainer | nu
     if (!type) return null;
 
     // Default to true for backwards compatibility
-    const willCreateOverlay = context?.config?.canvas?.willCreateOverlay !== false;
+    const createOverlay = context?.config?.canvas?.createOverlay !== false;
 
     const container = initCanvases(
         context.inputStream.getCanvasSize(),
         {
             willReadFrequently: !!context?.config?.inputStream?.willReadFrequently,
-            willCreateOverlay,
+            createOverlay,
             debug: context?.config?.locator?.debug
         }
     );
