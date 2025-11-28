@@ -57,15 +57,27 @@ Quagga.init({
 
 ## Important Considerations
 
-### Reader Order Matters
+### Reader Priority and Order
 
-The order of readers affects performance and accuracy:
+**Readers are processed in the exact order they appear in the `readers` array.** The first reader to successfully decode the barcode wins - subsequent readers are not tried.
 
-- Readers are processed in the order specified
+This allows you to prioritize certain formats over others when multiple formats might match the same barcode pattern:
+
+```javascript
+decoder: {
+    // EAN-13 checked first, then UPC formats
+    readers: ['ean_reader', 'upc_reader', 'upc_e_reader']
+}
+```
+
+**Why order matters:**
+
+- Readers are processed sequentially, not in parallel
 - Some readers may return false positives for other formats
-- Example: EAN-13 and UPC-A are similar and can clash
+- Example: EAN-13 and UPC-A/UPC-E share similar patterns and can clash
+- The first successful decode is returned immediately
 
-**Best practice**: List your most commonly expected barcode types first.
+**Best practice**: List your most commonly expected barcode types first for best accuracy and performance.
 
 ### Don't Enable All Readers
 
@@ -158,6 +170,29 @@ Quagga.init({
   }
 });
 ```
+
+### External Reader Priority
+
+External readers follow the **same priority rules** as built-in readers. Once registered with `Quagga.registerReader()`, an external reader can be placed anywhere in the `readers` array, and its position determines when it attempts to decode relative to other readers:
+
+```javascript
+// Register external reader first
+Quagga.registerReader('my_custom_reader', MyCustomReader);
+
+// Use in config - position determines priority
+Quagga.init({
+  decoder: {
+    // External reader tried first, then built-in readers
+    readers: ['my_custom_reader', 'ean_reader', 'code_128_reader']
+  }
+});
+```
+
+**Key points:**
+- External readers must be registered via `registerReader()` before use
+- Their position in `readers` array determines decode priority
+- There is no automatic "internal first, external second" ordering
+- External readers interleave freely with built-in readers
 
 ### Creating Custom Readers
 
