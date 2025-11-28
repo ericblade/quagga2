@@ -1,5 +1,5 @@
 import { vec2 } from 'gl-matrix';
-import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
+import { QuaggaJSResultObject, QuaggaJSReaderConfig, BarcodeReaderConstructor } from '../../type-definitions/quagga.d';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
@@ -284,7 +284,7 @@ export default class Quagga {
         QWorkers.setReaders(readers);
     }
 
-    registerReader(name: string, reader: QuaggaJSReaderConfig): void {
+    registerReader(name: string, reader: BarcodeReaderConstructor): void {
         BarcodeDecoder.registerReader(name, reader);
         if (this.context.decoder) {
             this.context.decoder.registerReader(name, reader);
