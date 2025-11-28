@@ -40,6 +40,34 @@ describe('CameraAccess (browser)', () => {
             expect(v[0].kind).to.equal('videoinput');
             expect(v[0].label).to.equal('fake_device_0');
         });
+
+        it('works with constraints (no filtering)', async () => {
+            // With constraints that match the fake device, should return the same device
+            const v = await Quagga.CameraAccess.enumerateVideoDevices({ width: 320, height: 240 });
+            expect(v).to.be.an('Array').of.length(1);
+            expect(v[0]).to.be.an.instanceof(InputDeviceInfo);
+            expect(v[0].kind).to.equal('videoinput');
+        });
+
+        it('works with constraints that filter out devices', async () => {
+            // Request constraints that the fake device cannot satisfy
+            // (very high resolution that typical fake devices don't support)
+            const v = await Quagga.CameraAccess.enumerateVideoDevices({
+                width: { exact: 9999 },
+                height: { exact: 9999 },
+            });
+            expect(v).to.be.an('Array').of.length(0);
+        });
+
+        it('works with deprecated constraints', async () => {
+            // Use deprecated constraint syntax
+            const v = await Quagga.CameraAccess.enumerateVideoDevices({
+                width: 320,
+                height: 240,
+                facing: 'user',
+            });
+            expect(v).to.be.an('Array');
+        });
     });
 
     describe('request', () => {

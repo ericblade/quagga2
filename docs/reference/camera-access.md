@@ -79,15 +79,20 @@ console.log('Camera released');
 
 **Note**: Always call `release()` when finished with the camera to free system resources.
 
-### `CameraAccess.enumerateVideoDevices()`
+### `CameraAccess.enumerateVideoDevices(constraints?)`
 
-Lists all available video input devices (cameras).
+Lists all available video input devices (cameras), optionally filtered by constraints.
+
+**Parameters**:
+
+- `constraints` (MediaTrackConstraints, optional) - Constraints to filter devices. When provided, only devices that can satisfy the given constraints will be returned.
 
 **Returns**: `Promise<MediaDeviceInfo[]>` - Array of video device information.
 
 **Example**:
 
 ```javascript
+// Get all video devices
 const devices = await Quagga.CameraAccess.enumerateVideoDevices();
 
 devices.forEach(device => {
@@ -103,13 +108,35 @@ devices.forEach(device => {
 // Device ID: def456...
 ```
 
+**Filtering devices with constraints**:
+
+```javascript
+// Get only devices that support a minimum resolution
+const hdDevices = await Quagga.CameraAccess.enumerateVideoDevices({
+  width: { min: 1280 },
+  height: { min: 720 }
+});
+
+// Get only back-facing cameras
+const backCameras = await Quagga.CameraAccess.enumerateVideoDevices({
+  facingMode: 'environment'
+});
+
+// Eliminate wide-angle only cameras by specifying aspect ratio
+const standardCameras = await Quagga.CameraAccess.enumerateVideoDevices({
+  aspectRatio: { ideal: 1.777 }  // 16:9
+});
+```
+
 **Use cases**:
 
 - Build camera selector UI
 - Detect available cameras before initialization
 - Check for front/back camera availability on mobile
+- Filter out cameras that don't meet quality requirements
+- Eliminate wide-angle cameras that may not be suitable for barcode scanning
 
-**Note**: Device labels may be empty strings until camera permission is granted.
+**Note**: Device labels may be empty strings until camera permission is granted. When using constraints, the method will request temporary access to each device to test if it satisfies the constraints.
 
 ### `CameraAccess.getActiveStreamLabel()`
 
