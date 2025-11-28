@@ -371,11 +371,87 @@ Quagga.decodeSingle({
 
 **Type**: `object`
 
-**Description**: Enable console logging for input stream diagnostics.
+**Description**: Enable console logging and visual debugging for input stream diagnostics.
 
 ```javascript
 debug: {
-  showImageDetails: false  // Log frame grabber operations
+  showImageDetails: false,  // Log frame grabber operations
+  showArea: false,          // Draw area boundary on overlay canvas
+  areaColor: 'rgba(0, 255, 0, 0.5)', // Color of the area border
+  areaLineWidth: 2          // Width of the area border
+}
+```
+
+#### `inputStream.debug.showImageDetails`
+
+**Type**: `boolean`
+
+**Default**: `false`
+
+**Description**: Logs frame grabber info, canvas size adjustments, and image loading details to the console.
+
+#### `inputStream.debug.showArea`
+
+**Type**: `boolean`
+
+**Default**: `false`
+
+**Description**: When `true` and an `area` is defined (not all 0%), draws a rectangle on the overlay canvas showing the scan area boundaries. This helps users visualize exactly where Quagga is looking for barcodes.
+
+**Requirements**:
+- `canvas.createOverlay` must be `true` (default)
+- `inputStream.area` must be defined and not all zeros
+
+**Example**:
+
+```javascript
+Quagga.init({
+  inputStream: {
+    area: {
+      top: '25%',
+      right: '10%',
+      bottom: '25%',
+      left: '10%'
+    },
+    debug: {
+      showArea: true  // Shows green rectangle around scan area
+    }
+  }
+});
+```
+
+#### `inputStream.debug.areaColor`
+
+**Type**: `string`
+
+**Default**: `'rgba(0, 255, 0, 0.5)'`
+
+**Description**: Color of the area border when `showArea` is enabled. Can be any valid CSS color value.
+
+**Example**:
+
+```javascript
+debug: {
+  showArea: true,
+  areaColor: 'red'  // Red border
+  // or: 'rgba(255, 0, 0, 0.7)'  // Semi-transparent red
+}
+```
+
+#### `inputStream.debug.areaLineWidth`
+
+**Type**: `number`
+
+**Default**: `2`
+
+**Description**: Width of the area border line in pixels when `showArea` is enabled.
+
+**Example**:
+
+```javascript
+debug: {
+  showArea: true,
+  areaLineWidth: 5  // Thicker border for visibility
 }
 ```
 
