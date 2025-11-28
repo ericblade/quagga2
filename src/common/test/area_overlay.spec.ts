@@ -4,6 +4,7 @@ import * as sinon from 'sinon';
 import {
     calculateAreaRect,
     isAreaDefined,
+    shouldDrawAreaOverlay,
     drawAreaOverlay,
     drawAreaIfConfigured,
 } from '../area_overlay';
@@ -96,6 +97,40 @@ describe('Area Overlay', () => {
         });
     });
 
+    describe('shouldDrawAreaOverlay', () => {
+        it('should return false for undefined area', () => {
+            expect(shouldDrawAreaOverlay(undefined)).to.be.false;
+        });
+
+        it('should return false for empty area object', () => {
+            expect(shouldDrawAreaOverlay({})).to.be.false;
+        });
+
+        it('should return true if borderColor is defined', () => {
+            expect(shouldDrawAreaOverlay({ borderColor: 'red' })).to.be.true;
+        });
+
+        it('should return true if borderWidth > 0', () => {
+            expect(shouldDrawAreaOverlay({ borderWidth: 2 })).to.be.true;
+        });
+
+        it('should return false if borderWidth is 0', () => {
+            expect(shouldDrawAreaOverlay({ borderWidth: 0 })).to.be.false;
+        });
+
+        it('should return true if backgroundColor is defined', () => {
+            expect(shouldDrawAreaOverlay({ backgroundColor: 'rgba(0, 255, 0, 0.1)' })).to.be.true;
+        });
+
+        it('should return false if borderColor is empty string', () => {
+            expect(shouldDrawAreaOverlay({ borderColor: '' })).to.be.false;
+        });
+
+        it('should return false if backgroundColor is empty string', () => {
+            expect(shouldDrawAreaOverlay({ backgroundColor: '' })).to.be.false;
+        });
+    });
+
     describe('drawAreaOverlay', () => {
         let mockCtx: sinon.SinonStubbedInstance<CanvasRenderingContext2D>;
 
@@ -103,7 +138,9 @@ describe('Area Overlay', () => {
             mockCtx = {
                 strokeStyle: '',
                 lineWidth: 0,
+                fillStyle: '',
                 strokeRect: sinon.stub(),
+                fillRect: sinon.stub(),
             } as unknown as sinon.SinonStubbedInstance<CanvasRenderingContext2D>;
         });
 
@@ -128,6 +165,42 @@ describe('Area Overlay', () => {
             expect(mockCtx.strokeStyle).to.equal('red');
             expect(mockCtx.lineWidth).to.equal(5);
         });
+
+        it('should not draw stroke when borderWidth is 0', () => {
+            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
+            const area = { top: '0%', right: '0%', bottom: '0%', left: '0%' };
+
+            drawAreaOverlay(mockCtx as unknown as CanvasRenderingContext2D, canvasSize, area, 'red', 0);
+
+            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
+        });
+
+        it('should draw background fill when backgroundColor is provided', () => {
+            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
+            const area = { top: '10%', right: '10%', bottom: '10%', left: '10%' };
+
+            drawAreaOverlay(
+                mockCtx as unknown as CanvasRenderingContext2D,
+                canvasSize,
+                area,
+                'red',
+                2,
+                'rgba(0, 255, 0, 0.1)',
+            );
+
+            expect(mockCtx.fillStyle).to.equal('rgba(0, 255, 0, 0.1)');
+            expect((mockCtx.fillRect as sinon.SinonStub).calledOnce).to.be.true;
+            expect((mockCtx.fillRect as sinon.SinonStub).firstCall.args).to.deep.equal([10, 10, 80, 80]);
+        });
+
+        it('should not draw background fill when backgroundColor is not provided', () => {
+            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
+            const area = { top: '0%', right: '0%', bottom: '0%', left: '0%' };
+
+            drawAreaOverlay(mockCtx as unknown as CanvasRenderingContext2D, canvasSize, area, 'red', 2);
+
+            expect((mockCtx.fillRect as sinon.SinonStub).called).to.be.false;
+        });
     });
 
     describe('drawAreaIfConfigured', () => {
@@ -137,7 +210,9 @@ describe('Area Overlay', () => {
             mockCtx = {
                 strokeStyle: '',
                 lineWidth: 0,
+                fillStyle: '',
                 strokeRect: sinon.stub(),
+                fillRect: sinon.stub(),
             } as unknown as sinon.SinonStubbedInstance<CanvasRenderingContext2D>;
         });
 
@@ -152,8 +227,7 @@ describe('Area Overlay', () => {
         it('should not draw if ctx is null', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
-                    area: { top: '10%' },
-                    showArea: true,
+                    area: { top: '10%', borderColor: 'red' },
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -163,11 +237,10 @@ describe('Area Overlay', () => {
             // No assertion needed - just verify it doesn't throw
         });
 
-        it('should not draw if showArea is false', () => {
+        it('should not draw if borderColor and borderWidth are not defined', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '10%' },
-                    showArea: false,
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -177,11 +250,10 @@ describe('Area Overlay', () => {
             expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
         });
 
-        it('should not draw if showArea is true but area is not defined', () => {
+        it('should not draw if borderColor is defined but area is not defined', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
-                    area: { top: '0%', right: '0%', bottom: '0%', left: '0%' },
-                    showArea: true,
+                    area: { top: '0%', right: '0%', bottom: '0%', left: '0%', borderColor: 'red' },
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -191,11 +263,10 @@ describe('Area Overlay', () => {
             expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
         });
 
-        it('should draw if showArea is true and area is defined', () => {
+        it('should draw if borderColor is defined and area is defined', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
-                    area: { top: '10%', right: '10%', bottom: '10%', left: '10%' },
-                    showArea: true,
+                    area: { top: '10%', right: '10%', bottom: '10%', left: '10%', borderColor: 'red' },
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -203,15 +274,27 @@ describe('Area Overlay', () => {
             drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
 
             expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.true;
+            expect(mockCtx.strokeStyle).to.equal('red');
         });
 
-        it('should use custom colors and line width from config', () => {
+        it('should draw if borderWidth is defined and area is defined', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
-                    area: { top: '10%' },
-                    showArea: true,
-                    areaColor: 'blue',
-                    areaLineWidth: 5,
+                    area: { top: '10%', borderWidth: 5 },
+                },
+            };
+            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
+
+            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
+
+            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.true;
+            expect(mockCtx.lineWidth).to.equal(5);
+        });
+
+        it('should use custom borderColor and borderWidth from config', () => {
+            const config: QuaggaJSConfigObject = {
+                inputStream: {
+                    area: { top: '10%', borderColor: 'blue', borderWidth: 5 },
                 },
             };
             const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
@@ -220,6 +303,26 @@ describe('Area Overlay', () => {
 
             expect(mockCtx.strokeStyle).to.equal('blue');
             expect(mockCtx.lineWidth).to.equal(5);
+        });
+
+        it('should draw backgroundColor when specified', () => {
+            const config: QuaggaJSConfigObject = {
+                inputStream: {
+                    area: {
+                        top: '10%',
+                        right: '10%',
+                        bottom: '10%',
+                        left: '10%',
+                        backgroundColor: 'rgba(0, 255, 0, 0.1)',
+                    },
+                },
+            };
+            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
+
+            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
+
+            expect((mockCtx.fillRect as sinon.SinonStub).called).to.be.true;
+            expect(mockCtx.fillStyle).to.equal('rgba(0, 255, 0, 0.1)');
         });
     });
 });

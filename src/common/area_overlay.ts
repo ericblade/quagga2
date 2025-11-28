@@ -57,32 +57,63 @@ export function isAreaDefined(
 }
 
 /**
+ * Checks if area visualization should be drawn based on borderColor or borderWidth being defined.
+ * 
+ * @param area - The area configuration
+ * @returns true if visualization should be drawn (borderColor is defined or borderWidth > 0)
+ */
+export function shouldDrawAreaOverlay(
+    area?: { borderColor?: string; borderWidth?: number; backgroundColor?: string },
+): boolean {
+    if (!area) {
+        return false;
+    }
+    return (
+        (area.borderColor !== undefined && area.borderColor !== '')
+        || (area.borderWidth !== undefined && area.borderWidth > 0)
+        || (area.backgroundColor !== undefined && area.backgroundColor !== '')
+    );
+}
+
+/**
  * Draws the scan area boundary on the overlay canvas.
  * This visually highlights the region where Quagga is looking for barcodes.
  * 
  * @param ctx - The canvas 2D rendering context (overlay canvas)
  * @param canvasSize - The size of the canvas
  * @param area - The area configuration with top, right, bottom, left as percentage strings
- * @param color - The color of the area border (default: 'rgba(0, 255, 0, 0.5)')
- * @param lineWidth - The width of the border line (default: 2)
+ * @param borderColor - The color of the area border (default: 'rgba(0, 255, 0, 0.5)')
+ * @param borderWidth - The width of the border line (default: 2)
+ * @param backgroundColor - The background color to fill the area (optional)
  */
 export function drawAreaOverlay(
     ctx: CanvasRenderingContext2D,
     canvasSize: XYSize,
     area: { top?: string; right?: string; bottom?: string; left?: string },
-    color = 'rgba(0, 255, 0, 0.5)',
-    lineWidth = 2,
+    borderColor = 'rgba(0, 255, 0, 0.5)',
+    borderWidth = 2,
+    backgroundColor?: string,
 ): void {
     const rect = calculateAreaRect(canvasSize, area);
 
-    ctx.strokeStyle = color;
-    ctx.lineWidth = lineWidth;
-    ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    // Draw background fill if specified
+    if (backgroundColor) {
+        ctx.fillStyle = backgroundColor;
+        ctx.fillRect(rect.x, rect.y, rect.width, rect.height);
+    }
+
+    // Draw border if borderWidth > 0
+    if (borderWidth > 0) {
+        ctx.strokeStyle = borderColor;
+        ctx.lineWidth = borderWidth;
+        ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+    }
 }
 
 /**
  * Draws the area overlay if configured to do so.
  * This is the main function to call from the Quagga processing loop.
+ * Drawing is triggered when area.borderColor or area.borderWidth is defined.
  * 
  * @param config - The Quagga configuration object
  * @param ctx - The canvas 2D rendering context (overlay canvas)
@@ -102,15 +133,16 @@ export function drawAreaIfConfigured(
         return;
     }
 
-    const { area, showArea, areaColor, areaLineWidth } = inputStream;
+    const { area } = inputStream;
 
-    // Only draw if showArea is enabled and area is defined
-    if (!showArea || !area || !isAreaDefined(area)) {
+    // Only draw if area visualization is configured and area is actually defined
+    if (!area || !shouldDrawAreaOverlay(area) || !isAreaDefined(area)) {
         return;
     }
 
-    const color = areaColor || 'rgba(0, 255, 0, 0.5)';
-    const lineWidth = areaLineWidth || 2;
+    const borderColor = area.borderColor || 'rgba(0, 255, 0, 0.5)';
+    const borderWidth = area.borderWidth ?? 2;
+    const backgroundColor = area.backgroundColor;
 
-    drawAreaOverlay(ctx, canvasSize, area, color, lineWidth);
+    drawAreaOverlay(ctx, canvasSize, area, borderColor, borderWidth, backgroundColor);
 }

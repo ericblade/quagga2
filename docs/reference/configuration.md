@@ -266,7 +266,7 @@ constraints: {
 
 **Type**: `object`
 
-**Description**: Defines rectangular region for detection/localization as percentage offsets.
+**Description**: Defines rectangular region for detection/localization as percentage offsets. Also supports visual styling options for the scan area.
 
 **Structure**:
 
@@ -275,28 +275,105 @@ area: {
   top: "0%",     // Offset from top
   right: "0%",   // Offset from right
   left: "0%",    // Offset from left
-  bottom: "0%"   // Offset from bottom
+  bottom: "0%",  // Offset from bottom
+  borderColor: undefined,  // Border color (draws border when defined)
+  borderWidth: undefined,  // Border width in pixels (draws border when > 0)
+  backgroundColor: undefined  // Background fill color
 }
 ```
 
-**Example - Center Rectangle**:
+**Example - Center Rectangle with Border**:
 
 ```javascript
 area: {
   top: "25%",
   right: "25%",
   left: "25%",
-  bottom: "25%"
+  bottom: "25%",
+  borderColor: "rgba(0, 255, 0, 0.7)",  // Green border
+  borderWidth: 3
 }
-// Results in a 50% x 50% rectangle in the center
+// Results in a 50% x 50% rectangle in the center with a green border
+```
+
+**Example - Scan Area with Background Tint**:
+
+```javascript
+area: {
+  top: "10%",
+  right: "10%",
+  left: "10%",
+  bottom: "10%",
+  borderColor: "red",
+  borderWidth: 2,
+  backgroundColor: "rgba(0, 255, 0, 0.1)"  // Light green tint
+}
 ```
 
 **Use cases**:
 
 - Restrict scanning to specific area
-- Guide user with overlay
+- Guide user with visual overlay showing scan region
 - Improve performance by processing less pixels
 - Required when `locate: false` to define scan region
+
+#### `inputStream.area.borderColor`
+
+**Type**: `string`
+
+**Default**: `undefined` (no border drawn)
+
+**Description**: Color of the area border. When defined, draws a rectangle on the overlay canvas showing the scan area boundaries. Requires `canvas.createOverlay: true` (default). Can be any valid CSS color value.
+
+**Example**:
+
+```javascript
+area: {
+  top: '25%',
+  bottom: '25%',
+  borderColor: 'red'  // Red border
+  // or: 'rgba(255, 0, 0, 0.7)'  // Semi-transparent red
+}
+```
+
+#### `inputStream.area.borderWidth`
+
+**Type**: `number`
+
+**Default**: `undefined` (uses default of 2 when borderColor is defined)
+
+**Description**: Width of the area border line in pixels. When defined with a value > 0, draws a rectangle on the overlay canvas.
+
+**Example**:
+
+```javascript
+area: {
+  top: '25%',
+  bottom: '25%',
+  borderColor: 'green',
+  borderWidth: 5  // Thicker border for visibility
+}
+```
+
+#### `inputStream.area.backgroundColor`
+
+**Type**: `string`
+
+**Default**: `undefined` (no background fill)
+
+**Description**: Background color to fill the scan area. Can be any valid CSS color value. Useful for tinting the scan area to make it more visible.
+
+**Example**:
+
+```javascript
+area: {
+  top: '10%',
+  right: '10%',
+  bottom: '10%',
+  left: '10%',
+  backgroundColor: 'rgba(0, 255, 0, 0.1)'  // Light green tint
+}
+```
 
 ### `inputStream.singleChannel`
 
@@ -366,69 +443,6 @@ Quagga.decodeSingle({
 ```
 
 **Performance Note**: Higher values increase processing time. Balance detection accuracy against speed based on your use case. Test different values to find the optimal setting for your specific images.
-
-### `inputStream.showArea`
-
-**Type**: `boolean`
-
-**Default**: `false`
-
-**Description**: When `true` and an `area` is defined (not all 0%), draws a rectangle on the overlay canvas showing the scan area boundaries. This helps users visualize exactly where Quagga is looking for barcodes.
-
-**Requirements**:
-- `canvas.createOverlay` must be `true` (default)
-- `inputStream.area` must be defined and not all zeros
-
-**Example**:
-
-```javascript
-Quagga.init({
-  inputStream: {
-    area: {
-      top: '25%',
-      right: '10%',
-      bottom: '25%',
-      left: '10%'
-    },
-    showArea: true  // Shows green rectangle around scan area
-  }
-});
-```
-
-### `inputStream.areaColor`
-
-**Type**: `string`
-
-**Default**: `'rgba(0, 255, 0, 0.5)'`
-
-**Description**: Color of the area border when `showArea` is enabled. Can be any valid CSS color value.
-
-**Example**:
-
-```javascript
-inputStream: {
-  showArea: true,
-  areaColor: 'red'  // Red border
-  // or: 'rgba(255, 0, 0, 0.7)'  // Semi-transparent red
-}
-```
-
-### `inputStream.areaLineWidth`
-
-**Type**: `number`
-
-**Default**: `2`
-
-**Description**: Width of the area border line in pixels when `showArea` is enabled.
-
-**Example**:
-
-```javascript
-inputStream: {
-  showArea: true,
-  areaLineWidth: 5  // Thicker border for visibility
-}
-```
 
 ### `inputStream.debug`
 

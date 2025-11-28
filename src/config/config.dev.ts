@@ -15,11 +15,11 @@ const DevConfig: QuaggaJSConfigObject = {
             right: '0%',
             left: '0%',
             bottom: '0%',
+            // borderColor: 'rgba(0, 255, 0, 0.5)', // uncomment to draw area border
+            // borderWidth: 2, // uncomment to draw area border
+            // backgroundColor: 'rgba(0, 255, 0, 0.1)', // uncomment to tint the scan area
         },
         singleChannel: false, // true: only the red color-channel is read
-        showArea: false, // draws area boundaries on overlay when area is defined
-        areaColor: 'rgba(0, 255, 0, 0.5)', // color of the area border
-        areaLineWidth: 2, // line width of the area border
         debug: {
             showImageDetails: false, // logs frame grabber info, canvas size adjustments
         },
