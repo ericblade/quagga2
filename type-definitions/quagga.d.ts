@@ -495,8 +495,20 @@ export interface QuaggaJSStatic {
      * When the library is initialized, the start()
      * method starts the video-stream and begins locating and decoding the
      * images.
+     *
+     * Optionally, you can pass a config object to start(), which will
+     * call init() and then start() for convenience.
+     *
+     * If start() is called without init() having been completed first,
+     * and no config is provided, an error will be thrown.
      */
     start(): void;
+
+    /**
+     * Combines init() and start() into a single call. Pass a config object
+     * and optionally a callback. If no callback is provided, returns a Promise.
+     */
+    start(config: QuaggaJSConfigObject, callback?: (err: any) => void): Promise<void>;
 
     /**
      * If the decoder is currently running, after calling
