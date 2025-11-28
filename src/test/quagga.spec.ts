@@ -26,7 +26,7 @@ describe('src/quagga.js', () => {
     });
 
     describe('start', () => {
-        it('throws descriptive error when called without init() and no config provided', async () => {
+        it('throws descriptive error when called without init() and no config provided', () => {
             // Use a fresh Quagga instance to simulate calling start without init
             const freshInstance = new Quagga();
             // The context should not have a framegrabber since init was never called
