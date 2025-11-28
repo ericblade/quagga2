@@ -105,18 +105,60 @@ describe('CV Utils', () => {
     });
 
     describe('calculatePatchSize', () => {
-        it('should not throw an error in case of valid image size', () => {
+        it('should return expected patch size for valid image dimensions', () => {
             const expected = { x: 32, y: 32 };
             const patchSize = calculatePatchSize('medium', { x: 640, y: 480 });
 
             expect(patchSize).to.deep.equal(expected);
         });
 
-        it('should thow an error if image size it not valid', () => {
-            const expected = { x: 32, y: 32 };
-            const patchSize = calculatePatchSize('medium', { x: 640, y: 480 });
+        it('should return different patch sizes based on patchSize setting', () => {
+            const imageSize = { x: 640, y: 480 };
 
-            expect(patchSize).to.deep.equal(expected);
+            // Different patchSize settings should produce different results
+            const medium = calculatePatchSize('medium', imageSize);
+            const large = calculatePatchSize('large', imageSize);
+            const small = calculatePatchSize('small', imageSize);
+
+            // Larger patchSize setting = larger patches = fewer patches
+            expect(large.x).to.be.greaterThan(medium.x);
+            expect(medium.x).to.be.greaterThan(small.x);
+        });
+
+        // Test for issue #218: calculatePatchSize should return fallback for difficult dimensions
+        it('should return image size as fallback for dimensions that cannot produce optimal patch size', () => {
+            // Small prime dimensions are difficult to find common divisors for
+            // The function should fall back to using image size instead of returning null
+            const patchSize = calculatePatchSize('medium', { x: 7, y: 11 });
+
+            // The function should return the image size as fallback
+            expect(patchSize).to.deep.equal({ x: 7, y: 11 });
+        });
+
+        it('should return minimum 1x1 for zero-sized images', () => {
+            // Edge case: zero-sized image should return 1x1 minimum
+            const patchSize = calculatePatchSize('medium', { x: 0, y: 0 });
+
+            expect(patchSize).to.deep.equal({ x: 1, y: 1 });
+        });
+
+        it('should always return a valid object, never null', () => {
+            // Test various edge cases to ensure we always get a valid return
+            const testCases = [
+                { x: 7, y: 11 },    // small primes
+                { x: 1, y: 1 },     // minimum size
+                { x: 0, y: 0 },     // zero size
+                { x: 13, y: 17 },   // larger primes
+            ];
+
+            testCases.forEach(size => {
+                const patchSize = calculatePatchSize('medium', size);
+                expect(patchSize).to.be.an('object');
+                expect(patchSize).to.have.property('x').that.is.a('number');
+                expect(patchSize).to.have.property('y').that.is.a('number');
+                expect(patchSize.x).to.be.at.least(1);
+                expect(patchSize.y).to.be.at.least(1);
+            });
         });
     });
 

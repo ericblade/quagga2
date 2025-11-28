@@ -165,6 +165,19 @@ describe('Barcode Locator', () => {
             expect(((inputStream.setTopRight) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedTopRight);
             expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
         });
+
+        // Test for issue #218: calculatePatchSize now returns fallback instead of null
+        // checkImageConstraints should succeed with unusual dimensions
+        it('should succeed with unusual dimensions using fallback patch size', function() {
+            // Use unusual dimensions that previously caused calculatePatchSize to return null
+            imageSize = { x: 7, y: 11 };  // Small prime dimensions
+
+            config.locator!.halfSample = false;
+
+            // This should succeed now that calculatePatchSize returns a fallback
+            expect(() => BarcodeLocator.checkImageConstraints(inputStream, config.locator))
+                .to.not.throw();
+        });
     });
 
     describe('init', function() {
@@ -229,6 +242,40 @@ describe('Barcode Locator', () => {
 
             // This should not throw an error with the fix in place
             expect(() => BarcodeLocator.init(largeImageWrapper, locatorConfig)).to.not.throw();
+        });
+
+        // Test for issue #218: calculatePatchSize now returns fallback instead of null
+        // init should succeed with unusual dimensions using fallback patch size
+        it('should succeed with unusual dimensions using fallback patch size', function() {
+            // Create an image with unusual dimensions that previously caused calculatePatchSize to return null
+            // Prime numbers are difficult to find common divisors for
+            const unusualImageWrapper = {
+                size: { x: 7, y: 11 },  // Small prime dimensions that are hard to divide
+                data: new Uint8Array(7 * 11),
+            };
+
+            const locatorConfig = merge({}, QuaggaConfig.locator, {
+                patchSize: 'medium',
+                halfSample: false,
+                debug: {
+                    showCanvas: false,
+                    showPatches: false,
+                    showFoundPatches: false,
+                    showSkeleton: false,
+                    showLabels: false,
+                    showPatchLabels: false,
+                    showRemainingPatchLabels: false,
+                    boxFromPatches: {
+                        showTransformed: false,
+                        showTransformedBox: false,
+                        showBB: false,
+                    },
+                },
+            });
+
+            // This should succeed now that calculatePatchSize returns a fallback
+            expect(() => BarcodeLocator.init(unusualImageWrapper, locatorConfig))
+                .to.not.throw();
         });
     });
 });

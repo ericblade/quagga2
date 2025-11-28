@@ -734,6 +734,14 @@ export function calculatePatchSize(patchSize, imgSize) {
             optimalPatchSize = findPatchSizeForDivisors((_computeDivisors(desiredPatchSize * nrOfPatches)));
         }
     }
+    // Fallback: if no optimal patch size found, use image size (or 1x1 minimum)
+    // This ensures the function always returns a valid {x, y} object
+    if (!optimalPatchSize) {
+        optimalPatchSize = {
+            x: Math.max(1, imgSize.x),
+            y: Math.max(1, imgSize.y),
+        };
+    }
     return optimalPatchSize;
 }
 
