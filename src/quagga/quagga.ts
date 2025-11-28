@@ -73,8 +73,19 @@ export default class Quagga {
         );
     }
 
-    canRecord = (callback: () => void): void => {
+    canRecord = (callback: (err?: Error) => void): void => {
+        // Check if init was aborted (e.g., by calling stop() during initialization)
+        // This can happen in React StrictMode where components are mounted/unmounted rapidly
+        if (this.context.initAborted) {
+            callback(new Error('Initialization was aborted'));
+            return;
+        }
         if (!this.context.config) {
+            return;
+        }
+        // Check if inputStream is properly initialized before proceeding
+        if (!this.context.inputStream) {
+            callback(new Error('Input stream not initialized'));
             return;
         }
         BarcodeLocator.checkImageConstraints(this.context.inputStream, this.context.config?.locator);
@@ -278,10 +289,16 @@ export default class Quagga {
 
     async stop(): Promise<void> {
         this.context.stopped = true;
+        // Set initAborted flag if stop() is called while init() is still in progress
+        // (i.e., before framegrabber is initialized). This prevents the canRecord
+        // callback from continuing after stop() was called.
+        if (!this.context.framegrabber) {
+            this.context.initAborted = true;
+        }
         QWorkers.adjustWorkerPool(0);
         if (this.context.config?.inputStream && this.context.config.inputStream.type === 'LiveStream') {
             await CameraAccess.release();
-            this.context.inputStream.clearEventHandlers();
+            this.context.inputStream?.clearEventHandlers();
         }
     }
 
