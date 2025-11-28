@@ -105,18 +105,24 @@ describe('CV Utils', () => {
     });
 
     describe('calculatePatchSize', () => {
-        it('should not throw an error in case of valid image size', () => {
+        it('should return expected patch size for valid image dimensions', () => {
             const expected = { x: 32, y: 32 };
             const patchSize = calculatePatchSize('medium', { x: 640, y: 480 });
 
             expect(patchSize).to.deep.equal(expected);
         });
 
-        it('should thow an error if image size it not valid', () => {
-            const expected = { x: 32, y: 32 };
-            const patchSize = calculatePatchSize('medium', { x: 640, y: 480 });
+        it('should return different patch sizes based on patchSize setting', () => {
+            const imageSize = { x: 640, y: 480 };
 
-            expect(patchSize).to.deep.equal(expected);
+            // Different patchSize settings should produce different results
+            const medium = calculatePatchSize('medium', imageSize);
+            const large = calculatePatchSize('large', imageSize);
+            const small = calculatePatchSize('small', imageSize);
+
+            // Larger patchSize setting = larger patches = fewer patches
+            expect(large.x).to.be.greaterThan(medium.x);
+            expect(medium.x).to.be.greaterThan(small.x);
         });
 
         // Test for issue #218: calculatePatchSize should return fallback for difficult dimensions
