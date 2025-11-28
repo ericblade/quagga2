@@ -367,30 +367,7 @@ Quagga.decodeSingle({
 
 **Performance Note**: Higher values increase processing time. Balance detection accuracy against speed based on your use case. Test different values to find the optimal setting for your specific images.
 
-### `inputStream.debug`
-
-**Type**: `object`
-
-**Description**: Enable console logging and visual debugging for input stream diagnostics.
-
-```javascript
-debug: {
-  showImageDetails: false,  // Log frame grabber operations
-  showArea: false,          // Draw area boundary on overlay canvas
-  areaColor: 'rgba(0, 255, 0, 0.5)', // Color of the area border
-  areaLineWidth: 2          // Width of the area border
-}
-```
-
-#### `inputStream.debug.showImageDetails`
-
-**Type**: `boolean`
-
-**Default**: `false`
-
-**Description**: Logs frame grabber info, canvas size adjustments, and image loading details to the console.
-
-#### `inputStream.debug.showArea`
+### `inputStream.showArea`
 
 **Type**: `boolean`
 
@@ -413,14 +390,12 @@ Quagga.init({
       bottom: '25%',
       left: '10%'
     },
-    debug: {
-      showArea: true  // Shows green rectangle around scan area
-    }
+    showArea: true  // Shows green rectangle around scan area
   }
 });
 ```
 
-#### `inputStream.debug.areaColor`
+### `inputStream.areaColor`
 
 **Type**: `string`
 
@@ -431,14 +406,14 @@ Quagga.init({
 **Example**:
 
 ```javascript
-debug: {
+inputStream: {
   showArea: true,
   areaColor: 'red'  // Red border
   // or: 'rgba(255, 0, 0, 0.7)'  // Semi-transparent red
 }
 ```
 
-#### `inputStream.debug.areaLineWidth`
+### `inputStream.areaLineWidth`
 
 **Type**: `number`
 
@@ -449,11 +424,31 @@ debug: {
 **Example**:
 
 ```javascript
-debug: {
+inputStream: {
   showArea: true,
   areaLineWidth: 5  // Thicker border for visibility
 }
 ```
+
+### `inputStream.debug`
+
+**Type**: `object`
+
+**Description**: Enable console logging for input stream diagnostics.
+
+```javascript
+debug: {
+  showImageDetails: false  // Log frame grabber operations
+}
+```
+
+#### `inputStream.debug.showImageDetails`
+
+**Type**: `boolean`
+
+**Default**: `false`
+
+**Description**: Logs frame grabber info, canvas size adjustments, and image loading details to the console.
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for details.
 

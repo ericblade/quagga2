@@ -153,7 +153,7 @@ describe('Area Overlay', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '10%' },
-                    debug: { showArea: true },
+                    showArea: true,
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -167,7 +167,7 @@ describe('Area Overlay', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '10%' },
-                    debug: { showArea: false },
+                    showArea: false,
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -181,7 +181,7 @@ describe('Area Overlay', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '0%', right: '0%', bottom: '0%', left: '0%' },
-                    debug: { showArea: true },
+                    showArea: true,
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -195,7 +195,7 @@ describe('Area Overlay', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '10%', right: '10%', bottom: '10%', left: '10%' },
-                    debug: { showArea: true },
+                    showArea: true,
                 },
             };
             const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
@@ -209,11 +209,9 @@ describe('Area Overlay', () => {
             const config: QuaggaJSConfigObject = {
                 inputStream: {
                     area: { top: '10%' },
-                    debug: {
-                        showArea: true,
-                        areaColor: 'blue',
-                        areaLineWidth: 5,
-                    },
+                    showArea: true,
+                    areaColor: 'blue',
+                    areaLineWidth: 5,
                 },
             };
             const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
