@@ -166,4 +166,69 @@ describe('Barcode Locator', () => {
             expect(((inputStream.setCanvasSize) as SinonSpy).getCall(0).args[0]).to.deep.equal(expectedCanvasSize);
         });
     });
+
+    describe('init', function() {
+        // Test for issue #95: Invalid typed array length when using resolution 1920+
+        // Fixed by commit 35614bc - dynamically calculates buffer size instead of fixed 64KB
+        it('should initialize without error for large image sizes (1920+)', function() {
+            // Create a mock ImageWrapper that simulates a high-resolution image
+            const largeImageWrapper = {
+                size: { x: 1920, y: 1080 },
+                data: new Uint8Array(1920 * 1080),
+            };
+
+            const locatorConfig = merge({}, QuaggaConfig.locator, {
+                patchSize: 'large',  // large patch size combined with large image triggered the issue
+                halfSample: false,   // no half sampling = larger buffer needed
+                debug: {
+                    showCanvas: false,
+                    showPatches: false,
+                    showFoundPatches: false,
+                    showSkeleton: false,
+                    showLabels: false,
+                    showPatchLabels: false,
+                    showRemainingPatchLabels: false,
+                    boxFromPatches: {
+                        showTransformed: false,
+                        showTransformedBox: false,
+                        showBB: false,
+                    },
+                },
+            });
+
+            // This should not throw an error with the fix in place
+            // Before the fix, this would throw "Invalid typed array length" error
+            expect(() => BarcodeLocator.init(largeImageWrapper, locatorConfig)).to.not.throw();
+        });
+
+        it('should initialize without error for very large image sizes (4K resolution)', function() {
+            // Create a mock ImageWrapper that simulates a 4K resolution image
+            const largeImageWrapper = {
+                size: { x: 3840, y: 2160 },
+                data: new Uint8Array(3840 * 2160),
+            };
+
+            const locatorConfig = merge({}, QuaggaConfig.locator, {
+                patchSize: 'x-large',  // x-large patch creates bigger buffers
+                halfSample: false,
+                debug: {
+                    showCanvas: false,
+                    showPatches: false,
+                    showFoundPatches: false,
+                    showSkeleton: false,
+                    showLabels: false,
+                    showPatchLabels: false,
+                    showRemainingPatchLabels: false,
+                    boxFromPatches: {
+                        showTransformed: false,
+                        showTransformedBox: false,
+                        showBB: false,
+                    },
+                },
+            });
+
+            // This should not throw an error with the fix in place
+            expect(() => BarcodeLocator.init(largeImageWrapper, locatorConfig)).to.not.throw();
+        });
+    });
 });
