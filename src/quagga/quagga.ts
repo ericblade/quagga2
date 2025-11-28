@@ -151,7 +151,10 @@ export default class Quagga {
 
         if (result.boxes && result.boxes.length > 0) {
             for (let i = 0; i < result.boxes.length; i++) {
-                moveBox(result.boxes[i], xOffset, yOffset);
+                // Skip if this box is the same reference as result.box (already transformed above)
+                if (result.boxes[i] !== result.box) {
+                    moveBox(result.boxes[i], xOffset, yOffset);
+                }
             }
         }
     }
