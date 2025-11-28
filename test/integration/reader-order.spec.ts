@@ -210,13 +210,13 @@ describe('Priority Behavior with Multiple Readers', () => {
         expect(result.codeResult.format).to.equal('ean_8');
     });
     
-    it('should decode EAN-8 as ean_13 when ean_reader is prioritized over ean_8_reader', async function() {
+    it('should fallback to ean_8_reader when ean_reader cannot decode EAN-8 barcode', async function() {
         this.timeout(20000);
         
-        // Note: EAN-8 barcodes can sometimes be read by EAN-13 reader with padding
-        // This test demonstrates that reader order affects the format returned
-        // However, the EAN reader may not successfully decode EAN-8 images,
-        // so we test that we get a result from whichever reader succeeds first.
+        // EAN-8 and EAN-13 are different barcode formats with different structures.
+        // The EAN-13 reader will not successfully decode an EAN-8 barcode,
+        // so it will return null and the decoder will try the next reader.
+        // This test demonstrates that reader order affects fallback behavior.
         const config = {
             inputStream: {
                 size: 640,
@@ -236,12 +236,11 @@ describe('Priority Behavior with Multiple Readers', () => {
         
         const result = await Quagga.decodeSingle(config);
         
-        // The result should be from one of the readers
-        // EAN reader may fail on EAN-8 images, in which case EAN-8 reader succeeds
+        // EAN-13 reader cannot decode EAN-8, so EAN-8 reader succeeds as fallback
         expect(result).to.be.an('object');
         expect(result.codeResult).to.be.an('object');
         expect(result.codeResult.code).to.equal('42191605');
-        // Format will be either ean_13 (if EAN reader succeeds) or ean_8 (if it falls back)
-        expect(['ean_13', 'ean_8']).to.include(result.codeResult.format);
+        // Since EAN-13 reader fails, the EAN-8 reader handles it
+        expect(result.codeResult.format).to.equal('ean_8');
     });
 });
