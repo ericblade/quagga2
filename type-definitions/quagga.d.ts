@@ -852,6 +852,22 @@ export interface QuaggaJSConfigObject {
              * Logs frame grabber info, canvas size adjustments, and image loading details
              */
             showImageDetails?: boolean;
+            /**
+             * @default false
+             * When true and an 'area' is defined, draws a rectangle on the overlay canvas
+             * showing the scan area boundaries. Requires createOverlay to be true.
+             */
+            showArea?: boolean;
+            /**
+             * Color of the area border when showArea is enabled
+             * @default "rgba(0, 255, 0, 0.5)"
+             */
+            areaColor?: string;
+            /**
+             * Line width of the area border when showArea is enabled
+             * @default 2
+             */
+            areaLineWidth?: number;
         };
     };
 

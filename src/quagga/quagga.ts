@@ -1,5 +1,6 @@
 import { vec2 } from 'gl-matrix';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig } from '../../type-definitions/quagga.d';
+import { drawAreaIfConfigured } from '../common/area_overlay';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
@@ -63,6 +64,13 @@ export default class Quagga {
         this.context.canvasContainer.dom.overlay = dom.overlay;
         this.context.canvasContainer.ctx.image = ctx.image;
         this.context.canvasContainer.ctx.overlay = ctx.overlay;
+
+        // Draw area overlay if configured
+        drawAreaIfConfigured(
+            this.context.config,
+            this.context.canvasContainer.ctx.overlay,
+            this.context.inputStream.getCanvasSize(),
+        );
     }
 
     canRecord = (callback: () => void): void => {

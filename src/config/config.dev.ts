@@ -19,6 +19,9 @@ const DevConfig: QuaggaJSConfigObject = {
         singleChannel: false, // true: only the red color-channel is read
         debug: {
             showImageDetails: false, // logs frame grabber info, canvas size adjustments
+            showArea: false, // draws area boundaries on overlay when area is defined
+            areaColor: 'rgba(0, 255, 0, 0.5)', // color of the area border
+            areaLineWidth: 2, // line width of the area border
         },
     },
     locate: true,
