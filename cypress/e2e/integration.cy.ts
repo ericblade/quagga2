@@ -15,3 +15,4 @@ import '../../test/integration/decoders/2of5.spec.ts';
 import '../../test/integration/decoders/code_93.spec.ts';
 import '../../test/integration/external-reader.spec.ts';
 import '../../test/integration/integration.spec.ts';
+import '../../test/integration/reader-order.spec.ts';
