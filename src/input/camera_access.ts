@@ -108,12 +108,18 @@ async function enumerateVideoDevices(
 
     // Filter devices based on constraints by trying to get a media stream for each
     const constrainedDevices: Array<MediaDeviceInfo> = [];
+
+    // Process constraints but exclude deviceId since we'll set it ourselves for each device
+    const processedConstraints = deprecatedConstraints(videoConstraints);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { deviceId: _, ...constraintsWithoutDeviceId } = processedConstraints;
+
     for (const device of videoDevices) {
         try {
             const constraints: MediaStreamConstraints = {
                 audio: false,
                 video: {
-                    ...deprecatedConstraints(videoConstraints),
+                    ...constraintsWithoutDeviceId,
                     deviceId: { exact: device.deviceId },
                 },
             };
@@ -122,7 +128,11 @@ async function enumerateVideoDevices(
             stream.getTracks().forEach((track) => track.stop());
             constrainedDevices.push(device);
         } catch {
-            // Device doesn't support the constraints, skip it
+            // Device doesn't support the constraints, skip it.
+            // This catch is intentionally empty as we're using getUserMedia to test if
+            // each device supports the constraints. Errors here indicate the device
+            // doesn't meet the requirements (OverconstrainedError) or other issues
+            // that mean we should exclude this device from the results.
         }
     }
 
