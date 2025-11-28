@@ -456,8 +456,35 @@ Quagga.onDetected(function(result) {
 
 ## Canvas Access
 
-Quagga exposes canvas objects for custom visualization:
+Quagga automatically creates and manages two canvas elements for visualization. These are positioned over the video/image stream and sized to match the processing dimensions.
 
+### Canvas Structure
+
+```javascript
+Quagga.canvas = {
+  dom: {
+    image: HTMLCanvasElement,   // Canvas for processed image data
+    overlay: HTMLCanvasElement  // Transparent canvas for drawing overlays
+  },
+  ctx: {
+    image: CanvasRenderingContext2D,   // Context for image canvas
+    overlay: CanvasRenderingContext2D  // Context for overlay canvas
+  }
+};
+```
+
+### Overlay Canvas
+
+The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes and is designed for drawing bounding boxes, scan lines, and other visual feedback.
+
+**Key characteristics:**
+- Has CSS class `drawingBuffer`
+- Sized to match the processed image dimensions (`inputStream.size`)
+- Positioned absolutely over the video/image element
+- Automatically appended to the viewport container
+- Coordinates match the processed image space (no scaling needed)
+
+**Accessing the overlay:**
 ```javascript
 const overlay = Quagga.canvas.dom.overlay;
 const overlayCtx = Quagga.canvas.ctx.overlay;
@@ -469,6 +496,66 @@ overlayCtx.clearRect(0, 0, overlay.width, overlay.height);
 overlayCtx.strokeStyle = "red";
 overlayCtx.lineWidth = 3;
 overlayCtx.strokeRect(10, 10, 100, 100);
+```
+
+### Image Canvas
+
+The **image canvas** (`Quagga.canvas.dom.image`) contains the processed grayscale image data used for barcode detection. This is primarily for internal use and debugging.
+
+**Key characteristics:**
+- Has CSS class `imgBuffer`
+- Contains the grayscale/processed image data
+- Useful for debugging locator issues
+
+### When to Use Each Canvas
+
+| Use Case | Canvas to Use |
+|----------|---------------|
+| Drawing bounding boxes | `overlay` |
+| Highlighting detected barcodes | `overlay` |
+| Custom scan line visualization | `overlay` |
+| Debugging image processing | `image` |
+| Checking processed resolution | Either (they have same dimensions) |
+
+### Important: Coordinate System
+
+When drawing on the overlay canvas, use `result.box` and `result.boxes` coordinates directly - **no scaling is needed**. These coordinates are already in the overlay canvas's coordinate space.
+
+```javascript
+Quagga.onProcessed(function(result) {
+  const ctx = Quagga.canvas.ctx.overlay;
+  const canvas = Quagga.canvas.dom.overlay;
+  
+  // Clear previous drawings
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  
+  // Draw box directly - coordinates already match the overlay canvas
+  if (result && result.box) {
+    Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, ctx, {
+      color: "green", lineWidth: 2
+    });
+  }
+});
+```
+
+> **Note**: Scaling is only needed when drawing on a **different** canvas (like a custom overlay on the original video element). See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for details.
+
+### CSS Styling
+
+The overlay canvas can be styled with CSS for positioning:
+
+```css
+/* Default positioning (handled automatically by Quagga) */
+canvas.drawingBuffer {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+/* Ensure proper stacking */
+#scanner-container {
+  position: relative;
+}
 ```
 
 ## ImageDebug Helper
