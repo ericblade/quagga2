@@ -393,11 +393,13 @@ area: {
 
 ### `inputStream.size`
 
-**Type**: `number` (for `decodeSingle` only)
+**Type**: `number`
 
-**Default**: Original image dimensions (when omitted)
+**Default**: `800` when using `decodeSingle()`; `0` (original image dimensions) otherwise
 
-**Description**: When using `decodeSingle` with file paths, scales the input image so that the longest side (width or height) equals this value, maintaining aspect ratio. When omitted, the original image dimensions are used without any scaling.
+**Description**: Scales the input image so that the longest side (width or height) equals this value, maintaining aspect ratio.
+
+**Important**: When using `decodeSingle()`, the default is `size: 800`. This means images are **automatically scaled to 800px** on their longest side (both larger and smaller images are scaled to match this value) unless you explicitly specify a different value. When using `init()`, no default scaling is applied - original dimensions are used unless you specify a size. The `box`, `boxes`, and `line` coordinates in the result are returned in the **scaled coordinate space**, not the original image dimensions. To use the original image size without any scaling, set `inputStream.size` to `0`. See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for details on handling scaled coordinates.
 
 **Note on Scaling**: This parameter scales images both up and down. While upscaling typically introduces interpolation artifacts, testing has shown that moderate upscaling can actually **improve** barcode detection accuracy, even with `halfSample:false`. The benefits include:
 
@@ -419,7 +421,14 @@ area: {
 **Example**:
 
 ```javascript
-// Scale down a large image
+// Default behavior: decodeSingle uses size: 800 by default
+Quagga.decodeSingle({
+  src: "./large-image.jpg",  // 3000x2000 image
+  // size defaults to 800, so this scales down to 800x533
+  // Result coordinates (box, line) will be in 800x533 space
+});
+
+// Override to preserve larger processing resolution
 Quagga.decodeSingle({
   src: "./large-image.jpg",  // 3000x2000 image
   inputStream: {
@@ -427,11 +436,11 @@ Quagga.decodeSingle({
   }
 });
 
-// Use original image size (often a good starting point)
+// Disable scaling entirely - use original image dimensions
 Quagga.decodeSingle({
   src: "./medium-image.jpg",  // 1280x720 image
   inputStream: {
-    // No size specified - uses original 1280x720
+    size: 0  // Zero disables scaling, uses original 1280x720
   }
 });
 

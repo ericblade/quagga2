@@ -120,6 +120,8 @@ Quagga.decodeSingle({
   decoder: {
     readers: ["code_128_reader"]
   }
+  // Note: Images are scaled to 800px (longest side) by default.
+  // See inputStream.size in the Configuration Reference for details.
 }, function(result) {
   if (result && result.codeResult) {
     console.log("Barcode found:", result.codeResult.code);
