@@ -33,7 +33,7 @@ Technical deep dive into the three input stream types and their initialization f
 
 High-level overview of Quagga2's processing pipeline from input to output.
 
-### [Code Architecture](architecture.md) *(Coming Soon)*
+### [Code Architecture](architecture.md)
 
 Structure of the codebase, module organization, and design decisions.
 

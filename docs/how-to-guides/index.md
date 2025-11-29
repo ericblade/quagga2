@@ -42,7 +42,13 @@ Control focus, zoom, flash/torch, and other camera parameters.
 
 ### [Working with Box Coordinates](working-with-coordinates.md) 🆕
 
-Understand how `box` and `boxes` coordinates relate to processed vs. original image dimensions, and how to properly scale coordinates for overlay rendering on video elements.
+Understand how `box`, `boxes`, and `line` coordinates relate to processed vs. original image dimensions, and how to properly scale coordinates for overlay rendering on video elements.
+
+## Tips & Best Practices
+
+### [Tips and Tricks](tips-and-tricks.md)
+
+Practical advice for getting the best results with Quagga2, including camera setup, user experience, and handling results.
 
 ## Integration
 

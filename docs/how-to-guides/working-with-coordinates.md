@@ -1,10 +1,10 @@
 # Working with Box Coordinates {#working-with-box-coordinates}
 
-This guide explains how Quagga2's coordinate system works and how to properly use `box` and `boxes` coordinates for overlay rendering, especially when using `inputStream.size` to scale processing.
+This guide explains how Quagga2's coordinate system works and how to properly use `box`, `boxes`, and `line` coordinates for overlay rendering, especially when using `inputStream.size` to scale processing.
 
 ## Understanding the Coordinate System {#understanding-coordinate-system}
 
-Quagga2 returns `box` and `boxes` coordinates in **processed canvas coordinates**, not original image/video coordinates. This is important to understand when:
+Quagga2 returns `box`, `boxes`, and `line` coordinates in **processed canvas coordinates**, not original image/video coordinates. This is important to understand when:
 
 - Drawing overlay boxes on a video element
 - Using `inputStream.size` to reduce processing resolution
