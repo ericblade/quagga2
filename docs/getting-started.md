@@ -1,8 +1,8 @@
-# Getting Started with Quagga2
+# Getting Started with Quagga2 {#getting-started}
 
 This guide will help you install Quagga2 and get your first barcode scanner running quickly.
 
-## What is Quagga2?
+## What is Quagga2? {#what-is-quagga2}
 
 Quagga2 is a JavaScript barcode scanner library that works in both browsers and Node.js. It can:
 
@@ -13,9 +13,9 @@ Quagga2 is a JavaScript barcode scanner library that works in both browsers and 
 
 Unlike some libraries, Quagga2 includes a barcode **locator** that can find and decode barcodes regardless of their rotation or scale in the image.
 
-## Installation
+## Installation {#installation}
 
-### Using NPM (Recommended)
+### Using NPM (Recommended) {#using-npm}
 
 ```bash
 npm install --save @ericblade/quagga2
@@ -31,7 +31,7 @@ import Quagga from '@ericblade/quagga2';
 const Quagga = require('@ericblade/quagga2').default;
 ```
 
-### Using CDN (Script Tag)
+### Using CDN (Script Tag) {#using-cdn}
 
 Add one of these script tags to your HTML:
 
@@ -55,11 +55,11 @@ Add one of these script tags to your HTML:
 
 The script tag exposes the library globally as `Quagga`.
 
-## Basic Usage - Live Camera Scanning
+## Basic Usage - Live Camera Scanning {#live-camera-scanning}
 
 Here's a minimal example to scan barcodes using your device's camera:
 
-### HTML
+### HTML {#html-example}
 
 ```html
 <!DOCTYPE html>
@@ -76,7 +76,7 @@ Here's a minimal example to scan barcodes using your device's camera:
 </html>
 ```
 
-### JavaScript (app.js)
+### JavaScript (app.js) {#javascript-example}
 
 ```javascript
 Quagga.init({
@@ -110,7 +110,7 @@ That's it! This will:
 3. Continuously scan for CODE 128 barcodes
 4. Alert you when a barcode is detected
 
-## Basic Usage - Static Image Scanning
+## Basic Usage - Static Image Scanning {#static-image-scanning}
 
 To decode a barcode from an existing image:
 
@@ -131,13 +131,13 @@ Quagga.decodeSingle({
 });
 ```
 
-## Important Notes
+## Important Notes {#important-notes}
 
-### HTTPS Required
+### HTTPS Required {#https-required}
 
 For security reasons, browsers require **HTTPS** to access the camera, except on `localhost`. If you host your app on a domain, you must use `https://`.
 
-### Browser Compatibility
+### Browser Compatibility {#browser-compatibility}
 
 Quagga2 works in modern browsers that support:
 
@@ -147,7 +147,7 @@ Quagga2 works in modern browsers that support:
 
 See the [Browser Support](reference/browser-support.md) page for detailed compatibility information.
 
-### Polyfill Recommendation
+### Polyfill Recommendation {#polyfill-recommendation}
 
 Different browsers implement camera APIs differently. We recommend including [webrtc-adapter](https://github.com/webrtc/adapter) for better compatibility:
 
@@ -155,7 +155,7 @@ Different browsers implement camera APIs differently. We recommend including [we
 <script src="https://webrtc.github.io/adapter/adapter-latest.js"></script>
 ```
 
-## Next Steps
+## Next Steps {#next-steps}
 
 Now that you have the basics working:
 
@@ -164,9 +164,9 @@ Now that you have the basics working:
 - **[Explore supported barcode types](reference/readers.md)** - Enable different formats
 - **[Check out live examples](https://serratus.github.io/quaggaJS/examples)** - See Quagga2 in action
 
-## Common Issues
+## Common Issues {#common-issues}
 
-### Camera Permission Denied
+### Camera Permission Denied {#camera-permission-denied}
 
 If the user denies camera access, the `init` callback will receive an error. Always handle this gracefully:
 
@@ -183,7 +183,7 @@ Quagga.init(config, function(err) {
 });
 ```
 
-### Camera Not Found
+### Camera Not Found {#camera-not-found}
 
 Some devices don't have a camera (desktops, VMs). Check for camera availability:
 
@@ -197,7 +197,7 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'fu
 }
 ```
 
-### No Barcode Detected
+### No Barcode Detected {#no-barcode-detected}
 
 If Quagga2 isn't detecting your barcode:
 
@@ -206,7 +206,7 @@ If Quagga2 isn't detecting your barcode:
 - Try holding the barcode steady and filling most of the camera view
 - See [How to Handle Difficult Barcodes](how-to-guides/handle-difficult-barcodes.md)
 
-## Getting Help
+## Getting Help {#getting-help}
 
 - **[GitHub Issues](https://github.com/ericblade/quagga2/issues)** - Report bugs or request features
 - **[Gitter Chat](https://gitter.im/quaggaJS/Lobby)** - Ask questions and get help from the community

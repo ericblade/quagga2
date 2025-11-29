@@ -1,18 +1,18 @@
-## Contributing
+## Contributing {#contributing}
 
-### Questions, Bugs, Enhancements / Suggestions
+### Questions, Bugs, Enhancements / Suggestions {#questions-bugs-enhancements}
 
 For questions, bug reports, and enhancement requests / suggestions, please use the GitHub issue 
 tracker at https://github.com/ericblade/quagga2/issues
 
-### Chat / Real Time Communication?
+### Chat / Real Time Communication? {#chat}
 
 We have a Gitter chat channel available at https://gitter.im/quaggaJS/Lobby . Please join us there,
 and be patient.  Thanks!
 
-### Code
+### Code {#code}
 
-#### Developing enhancements to Quagga2
+#### Developing enhancements to Quagga2 {#developing-enhancements}
 
 If you'd like to work directly on the Quagga2 code, it is quite easy to build a local development
 copy and get started hacking on the base code.  Simply clone this repository, then run:
@@ -22,7 +22,7 @@ npm install
 npm run build
 ```
 
-#### Running tests
+#### Running tests {#running-tests}
 
 There are several tests included in Quagga2, in the test/ folder.  Please make sure before you
 send in any pull requests, that you have run ```npm test``` against the existing tests, as well as
@@ -66,7 +66,7 @@ environments by default. If a test is known to fail in a specific environment, m
 
 See `test/integration/README.md` for complete details on the test failure marking system.
 
-#### Working on a changed copy of Quagga2 from another repository (ie, developing an external plugin)
+#### Working on a changed copy of Quagga2 from another repository (ie, developing an external plugin) {#working-on-external-plugin}
 
 If you need to make changes to Quagga2 to support some external code (such as an external reader plugin),
 you will probably need to be able to test the code in your other repo.  One such way to do that is
@@ -76,12 +76,12 @@ lib/quagga.js (node) and/or dist/quagga.js and/or dist/quagga.min.js files into
 ExternalRepo/node_modules/@ericblade/quagga2, preserving the "lib" or "dist" folder. Then your code
 will have the new changes that you have implemented in your copy of the quagga2 repo.
 
-#### Pull requests
+#### Pull requests {#pull-requests}
 
 Please, submit pull requests! Open source works best when we all work together.  If you find a change
 to be useful, the odds are that other users will, as well!
 
-## BE AWESOME
+## BE AWESOME {#be-awesome}
 
 Don't forget to BE AWESOME.
 

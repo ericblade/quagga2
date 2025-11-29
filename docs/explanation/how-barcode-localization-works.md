@@ -1,10 +1,10 @@
-# How Barcode Localization Works
+# How Barcode Localization Works {#how-barcode-localization-works}
 
 > **Note on Terminology**: "Localization" in this context refers to finding the **physical location** (position, bounding box) of a barcode within an image - not language localization (i18n). This is standard computer vision terminology.
 
 This article explains the technical details of how Quagga2 locates and decodes barcodes in images. Understanding this can help you optimize performance and troubleshoot issues.
 
-## Overview
+## Overview {#overview}
 
 Quagga2 uses a two-stage process:
 
@@ -13,7 +13,7 @@ Quagga2 uses a two-stage process:
 
 This approach is based on the paper [Locating and decoding EAN-13 barcodes from images captured by digital cameras](http://www.icics.org/2005/download/P0840.pdf) by Douglas et al., with adaptations and modifications for web browsers.
 
-## Stage 1: Barcode Locator
+## Stage 1: Barcode Locator {#stage-1-barcode-locator}
 
 The locator finds patterns that look like barcodes. A barcode is typically characterized by:
 
@@ -21,7 +21,7 @@ The locator finds patterns that look like barcodes. A barcode is typically chara
 - That are **close to each other**
 - With a **similar angle** (parallel lines)
 
-### Step 1: Creating a Binary Image
+### Step 1: Creating a Binary Image {#step-1-binary-image}
 
 The first step is converting the color image to binary (black and white). Instead of using a simple threshold (e.g., everything below 127 is black), Quagga2 uses **Otsu's method**, which adapts to lighting changes across the image.
 
@@ -29,11 +29,11 @@ The first step is converting the color image to binary (black and white). Instea
 
 Otsu's method analyzes the image histogram and automatically separates foreground (barcode) from background, even with uneven lighting.
 
-### Step 2: Slicing into a Grid
+### Step 2: Slicing into a Grid {#step-2-slicing-grid}
 
 The binary image is divided into a **20×15 grid** (assuming 4:3 aspect ratio). Each cell is analyzed independently to determine if it contains barcode-like patterns.
 
-### Step 3: Extract Skeleton
+### Step 3: Extract Skeleton {#step-3-extract-skeleton}
 
 Each cell undergoes **skeletonization** - reducing bars to their centerline (1px width). This is done through iterative erosion and dilation.
 
@@ -41,7 +41,7 @@ Each cell undergoes **skeletonization** - reducing bars to their centerline (1px
 
 The skeleton clearly shows where parallel lines exist, making it easier to identify barcode regions.
 
-### Step 4: Component Labeling
+### Step 4: Component Labeling {#step-4-component-labeling}
 
 Using **connected-component labeling**, each line in the skeletonized image is separated into individual components. This is done with a fast algorithm based on the paper ["A Linear-Time Component-Labeling Algorithm Using Contour Tracing Technique"](http://www.iis.sinica.edu.tw/papers/fchang/1362-F.pdf) by Fu Chang et al.
 
@@ -57,7 +57,7 @@ Here are zoomed examples of two cells:
 ![Component labeling - text](../assets/component-labeling-text.png)
 *Bad: Random components indicate noise/text*
 
-### Step 5: Determining Orientation
+### Step 5: Determining Orientation {#step-5-determining-orientation}
 
 For each component, Quagga2 calculates its orientation using **central image moments**. This is a mathematical technique to extract the angle of a shape.
 
@@ -81,7 +81,7 @@ Where I(x,y) is the pixel value at position (x,y) - either 0 or 1 in a binary im
 
 Don't worry if the math looks intimidating - the key insight is that these formulas calculate **which direction each line is pointing**.
 
-### Step 6: Determining Cell Quality
+### Step 6: Determining Cell Quality {#step-6-determining-cell-quality}
 
 Cells are evaluated based on how parallel their lines are:
 
@@ -102,7 +102,7 @@ Cells that pass this test are called **patches** and contain:
 
 Yellow boxes show patches that were classified as possible barcode areas. Note some false positives (text regions).
 
-### Step 7: Finding Connected Cells
+### Step 7: Finding Connected Cells {#step-7-finding-connected-cells}
 
 Patches are grouped together if they're neighbors with similar orientation (within 5% angle difference). This is done using recursive component labeling.
 
@@ -110,7 +110,7 @@ Patches are grouped together if they're neighbors with similar orientation (with
 
 Each color represents a distinct group. Sometimes adjacent patches have different colors due to angle differences exceeding the 5% threshold.
 
-### Step 8: Selecting Groups
+### Step 8: Selecting Groups {#step-8-selecting-groups}
 
 Groups are sorted by size (number of patches) and only the largest groups are kept - these are most likely to be actual barcodes.
 
@@ -118,7 +118,7 @@ Groups are sorted by size (number of patches) and only the largest groups are ke
 
 Small groups and false positives have been filtered out.
 
-### Step 9: Create Bounding Box
+### Step 9: Create Bounding Box {#step-9-create-bounding-box}
 
 For each group, a **minimum bounding box** is calculated:
 
@@ -136,7 +136,7 @@ For each group, a **minimum bounding box** is calculated:
 
 The bounding box now precisely outlines the barcode, including its rotation and scale. This information is passed to the decoder.
 
-## Stage 2: Barcode Decoder
+## Stage 2: Barcode Decoder {#stage-2-barcode-decoder}
 
 With the bounding box and orientation known, the decoder:
 
@@ -147,7 +147,7 @@ With the bounding box and orientation known, the decoder:
 5. Validates checksums
 6. Returns the decoded data
 
-## Why This Approach?
+## Why This Approach? {#why-this-approach}
 
 Unlike simpler barcode scanners that require the barcode to be:
 
@@ -164,7 +164,7 @@ Quagga2's localization algorithm is **invariant to rotation and scale**. It can 
 
 This makes it much more practical for real-world camera scanning where users can't always position the camera perfectly.
 
-## Performance Considerations
+## Performance Considerations {#performance-considerations}
 
 The localization algorithm is computationally intensive. Key factors affecting performance:
 
@@ -175,7 +175,7 @@ The localization algorithm is computationally intensive. Key factors affecting p
 
 See [Optimize Performance](../how-to-guides/optimize-performance.md) for practical tips.
 
-## Related Reading
+## Related Reading {#related-reading}
 
 - **Original Paper**: [Locating and decoding EAN-13 barcodes from images captured by digital cameras](http://www.icics.org/2005/download/P0840.pdf)
 - **Otsu's Method**: [Wikipedia - Otsu's method](http://en.wikipedia.org/wiki/Otsu%27s_method)
@@ -185,7 +185,7 @@ See [Optimize Performance](../how-to-guides/optimize-performance.md) for practic
 - **Fast Labeling Algorithm**: [A Linear-Time Component-Labeling Algorithm (PDF)](http://www.iis.sinica.edu.tw/papers/fchang/1362-F.pdf)
 - **CodeProject Implementation**: [Connected Component Labeling and Vectorization](http://www.codeproject.com/Tips/407172/Connected-Component-Labeling-and-Vectorization)
 
-## Source Code
+## Source Code {#source-code}
 
 The localization algorithm is implemented in:
 

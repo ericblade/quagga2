@@ -18,11 +18,11 @@ Deep dive into the computer vision algorithms that find barcodes in images. Cove
 
 ## Architecture
 
-### [Algorithm Overview](algorithm-overview.md) *(Coming Soon)*
+### [Algorithm Overview](algorithm-overview.md)
 
 High-level overview of Quagga2's processing pipeline from input to output.
 
-### [Code Architecture](architecture.md) *(Coming Soon)*
+### [Code Architecture](architecture.md)
 
 Structure of the codebase, module organization, and design decisions.
 

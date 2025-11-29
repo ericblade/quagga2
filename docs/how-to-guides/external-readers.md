@@ -1,10 +1,10 @@
-# How-To: Create and Use External Readers
+# How-To: Create and Use External Readers {#create-and-use-external-readers}
 
 This guide explains how to create custom barcode reader plugins and integrate them into Quagga2.
 
-## Using Existing External Readers
+## Using Existing External Readers {#using-existing-external-readers}
 
-### QR Code Reader
+### QR Code Reader {#qr-code-reader}
 
 The most common external reader is [quagga2-reader-qr](https://github.com/ericblade/quagga2-reader-qr) for QR code support:
 
@@ -23,7 +23,7 @@ Quagga.init({
 });
 ```
 
-## External Reader Priority
+## External Reader Priority {#external-reader-priority}
 
 External readers follow the **same priority rules** as built-in readers:
 
@@ -31,7 +31,7 @@ External readers follow the **same priority rules** as built-in readers:
 2. **Position determines priority**: The reader's position in the `readers` array determines when it attempts to decode
 3. **First success wins**: The first reader to return a valid result is used
 
-### Example: Prioritizing External Readers
+### Example: Prioritizing External Readers {#prioritizing-external-readers}
 
 ```javascript
 // Register external reader
@@ -45,7 +45,7 @@ Quagga.init({
 });
 ```
 
-### Example: External Reader as Fallback
+### Example: External Reader as Fallback {#external-reader-fallback}
 
 ```javascript
 // Register external reader
@@ -59,11 +59,11 @@ Quagga.init({
 });
 ```
 
-## Creating Custom Readers
+## Creating Custom Readers {#creating-custom-readers}
 
 Quagga2 exports the `BarcodeReader` prototype that you can extend to create custom readers.
 
-### Basic Reader Structure
+### Basic Reader Structure {#basic-reader-structure}
 
 ```javascript
 import { Readers } from '@ericblade/quagga2';
@@ -92,7 +92,7 @@ class MyCustomReader extends BarcodeReader {
 export default MyCustomReader;
 ```
 
-### Reader Return Format
+### Reader Return Format {#reader-return-format}
 
 Your `decode()` method should return either `null` (no match) or a result object:
 
@@ -107,7 +107,7 @@ Your `decode()` method should return either `null` (no match) or a result object
 }
 ```
 
-### Pattern Matching Utilities
+### Pattern Matching Utilities {#pattern-matching-utilities}
 
 BarcodeReader provides useful methods for pattern matching:
 
@@ -116,7 +116,7 @@ BarcodeReader provides useful methods for pattern matching:
 - `_matchPattern(counter, code, maxSingleError)` - Match bar patterns
 - `_fillCounters(offset, end, isWhite)` - Count consecutive bars/spaces
 
-### Example: Simple Pattern Reader
+### Example: Simple Pattern Reader {#simple-pattern-reader}
 
 ```javascript
 class SimpleBarReader extends BarcodeReader {
@@ -156,7 +156,7 @@ class SimpleBarReader extends BarcodeReader {
 }
 ```
 
-## Image-Based Readers
+## Image-Based Readers {#image-based-readers}
 
 For non-linear barcodes (like QR codes), implement `decodeImage()` instead:
 
@@ -191,13 +191,13 @@ class MyImageReader extends BarcodeReader {
 }
 ```
 
-## Testing Your Reader
+## Testing Your Reader {#testing-your-reader}
 
 1. **Unit tests**: Test pattern matching and decoding logic in isolation
 2. **Integration tests**: Use `Quagga.decodeSingle()` with test images
 3. **Live testing**: Test with real camera input
 
-### Example Test
+### Example Test {#example-test}
 
 ```javascript
 import Quagga from '@ericblade/quagga2';
@@ -215,7 +215,7 @@ const result = await Quagga.decodeSingle({
 console.log('Result:', result?.codeResult?.code);
 ```
 
-## Best Practices
+## Best Practices {#best-practices}
 
 1. **Set unique FORMAT**: Use a distinctive format name to identify your reader
 2. **Handle edge cases**: Return `null` gracefully when patterns don't match
@@ -223,7 +223,7 @@ console.log('Result:', result?.codeResult?.code);
 4. **Consider performance**: Optimize pattern matching for real-time scanning
 5. **Test thoroughly**: Test with various image qualities and conditions
 
-## Related
+## Related {#related}
 
 - [Supported Barcode Types](../reference/readers.md) - Built-in readers
 - [Configuration Reference](../reference/configuration.md) - Full config options

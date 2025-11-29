@@ -1,10 +1,10 @@
-# CameraAccess API
+# CameraAccess API {#cameraaccess-api}
 
 Quagga2 exposes a `CameraAccess` API for direct control of camera functionality. This API provides shortcuts for commonly used camera operations.
 
 **Access**: `Quagga.CameraAccess`
 
-## Overview
+## Overview {#overview}
 
 The CameraAccess API allows you to:
 
@@ -15,9 +15,9 @@ The CameraAccess API allows you to:
 
 All methods return Promises for async operation handling.
 
-## Methods
+## Methods {#methods}
 
-### `CameraAccess.request(videoElement, constraints)`
+### `CameraAccess.request(videoElement, constraints)` {#cameraaccess-request}
 
 Initializes the camera and starts playback.
 
@@ -57,7 +57,7 @@ await Quagga.CameraAccess.request(null);
 - Probe camera availability and permissions
 - Initialize camera without displaying video
 
-### `CameraAccess.release()`
+### `CameraAccess.release()` {#cameraaccess-release}
 
 Stops the video stream and releases all camera resources.
 
@@ -79,7 +79,7 @@ console.log('Camera released');
 
 **Note**: Always call `release()` when finished with the camera to free system resources.
 
-### `CameraAccess.enumerateVideoDevices(constraints?)`
+### `CameraAccess.enumerateVideoDevices(constraints?)` {#cameraaccess-enumeratevideodevices}
 
 Lists all available video input devices (cameras), optionally filtered by constraints.
 
@@ -138,7 +138,7 @@ const standardCameras = await Quagga.CameraAccess.enumerateVideoDevices({
 
 **Note**: Device labels may be empty strings until camera permission is granted. When using constraints, the method will request temporary access to each device to test if it satisfies the constraints.
 
-### `CameraAccess.getActiveStreamLabel()`
+### `CameraAccess.getActiveStreamLabel()` {#cameraaccess-getactivestreamlabel}
 
 Gets the label of the currently active video track.
 
@@ -158,7 +158,7 @@ console.log('Using camera:', label);
 - Verify correct camera is being used
 - Logging and debugging
 
-### `CameraAccess.getActiveTrack()`
+### `CameraAccess.getActiveTrack()` {#cameraaccess-getactivetrack}
 
 Gets the MediaStreamTrack for the currently active video.
 
@@ -185,7 +185,7 @@ console.log(`Resolution: ${settings.width}x${settings.height}`);
 - Apply additional constraints
 - Access camera capabilities (zoom, focus, etc.)
 
-### `CameraAccess.enableTorch()`
+### `CameraAccess.enableTorch()` {#cameraaccess-enabletorch}
 
 Turns on the camera torch (flash).
 
@@ -217,7 +217,7 @@ try {
 
 **Note**: Always wrap in try-catch as not all devices support torch.
 
-### `CameraAccess.disableTorch()`
+### `CameraAccess.disableTorch()` {#cameraaccess-disabletorch}
 
 Turns off the camera torch (flash).
 
@@ -236,7 +236,7 @@ try {
 
 **Browser Support**: Same as `enableTorch()`.
 
-## Complete Example
+## Complete Example {#complete-example}
 
 ```javascript
 // Enumerate cameras and let user choose
@@ -265,7 +265,7 @@ await Quagga.CameraAccess.disableTorch();
 await Quagga.CameraAccess.release();
 ```
 
-## Torch Control in Live Scanning
+## Torch Control in Live Scanning {#torch-control}
 
 For torch control during live scanning, you may want to provide a toggle button:
 
@@ -288,7 +288,7 @@ document.querySelector('#torch-toggle').addEventListener('click', async () => {
 });
 ```
 
-## Advanced Camera Control
+## Advanced Camera Control {#advanced-camera-control}
 
 For advanced camera control (zoom, focus, etc.), use the MediaStreamTrack API:
 
@@ -309,7 +309,7 @@ if (capabilities.zoom) {
 
 Read more: [MediaStreamTrack Capabilities](https://www.oberhofer.co/mediastreamtrack-and-its-capabilities)
 
-## Error Handling
+## Error Handling {#error-handling}
 
 Always handle errors when using CameraAccess methods:
 
@@ -327,7 +327,7 @@ try {
 }
 ```
 
-## Related
+## Related {#related}
 
 - [Browser Support](browser-support.md) - Camera compatibility information
 - [Configuration Reference](configuration.md) - Camera configuration in Quagga.init()

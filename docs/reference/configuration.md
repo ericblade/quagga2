@@ -1,8 +1,8 @@
-# Configuration Reference
+# Configuration Reference {#configuration-reference}
 
 Complete reference for all Quagga2 configuration options.
 
-## Configuration Object Structure
+## Configuration Object Structure {#configuration-object-structure}
 
 The configuration object passed to `Quagga.init()` defines all aspects of barcode detection and decoding:
 
@@ -17,9 +17,9 @@ The configuration object passed to `Quagga.init()` defines all aspects of barcod
 }
 ```
 
-## Top-Level Properties
+## Top-Level Properties {#top-level-properties}
 
-### `locate`
+### `locate` {#locate}
 
 **Type**: `boolean`
 
@@ -60,7 +60,7 @@ Quagga.init({
 
 **Performance Impact**: Disabling `locate` significantly improves performance but requires barcode to be properly positioned.
 
-### `inputStream`
+### `inputStream` {#inputstream}
 
 **Type**: `object`
 
@@ -68,7 +68,7 @@ Quagga.init({
 
 See [inputStream Configuration](#inputstream-configuration) below for complete details.
 
-### `frequency`
+### `frequency` {#frequency}
 
 **Type**: `number` (optional)
 
@@ -92,7 +92,7 @@ Quagga.init({
 - Reduce battery drain on mobile devices
 - Throttle processing when high frame rate isn't needed
 
-### `decoder`
+### `decoder` {#decoder}
 
 **Type**: `object`
 
@@ -100,7 +100,7 @@ Quagga.init({
 
 See [Decoder Configuration](#decoder-configuration) below for complete details.
 
-### `locator`
+### `locator` {#locator}
 
 **Type**: `object`
 
@@ -108,7 +108,7 @@ See [Decoder Configuration](#decoder-configuration) below for complete details.
 
 See [Locator Configuration](#locator-configuration) below for complete details.
 
-### `debug`
+### `debug` {#debug}
 
 **Type**: `boolean`
 
@@ -121,7 +121,7 @@ See [Locator Configuration](#locator-configuration) below for complete details.
 
 **Note**: More fine-grained debug control is available via `inputStream.debug`, `decoder.debug`, and `locator.debug`. See [Debug Flags Guide](../how-to-guides/use-debug-flags.md).
 
-### `canvas`
+### `canvas` {#canvas}
 
 **Type**: `object`
 
@@ -129,11 +129,11 @@ See [Locator Configuration](#locator-configuration) below for complete details.
 
 See [Canvas Configuration](#canvas-configuration) below for complete details.
 
-## inputStream Configuration
+## inputStream Configuration {#inputstream-configuration}
 
 Controls the source and properties of the image/video stream.
 
-### inputStream Structure
+### inputStream Structure {#inputstream-structure}
 
 ```javascript
 inputStream: {
@@ -159,7 +159,7 @@ inputStream: {
 }
 ```
 
-### `inputStream.type`
+### `inputStream.type` {#inputstream-type}
 
 **Type**: `string`
 
@@ -183,7 +183,7 @@ inputStream: {
 - Processes static images
 - Can use file paths or data URLs
 
-### `inputStream.target`
+### `inputStream.target` {#inputstream-target}
 
 **Type**: `HTMLElement | string`
 
@@ -201,7 +201,7 @@ target: '#scanner-container'
 // Default if omitted: '#interactive.viewport'
 ```
 
-### `inputStream.constraints`
+### `inputStream.constraints` {#inputstream-constraints}
 
 **Type**: `object`
 
@@ -264,7 +264,7 @@ constraints: {
 }
 ```
 
-### `inputStream.area`
+### `inputStream.area` {#inputstream-area}
 
 **Type**: `object`
 
@@ -319,7 +319,7 @@ area: {
 - Improve performance by processing less pixels
 - Required when `locate: false` to define scan region
 
-#### `inputStream.area.borderColor`
+#### `inputStream.area.borderColor` {#inputstream-area-bordercolor}
 
 **Type**: `string`
 
@@ -338,7 +338,7 @@ area: {
 }
 ```
 
-#### `inputStream.area.borderWidth`
+#### `inputStream.area.borderWidth` {#inputstream-area-borderwidth}
 
 **Type**: `number`
 
@@ -357,7 +357,7 @@ area: {
 }
 ```
 
-#### `inputStream.area.backgroundColor`
+#### `inputStream.area.backgroundColor` {#inputstream-area-backgroundcolor}
 
 **Type**: `string`
 
@@ -377,7 +377,7 @@ area: {
 }
 ```
 
-### `inputStream.singleChannel`
+### `inputStream.singleChannel` {#inputstream-singlechannel}
 
 **Type**: `boolean`
 
@@ -391,7 +391,7 @@ area: {
 - Used with ResultCollector for analysis
 - Not recommended for normal use
 
-### `inputStream.size`
+### `inputStream.size` {#inputstream-size}
 
 **Type**: `number`
 
@@ -455,7 +455,7 @@ Quagga.decodeSingle({
 
 **Performance Note**: Higher values increase processing time. Balance detection accuracy against speed based on your use case. Test different values to find the optimal setting for your specific images.
 
-### `inputStream.debug`
+### `inputStream.debug` {#inputstream-debug}
 
 **Type**: `object`
 
@@ -467,7 +467,7 @@ debug: {
 }
 ```
 
-#### `inputStream.debug.showImageDetails`
+#### `inputStream.debug.showImageDetails` {#inputstream-debug-showimagedetails}
 
 **Type**: `boolean`
 
@@ -477,7 +477,7 @@ debug: {
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for details.
 
-### `inputStream.sequence` (ImageStream only)
+### `inputStream.sequence` (ImageStream only) {#inputstream-sequence}
 
 **Type**: `boolean` (default: `false`)
 
@@ -509,11 +509,11 @@ This will load `/path/to/images/image-001.jpg`, `/path/to/images/image-002.jpg`,
 
 Sequence mode is ideal for batch testing or processing multiple images with predictable filenames.
 
-## Decoder Configuration
+## Decoder Configuration {#decoder-configuration}
 
 Controls barcode detection and decoding behavior.
 
-### Decoder Structure
+### Decoder Structure {#decoder-structure}
 
 ```javascript
 decoder: {
@@ -529,7 +529,7 @@ decoder: {
 }
 ```
 
-### `decoder.readers`
+### `decoder.readers` {#decoder-readers}
 
 **Type**: `Array<string | object>`
 
@@ -576,7 +576,7 @@ readers: [
 
 **Important**: Readers are processed in the exact order specified. The first reader to successfully decode wins. List most common/expected formats first for better performance and accuracy. See [Reader Priority](readers.md#reader-priority-and-order) for details.
 
-### `decoder.debug`
+### `decoder.debug` {#decoder-debug}
 
 **Type**: `object`
 
@@ -594,7 +594,7 @@ debug: {
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for details.
 
-### `decoder.multiple`
+### `decoder.multiple` {#decoder-multiple}
 
 **Type**: `boolean`
 
@@ -624,11 +624,11 @@ Quagga.onDetected(function(results) {
 });
 ```
 
-## Locator Configuration
+## Locator Configuration {#locator-configuration}
 
 Controls the barcode localization algorithm. Only relevant when `locate: true`.
 
-### Locator Structure
+### Locator Structure {#locator-structure}
 
 ```javascript
 locator: {
@@ -653,7 +653,7 @@ locator: {
 }
 ```
 
-### `locator.halfSample`
+### `locator.halfSample` {#locator-halfsample}
 
 **Type**: `boolean`
 
@@ -675,7 +675,7 @@ locator: {
 
 **Recommendation**: Keep `true` and increase camera resolution if needed, rather than disabling half-sampling.
 
-### `locator.patchSize`
+### `locator.patchSize` {#locator-patchsize}
 
 **Type**: `string`
 
@@ -724,7 +724,7 @@ locator: {
 }
 ```
 
-### `locator.debug`
+### `locator.debug` {#locator-debug}
 
 **Type**: `object`
 
@@ -760,11 +760,11 @@ debug: {
 
 See [Debug Flags Guide](../how-to-guides/use-debug-flags.md) for complete details on all debug options.
 
-## Canvas Configuration
+## Canvas Configuration {#canvas-configuration}
 
 Controls the creation and management of canvas elements.
 
-### Canvas Structure
+### Canvas Structure {#canvas-structure}
 
 ```javascript
 canvas: {
@@ -772,7 +772,7 @@ canvas: {
 }
 ```
 
-### `canvas.createOverlay`
+### `canvas.createOverlay` {#canvas-createoverlay}
 
 **Type**: `boolean`
 
@@ -846,9 +846,9 @@ Quagga.onProcessed(function(result) {
 });
 ```
 
-## Complete Configuration Examples
+## Complete Configuration Examples {#complete-configuration-examples}
 
-### Example 1: Live Camera Scanning
+### Example 1: Live Camera Scanning {#example-live-camera-scanning}
 
 ```javascript
 Quagga.init({
@@ -879,7 +879,7 @@ Quagga.init({
 });
 ```
 
-### Example 2: Static Image Processing
+### Example 2: Static Image Processing {#example-static-image-processing}
 
 ```javascript
 Quagga.decodeSingle({
@@ -899,7 +899,7 @@ Quagga.decodeSingle({
 });
 ```
 
-### Example 3: Guided Scanning (No Localization)
+### Example 3: Guided Scanning (No Localization) {#example-guided-scanning}
 
 ```javascript
 Quagga.init({
@@ -925,7 +925,7 @@ Quagga.init({
 });
 ```
 
-### Example 4: Multiple Barcode Detection
+### Example 4: Multiple Barcode Detection {#example-multiple-barcode-detection}
 
 ```javascript
 Quagga.init({
@@ -954,7 +954,7 @@ Quagga.onDetected(function(results) {
 });
 ```
 
-### Example 5: Node.js Processing
+### Example 5: Node.js Processing {#example-nodejs-processing}
 
 ```javascript
 const Quagga = require('@ericblade/quagga2').default;
@@ -977,7 +977,7 @@ Quagga.decodeSingle({
 });
 ```
 
-## Configuration Best Practices
+## Configuration Best Practices {#configuration-best-practices}
 
 1. **Start simple**: Use defaults, only add specific readers you need
 2. **Test thoroughly**: Different devices and lighting require different settings
@@ -987,7 +987,7 @@ Quagga.decodeSingle({
 6. **Use constraints wisely**: Higher resolution helps but costs performance
 7. **Debug systematically**: Enable debug flags to understand behavior
 
-## Related
+## Related {#related}
 
 - [API Documentation](api.md) - How to use Quagga methods
 - [Supported Barcode Types](readers.md) - Available readers

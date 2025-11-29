@@ -1,8 +1,8 @@
-# Browser Support
+# Browser Support {#browser-support}
 
 Quagga2 makes use of many modern Web APIs which are not implemented by all browsers yet. This page details browser compatibility and required APIs.
 
-## Operating Modes
+## Operating Modes {#operating-modes}
 
 Quagga2 operates in two modes:
 
@@ -11,14 +11,14 @@ Quagga2 operates in two modes:
 
 The latter requires the MediaDevices API for camera access.
 
-## Browser Compatibility
+## Browser Compatibility {#browser-compatibility}
 
 You can track the compatibility of the used Web APIs for each mode:
 
 - [Static Images](http://caniuse.com/#feat=canvas,typedarrays,bloburls,blobbuilder)
 - [Live Stream](http://caniuse.com/#feat=canvas,typedarrays,bloburls,blobbuilder,stream)
 
-### Static Image Mode
+### Static Image Mode {#static-image-mode}
 
 The following APIs must be supported by your browser:
 
@@ -27,13 +27,13 @@ The following APIs must be supported by your browser:
 - [Blob URLs](http://caniuse.com/#feat=bloburls)
 - [Blob Builder](http://caniuse.com/#feat=blobbuilder)
 
-### Live Stream Mode
+### Live Stream Mode {#live-stream-mode}
 
 In addition to the APIs required for static images:
 
 - [MediaDevices API](http://caniuse.com/#feat=stream) - Required for camera access
 
-## Secure Origins Required
+## Secure Origins Required {#secure-origins}
 
 **Important**: Accessing `getUserMedia` requires a secure origin in most browsers:
 
@@ -42,9 +42,9 @@ In addition to the APIs required for static images:
 
 This is a browser security requirement. Read more in the [Chrome M47 WebRTC Release Notes](https://groups.google.com/forum/#!topic/discuss-webrtc/sq5CVmY69sc).
 
-## Feature Detection
+## Feature Detection {#feature-detection}
 
-### Detecting getUserMedia Support
+### Detecting getUserMedia Support {#detecting-getusermedia}
 
 Every browser implements the `mediaDevices.getUserMedia` API differently. It's highly recommended to include [webrtc-adapter](https://github.com/webrtc/adapter) in your project for cross-browser compatibility.
 
@@ -60,7 +60,7 @@ if (navigator.mediaDevices && typeof navigator.mediaDevices.getUserMedia === 'fu
 }
 ```
 
-### Browser Support Table
+### Browser Support Table {#browser-support-table}
 
 The above condition evaluates as follows:
 
@@ -73,22 +73,22 @@ The above condition evaluates as follows:
 | IE 11         | `false` | Not supported |
 | Safari Desktop| `true`  | macOS 11+ |
 
-## Known Issues
+## Known Issues {#known-issues}
 
-### iOS Torch/Flash
+### iOS Torch/Flash {#ios-torch-flash}
 
 Torch (flash) control via `CameraAccess.enableTorch()` and `CameraAccess.disableTorch()` does **not work** on iOS devices running version 16.4 and earlier. Support on later versions may vary.
 
-### Safari Limitations
+### Safari Limitations {#safari-limitations}
 
 - Older Safari versions may require user interaction before camera access
 - Some older iOS versions have limited WebRTC support
 
-### Internet Explorer
+### Internet Explorer {#internet-explorer}
 
 Internet Explorer 11 and below do not support the MediaDevices API and cannot use live camera features. Static image decoding may work with polyfills, but this is not officially supported.
 
-## Recommendations
+## Recommendations {#recommendations}
 
 For best compatibility:
 
@@ -98,7 +98,7 @@ For best compatibility:
 4. **Provide fallbacks** - Offer file upload as alternative to camera access
 5. **Test thoroughly** - Browser behavior varies, especially on mobile
 
-## Related
+## Related {#related}
 
 - [Configuration Reference](configuration.md) - How to configure Quagga2
 - [Camera Access API](camera-access.md) - Camera control methods
