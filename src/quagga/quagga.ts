@@ -81,6 +81,7 @@ export default class Quagga {
             return;
         }
         if (!this.context.config) {
+            callback(new Error('Configuration not initialized'));
             return;
         }
         // Check if inputStream is properly initialized before proceeding

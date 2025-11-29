@@ -141,6 +141,15 @@ describe('src/quagga/quagga.ts', () => {
             });
         });
 
+        it('should call callback with error when config is null', (done) => {
+            quagga.context.config = undefined;
+            quagga.canRecord((err?: Error) => {
+                expect(err).to.be.instanceOf(Error);
+                expect(err?.message).to.equal('Configuration not initialized');
+                done();
+            });
+        });
+
         it('should call callback with error when inputStream is null', (done) => {
             quagga.context.config = { inputStream: { type: 'ImageStream' } };
             quagga.context.inputStream = null;
@@ -151,20 +160,16 @@ describe('src/quagga/quagga.ts', () => {
             });
         });
 
-        it('should not call callback with error when initAborted is false and inputStream is valid', () => {
-            // This test just ensures that the flow continues correctly
-            // A full test would require mocking many dependencies
+        it('should call callback with error when inputStream is not initialized', () => {
             quagga.context.initAborted = false;
             quagga.context.config = { inputStream: { type: 'ImageStream' } };
-            // Don't set inputStream, so it will fail early
-            let errorCalled = false;
+            // Don't set inputStream, so it will fail with the inputStream error
+            let receivedError: Error | undefined;
             quagga.canRecord((err?: Error) => {
-                if (err) {
-                    errorCalled = true;
-                }
+                receivedError = err;
             });
-            // Since inputStream is not set, it should error
-            expect(errorCalled).to.be.true;
+            expect(receivedError).to.be.instanceOf(Error);
+            expect(receivedError?.message).to.equal('Input stream not initialized');
         });
     });
 
