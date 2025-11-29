@@ -103,11 +103,11 @@ Be careful when enabling multiple related formats together.
 
 ### EAN-2 and EAN-5 Supplements
 
-**EAN/UPC are the only barcode formats that support supplements.** The EAN-2 and EAN-5 supplements are additional digits printed beside the main barcode, typically used for:
+The EAN and UPC barcode formats support a supplement format, adding an additional 2 or 5 digits beyond the main barcode, EAN-2 and EAN-5, respectively. They are typically used for:
 - **Magazines and periodicals**: The main barcode identifies the publication, while the supplement denotes issue numbers or publication dates
 - **Books with ISBN**: The 5-digit supplement often encodes the suggested retail price
 
-The default `ean_reader` does not read these extensions. Since UPC-A is a subset of EAN-13 (UPC-A codes are EAN-13 codes starting with 0), supplement support configured on `ean_reader` also works for UPC-A barcodes.
+By default, `ean_reader` does not read and decode these extensions, you must explicitly enable support for them, if you are looking for them. Since UPC-A is a subset of EAN-13 -- UPC-A codes are EAN-13 codes that begin with a 0 -- supplement support configured on `ean_reader` also works for UPC-A codes.
 
 To enable supplement decoding:
 
