@@ -32,9 +32,10 @@ describe('EAN Supplement Format Tests', () => {
     it('should return ean_2 format for 2-digit supplement', async function() {
         this.timeout(30000);
         
+        const isBrowser = typeof window !== 'undefined';
         const config = {
             ...baseConfig,
-            src: 'test/fixtures/ean_extended/image-002.jpg', // EAN-13 with 2-digit supplement
+            src: `${isBrowser ? '/' : ''}test/fixtures/ean_extended/image-002.jpg`, // EAN-13 with 2-digit supplement
         };
         
         const result = await Quagga.decodeSingle(config);
@@ -50,9 +51,10 @@ describe('EAN Supplement Format Tests', () => {
     it('should return ean_5 format for 5-digit supplement', async function() {
         this.timeout(30000);
         
+        const isBrowser = typeof window !== 'undefined';
         const config = {
             ...baseConfig,
-            src: 'test/fixtures/ean_extended/image-004.jpg', // EAN-13 with 5-digit supplement
+            src: `${isBrowser ? '/' : ''}test/fixtures/ean_extended/image-004.jpg`, // EAN-13 with 5-digit supplement
         };
         
         const result = await Quagga.decodeSingle(config);
