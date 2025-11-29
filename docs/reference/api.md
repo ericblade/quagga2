@@ -1,10 +1,10 @@
-# API Documentation
+# API Documentation {#api-documentation}
 
 Complete reference for all Quagga2 methods, callbacks, and events.
 
-## Core Methods
+## Core Methods {#core-methods}
 
-### `Quagga.init(config, callback)`
+### `Quagga.init(config, callback)` {#quagga-init}
 
 Initializes the library with the given configuration and requests camera access if using live stream mode.
 
@@ -73,7 +73,7 @@ Always check for errors before calling `start()`:
 
 If no `target` is specified, Quagga looks for an element matching the CSS selector `#interactive.viewport` (for backwards compatibility).
 
-### `Quagga.start()`
+### `Quagga.start()` {#quagga-start}
 
 Starts the video stream and begins locating and decoding barcodes.
 
@@ -98,7 +98,7 @@ Quagga.init(config, function(err) {
 
 **Note**: Call this in the `init()` callback after checking for errors.
 
-### `Quagga.stop()`
+### `Quagga.stop()` {#quagga-stop}
 
 Stops the decoder from processing images and disconnects the camera if one was requested.
 
@@ -126,7 +126,7 @@ Quagga.stop().then(() => {
 - Does not remove event listeners (use `offDetected()` / `offProcessed()` for that)
 - Returns a Promise that resolves when camera release is complete
 
-### `Quagga.onDetected(callback)`
+### `Quagga.onDetected(callback)` {#quagga-ondetected}
 
 Registers a callback that is triggered when a barcode is successfully located and decoded.
 
@@ -160,7 +160,7 @@ Quagga.onDetected(handler1);
 Quagga.onDetected(handler2);  // Both execute on detection
 ```
 
-### `Quagga.onProcessed(callback)`
+### `Quagga.onProcessed(callback)` {#quagga-onprocessed}
 
 Registers a callback that is called for each processed frame, regardless of detection success.
 
@@ -210,7 +210,7 @@ Quagga.onProcessed(function(result) {
 - Performance monitoring
 - Drawing custom overlays
 
-### `Quagga.offDetected(handler)`
+### `Quagga.offDetected(handler)` {#quagga-offdetected}
 
 Removes a previously registered `onDetected` handler.
 
@@ -236,7 +236,7 @@ Quagga.offDetected(myHandler);
 Quagga.offDetected();
 ```
 
-### `Quagga.offProcessed(handler)`
+### `Quagga.offProcessed(handler)` {#quagga-offprocessed}
 
 Removes a previously registered `onProcessed` handler.
 
@@ -262,7 +262,7 @@ Quagga.offProcessed(processHandler);
 Quagga.offProcessed();
 ```
 
-### `Quagga.decodeSingle(config, callback)`
+### `Quagga.decodeSingle(config, callback)` {#quagga-decodesingle}
 
 Decodes a single image without using `getUserMedia`. Useful for processing uploaded images or static images.
 
@@ -342,11 +342,11 @@ Quagga.decodeSingle({
 });
 ```
 
-## Result Object
+## Result Object {#result-object}
 
 The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` callbacks contains detailed information about the detection and decoding process.
 
-### Complete Result Structure
+### Complete Result Structure {#result-structure}
 
 ```javascript
 {
@@ -395,7 +395,7 @@ The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` call
 }
 ```
 
-### Result Properties
+### Result Properties {#result-properties}
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -424,7 +424,7 @@ The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` call
 >
 > See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for complete examples.
 
-### Checking for Successful Detection
+### Checking for Successful Detection {#checking-detection}
 
 ```javascript
 Quagga.onDetected(function(result) {
@@ -435,7 +435,7 @@ Quagga.onDetected(function(result) {
 });
 ```
 
-### Using Multiple Barcode Detection
+### Using Multiple Barcode Detection {#multiple-barcode-detection}
 
 When `decoder.multiple` is `true`, results are returned as an array:
 
@@ -458,11 +458,11 @@ Quagga.onDetected(function(result) {
 });
 ```
 
-## Canvas Access
+## Canvas Access {#canvas-access}
 
 Quagga automatically creates and manages two canvas elements for visualization. These are positioned over the video/image stream and sized to match the processing dimensions.
 
-### Canvas Structure
+### Canvas Structure {#canvas-structure}
 
 ```javascript
 Quagga.canvas = {
@@ -479,7 +479,7 @@ Quagga.canvas = {
 
 > **Note**: The overlay canvas can be `null` if `canvas.createOverlay` is set to `false` in the configuration. See [Canvas Configuration](configuration.md#canvas-configuration) for details.
 
-### Overlay Canvas
+### Overlay Canvas {#overlay-canvas}
 
 The **overlay canvas** (`Quagga.canvas.dom.overlay`) is a transparent canvas element positioned over the video stream. It's automatically created when Quagga initializes (unless `canvas.createOverlay` is `false`) and is designed for drawing bounding boxes, scan lines, and other visual feedback.
 
@@ -508,7 +508,7 @@ if (overlayCtx && overlay) {
 }
 ```
 
-### Image Canvas
+### Image Canvas {#image-canvas}
 
 The **image canvas** (`Quagga.canvas.dom.image`) contains the processed grayscale image data used for barcode detection. This is primarily for internal use and debugging.
 
@@ -517,7 +517,7 @@ The **image canvas** (`Quagga.canvas.dom.image`) contains the processed grayscal
 - Contains the grayscale/processed image data
 - Useful for debugging locator issues
 
-### When to Use Each Canvas
+### When to Use Each Canvas {#when-to-use-canvas}
 
 | Use Case | Canvas to Use |
 |----------|---------------|
@@ -527,7 +527,7 @@ The **image canvas** (`Quagga.canvas.dom.image`) contains the processed grayscal
 | Debugging image processing | `image` |
 | Checking processed resolution | Either (they have same dimensions) |
 
-### Important: Coordinate System
+### Important: Coordinate System {#canvas-coordinate-system}
 
 When drawing on the overlay canvas, use `result.box` and `result.boxes` coordinates directly - **no scaling is needed**. These coordinates are already in the overlay canvas's coordinate space.
 
@@ -550,7 +550,7 @@ Quagga.onProcessed(function(result) {
 
 > **Note**: Scaling is only needed when drawing on a **different** canvas (like a custom overlay on the original video element). See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for details.
 
-### CSS Styling
+### CSS Styling {#canvas-css-styling}
 
 The overlay canvas can be styled with CSS for positioning:
 
@@ -568,7 +568,7 @@ canvas.drawingBuffer {
 }
 ```
 
-## ImageDebug Helper
+## ImageDebug Helper {#imagedebug-helper}
 
 Quagga provides a helper for drawing debug visualizations:
 
@@ -585,7 +585,7 @@ Quagga.ImageDebug.drawPath(
 );
 ```
 
-## Complete Example
+## Complete Example {#complete-example}
 
 ```javascript
 // Initialize
@@ -647,7 +647,7 @@ document.querySelector('#stop').addEventListener('click', function() {
 });
 ```
 
-## Related
+## Related {#related}
 
 - [Configuration Reference](configuration.md) - Complete configuration options
 - [CameraAccess API](camera-access.md) - Camera control methods
