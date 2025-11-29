@@ -123,6 +123,25 @@ Quagga.init({
 });
 ```
 
+#### Supplement Result Structure
+
+When a barcode with a supplement is decoded, the result includes a `supplement` property:
+
+```javascript
+{
+  codeResult: {
+    code: "419871600890101",    // Combined: main barcode + supplement
+    format: "ean_13",          // Main barcode format
+    supplement: {
+      code: "01",              // Supplement digits only
+      format: "ean_2"          // "ean_2" or "ean_5"
+    }
+  }
+}
+```
+
+The main `codeResult.code` contains the full combined value, while `codeResult.supplement` provides the supplement details separately.
+
 ### Important Notes About Supplements
 
 **Supplement order matters**: The reader stops when it finds the first matching supplement. List `ean_5_reader` before `ean_2_reader` if you want to prioritize 5-digit extensions.
