@@ -22,6 +22,8 @@ const QuaggaJSStaticInterface = {
                 cb = (err) => { err ? reject(err) : resolve(); };
             });
         }
+        // Reset the initAborted flag when starting a new init
+        quaggaInstance.context.initAborted = false;
         quaggaInstance.context.config = merge({}, Config, config);
         // TODO #179: pending restructure in Issue #179, we are temp disabling workers
         if (quaggaInstance.context.config.numOfWorkers > 0) {
