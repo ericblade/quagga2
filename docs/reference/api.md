@@ -405,6 +405,9 @@ The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` call
 | `codeResult.start` | Number | Start position in pattern |
 | `codeResult.end` | Number | End position in pattern |
 | `codeResult.direction` | Number | Scan direction (1 or -1) |
+| `codeResult.supplement` | Object | (Optional) Supplement barcode data for EAN-13/UPC-A with EAN-2 or EAN-5 extensions |
+| `codeResult.supplement.code` | String | The decoded supplement value (2 or 5 digits) |
+| `codeResult.supplement.format` | String | Supplement format: "ean_2" or "ean_5" |
 | `line` | Array | Two points defining the scan line |
 | `angle` | Number | Barcode rotation angle (radians) |
 | `pattern` | Array | Binary pattern (0=space, 1=bar) |
