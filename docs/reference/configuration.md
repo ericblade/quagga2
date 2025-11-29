@@ -316,13 +316,13 @@ area: {
 
 ### `inputStream.size`
 
-**Type**: `number` (for `decodeSingle` only)
+**Type**: `number`
 
-**Default**: `800` (for `decodeSingle`); original image dimensions when using `init()`
+**Default**: `800` when using `decodeSingle()`; original image dimensions when using `init()`
 
-**Description**: When using `decodeSingle` with file paths, scales the input image so that the longest side (width or height) equals this value, maintaining aspect ratio.
+**Description**: Scales the input image so that the longest side (width or height) equals this value, maintaining aspect ratio. This option works with both `decodeSingle()` and `init()`/`start()`.
 
-**Important**: `decodeSingle` has a built-in default of `size: 800`. This means images are **automatically scaled to 800px** on their longest side (both larger and smaller images are scaled to match this value) unless you explicitly specify a different value. The `box`, `boxes`, and `line` coordinates in the result are returned in the **scaled coordinate space**, not the original image dimensions. To use the original image size without any scaling, set `inputStream.size` to `0`.
+**Important**: When using `decodeSingle()`, the default is `size: 800`. This means images are **automatically scaled to 800px** on their longest side (both larger and smaller images are scaled to match this value) unless you explicitly specify a different value. When using `init()`, no default scaling is applied - original dimensions are used unless you specify a size. The `box`, `boxes`, and `line` coordinates in the result are returned in the **scaled coordinate space**, not the original image dimensions. To use the original image size without any scaling, set `inputStream.size` to `0`. See [Working with Box Coordinates](../how-to-guides/working-with-coordinates.md) for details on handling scaled coordinates.
 
 **Note on Scaling**: This parameter scales images both up and down. While upscaling typically introduces interpolation artifacts, testing has shown that moderate upscaling can actually **improve** barcode detection accuracy, even with `halfSample:false`. The benefits include:
 
@@ -363,7 +363,7 @@ Quagga.decodeSingle({
 Quagga.decodeSingle({
   src: "./medium-image.jpg",  // 1280x720 image
   inputStream: {
-    size: 0  // Falsy value disables scaling, uses original 1280x720
+    size: 0  // Zero disables scaling, uses original 1280x720
   }
 });
 
