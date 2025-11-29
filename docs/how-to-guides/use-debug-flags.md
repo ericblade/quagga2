@@ -1,16 +1,16 @@
-# How to Use Debug Flags
+# How to Use Debug Flags {#how-to-use-debug-flags}
 
 Quagga2 includes several debug flags that enable diagnostic console output to help troubleshoot issues with barcode detection and decoding. This guide explains when and how to use them.
 
-## Overview
+## Overview {#overview}
 
 Debug flags control what information Quagga2 logs to the browser console. By default, **all debug output is suppressed** to keep your console clean. Enable specific flags when you need to diagnose problems.
 
-## Important Note
+## Important Note {#important-note}
 
 Debug flags only work when `ENV.development` is `true` (development builds). Production builds strip out all debug code to minimize bundle size.
 
-## Available Debug Flags
+## Available Debug Flags {#available-debug-flags}
 
 Debug flags are organized into three categories:
 
@@ -18,9 +18,9 @@ Debug flags are organized into three categories:
 2. **Visual canvas overlays** - Draw debugging information on the canvas
 3. **Performance analysis** - Display frequency and pattern data
 
-### Console Logging Flags
+### Console Logging Flags {#console-logging-flags}
 
-#### `inputStream.debug.showImageDetails`
+#### `inputStream.debug.showImageDetails` {#inputstream-debug-showimagedetails}
 
 **What it shows**: Image loading and frame grabber operations
 
@@ -51,7 +51,7 @@ Quagga.init({
 });
 ```
 
-#### `decoder.debug.printReaderInfo`
+#### `decoder.debug.printReaderInfo` {#decoder-debug-printreaderinfo}
 
 **What it shows**: Barcode reader registration and initialization
 
@@ -84,7 +84,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showPatchSize`
+#### `locator.debug.showPatchSize` {#locator-debug-showpatchsize}
 
 **What it shows**: Patch dimensions during barcode localization
 
@@ -114,7 +114,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showImageDetails`
+#### `locator.debug.showImageDetails` {#locator-debug-showimagedetails}
 
 **What it shows**: Canvas and image wrapper initialization for locator
 
@@ -145,11 +145,11 @@ Quagga.init({
 });
 ```
 
-### Visual Canvas Overlay Flags
+### Visual Canvas Overlay Flags {#visual-canvas-overlay-flags}
 
 These flags draw debugging information directly on the canvas, allowing you to visualize the barcode detection algorithm's internal state.
 
-#### `decoder.debug.drawBoundingBox`
+#### `decoder.debug.drawBoundingBox` {#decoder-debug-drawboundingbox}
 
 **What it shows**: Draws a box around the detected barcode location
 
@@ -172,7 +172,7 @@ Quagga.init({
 });
 ```
 
-#### `decoder.debug.drawScanline`
+#### `decoder.debug.drawScanline` {#decoder-debug-drawscanline}
 
 **What it shows**: Draws the scanline path used for decoding
 
@@ -195,7 +195,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showCanvas`
+#### `locator.debug.showCanvas` {#locator-debug-showcanvas}
 
 **What it shows**: Displays the locator's internal canvas used for image processing
 
@@ -218,7 +218,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showPatches`
+#### `locator.debug.showPatches` {#locator-debug-showpatches}
 
 **What it shows**: Draws all patches extracted during the localization phase
 
@@ -241,7 +241,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showFoundPatches`
+#### `locator.debug.showFoundPatches` {#locator-debug-showfoundpatches}
 
 **What it shows**: Highlights patches where potential barcodes were found
 
@@ -264,7 +264,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showSkeleton`
+#### `locator.debug.showSkeleton` {#locator-debug-showskeleton}
 
 **What it shows**: Displays the skeleton structure extracted from patches
 
@@ -287,7 +287,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showLabels`
+#### `locator.debug.showLabels` {#locator-debug-showlabels}
 
 **What it shows**: Displays component labels during connected component analysis
 
@@ -310,7 +310,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showPatchLabels`
+#### `locator.debug.showPatchLabels` {#locator-debug-showpatchlabels}
 
 **What it shows**: Shows labels assigned to individual patches
 
@@ -333,7 +333,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.showRemainingPatchLabels`
+#### `locator.debug.showRemainingPatchLabels` {#locator-debug-showremainingpatchlabels}
 
 **What it shows**: Displays labels for patches remaining after filtering
 
@@ -356,7 +356,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.boxFromPatches.showTransformed`
+#### `locator.debug.boxFromPatches.showTransformed` {#locator-debug-boxfrompatches-showtransformed}
 
 **What it shows**: Shows transformed patch coordinates during box calculation
 
@@ -381,7 +381,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.boxFromPatches.showTransformedBox`
+#### `locator.debug.boxFromPatches.showTransformedBox` {#locator-debug-boxfrompatches-showtransformedbox}
 
 **What it shows**: Displays the bounding box after transformation
 
@@ -406,7 +406,7 @@ Quagga.init({
 });
 ```
 
-#### `locator.debug.boxFromPatches.showBB`
+#### `locator.debug.boxFromPatches.showBB` {#locator-debug-boxfrompatches-showbb}
 
 **What it shows**: Displays the final bounding box around detected barcode region
 
@@ -431,9 +431,9 @@ Quagga.init({
 });
 ```
 
-### Performance Analysis Flags
+### Performance Analysis Flags {#performance-analysis-flags}
 
-#### `decoder.debug.showFrequency`
+#### `decoder.debug.showFrequency` {#decoder-debug-showfrequency}
 
 **What it shows**: Displays frequency data from the barcode scanline
 
@@ -456,7 +456,7 @@ Quagga.init({
 });
 ```
 
-#### `decoder.debug.showPattern`
+#### `decoder.debug.showPattern` {#decoder-debug-showpattern}
 
 **What it shows**: Displays the pattern data extracted from the barcode
 
@@ -479,9 +479,9 @@ Quagga.init({
 });
 ```
 
-## Common Debugging Scenarios
+## Common Debugging Scenarios {#common-debugging-scenarios}
 
-### "No barcodes detected"
+### "No barcodes detected" {#no-barcodes-detected}
 
 Enable console logging first, then add visual overlays if needed:
 
@@ -531,7 +531,7 @@ Check canvas overlay for:
 - ✅ Is a bounding box drawn?
 - ✅ Is the scanline visible and passing through the barcode?
 
-### "Camera not working"
+### "Camera not working" {#camera-not-working}
 
 Enable input stream debugging:
 
@@ -547,7 +547,7 @@ Quagga.init({
 });
 ```
 
-### "Wrong barcode type detected"
+### "Wrong barcode type detected" {#wrong-barcode-type}
 
 Enable reader info to verify configuration:
 
@@ -566,7 +566,7 @@ Quagga.init({
 });
 ```
 
-### "Deep-dive localization debugging"
+### "Deep-dive localization debugging" {#deep-dive-debugging}
 
 For advanced debugging of the localization algorithm, enable all visual overlays:
 
@@ -606,7 +606,7 @@ This will display every step of the localization process visually on the canvas.
 
 **Warning**: Enabling all visual overlays may impact performance and make the canvas cluttered. Enable only what you need.
 
-## Performance Impact
+## Performance Impact {#performance-impact}
 
 Debug flags have varying performance impacts:
 
@@ -628,7 +628,7 @@ Debug flags have varying performance impacts:
 
 **Recommendation**: Enable only the flags you need. Disable all visual overlays for production.
 
-## Disabling Debug Output
+## Disabling Debug Output {#disabling-debug-output}
 
 To turn off all debug output, either:
 
@@ -682,7 +682,7 @@ Quagga.init({
 });
 ```
 
-## Using in Node.js
+## Using in Node.js {#using-in-nodejs}
 
 Debug flags work in Node.js too! Output goes to `console.log`:
 
@@ -705,7 +705,7 @@ Quagga.decodeSingle({
 });
 ```
 
-## Development vs Production
+## Development vs Production {#development-vs-production}
 
 **Development builds** (`dist/quagga.js` or when using webpack dev server):
 
@@ -724,7 +724,7 @@ To enable debug output in production:
 1. Use the development build (`quagga.js` instead of `quagga.min.js`)
 2. Set `ENV.development = true` before importing Quagga
 
-## Summary
+## Summary {#summary}
 
 Quagga2 provides **19 debug flags** organized into three categories:
 
@@ -757,13 +757,13 @@ Quagga2 provides **19 debug flags** organized into three categories:
 
 **Debugging strategy**: Start with console logging flags, then add visual overlays as needed. Disable all flags in production.
 
-## Related
+## Related {#related}
 
 - [Configuration Reference](../reference/configuration.md) - Complete config documentation
 - [Optimize Performance](optimize-performance.md) - Speed up barcode detection
 - [Handle Difficult Barcodes](handle-difficult-barcodes.md) - Improve detection accuracy
 
-## Changelog
+## Changelog {#changelog}
 
 **v1.8.4+** (November 2025): Debug flags introduced to replace always-on console spam
 

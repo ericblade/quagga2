@@ -1,8 +1,8 @@
-# Supported Barcode Types
+# Supported Barcode Types {#supported-barcode-types}
 
 Quagga2 supports a wide variety of 1D barcode formats. This page lists all available barcode readers and how to configure them.
 
-## Available Readers
+## Available Readers {#available-readers}
 
 Quagga2 includes built-in readers for the following barcode formats:
 
@@ -21,7 +21,7 @@ Quagga2 includes built-in readers for the following barcode formats:
 | `code_93_reader` | [Code 93](https://en.wikipedia.org/wiki/Code_93) | Logistics, retail |
 | `code_32_reader` | [Code 32](https://en.wikipedia.org/wiki/Pharmacode#Code_32) | Italian pharmaceuticals |
 
-## Basic Configuration
+## Basic Configuration {#basic-configuration}
 
 Specify which barcode types to detect in the `decoder.readers` array:
 
@@ -39,7 +39,7 @@ Quagga.init({
 });
 ```
 
-### Multiple Readers
+### Multiple Readers {#multiple-readers}
 
 You can enable multiple readers to detect different barcode types:
 
@@ -55,9 +55,9 @@ Quagga.init({
 });
 ```
 
-## Important Considerations
+## Important Considerations {#important-considerations}
 
-### Reader Priority and Order
+### Reader Priority and Order {#reader-priority-and-order}
 
 **Readers are processed in the exact order they appear in the `readers` array.** The first reader to successfully decode the barcode wins - subsequent readers are not tried.
 
@@ -79,7 +79,7 @@ decoder: {
 
 **Best practice**: List your most commonly expected barcode types first for best accuracy and performance.
 
-### Don't Enable All Readers
+### Don't Enable All Readers {#dont-enable-all-readers}
 
 **Why not enable all readers by default?**
 
@@ -89,7 +89,7 @@ decoder: {
 
 **Best practice**: Only enable the barcode formats you actually need to scan.
 
-### Format Conflicts
+### Format Conflicts {#format-conflicts}
 
 Some barcode formats are subsets or extensions of others:
 
@@ -99,9 +99,9 @@ Some barcode formats are subsets or extensions of others:
 
 Be careful when enabling multiple related formats together.
 
-## EAN Extensions
+## EAN Extensions {#ean-extensions}
 
-### EAN-2 and EAN-5 Supplements
+### EAN-2 and EAN-5 Supplements {#ean-supplements}
 
 The EAN and UPC barcode formats support a supplement format, adding an additional 2 or 5 digits beyond the main barcode, EAN-2 and EAN-5, respectively. They are typically used for:
 - **Magazines and periodicals**: The main barcode identifies the publication, while the supplement denotes issue numbers or publication dates
@@ -127,26 +127,7 @@ Quagga.init({
 });
 ```
 
-#### Supplement Result Structure
-
-When a barcode with a supplement is decoded, the result includes a `supplement` property:
-
-```javascript
-{
-  codeResult: {
-    code: "419871600890101",    // Combined: main barcode + supplement
-    format: "ean_13",          // Main barcode format
-    supplement: {
-      code: "01",              // Supplement digits only
-      format: "ean_2"          // "ean_2" or "ean_5"
-    }
-  }
-}
-```
-
-The main `codeResult.code` contains the full combined value, while `codeResult.supplement` provides the supplement details separately.
-
-### Important Notes About Supplements
+### Important Notes About Supplements {#supplements-notes}
 
 **Supplement order matters**: The reader stops when it finds the first matching supplement. List `ean_5_reader` before `ean_2_reader` if you want to prioritize 5-digit extensions.
 
@@ -170,11 +151,11 @@ Quagga.init({
 
 This configuration creates two separate reader instances.
 
-## External Readers
+## External Readers {#external-readers}
 
 Quagga2 supports external reader modules for additional barcode formats not built into the core library.
 
-### QR Code Reader
+### QR Code Reader {#qr-code-reader}
 
 For QR code support, see [quagga2-reader-qr](https://github.com/ericblade/quagga2-reader-qr).
 
@@ -194,7 +175,7 @@ Quagga.init({
 });
 ```
 
-### External Reader Priority
+### External Reader Priority {#external-reader-priority}
 
 External readers follow the **same priority rules** as built-in readers. Once registered with `Quagga.registerReader()`, an external reader can be placed anywhere in the `readers` array, and its position determines when it attempts to decode relative to other readers:
 
@@ -217,11 +198,11 @@ Quagga.init({
 - There is no automatic "internal first, external second" ordering
 - External readers interleave freely with built-in readers
 
-### Creating Custom Readers
+### Creating Custom Readers {#creating-custom-readers}
 
 You can create your own barcode reader implementations by extending the `BarcodeReader` prototype exported by Quagga2. See [How-To: Create External Readers](../how-to-guides/external-readers.md) for details.
 
-## Reader Performance
+## Reader Performance {#reader-performance}
 
 Different readers have different performance characteristics:
 
@@ -240,7 +221,7 @@ Different readers have different performance characteristics:
 - Multiple readers enabled simultaneously
 - Readers with supplements configured
 
-## Validation
+## Validation {#validation}
 
 Some barcode formats include check digits for validation:
 
@@ -250,7 +231,7 @@ Some barcode formats include check digits for validation:
 
 For additional validation in your application, consider using [barcode-validator](https://github.com/ericblade/barcode-validator).
 
-## Related
+## Related {#related}
 
 - [Configuration Reference](configuration.md) - Complete config options
 - [API Documentation](api.md) - How to use Quagga2 methods
