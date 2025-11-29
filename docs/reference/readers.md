@@ -103,7 +103,7 @@ Be careful when enabling multiple related formats together.
 
 ### EAN-2 and EAN-5 Supplements {#ean-supplements}
 
-The default `ean_reader` does not read extensions like [EAN-2](https://en.wikipedia.org/wiki/EAN_2) or [EAN-5](https://en.wikipedia.org/wiki/EAN_5) (additional digits printed beside the main barcode).
+The default `ean_reader` does not read extension supplements like [EAN-2](https://en.wikipedia.org/wiki/EAN_2) or [EAN-5](https://en.wikipedia.org/wiki/EAN_5) (additional digits printed beside the main barcode).
 
 To enable supplement decoding:
 
