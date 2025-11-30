@@ -56,14 +56,18 @@ export function addBorder(borderSize: number): PreprocessorFunction {
         const scaleY = innerHeight / height;
 
         // Create a temporary copy of the original data
-        const originalData = new Uint8Array(imageWrapper.data.length);
-        for (let i = 0; i < imageWrapper.data.length; i++) {
-            originalData[i] = imageWrapper.data[i] as number;
-        }
+        // Note: We need to handle both TypedArray and Array<number> types
+        const originalData = imageWrapper.data instanceof Uint8Array
+            ? new Uint8Array(imageWrapper.data)
+            : new Uint8Array(imageWrapper.data);
 
         // Fill the entire image with white first
-        for (let i = 0; i < imageWrapper.data.length; i++) {
-            imageWrapper.data[i] = 255;
+        if (imageWrapper.data instanceof Uint8Array) {
+            imageWrapper.data.fill(255);
+        } else {
+            for (let i = 0; i < imageWrapper.data.length; i++) {
+                imageWrapper.data[i] = 255;
+            }
         }
 
         // Copy the shrunk image into the center using bilinear interpolation
