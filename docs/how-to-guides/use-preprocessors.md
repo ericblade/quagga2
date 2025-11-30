@@ -215,6 +215,75 @@ const debugPreprocessor = (imageWrapper) => {
 };
 ```
 
+## Visualizing with Overlay Canvas {#visualizing-overlay}
+
+When using LiveStream or VideoStream input sources, you can draw on the overlay canvas to visualize preprocessing effects. The overlay canvas is positioned over the video feed.
+
+**Setting up the canvas:**
+
+```javascript
+Quagga.init({
+    inputStream: {
+        type: 'LiveStream',
+        target: document.querySelector('#barcode-scanner')
+    },
+    // ... other config
+}, function(err) {
+    if (err) return console.error(err);
+    Quagga.start();
+});
+```
+
+**Drawing on the overlay:**
+
+```javascript
+// Access the overlay canvas
+const overlayCanvas = document.querySelector('canvas.drawingBuffer');
+const ctx = overlayCanvas.getContext('2d');
+
+// Draw after each processed frame
+Quagga.onProcessed(function(result) {
+    // Clear previous drawings
+    ctx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    
+    // Draw custom visualizations
+    if (result && result.box) {
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(result.box[0][0], result.box[0][1], 
+                       result.box[2][0] - result.box[0][0],
+                       result.box[2][1] - result.box[0][1]);
+    }
+});
+```
+
+**Visualizing preprocessing effects:**
+
+To visualize what your preprocessor does, you can render the processed image data to the overlay:
+
+```javascript
+const visualizePreprocessor = (imageWrapper) => {
+    const overlayCanvas = document.querySelector('canvas.drawingBuffer');
+    if (overlayCanvas) {
+        const ctx = overlayCanvas.getContext('2d');
+        const imageData = ctx.createImageData(imageWrapper.size.x, imageWrapper.size.y);
+        
+        // Convert grayscale to RGBA for display
+        for (let i = 0; i < imageWrapper.data.length; i++) {
+            const val = imageWrapper.data[i];
+            imageData.data[i * 4 + 0] = val; // R
+            imageData.data[i * 4 + 1] = val; // G
+            imageData.data[i * 4 + 2] = val; // B
+            imageData.data[i * 4 + 3] = 128; // A (semi-transparent)
+        }
+        
+        ctx.putImageData(imageData, 0, 0);
+    }
+    
+    return imageWrapper;
+};
+```
+
 ## Related {#related}
 
 - [Configuration Reference](../reference/configuration.md#preprocessors) - Complete preprocessors config
