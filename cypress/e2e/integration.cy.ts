@@ -2,6 +2,7 @@ window.ENV = { development: true, production: false, node: false };
 
 import '../../test/integration/decoders/ean.spec.ts';
 import '../../test/integration/decoders/ean_extended.spec.ts';
+import '../../test/integration/decoders/ean_supplement_format.spec.ts';
 import '../../test/integration/decoders/code_128.spec.ts';
 import '../../test/integration/decoders/code_39.spec.ts';
 import '../../test/integration/decoders/code_39_vin.spec.ts';

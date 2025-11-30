@@ -12,6 +12,14 @@ export class QuaggaContext {
 
     public stopped: boolean = false;
 
+    /**
+     * Flag indicating that stop() was called while init() was still in progress.
+     * This is used to handle race conditions in React StrictMode where components
+     * are mounted/unmounted rapidly, causing init() to be called, then stop(),
+     * then init() again before the first init() completes.
+     */
+    public initAborted: boolean = false;
+
     public boxSize: any;
 
     public resultCollector: any;
