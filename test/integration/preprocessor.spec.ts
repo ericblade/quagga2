@@ -51,7 +51,7 @@ describe('Preprocessor Integration Tests', () => {
                     halfSample: false,
                     patchSize: 'medium',
                 },
-                preprocessing: [Quagga.Preprocessors.addBorder(20)],
+                preprocessors: [Quagga.Preprocessors.addBorder(20)],
             });
 
             // With the addBorder preprocessor, the barcode should be decoded

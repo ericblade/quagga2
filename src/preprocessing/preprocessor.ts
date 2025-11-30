@@ -33,7 +33,7 @@ export type QuaggaImagePreprocessor = (imageWrapper: ImageWrapper) => ImageWrapp
  * 
  * @example
  * // Add 10 pixels of white border around all images
- * config.preprocessing = [Quagga.Preprocessors.addBorder(10)];
+ * config.preprocessors = [Quagga.Preprocessors.addBorder(10)];
  */
 export function addBorder(borderSize: number): QuaggaImagePreprocessor {
     return (imageWrapper: ImageWrapper): ImageWrapper => {

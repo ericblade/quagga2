@@ -594,10 +594,10 @@ export interface QuaggaJSStatic {
 
     /**
      * Built-in preprocessor factories for image manipulation before barcode detection.
-     * Use these with the `preprocessing` config option.
+     * Use these with the `preprocessors` config option.
      * 
      * @example
-     * config.preprocessing = [Quagga.Preprocessors.addBorder(10)];
+     * config.preprocessors = [Quagga.Preprocessors.addBorder(10)];
      */
     Preprocessors: {
         /**
@@ -845,7 +845,7 @@ export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
  *     return imageWrapper;
  * };
  * 
- * config.preprocessing = [invertColors];
+ * config.preprocessors = [invertColors];
  */
 export type QuaggaImagePreprocessor = (imageWrapper: ImageWrapper) => ImageWrapper;
 
@@ -978,18 +978,18 @@ export interface QuaggaJSConfigObject {
      * 
      * @example
      * // Add 10 pixels of white border to help decode barcodes without quiet zones
-     * preprocessing: [Quagga.Preprocessors.addBorder(10)]
+     * preprocessors: [Quagga.Preprocessors.addBorder(10)]
      * 
      * @example
      * // Chain multiple preprocessors
-     * preprocessing: [
+     * preprocessors: [
      *     Quagga.Preprocessors.addBorder(5),
      *     myCustomPreprocessor
      * ]
      * 
-     * @default undefined (no preprocessing)
+     * @default undefined (no preprocessors)
      */
-    preprocessing?: QuaggaImagePreprocessor[];
+    preprocessors?: QuaggaImagePreprocessor[];
 
     /**
      * Canvas configuration options for controlling overlay and debug canvases.

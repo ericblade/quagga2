@@ -246,9 +246,9 @@ export default class Quagga {
             if (!workersUpdated) {
                 this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
                 if (this.context.framegrabber.grab()) {
-                    // Apply preprocessing if configured
-                    if (this.context.config?.preprocessing && this.context.config.preprocessing.length > 0 && this.context.inputImageWrapper) {
-                        applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as QuaggaImagePreprocessor[]);
+                    // Apply preprocessors if configured
+                    if (this.context.config?.preprocessors && this.context.config.preprocessors.length > 0 && this.context.inputImageWrapper) {
+                        applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessors as QuaggaImagePreprocessor[]);
                     }
                     if (!workersUpdated) {
                         this.locateAndDecode();
@@ -258,9 +258,9 @@ export default class Quagga {
         } else {
             this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
             this.context.framegrabber.grab();
-            // Apply preprocessing if configured
-            if (this.context.config?.preprocessing && this.context.config.preprocessing.length > 0 && this.context.inputImageWrapper) {
-                applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as QuaggaImagePreprocessor[]);
+            // Apply preprocessors if configured
+            if (this.context.config?.preprocessors && this.context.config.preprocessors.length > 0 && this.context.inputImageWrapper) {
+                applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessors as QuaggaImagePreprocessor[]);
             }
             this.locateAndDecode();
         }

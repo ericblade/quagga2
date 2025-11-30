@@ -26,7 +26,7 @@ Quick links from this README:
 - [API](#api)
 - [CameraAccess API](#cameraaccess-api)
 - [Configuration](#configobject)
-- [Preprocessing](#preprocessing)
+- [Preprocessors](#preprocessors)
 - [Tips & Tricks](#tipsandtricks)
 
 ## Using React / Redux?
@@ -520,7 +520,7 @@ high-level properties:
   frequency: 10,
   decoder:{...},
   locator: {...},
-  preprocessing: [...],  // optional: image preprocessing pipeline
+  preprocessors: [...],  // optional: image preprocessors pipeline
   debug: false,
 }
 ```
@@ -757,15 +757,15 @@ from the camera lens (lack of auto-focus, or small barcodes) then it's advised
 to set the size to `small` or even `x-small`. For the latter it's also
 recommended to crank up the resolution in order to find a barcode.
 
-### <a name="preprocessing">preprocessing</a>
+### <a name="preprocessors">preprocessors</a>
 
-The `preprocessing` property allows you to apply image transformations before 
+The `preprocessors` property allows you to apply image transformations before 
 barcode localization and decoding. This is useful for handling edge cases like 
 barcodes without sufficient quiet zones (whitespace around the barcode).
 
 ```javascript
 {
-  preprocessing: [
+  preprocessors: [
     Quagga.Preprocessors.addBorder(20)  // Add 20px white border
   ]
 }
@@ -781,7 +781,7 @@ proper quiet zones (whitespace around the barcode edges).
 
 ```javascript
 // Add 10 pixels of white border on all sides
-preprocessing: [Quagga.Preprocessors.addBorder(10)]
+preprocessors: [Quagga.Preprocessors.addBorder(10)]
 ```
 
 - `size`: Number of pixels of white border to add on each side
@@ -793,7 +793,7 @@ preprocessing: [Quagga.Preprocessors.addBorder(10)]
 Preprocessors are applied in the order they appear in the array:
 
 ```javascript
-preprocessing: [
+preprocessors: [
   Quagga.Preprocessors.addBorder(15),
   myCustomPreprocessor
 ]
@@ -837,12 +837,12 @@ const increaseContrast = (imageWrapper) => {
 
 // Use custom preprocessors
 Quagga.init({
-    preprocessing: [invertColors, increaseContrast],
+    preprocessors: [invertColors, increaseContrast],
     // ... other config
 });
 ```
 
-#### When to Use Preprocessing
+#### When to Use Preprocessors
 
 - **Barcodes without whitespace**: Use `addBorder()` when barcodes are cropped 
   tightly without quiet zones
