@@ -4,7 +4,8 @@ import { expect } from 'chai';
 describe('Preprocessor Integration Tests', () => {
     describe('addBorder preprocessor with no-whitespace barcode', () => {
         const expectedCode = '439393900039990260001000000000000000000000123123220412';
-        const barcodePath = 'test/fixtures/preprocessors/whitespace/no-whitespace-barcode.gif';
+        // Use leading slash for browser (Cypress) environment
+        const barcodePath = `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/preprocessors/whitespace/no-whitespace-barcode.gif`;
 
         it('should fail to decode barcode without preprocessor', async function() {
             this.timeout(20000);
