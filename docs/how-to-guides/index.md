@@ -22,6 +22,10 @@ Improve scanning speed and reduce CPU usage through configuration tuning.
 
 Techniques for decoding barcodes with poor lighting, damage, rotation, or small size.
 
+### [Use Preprocessors](use-preprocessors.md) 🆕
+
+Apply image transformations before barcode detection. Useful for barcodes without quiet zones.
+
 ## Advanced Features
 
 ### [Create External Readers](external-readers.md)

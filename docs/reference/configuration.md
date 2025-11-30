@@ -13,6 +13,7 @@ The configuration object passed to `Quagga.init()` defines all aspects of barcod
   frequency: 10,
   decoder: { ... },
   locator: { ... },
+  preprocessors: [ ... ],  // optional: image preprocessors
   debug: false
 }
 ```
@@ -120,6 +121,47 @@ See [Locator Configuration](#locator-configuration) below for complete details.
 - Allows visual debug flags to work
 
 **Note**: More fine-grained debug control is available via `inputStream.debug`, `decoder.debug`, and `locator.debug`. See [Debug Flags Guide](../how-to-guides/use-debug-flags.md).
+
+### `preprocessors` {#preprocessors}
+
+**Type**: `Array<QuaggaImagePreprocessor>`
+
+**Default**: `undefined` (no preprocessing)
+
+**Description**: Array of preprocessor functions applied to the image after frame grabbing but before barcode localization and decoding. Preprocessors are executed in array order.
+
+**Use cases**:
+- Add white border to barcodes lacking quiet zones
+- Enhance contrast for poor lighting conditions
+- Apply custom image transformations
+
+**Example - Add border for barcodes without whitespace**:
+
+```javascript
+Quagga.init({
+    preprocessors: [Quagga.Preprocessors.addBorder(20)],
+    decoder: {
+        readers: ['code_128_reader']
+    }
+});
+```
+
+**Example - Chain multiple preprocessors**:
+
+```javascript
+preprocessors: [
+    Quagga.Preprocessors.addBorder(15),
+    myCustomContrastEnhancer
+]
+```
+
+**Built-in preprocessors** (via `Quagga.Preprocessors`):
+
+| Preprocessor | Description |
+|--------------|-------------|
+| `addBorder(size)` | Adds white border by shrinking content |
+
+See [Use Preprocessors Guide](../how-to-guides/use-preprocessors.md) for complete details on built-in and custom preprocessors.
 
 ### `canvas` {#canvas}
 
