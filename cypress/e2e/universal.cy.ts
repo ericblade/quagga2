@@ -12,3 +12,5 @@ import '../../src/quagga/test/quagga.spec.ts';
 import '../../src/common/test/image_wrapper.spec.ts';
 // Tests for QuaggaJSStaticInterface (init method)
 import '../../src/test/quagga.spec.ts';
+// Tests for preprocessing module
+import '../../src/preprocessing/test/preprocessor.spec.ts';
