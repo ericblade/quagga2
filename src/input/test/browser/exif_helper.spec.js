@@ -24,13 +24,30 @@ describe('EXIF Helper', () => {
             });
         });
 
-        it('should fail for a invalid blob type', (done) => {
+        it('should fail for an invalid blob type', (done) => {
             findTagsInObjectURL('blob:balbla')
                 .then(() => {})
                 .catch(err => {
-                    console.log(err);
-                    expect(typeof err !== 'undefined');
+                    expect(err).to.exist;
                 }).then(done);
+        });
+
+        it('should extract orientation from a valid Blob URL', (done) => {
+            // Create a Blob from a valid JPEG base64 fixture
+            const base64 = fixtures.orientation['6'].replace(/^data:image\/jpeg;base64,/, '');
+            const binary = atob(base64);
+            const array = new Uint8Array(binary.length);
+            for (let i = 0; i < binary.length; i++) array[i] = binary.charCodeAt(i);
+            const blob = new Blob([array], { type: 'image/jpeg' });
+            const url = URL.createObjectURL(blob);
+            findTagsInObjectURL(url).then(tags => {
+                expect(tags).to.deep.equal({ orientation: 6 });
+                URL.revokeObjectURL(url);
+                done();
+            }).catch(err => {
+                URL.revokeObjectURL(url);
+                done(err);
+            });
         });
     });
 

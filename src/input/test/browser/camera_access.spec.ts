@@ -135,7 +135,19 @@ describe('CameraAccess (browser)', () => {
                 expect(err.message).to.equal('Unable to play video stream. Is webcam working?');
             }
         });
-        // TODO: need to add a test for no support in browser to straight up fail
+        it('fails if getUserMedia is missing', async () => {
+            const origGetUserMedia = navigator.mediaDevices.getUserMedia;
+            navigator.mediaDevices.getUserMedia = undefined;
+            const video = document.createElement('video');
+            try {
+                await Quagga.CameraAccess.request(video, { width: 320, height: 240 });
+                expect.fail('Should have thrown due to missing getUserMedia');
+            } catch (err) {
+                expect(err).to.exist;
+            } finally {
+                navigator.mediaDevices.getUserMedia = origGetUserMedia;
+            }
+        });
     });
 
     describe('release', () => {
@@ -163,8 +175,16 @@ describe('CameraAccess (browser)', () => {
         });
     });
 
-    // TODO: can this be tested?
-    describe('enableTorch', () => {});
-    // TODO: can this be tested?
-    describe('disableTorch', () => {});
+    describe('enableTorch', () => {
+        it('does not throw if no active track', async () => {
+            await Quagga.CameraAccess.release();
+            await expect(Quagga.CameraAccess.enableTorch()).to.be.fulfilled;
+        });
+    });
+    describe('disableTorch', () => {
+        it('does not throw if no active track', async () => {
+            await Quagga.CameraAccess.release();
+            await expect(Quagga.CameraAccess.disableTorch()).to.be.fulfilled;
+        });
+    });
 });
