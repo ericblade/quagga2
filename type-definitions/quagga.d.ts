@@ -65,7 +65,7 @@ export class ImageWrapper {
         initialize?: boolean
     );
 
-    inImageWithBorder(imgRef: ImageRef, border: number): boolean;
+    inImageWithBorder(imgRef: XYSize, border?: number): boolean;
 
     subImageAsCopy(imageWrapper: ImageWrapper, from: XYSize): ImageWrapper;
 
@@ -591,6 +591,23 @@ export interface QuaggaJSStatic {
     };
 
     CameraAccess: QuaggaJSCameraAccess;
+
+    /**
+     * Built-in preprocessor factories for image manipulation before barcode detection.
+     * Use these with the `preprocessing` config option.
+     * 
+     * @example
+     * config.preprocessing = [Quagga.Preprocessors.addBorder(10)];
+     */
+    Preprocessors: {
+        /**
+         * Creates a preprocessor that adds a white border around the image.
+         * The image is shrunk slightly to maintain the same dimensions.
+         * Useful for barcodes that lack sufficient quiet zone (whitespace).
+         * @param borderSize Number of pixels of border to add on each side
+         */
+        addBorder: (borderSize: number) => PreprocessorFunction;
+    };
 }
 
 /**
@@ -803,6 +820,27 @@ export interface QuaggaJSResultObject_CodeResult {
 
 export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
 
+/**
+ * A preprocessor function that transforms image data.
+ * Preprocessors are applied to the image data after frame grabbing
+ * but before barcode localization and decoding.
+ * 
+ * @param imageWrapper The image wrapper to process
+ * @returns The processed image wrapper (may be the same instance modified, or a new instance)
+ * 
+ * @example
+ * // Custom preprocessor that inverts colors
+ * const invertColors: PreprocessorFunction = (imageWrapper) => {
+ *     for (let i = 0; i < imageWrapper.data.length; i++) {
+ *         imageWrapper.data[i] = 255 - imageWrapper.data[i];
+ *     }
+ *     return imageWrapper;
+ * };
+ * 
+ * config.preprocessing = [invertColors];
+ */
+export type PreprocessorFunction = (imageWrapper: ImageWrapper) => ImageWrapper;
+
 export interface QuaggaJSConfigObject {
     /**
      * The image path to load from, or a data url
@@ -887,16 +925,6 @@ export interface QuaggaJSConfigObject {
         size?: number;
         sequence?: boolean;
 
-        /**
-         * Adds a white border of the specified number of pixels around the image.
-         * This is useful for barcodes that lack sufficient quiet zone (whitespace)
-         * around them. When a barcode is generated or cropped without proper margins,
-         * the decoder may fail to detect it. Adding a border simulates the whitespace
-         * that would naturally exist when displaying the barcode on paper or screen.
-         * @default 0 (no border added)
-         */
-        addBorder?: number;
-
         debug?: {
             /**
              * @default false
@@ -932,6 +960,28 @@ export interface QuaggaJSConfigObject {
      * scans will occur as fast as the system allows.
      */
     frequency?: number;
+
+    /**
+     * Array of preprocessor functions to apply to the image after frame grabbing
+     * but before barcode localization and decoding. Preprocessors are applied
+     * in the order they appear in the array.
+     * 
+     * Use built-in preprocessors from Quagga.Preprocessors or provide custom functions.
+     * 
+     * @example
+     * // Add 10 pixels of white border to help decode barcodes without quiet zones
+     * preprocessing: [Quagga.Preprocessors.addBorder(10)]
+     * 
+     * @example
+     * // Chain multiple preprocessors
+     * preprocessing: [
+     *     Quagga.Preprocessors.addBorder(5),
+     *     myCustomPreprocessor
+     * ]
+     * 
+     * @default undefined (no preprocessing)
+     */
+    preprocessing?: PreprocessorFunction[];
 
     /**
      * Canvas configuration options for controlling overlay and debug canvases.

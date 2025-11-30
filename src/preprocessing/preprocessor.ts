@@ -1,0 +1,127 @@
+import ImageWrapper from '../common/image_wrapper';
+
+/**
+ * A preprocessor function that transforms image data.
+ * Preprocessors are applied to the image data after frame grabbing
+ * but before barcode localization and decoding.
+ * 
+ * IMPORTANT: Preprocessors should maintain the same image dimensions.
+ * The returned ImageWrapper should have the same size as the input.
+ * 
+ * @param imageWrapper The image wrapper to process
+ * @returns The processed image wrapper (same size as input)
+ */
+export type PreprocessorFunction = (imageWrapper: ImageWrapper) => ImageWrapper;
+
+/**
+ * Built-in preprocessor: Adds a white border around the image.
+ * This is useful for barcodes that lack sufficient quiet zone (whitespace)
+ * around them. When a barcode is generated or cropped without proper margins,
+ * the decoder may fail to detect it. Adding a border simulates the whitespace
+ * that would naturally exist when displaying the barcode on paper or screen.
+ * 
+ * The image is shrunk slightly and centered, with white border pixels added
+ * around it. The output size remains the same as the input size.
+ * 
+ * @param borderSize Number of pixels of white border to add on each side
+ * @returns A preprocessor function that adds the border
+ * 
+ * @example
+ * // Add 10 pixels of white border around all images
+ * config.preprocessing = [Quagga.Preprocessors.addBorder(10)];
+ */
+export function addBorder(borderSize: number): PreprocessorFunction {
+    return (imageWrapper: ImageWrapper): ImageWrapper => {
+        if (borderSize <= 0) {
+            return imageWrapper;
+        }
+
+        const width = imageWrapper.size.x;
+        const height = imageWrapper.size.y;
+
+        // Calculate the inner image area (shrunk to make room for border)
+        const innerWidth = width - (borderSize * 2);
+        const innerHeight = height - (borderSize * 2);
+
+        // If border is too large for the image, just fill with white
+        if (innerWidth <= 0 || innerHeight <= 0) {
+            for (let i = 0; i < imageWrapper.data.length; i++) {
+                imageWrapper.data[i] = 255;
+            }
+            return imageWrapper;
+        }
+
+        // Calculate scale factors for shrinking
+        const scaleX = innerWidth / width;
+        const scaleY = innerHeight / height;
+
+        // Create a temporary copy of the original data
+        const originalData = new Uint8Array(imageWrapper.data.length);
+        for (let i = 0; i < imageWrapper.data.length; i++) {
+            originalData[i] = imageWrapper.data[i] as number;
+        }
+
+        // Fill the entire image with white first
+        for (let i = 0; i < imageWrapper.data.length; i++) {
+            imageWrapper.data[i] = 255;
+        }
+
+        // Copy the shrunk image into the center using bilinear interpolation
+        for (let y = 0; y < innerHeight; y++) {
+            for (let x = 0; x < innerWidth; x++) {
+                // Map destination coordinates to source coordinates
+                const srcX = x / scaleX;
+                const srcY = y / scaleY;
+
+                // Bilinear interpolation
+                const x0 = Math.floor(srcX);
+                const y0 = Math.floor(srcY);
+                const x1 = Math.min(x0 + 1, width - 1);
+                const y1 = Math.min(y0 + 1, height - 1);
+
+                const fx = srcX - x0;
+                const fy = srcY - y0;
+
+                const v00 = originalData[y0 * width + x0];
+                const v10 = originalData[y0 * width + x1];
+                const v01 = originalData[y1 * width + x0];
+                const v11 = originalData[y1 * width + x1];
+
+                const v0 = v00 * (1 - fx) + v10 * fx;
+                const v1 = v01 * (1 - fx) + v11 * fx;
+                const value = Math.round(v0 * (1 - fy) + v1 * fy);
+
+                // Write to destination with border offset
+                const destIdx = (y + borderSize) * width + (x + borderSize);
+                imageWrapper.data[destIdx] = value;
+            }
+        }
+
+        return imageWrapper;
+    };
+}
+
+/**
+ * Applies a chain of preprocessor functions to an image wrapper.
+ * @param imageWrapper The image wrapper to process
+ * @param preprocessors Array of preprocessor functions to apply in order
+ * @returns The processed image wrapper (same instance, potentially modified)
+ */
+export function applyPreprocessors(
+    imageWrapper: ImageWrapper,
+    preprocessors: PreprocessorFunction[],
+): ImageWrapper {
+    let result = imageWrapper;
+    for (const preprocessor of preprocessors) {
+        result = preprocessor(result);
+    }
+    return result;
+}
+
+/**
+ * Collection of built-in preprocessor factories.
+ * Users can use these or provide their own PreprocessorFunction implementations.
+ */
+export const Preprocessors = {
+    addBorder,
+};
