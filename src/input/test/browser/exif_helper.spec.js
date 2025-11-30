@@ -26,10 +26,13 @@ describe('EXIF Helper', () => {
 
         it('should fail for an invalid blob type', (done) => {
             findTagsInObjectURL('blob:balbla')
-                .then(() => {})
+                .then(() => {
+                    done(new Error('Expected promise to reject'));
+                })
                 .catch(err => {
                     expect(err).to.exist;
-                }).then(done);
+                    done();
+                });
         });
 
         it('should extract orientation from a valid Blob URL', (done) => {
