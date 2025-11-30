@@ -88,7 +88,7 @@ Using Quagga2 with a specific framework?
 
 - **DataMatrix Reader**: [hackathi/quagga2-reader-datamatrix](https://github.com/hackathi/quagga2-reader-datamatrix)
 - **QR Code Reader**: [ericblade/quagga2-qr-code-reader](https://github.com/ericblade/quagga2-qr-code-reader)
-- **PDFbarcodeJS**: [rexshijaku/PDFBarcodeJS](https://github.com/rexshijaku/PDFBarcodeJS)
+- **PDFBarcodeJS**: [rexshijaku/PDFBarcodeJS](https://github.com/rexshijaku/PDFBarcodeJS)
 
 ---
 
