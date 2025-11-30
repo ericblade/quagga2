@@ -1,17 +1,22 @@
 import ImageWrapper from '../common/image_wrapper';
 
 /**
- * A preprocessor function that transforms image data.
+ * A preprocessor function that transforms image data in place.
  * Preprocessors are applied to the image data after frame grabbing
  * but before barcode localization and decoding.
  * 
- * IMPORTANT: Preprocessors should maintain the same image dimensions.
- * The returned ImageWrapper should have the same size as the input.
+ * IMPORTANT: Preprocessors should:
+ * - Modify the imageWrapper.data array IN PLACE for best performance
+ * - Maintain the same image dimensions (do not resize)
+ * - Return the same imageWrapper instance that was passed in
  * 
- * @param imageWrapper The image wrapper to process
- * @returns The processed image wrapper (same size as input)
+ * Modifying in place avoids unnecessary memory allocations and copies,
+ * which is critical for real-time video processing performance.
+ * 
+ * @param imageWrapper The image wrapper to process (modify in place)
+ * @returns The same imageWrapper instance (for chaining)
  */
-export type PreprocessorFunction = (imageWrapper: ImageWrapper) => ImageWrapper;
+export type QuaggaImagePreprocessor = (imageWrapper: ImageWrapper) => ImageWrapper;
 
 /**
  * Built-in preprocessor: Adds a white border around the image.
@@ -30,7 +35,7 @@ export type PreprocessorFunction = (imageWrapper: ImageWrapper) => ImageWrapper;
  * // Add 10 pixels of white border around all images
  * config.preprocessing = [Quagga.Preprocessors.addBorder(10)];
  */
-export function addBorder(borderSize: number): PreprocessorFunction {
+export function addBorder(borderSize: number): QuaggaImagePreprocessor {
     return (imageWrapper: ImageWrapper): ImageWrapper => {
         if (borderSize <= 0) {
             return imageWrapper;
@@ -107,13 +112,14 @@ export function addBorder(borderSize: number): PreprocessorFunction {
 
 /**
  * Applies a chain of preprocessor functions to an image wrapper.
+ * Each preprocessor modifies the image data in place.
  * @param imageWrapper The image wrapper to process
  * @param preprocessors Array of preprocessor functions to apply in order
- * @returns The processed image wrapper (same instance, potentially modified)
+ * @returns The same imageWrapper instance (modified in place)
  */
 export function applyPreprocessors(
     imageWrapper: ImageWrapper,
-    preprocessors: PreprocessorFunction[],
+    preprocessors: QuaggaImagePreprocessor[],
 ): ImageWrapper {
     let result = imageWrapper;
     for (const preprocessor of preprocessors) {
@@ -124,7 +130,7 @@ export function applyPreprocessors(
 
 /**
  * Collection of built-in preprocessor factories.
- * Users can use these or provide their own PreprocessorFunction implementations.
+ * Users can use these or provide their own QuaggaImagePreprocessor implementations.
  */
 export const Preprocessors = {
     addBorder,

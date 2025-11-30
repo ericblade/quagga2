@@ -8,7 +8,7 @@ import CameraAccess from '../input/camera_access';
 import FrameGrabber from '../input/frame_grabber.js';
 import InputStream from '../input/input_stream/input_stream';
 import BarcodeLocator from '../locator/barcode_locator';
-import { applyPreprocessors, PreprocessorFunction } from '../preprocessing';
+import { applyPreprocessors, QuaggaImagePreprocessor } from '../preprocessing';
 import { QuaggaContext } from '../QuaggaContext';
 import { BarcodeInfo } from '../reader/barcode_reader';
 import _getViewPort from './getViewPort';
@@ -248,7 +248,7 @@ export default class Quagga {
                 if (this.context.framegrabber.grab()) {
                     // Apply preprocessing if configured
                     if (this.context.config?.preprocessing && this.context.config.preprocessing.length > 0 && this.context.inputImageWrapper) {
-                        applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as PreprocessorFunction[]);
+                        applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as QuaggaImagePreprocessor[]);
                     }
                     if (!workersUpdated) {
                         this.locateAndDecode();
@@ -260,7 +260,7 @@ export default class Quagga {
             this.context.framegrabber.grab();
             // Apply preprocessing if configured
             if (this.context.config?.preprocessing && this.context.config.preprocessing.length > 0 && this.context.inputImageWrapper) {
-                applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as PreprocessorFunction[]);
+                applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessing as QuaggaImagePreprocessor[]);
             }
             this.locateAndDecode();
         }

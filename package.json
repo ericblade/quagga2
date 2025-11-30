@@ -51,7 +51,6 @@
     "ndarray-linear-interpolate": "^1.0.0",
     "ndarray-pixels": "^5.0.1",
     "nyc": "^17.1.0",
-    "sharp": "^0.34.5",
     "sinon": "^21.0.0",
     "sinon-chai": "^3.7.0",
     "source-map-loader": "^1.1.1",

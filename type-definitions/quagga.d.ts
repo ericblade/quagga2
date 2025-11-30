@@ -606,7 +606,7 @@ export interface QuaggaJSStatic {
          * Useful for barcodes that lack sufficient quiet zone (whitespace).
          * @param borderSize Number of pixels of border to add on each side
          */
-        addBorder: (borderSize: number) => PreprocessorFunction;
+        addBorder: (borderSize: number) => QuaggaImagePreprocessor;
     };
 }
 
@@ -821,16 +821,24 @@ export interface QuaggaJSResultObject_CodeResult {
 export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
 
 /**
- * A preprocessor function that transforms image data.
+ * A preprocessor function that transforms image data in place.
  * Preprocessors are applied to the image data after frame grabbing
  * but before barcode localization and decoding.
  * 
- * @param imageWrapper The image wrapper to process
- * @returns The processed image wrapper (may be the same instance modified, or a new instance)
+ * IMPORTANT: Preprocessors should:
+ * - Modify the imageWrapper.data array IN PLACE for best performance
+ * - Maintain the same image dimensions (do not resize)
+ * - Return the same imageWrapper instance that was passed in
+ * 
+ * Modifying in place avoids unnecessary memory allocations and copies,
+ * which is critical for real-time video processing performance.
+ * 
+ * @param imageWrapper The image wrapper to process (modify in place)
+ * @returns The same imageWrapper instance (for chaining)
  * 
  * @example
  * // Custom preprocessor that inverts colors
- * const invertColors: PreprocessorFunction = (imageWrapper) => {
+ * const invertColors: QuaggaImagePreprocessor = (imageWrapper) => {
  *     for (let i = 0; i < imageWrapper.data.length; i++) {
  *         imageWrapper.data[i] = 255 - imageWrapper.data[i];
  *     }
@@ -839,7 +847,7 @@ export type InputStreamType = 'VideoStream' | 'ImageStream' | 'LiveStream';
  * 
  * config.preprocessing = [invertColors];
  */
-export type PreprocessorFunction = (imageWrapper: ImageWrapper) => ImageWrapper;
+export type QuaggaImagePreprocessor = (imageWrapper: ImageWrapper) => ImageWrapper;
 
 export interface QuaggaJSConfigObject {
     /**
@@ -981,7 +989,7 @@ export interface QuaggaJSConfigObject {
      * 
      * @default undefined (no preprocessing)
      */
-    preprocessing?: PreprocessorFunction[];
+    preprocessing?: QuaggaImagePreprocessor[];
 
     /**
      * Canvas configuration options for controlling overlay and debug canvases.
