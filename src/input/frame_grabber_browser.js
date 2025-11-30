@@ -97,11 +97,10 @@ FrameGrabber.create = function (inputStream, canvas) {
      * Fetches a frame from the input-stream and puts into the frame-buffer.
      * The image-data is converted to gray-scale and then half-sampled if configured.
      * 
-     * IMPORTANT: This now matches Node's processing order to ensure consistent results:
-     * 1. Draw image at original size
-     * 2. Convert RGB to grayscale
-     * 3. Scale grayscale data using bilinear interpolation
-     * 4. Crop to target region
+     * For improved accuracy (matching Node's processing), non-half-sampled images
+     * use bilinear interpolation on grayscale data instead of scaling RGB then converting.
+     * 
+     * IMPORTANT: The image is ALWAYS drawn to the visible canvas for overlays and display.
      */
     _that.grab = function () {
         const doHalfSample = _streamConfig.halfSample;
@@ -110,6 +109,7 @@ FrameGrabber.create = function (inputStream, canvas) {
         let drawAngle = 0;
         
         if (drawable) {
+            adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
             if (_streamConfig.type === 'ImageStream') {
                 drawable = frame.img;
                 if (frame.tags && frame.tags.orientation) {
@@ -124,42 +124,43 @@ FrameGrabber.create = function (inputStream, canvas) {
                 }
             }
 
-            // Step 1: Draw image at ORIGINAL size (not scaled to canvas size yet)
-            // Create a temporary canvas for the original-sized image
-            const tempCanvas = document.createElement('canvas');
-            tempCanvas.width = _videoSize.x;
-            tempCanvas.height = _videoSize.y;
-            const tempCtx = tempCanvas.getContext('2d');
-            
+            // ALWAYS draw to visible canvas (for overlays, display, and toDataURL)
             if (drawAngle !== 0) {
-                tempCtx.translate(_videoSize.x / 2, _videoSize.y / 2);
-                tempCtx.rotate(drawAngle);
-                tempCtx.drawImage(drawable, -_videoSize.y / 2, -_videoSize.x / 2, _videoSize.y, _videoSize.x);
+                _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
+                _ctx.rotate(drawAngle);
+                _ctx.drawImage(drawable, -_canvasSize.y / 2, -_canvasSize.x / 2, _canvasSize.y, _canvasSize.x);
+                _ctx.rotate(-drawAngle);
+                _ctx.translate(-_canvasSize.x / 2, -_canvasSize.y / 2);
             } else {
-                tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);
+                _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);
             }
 
-            // Step 2: Convert RGB to grayscale at original size
-            const originalImageData = tempCtx.getImageData(0, 0, _videoSize.x, _videoSize.y).data;
-            const grayData = new Uint8Array(_videoSize.x * _videoSize.y);
-            computeGray(originalImageData, grayData, _streamConfig);
-
             if (doHalfSample) {
-                // For half-sampling, we still need the scaled RGB canvas approach
-                adjustCanvasSize(_canvas, _canvasSize, _streamConfig.debug);
-                if (drawAngle !== 0) {
-                    _ctx.translate(_canvasSize.x / 2, _canvasSize.y / 2);
-                    _ctx.rotate(drawAngle);
-                    _ctx.drawImage(drawable, -_canvasSize.y / 2, -_canvasSize.x / 2, _canvasSize.y, _canvasSize.x);
-                    _ctx.rotate(-drawAngle);
-                    _ctx.translate(-_canvasSize.x / 2, -_canvasSize.y / 2);
-                } else {
-                    _ctx.drawImage(drawable, 0, 0, _canvasSize.x, _canvasSize.y);
-                }
+                // Half-sample path: use existing optimized approach
                 const ctxData = _ctx.getImageData(_sx, _sy, _size.x, _size.y).data;
                 grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
             } else {
-                // Step 3: Scale the grayscale data using bilinear interpolation (matching Node)
+                // Non-half-sample: use improved bilinear interpolation for better accuracy
+                // Process at original size, then scale grayscale data
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = _videoSize.x;
+                tempCanvas.height = _videoSize.y;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                if (drawAngle !== 0) {
+                    tempCtx.translate(_videoSize.x / 2, _videoSize.y / 2);
+                    tempCtx.rotate(drawAngle);
+                    tempCtx.drawImage(drawable, -_videoSize.y / 2, -_videoSize.x / 2, _videoSize.y, _videoSize.x);
+                } else {
+                    tempCtx.drawImage(drawable, 0, 0, _videoSize.x, _videoSize.y);
+                }
+
+                // Convert to grayscale at original size
+                const originalImageData = tempCtx.getImageData(0, 0, _videoSize.x, _videoSize.y).data;
+                const grayData = new Uint8Array(_videoSize.x * _videoSize.y);
+                computeGray(originalImageData, grayData, _streamConfig);
+
+                // Scale grayscale data using bilinear interpolation
                 const scaledGrayData = new Uint8Array(_canvasSize.x * _canvasSize.y);
                 const stepSizeX = _videoSize.x / _canvasSize.x;
                 const stepSizeY = _videoSize.y / _canvasSize.y;
@@ -178,7 +179,7 @@ FrameGrabber.create = function (inputStream, canvas) {
                     }
                 }
                 
-                // Step 4: Crop to target region
+                // Crop to target region
                 for (let y = 0; y < _size.y; y++) {
                     for (let x = 0; x < _size.x; x++) {
                         const srcIdx = (y + _sy) * _canvasSize.x + (x + _sx);
