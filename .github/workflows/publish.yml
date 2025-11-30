@@ -34,3 +34,13 @@ jobs:
         # echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" > ~/.npmrc
         # npx rollingversions publish -d -g ${{ secrets.GITHUB_TOKEN }}
         # npx rollingversions publish -g ${{ secrets.GITHUB_TOKEN }}
+    - name: Copy dist to docs/examples/dist
+      run: |
+        npx cpx "dist/*" "docs/examples/dist"
+    - name: Commit and push updated examples
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        git add -f docs/examples/dist/*
+        git commit -m "Update docs/examples/dist with latest build" || echo "No changes to commit"
+        git push

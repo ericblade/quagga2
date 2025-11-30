@@ -11,7 +11,7 @@ Welcome to the Quagga2 documentation! Quagga2 is a JavaScript barcode scanner li
 - [GitHub Repository](https://github.com/ericblade/quagga2)
 - [Changelog](https://github.com/ericblade/quagga2/releases)
 - [npm Package](https://www.npmjs.com/package/@ericblade/quagga2)
-- [Live Examples](../example/)
+- [Live Examples](examples/)
 
 ## Getting Started
 
@@ -81,6 +81,33 @@ Using Quagga2 with a specific framework?
 - **Vue 2**: [vue-quagga-2](https://github.com/DevinNorgarb/vue-quagga-2)
 - **Vue 3**: [vue3-quagga-2](https://github.com/nick-0101/vue3-quagga-2)
 - **ThingWorx**: [ThingworxBarcodeScannerWidget](https://github.com/ptc-iot-sharing/ThingworxBarcodeScannerWidget)
+
+---
+
+## External Readers and Other Related Projects {#external-readers}
+
+- **DataMatrix Reader**: [hackathi/quagga2-reader-datamatrix](https://github.com/hackathi/quagga2-reader-datamatrix)
+- **QR Code Reader**: [ericblade/quagga2-qr-code-reader](https://github.com/ericblade/quagga2-qr-code-reader)
+- **PDFBarcodeJS**: [rexshijaku/PDFBarcodeJS](https://github.com/rexshijaku/PDFBarcodeJS)
+
+---
+
+## Who Uses Quagga2? {#who-uses}
+Quagga2 is used by developers worldwide in various applications, including inventory management, retail point-of-sale systems, library systems, and mobile scanning apps. If you're using Quagga2 in your project, let us know!
+
+- **Internet Archive Open Library**: [internetarchive/openlibrary](https://github.com/internetarchive/openlibrary)
+- **Grocy**: [grocy/grocy](https://github.com/grocy/grocy)
+- **German Federal Agency For Technical Relief**: [mziech/thw-inventory](https://github.com/mziech/thw-inventory)
+- **Food Coop Shop**: [foodcoopshop/foodcoopshop](https://github.com/foodcoopshop/foodcoopshop)
+- **Rintagi**: [Rintagi/Low-Code-Development-Platform](https://github.com/Rintagi/Low-Code-Development-Platform)
+- **LINE**: [line/line-api-use-case-smart-retail](https://github.com/line/line-api-use-case-smart-retail)
+- **Veganify**: [frontendnetwork/veganify](https://github.com/frontendnetwork/veganify)
+- **Appsemble**: [Appsemble](https://gitlab.com/appsemble/appsemble)
+- **Intake24**: [intake24/intake24](https://github.com/intake24/intake24)
+- **FridgeToPlate**: [COS301-SE-2023/FridgeToPlate](https://github.com/COS301-SE-2023/FridgeToPlate)
+- **Nutri-Scanner**: [kishan9535/Nutri-Scanner](https://github.com/kishan9535/Nutri-Scanner)
+- **Musclog**: [blopa/musclog-app](https://github.com/blopa/musclog-app)
+
 
 ---
 
