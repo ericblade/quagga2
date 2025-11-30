@@ -84,6 +84,33 @@ Using Quagga2 with a specific framework?
 
 ---
 
+## External Readers and Other Related Projects {#external-readers}
+
+- **DataMatrix Reader**: [hackathi/quagga2-reader-datamatrix](https://github.com/hackathi/quagga2-reader-datamatrix)
+- **QR Code Reader**: [ericblade/quagga2-qr-code-reader](https://github.com/ericblade/quagga2-qr-code-reader)
+- **PDFbarcodeJS**: [rexshijaku/PDFBarcodeJS](https://github.com/rexshijaku/PDFBarcodeJS)
+
+---
+
+## Who Uses Quagga2? {#who-uses}
+Quagga2 is used by developers worldwide in various applications, including inventory management, retail point-of-sale systems, library systems, and mobile scanning apps. If you're using Quagga2 in your project, let us know!
+
+- **Internet Archive Open Library**: [internetarchive/openlibrary](https://github.com/internetarchive/openlibrary)
+- **Grocy**: [grocy/grocy](https://github.com/grocy/grocy)
+- **German Federal Agency For Technical Relief**: [mziech/thw-inventory](https://github.com/mziech/thw-inventory)
+- **Food Coop Shop**: [foodcoopshop/foodcoopshop](https://github.com/foodcoopshop/foodcoopshop)
+- **Rintagi**: [Rintagi/Low-Code-Development-Platform](https://github.com/Rintagi/Low-Code-Development-Platform)
+- **LINE**: [line/line-api-use-case-smart-retail](https://github.com/line/line-api-use-case-smart-retail)
+- **Veganify**: [frontendnetwork/veganify](https://github.com/frontendnetwork/veganify)
+- **Appsemble**: [Appsemble](https://gitlab.com/appsemble/appsemble)
+- **Intake24**: [intake24/intake24](https://github.com/intake24/intake24)
+- **FridgeToPlate**: [COS301-SE-2023/FridgeToPlate](https://github.com/COS301-SE-2023/FridgeToPlate)
+- **Nutri-Scanner**: [kishan9535/Nutri-Scanner](https://github.com/kishan9535/Nutri-Scanner)
+- **Musclog**: [blopa/musclog-app](https://github.com/blopa/musclog-app)
+
+
+---
+
 ## About This Documentation
 
 This documentation is maintained alongside the Quagga2 codebase. If you find errors or have suggestions for improvement, please [open an issue](https://github.com/ericblade/quagga2/issues) or submit a pull request.
