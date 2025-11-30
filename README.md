@@ -53,7 +53,7 @@ __2of5__, __CODE 93__, __CODE 32__ and __CODABAR__. The library is also capable 
 code relies on heavy image-processing even recent smartphones are capable of
 locating and decoding barcodes in real-time.
 
-Try some [examples](https://serratus.github.io/quaggaJS/examples) and check out
+Try some [examples](https://ericblade.github.io/quagga2/examples) and check out
 the blog post ([How barcode-localization works in QuaggaJS][oberhofer_co_how])
 if you want to dive deeper into this topic.
 
@@ -830,7 +830,7 @@ false-positives.
 
 Starting in Chrome 59 you can now make use of `capabilities` and directly
 control the zoom of the camera. Head over to the
-[web-cam demo](https://serratus.github.io/quaggaJS/examples/live_w_locator.html)
+[web-cam demo](https://ericblade.github.io/quagga2/examples/live_w_locator.html)
 and check out the __Zoom__ feature.
 
 You can read more about those `capabilities` in
@@ -843,7 +843,7 @@ recognition logic.
 
 Since Chrome 59 you can turn on/off the __Torch__ of your device and vastly
 improve the quality of the images. Head over to the
-[web-cam demo](https://serratus.github.io/quaggaJS/examples/live_w_locator.html)
+[web-cam demo](https://ericblade.github.io/quagga2/examples/live_w_locator.html)
 and check out the __Torch__ feature.
 
 To find out more about this feature [read on](https://www.oberhofer.co/mediastreamtrack-and-its-capabilities).
@@ -965,7 +965,7 @@ on the ``singleChannel`` flag in the configuration when using ``decodeSingle``.
 [upc_wiki]: http://en.wikipedia.org/wiki/Universal_Product_Code
 [ean_8_wiki]: http://en.wikipedia.org/wiki/EAN-8
 [oberhofer_co_how]: http://www.oberhofer.co/how-barcode-localization-works-in-quaggajs/
-[github_examples]: https://serratus.github.io/quaggaJS/examples
+[github_examples]: https://ericblade.github.io/quagga2/examples
 [i2of5_wiki]: https://en.wikipedia.org/wiki/Interleaved_2_of_5
 [enumerateDevices]: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/enumerateDevices
 [reactExample]: https://github.com/ericblade/quagga2-react-example

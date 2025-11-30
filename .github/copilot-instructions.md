@@ -97,7 +97,7 @@ This file controls which packages `npm-check-updates` can upgrade:
 
 3. **Test extensively:**
    - Run full test suite: `npm run build-and-test`
-   - Test example files in browser: `example/live_w_locator.html`
+   - Test example files in browser: `docs/examples/live_w_locator.html`
    - Check Cypress tests: `npm run cypress:run`
 
 ### When Removing Dependencies
