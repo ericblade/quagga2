@@ -18,6 +18,17 @@ Deep dive into the computer vision algorithms that find barcodes in images. Cove
 
 ## Architecture
 
+### [How Input Streams Work](input-streams.md)
+
+Technical deep dive into the three input stream types and their initialization flow. Covers:
+
+- LiveStream, VideoStream, and ImageStream differences
+- The async initialization sequence
+- Why `framegrabber` indicates init completion
+- Race conditions and how to avoid them
+
+**Read this if**: You're debugging initialization issues, dealing with React StrictMode, or want to understand the media pipeline.
+
 ### [Algorithm Overview](algorithm-overview.md) *(Coming Soon)*
 
 High-level overview of Quagga2's processing pipeline from input to output.
