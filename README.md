@@ -30,7 +30,7 @@ Quick links from this README:
 
 ## Using React / Redux?
 
-Please see also <https://github.com/ericblade/quagga2-react-example/> and <https://github.com/ericblade/quagga2-redux-middleware/>
+Please see also <https://github.com/ericblade/quagga2-react-example/> and <https://github.com/ericblade/quagga2-redux-middleware/>. For live browser examples, see [docs/examples/](docs/examples/).
 
 ## Using Angular?
 

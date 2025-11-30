@@ -11,7 +11,7 @@ Welcome to the Quagga2 documentation! Quagga2 is a JavaScript barcode scanner li
 - [GitHub Repository](https://github.com/ericblade/quagga2)
 - [Changelog](https://github.com/ericblade/quagga2/releases)
 - [npm Package](https://www.npmjs.com/package/@ericblade/quagga2)
-- [Live Examples](../example/)
+- [Live Examples](examples/)
 
 ## Getting Started
 
