@@ -1,16 +1,16 @@
-# Working with Box Coordinates
+# Working with Box Coordinates {#working-with-box-coordinates}
 
-This guide explains how Quagga2's coordinate system works and how to properly use `box` and `boxes` coordinates for overlay rendering, especially when using `inputStream.size` to scale processing.
+This guide explains how Quagga2's coordinate system works and how to properly use `box`, `boxes`, and `line` coordinates for overlay rendering, especially when using `inputStream.size` to scale processing.
 
-## Understanding the Coordinate System
+## Understanding the Coordinate System {#understanding-coordinate-system}
 
-Quagga2 returns `box` and `boxes` coordinates in **processed canvas coordinates**, not original image/video coordinates. This is important to understand when:
+Quagga2 returns `box`, `boxes`, and `line` coordinates in **processed canvas coordinates**, not original image/video coordinates. This is important to understand when:
 
 - Drawing overlay boxes on a video element
 - Using `inputStream.size` to reduce processing resolution
 - Cropping detected barcode regions from the original image
 
-### Key Concepts
+### Key Concepts {#key-concepts}
 
 | Term | Description |
 |------|-------------|
@@ -18,18 +18,18 @@ Quagga2 returns `box` and `boxes` coordinates in **processed canvas coordinates*
 | **Processed Size** | The scaled dimensions used for barcode detection (controlled by `inputStream.size`) |
 | **Canvas Size** | The dimensions of the processing canvas (typically matches processed size) |
 
-### How Coordinates are Generated
+### How Coordinates are Generated {#how-coordinates-generated}
 
 1. **Image Scaling**: When `inputStream.size` is set, the image is scaled so the longest side equals that value
 2. **Localization**: Barcode regions are found in the scaled image
 3. **Box Coordinates**: Returned coordinates are relative to the scaled/processed image
 4. **halfSample Adjustment**: If `halfSample: true`, coordinates are automatically scaled 2x
 
-## Converting Coordinates to Original Image Space
+## Converting Coordinates to Original Image Space {#converting-coordinates}
 
 When you need to draw boxes on the original video/image (not the processed canvas), you must scale the coordinates.
 
-### For Live Video Streams
+### For Live Video Streams {#live-video-streams}
 
 ```javascript
 Quagga.onDetected(function(result) {
@@ -62,7 +62,7 @@ Quagga.onDetected(function(result) {
 });
 ```
 
-### For Static Images with decodeSingle
+### For Static Images with decodeSingle {#static-images-decodesingle}
 
 ```javascript
 Quagga.decodeSingle({
@@ -113,7 +113,7 @@ Quagga.decodeSingle({
 });
 ```
 
-## Complete Example: Drawing Boxes on Live Video
+## Complete Example: Drawing Boxes on Live Video {#complete-example}
 
 Here's a complete example showing how to draw accurate bounding boxes on a live video stream:
 
@@ -196,7 +196,7 @@ function drawScaledBox(ctx, box, scaleX, scaleY, color) {
 }
 ```
 
-## When Coordinates Don't Need Scaling
+## When Coordinates Don't Need Scaling {#no-scaling-needed}
 
 If you're drawing on Quagga's own overlay canvas (`Quagga.canvas.dom.overlay`), coordinates are already in the correct space:
 
@@ -217,13 +217,13 @@ Quagga.onDetected(function(result) {
 });
 ```
 
-## Common Pitfalls
+## Common Pitfalls {#common-pitfalls}
 
-### 1. Forgetting halfSample Adjustment
+### 1. Forgetting halfSample Adjustment {#forgetting-halfsample}
 
 If you're manually calculating processed size, remember that `halfSample: true` doesn't affect the returned coordinates (they're already adjusted).
 
-### 2. Using Wrong Canvas Reference
+### 2. Using Wrong Canvas Reference {#wrong-canvas-reference}
 
 ```javascript
 // ❌ Wrong - using overlay canvas for scale calculation
@@ -233,7 +233,7 @@ const wrongWidth = Quagga.canvas.dom.overlay.width;
 const correctWidth = Quagga.canvas.dom.image.width;
 ```
 
-### 3. Assuming Square Pixels
+### 3. Assuming Square Pixels {#assuming-square-pixels}
 
 Always calculate scaleX and scaleY separately, as aspect ratios may differ:
 
@@ -246,7 +246,7 @@ const scaleX = videoWidth / canvasWidth;
 const scaleY = videoHeight / canvasHeight;
 ```
 
-## Performance Tips
+## Performance Tips {#performance-tips}
 
 1. **Use smaller `inputStream.size`** (e.g., 640-800) for live video to reduce CPU usage
 2. **Cache scale factors** - recalculate only when video dimensions change

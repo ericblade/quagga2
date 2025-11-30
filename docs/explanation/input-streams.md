@@ -1,8 +1,8 @@
-# How Input Streams Work
+# How Input Streams Work {#how-input-streams-work}
 
 This article explains the technical details of how Quagga2's input stream system works. Understanding this is helpful for troubleshooting initialization issues and understanding async behavior.
 
-## Overview
+## Overview {#overview}
 
 Quagga2 supports three types of input streams for reading barcode data:
 
@@ -14,7 +14,7 @@ Quagga2 supports three types of input streams for reading barcode data:
 
 All three stream types share the same interface (`InputStream`) and follow a common initialization pattern, but differ in how they acquire media.
 
-## The InputStream Interface
+## The InputStream Interface {#inputstream-interface}
 
 Every input stream implements these core methods:
 
@@ -47,7 +47,7 @@ interface InputStream {
 }
 ```
 
-## Initialization Flow
+## Initialization Flow {#initialization-flow}
 
 All stream types follow the same initialization sequence:
 
@@ -57,7 +57,7 @@ init() → initInputStream() → [async media access] → 'canrecord' event → 
 
 Here's what happens at each step:
 
-### 1. `init()` is called
+### 1. `init()` is called {#step-1-init}
 
 The static `Quagga.init(config, callback)` function starts the process:
 
@@ -78,7 +78,7 @@ Quagga.init({
 });
 ```
 
-### 2. `initInputStream()` creates the stream
+### 2. `initInputStream()` creates the stream {#step-2-initinputstream}
 
 Based on the `type` configuration, the appropriate stream factory is called:
 
@@ -86,7 +86,7 @@ Based on the `type` configuration, the appropriate stream factory is called:
 - `VideoStream` → `createVideoStream(video)`
 - `ImageStream` → `createImageStream()`
 
-### 3. Async media access begins
+### 3. Async media access begins {#step-3-async-media}
 
 This is where the streams diverge:
 
@@ -99,14 +99,14 @@ This is where the streams diverge:
 
 **ImageStream**: Uses `ImageLoader` to fetch and decode image(s). Async because images must be downloaded.
 
-### 4. `canrecord` event fires
+### 4. `canrecord` event fires {#step-4-canrecord}
 
 When the media is ready, the stream triggers the `canrecord` event. This is the signal that:
 - Media dimensions are now available
 - Frames can be grabbed
 - Processing can begin
 
-### 5. `canRecord()` completes initialization
+### 5. `canRecord()` completes initialization {#step-5-canrecord-callback}
 
 The `canRecord()` callback:
 1. Validates the input stream is properly initialized
@@ -116,16 +116,16 @@ The `canRecord()` callback:
 5. Sets up worker threads (if configured)
 6. Calls the user's callback to signal init is complete
 
-### 6. Framegrabber indicates completion
+### 6. Framegrabber indicates completion {#step-6-framegrabber}
 
 The `framegrabber` being non-null is the reliable indicator that initialization completed successfully. This is why:
 
 - The static `start()` function checks `if (!_context.framegrabber)` before proceeding
 - The `stop()` function uses `!framegrabber` to detect if init was still in progress
 
-## Stream Type Details
+## Stream Type Details {#stream-type-details}
 
-### LiveStream
+### LiveStream {#livestream}
 
 **Purpose**: Real-time barcode scanning using the device camera.
 
@@ -154,7 +154,7 @@ inputStream: {
 }
 ```
 
-### VideoStream
+### VideoStream {#videostream}
 
 **Purpose**: Scanning barcodes from pre-recorded video files.
 
@@ -177,7 +177,7 @@ inputStream: {
 }
 ```
 
-### ImageStream
+### ImageStream {#imagestream}
 
 **Purpose**: Scanning barcodes from static images or image sequences.
 
@@ -213,7 +213,7 @@ inputStream: {
 }
 ```
 
-## Race Conditions and Async Behavior
+## Race Conditions and Async Behavior {#race-conditions}
 
 Because initialization involves async operations (camera access, file loading), race conditions can occur if:
 
@@ -245,7 +245,7 @@ useLayoutEffect(() => {
 }, []);
 ```
 
-## Source Code
+## Source Code {#source-code}
 
 The input stream system is implemented in:
 
@@ -259,7 +259,7 @@ The input stream system is implemented in:
 
 > **Note**: Webpack replaces `frame_grabber.js` with `frame_grabber_browser.js` when building the browser bundle. The Node.js version uses `ndarray` for image manipulation, while the browser version uses the Canvas API.
 
-## Related Reading
+## Related Reading {#related-reading}
 
 - [How Barcode Localization Works](how-barcode-localization-works.md) - What happens after frames are grabbed
 - [Camera Access Reference](../reference/camera-access.md) - Camera configuration options
