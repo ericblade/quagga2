@@ -887,6 +887,16 @@ export interface QuaggaJSConfigObject {
         size?: number;
         sequence?: boolean;
 
+        /**
+         * Adds a white border of the specified number of pixels around the image.
+         * This is useful for barcodes that lack sufficient quiet zone (whitespace)
+         * around them. When a barcode is generated or cropped without proper margins,
+         * the decoder may fail to detect it. Adding a border simulates the whitespace
+         * that would naturally exist when displaying the barcode on paper or screen.
+         * @default 0 (no border added)
+         */
+        addBorder?: number;
+
         debug?: {
             /**
              * @default false
