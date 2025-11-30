@@ -254,7 +254,10 @@ The input stream system is implemented in:
 - `src/input/input_stream/input_stream.d.ts` - TypeScript interface
 - `src/quagga/setupInputStream.ts` - Stream factory selection
 - `src/input/camera_access.ts` - Camera permission handling
-- `src/input/frame_grabber.js` - Frame extraction from streams
+- `src/input/frame_grabber.js` - Frame extraction for Node.js (uses ndarray)
+- `src/input/frame_grabber_browser.js` - Frame extraction for browsers (uses canvas)
+
+> **Note**: Webpack replaces `frame_grabber.js` with `frame_grabber_browser.js` when building the browser bundle. The Node.js version uses `ndarray` for image manipulation, while the browser version uses the Canvas API.
 
 ## Related Reading
 
