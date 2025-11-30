@@ -178,13 +178,13 @@ describe('CameraAccess (browser)', () => {
     describe('enableTorch', () => {
         it('does not throw if no active track', async () => {
             await Quagga.CameraAccess.release();
-            await expect(Quagga.CameraAccess.enableTorch()).to.be.fulfilled;
+            await Quagga.CameraAccess.enableTorch();
         });
     });
     describe('disableTorch', () => {
         it('does not throw if no active track', async () => {
             await Quagga.CameraAccess.release();
-            await expect(Quagga.CameraAccess.disableTorch()).to.be.fulfilled;
+            await Quagga.CameraAccess.disableTorch();
         });
     });
 });
