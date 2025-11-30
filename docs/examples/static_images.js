@@ -113,13 +113,13 @@ $(function() {
             },
             inputStream: {
                 src: function(value) {
-                    return "../test/fixtures/" + value + "/"
+                    return "fixtures/" + value + "/"
                 }
             }
         },
         state: {
             inputStream: {
-                src: "../test/fixtures/code_128/"
+                src: "fixtures/code_128/"
             },
             decoder : {
                 readers : [{
