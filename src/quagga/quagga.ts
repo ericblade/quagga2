@@ -8,6 +8,7 @@ import CameraAccess from '../input/camera_access';
 import FrameGrabber from '../input/frame_grabber.js';
 import InputStream from '../input/input_stream/input_stream';
 import BarcodeLocator from '../locator/barcode_locator';
+import { applyPreprocessors, QuaggaImagePreprocessor } from '../preprocessing';
 import { QuaggaContext } from '../QuaggaContext';
 import { BarcodeInfo } from '../reader/barcode_reader';
 import _getViewPort from './getViewPort';
@@ -245,6 +246,10 @@ export default class Quagga {
             if (!workersUpdated) {
                 this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
                 if (this.context.framegrabber.grab()) {
+                    // Apply preprocessors if configured
+                    if (this.context.config?.preprocessors && this.context.config.preprocessors.length > 0 && this.context.inputImageWrapper) {
+                        applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessors as QuaggaImagePreprocessor[]);
+                    }
                     if (!workersUpdated) {
                         this.locateAndDecode();
                     }
@@ -253,6 +258,10 @@ export default class Quagga {
         } else {
             this.context.framegrabber.attachData(this.context.inputImageWrapper?.data);
             this.context.framegrabber.grab();
+            // Apply preprocessors if configured
+            if (this.context.config?.preprocessors && this.context.config.preprocessors.length > 0 && this.context.inputImageWrapper) {
+                applyPreprocessors(this.context.inputImageWrapper, this.context.config.preprocessors as QuaggaImagePreprocessor[]);
+            }
             this.locateAndDecode();
         }
     };

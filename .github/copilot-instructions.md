@@ -314,8 +314,97 @@ When preparing a release:
 - **Issue Tracker**: https://github.com/ericblade/quagga2/issues
 - **Original Quagga**: https://github.com/serratus/quaggaJS (archived)
 
+## Documentation (Divio System)
+
+This project uses the [Divio Documentation System](https://documentation.divio.com/) for user-facing documentation in `/docs`. The README.md should only contain brief summaries with links to full documentation.
+
+### Documentation Structure
+
+The `/docs` folder has four distinct sections, each serving a specific purpose:
+
+| Section | Purpose | User Question | Content Style |
+|---------|---------|---------------|---------------|
+| `tutorials/` | Learning-oriented | "I want to learn" | Step-by-step lessons, beginner-friendly |
+| `how-to-guides/` | Task-oriented | "I want to do X" | Practical guides for specific goals |
+| `reference/` | Information-oriented | "I need details about Y" | Technical specs, API docs, config options |
+| `explanation/` | Understanding-oriented | "I want to understand why" | Background, concepts, architecture |
+
+### When Adding a New Feature
+
+When implementing a new feature, update documentation in the appropriate sections:
+
+1. **reference/configuration.md** - Add new config options with:
+   - Type information
+   - Default values
+   - Examples
+   - Link to how-to guide if relevant
+
+2. **how-to-guides/** - Create or update guides if the feature requires user action:
+   - Create new file: `how-to-guides/use-feature-name.md`
+   - Update `how-to-guides/index.md` to link to new guide
+   - Focus on practical usage, not theory
+
+3. **explanation/algorithm-overview.md** - Update if the feature affects the processing pipeline
+
+4. **tutorials/** - Update if the feature is essential for beginners (rare for most features)
+
+5. **README.md** - Add only a brief mention with link to full docs:
+   ```markdown
+   ### feature-name
+   
+   Brief one-line description.
+   
+   **[📖 Full Documentation](https://ericblade.github.io/quagga2/how-to-guides/use-feature-name.html)**
+   ```
+
+### Documentation File Format
+
+Use this template for new how-to guides:
+
+```markdown
+# Feature Name {#feature-name}
+
+Brief description of what this guide covers.
+
+## When to Use {#when-to-use}
+
+List use cases.
+
+## Basic Usage {#basic-usage}
+
+Code examples.
+
+## Advanced Usage {#advanced-usage}
+
+More complex examples.
+
+## Related {#related}
+
+- [Link to related docs](path/to/doc.md)
+
 ---
 
-**Last Updated**: 2025-11-16
+[← Back to How-To Guides](index.md)
+```
 
-**Note to Copilot**: When suggesting changes, always consider the impact on `DEPENDENCIES.md` and whether it needs updates. This project has complex dependency management due to bundling, version pinning, and security overrides - treat dependency changes with extra care.
+### Documentation Index Files
+
+Each section has an `index.md` that lists all pages in that section. When adding a new page:
+- Add entry to the appropriate section's `index.md`
+- Mark new entries with 🆕 emoji
+- Keep entries organized by category
+
+### Don't Do This
+
+- ❌ Don't put comprehensive documentation in README.md
+- ❌ Don't duplicate content across sections
+- ❌ Don't mix different documentation types (e.g., tutorials in reference)
+- ❌ Don't forget to update index files
+
+---
+
+**Last Updated**: 2025-11-30
+
+**Note to Copilot**: When suggesting changes, always consider:
+1. The impact on `DEPENDENCIES.md` - This project has complex dependency management due to bundling, version pinning, and security overrides. Treat dependency changes with extra care.
+2. The impact on `/docs` - User-facing features need documentation following the Divio system. Comprehensive docs go in `/docs`, not README.md.

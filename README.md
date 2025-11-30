@@ -519,6 +519,7 @@ high-level properties:
   frequency: 10,
   decoder:{...},
   locator: {...},
+  preprocessors: [...],  // optional: image preprocessors pipeline
   debug: false,
 }
 ```
@@ -754,6 +755,18 @@ If you have really large barcodes which can be read close-up, then the use of
 from the camera lens (lack of auto-focus, or small barcodes) then it's advised
 to set the size to `small` or even `x-small`. For the latter it's also
 recommended to crank up the resolution in order to find a barcode.
+
+### preprocessors
+
+The `preprocessors` config option allows you to apply image transformations before barcode detection. Useful for handling barcodes without sufficient quiet zones (whitespace).
+
+```javascript
+{
+  preprocessors: [Quagga.Preprocessors.addBorder(20)]  // Add 20px white border
+}
+```
+
+**[📖 Full Preprocessors Documentation](https://ericblade.github.io/quagga2/how-to-guides/use-preprocessors.html)** - Built-in preprocessors, creating custom preprocessors, and usage examples.
 
 ## Examples
 

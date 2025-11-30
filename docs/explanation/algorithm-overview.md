@@ -12,9 +12,15 @@ Input Image → Preprocessing → Localization → Decoding → Result
 
 ### 1. Preprocessing {#preprocessing}
 
+**Built-in preprocessing** (during frame grabbing):
 - **Scaling**: Image is resized based on `inputStream.size`
-- **Grayscale conversion**: Color image converted to grayscale
+- **Grayscale conversion**: Color image converted to grayscale (uses `inputStream.singleChannel` option - if true, uses only red channel; otherwise uses luminance formula)
 - **Area cropping**: If `inputStream.area` is set, crop to that region
+
+**Custom preprocessors** (via `preprocessors` config):
+- Applied after frame grabbing but before localization
+- Useful for adding borders, enhancing contrast, or other transformations
+- See [Use Preprocessors Guide](../how-to-guides/use-preprocessors.md) for details
 
 ### 2. Localization {#localization}
 

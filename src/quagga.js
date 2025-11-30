@@ -8,6 +8,7 @@ import CameraAccess from './input/camera_access';
 import ImageDebug from './common/image_debug';
 import ResultCollector from './analytics/result_collector';
 import Config from './config/config';
+import { Preprocessors } from './preprocessing';
 
 import Quagga from './quagga/quagga';
 
@@ -174,6 +175,7 @@ const QuaggaJSStaticInterface = {
     ImageDebug,
     ImageWrapper,
     ResultCollector,
+    Preprocessors,
 };
 
 export default QuaggaJSStaticInterface;
@@ -185,4 +187,5 @@ export {
     ImageDebug,
     ImageWrapper,
     ResultCollector,
+    Preprocessors,
 };
