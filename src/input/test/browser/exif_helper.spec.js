@@ -28,7 +28,7 @@ describe('EXIF Helper', () => {
             findTagsInObjectURL('blob:balbla')
                 .then(() => {})
                 .catch(err => {
-                    expect(typeof err !== 'undefined');
+                    expect(err).to.exist;
                 }).then(done);
         });
 
