@@ -29,7 +29,7 @@ Technical deep dive into the three input stream types and their initialization f
 
 **Read this if**: You're debugging initialization issues, dealing with React StrictMode, or want to understand the media pipeline.
 
-### [Algorithm Overview](algorithm-overview.md)
+### [Algorithm Overview](algorithm-overview.md) *(Coming Soon)*
 
 High-level overview of Quagga2's processing pipeline from input to output.
 
