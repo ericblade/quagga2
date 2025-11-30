@@ -26,6 +26,7 @@ Quick links from this README:
 - [API](#api)
 - [CameraAccess API](#cameraaccess-api)
 - [Configuration](#configobject)
+- [Preprocessing](#preprocessing)
 - [Tips & Tricks](#tipsandtricks)
 
 ## Using React / Redux?
@@ -519,6 +520,7 @@ high-level properties:
   frequency: 10,
   decoder:{...},
   locator: {...},
+  preprocessing: [...],  // optional: image preprocessing pipeline
   debug: false,
 }
 ```
@@ -754,6 +756,99 @@ If you have really large barcodes which can be read close-up, then the use of
 from the camera lens (lack of auto-focus, or small barcodes) then it's advised
 to set the size to `small` or even `x-small`. For the latter it's also
 recommended to crank up the resolution in order to find a barcode.
+
+### <a name="preprocessing">preprocessing</a>
+
+The `preprocessing` property allows you to apply image transformations before 
+barcode localization and decoding. This is useful for handling edge cases like 
+barcodes without sufficient quiet zones (whitespace around the barcode).
+
+```javascript
+{
+  preprocessing: [
+    Quagga.Preprocessors.addBorder(20)  // Add 20px white border
+  ]
+}
+```
+
+#### Built-in Preprocessors
+
+**`Quagga.Preprocessors.addBorder(size)`**
+
+Adds a white border around the image by shrinking the image content slightly 
+and filling the border with white pixels. This helps decode barcodes that lack 
+proper quiet zones (whitespace around the barcode edges).
+
+```javascript
+// Add 10 pixels of white border on all sides
+preprocessing: [Quagga.Preprocessors.addBorder(10)]
+```
+
+- `size`: Number of pixels of white border to add on each side
+- The image dimensions remain unchanged; the content is shrunk to make room
+- Recommended values: 10-30 pixels depending on image size
+
+#### Chaining Multiple Preprocessors
+
+Preprocessors are applied in the order they appear in the array:
+
+```javascript
+preprocessing: [
+  Quagga.Preprocessors.addBorder(15),
+  myCustomPreprocessor
+]
+```
+
+#### Creating Custom Preprocessors
+
+You can create custom preprocessor functions that follow the `QuaggaImagePreprocessor` type signature:
+
+```typescript
+type QuaggaImagePreprocessor = (imageWrapper: ImageWrapper) => ImageWrapper;
+```
+
+**Important guidelines for custom preprocessors:**
+
+1. **Modify in place**: For best performance, modify `imageWrapper.data` directly
+2. **Maintain dimensions**: Keep the same image width and height
+3. **Return the same instance**: Return the same imageWrapper that was passed in
+
+```javascript
+// Example: Custom preprocessor that inverts colors
+const invertColors = (imageWrapper) => {
+    for (let i = 0; i < imageWrapper.data.length; i++) {
+        imageWrapper.data[i] = 255 - imageWrapper.data[i];
+    }
+    return imageWrapper;
+};
+
+// Example: Custom preprocessor that increases contrast
+const increaseContrast = (imageWrapper) => {
+    const factor = 1.5;  // contrast factor
+    const midpoint = 128;
+    for (let i = 0; i < imageWrapper.data.length; i++) {
+        const value = imageWrapper.data[i];
+        imageWrapper.data[i] = Math.max(0, Math.min(255, 
+            midpoint + (value - midpoint) * factor
+        ));
+    }
+    return imageWrapper;
+};
+
+// Use custom preprocessors
+Quagga.init({
+    preprocessing: [invertColors, increaseContrast],
+    // ... other config
+});
+```
+
+#### When to Use Preprocessing
+
+- **Barcodes without whitespace**: Use `addBorder()` when barcodes are cropped 
+  tightly without quiet zones
+- **Poor contrast**: Create a custom contrast enhancement preprocessor
+- **Noise reduction**: Implement smoothing or median filters
+- **Color issues**: Apply color correction or channel manipulation
 
 ## Examples
 
