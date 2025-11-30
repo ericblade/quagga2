@@ -57,7 +57,7 @@ init() → initInputStream() → [async media access] → 'canrecord' event → 
 
 Here's what happens at each step:
 
-### 1. `init()` is called
+### 1. `init()` is called {#step-1-init}
 
 The static `Quagga.init(config, callback)` function starts the process:
 
@@ -78,7 +78,7 @@ Quagga.init({
 });
 ```
 
-### 2. `initInputStream()` creates the stream
+### 2. `initInputStream()` creates the stream {#step-2-initinputstream}
 
 Based on the `type` configuration, the appropriate stream factory is called:
 
@@ -99,14 +99,14 @@ This is where the streams diverge:
 
 **ImageStream**: Uses `ImageLoader` to fetch and decode image(s). Async because images must be downloaded.
 
-### 4. `canrecord` event fires
+### 4. `canrecord` event fires {#step-4-canrecord}
 
 When the media is ready, the stream triggers the `canrecord` event. This is the signal that:
 - Media dimensions are now available
 - Frames can be grabbed
 - Processing can begin
 
-### 5. `canRecord()` completes initialization
+### 5. `canRecord()` completes initialization {#step-5-canrecord-callback}
 
 The `canRecord()` callback:
 1. Validates the input stream is properly initialized
