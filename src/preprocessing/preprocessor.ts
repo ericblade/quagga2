@@ -62,9 +62,7 @@ export function addBorder(borderSize: number): QuaggaImagePreprocessor {
 
         // Create a temporary copy of the original data
         // Note: We need to handle both TypedArray and Array<number> types
-        const originalData = imageWrapper.data instanceof Uint8Array
-            ? new Uint8Array(imageWrapper.data)
-            : new Uint8Array(imageWrapper.data);
+        const originalData = new Uint8Array(imageWrapper.data);
 
         // Fill the entire image with white first
         if (imageWrapper.data instanceof Uint8Array) {
