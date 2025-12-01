@@ -48,18 +48,20 @@ footer {
 
 #interactive.viewport {
   width: 640px;
-  height: 480px;
+  min-height: 480px;
+  max-height: 90vh;
+  overflow: auto;
 }
 
 
 #interactive.viewport canvas, video {
   float: left;
-  width: 640px;
-  height: 480px;
+  max-width: 100%;
+  height: auto;
 }
 
 #interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
-  margin-left: -640px;
+  margin-left: -100%;
 }
 
 .controls fieldset {
@@ -232,19 +234,19 @@ i.icon-24-scan {
 
   #interactive.viewport {
     width: 300px;
-    height: 300px;
-    overflow: hidden;
+    min-height: 300px;
+    max-height: 80vh;
+    overflow: auto;
   }
 
 
   #interactive.viewport canvas, video {
-    margin-top: -50px;
-    width: 300px;
-    height: 400px;
+    max-width: 100%;
+    height: auto;
   }
 
   #interactive.viewport canvas.drawingBuffer, video.drawingBuffer {
-    margin-left: -300px;
+    margin-left: -100%;
   }
 
 
