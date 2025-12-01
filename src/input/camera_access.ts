@@ -147,6 +147,12 @@ function getActiveTrack(): MediaStreamTrack | null {
     return tracks && tracks?.length ? tracks[0] : null;
 }
 
+/**
+ * Returns the active MediaStream, or null if no stream is active.
+ * Use this when you need access to the full stream, for example to pass to WebRTC
+ * or to clone the stream. For just the video track, use getActiveTrack() instead.
+ * @returns The active MediaStream, or null if no camera is currently active.
+ */
 function getActiveStream(): MediaStream | null {
     return streamRef ?? null;
 }
