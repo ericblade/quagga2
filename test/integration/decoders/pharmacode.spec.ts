@@ -15,7 +15,7 @@ describe('Pharmacode Decoder Tests', () => {
         { 'name': 'image-011.jpg', 'result': '12345', format: 'pharmacode' },
         { 'name': 'image-012.jpg', 'result': '65535', format: 'pharmacode' },
     ];
-    // Use locate: false since test images are synthetically generated
+    // Use locate: false since test images are synthetically generated and pre-cropped to contain only the barcode (location detection not required)
     runDecoderTestBothHalfSample('pharmacode', (halfSample) => generateConfig({
         locate: false,
         locator: {
