@@ -166,12 +166,21 @@ npx ts-mocha -p test/tsconfig.json test/integration/decoders/ean_extended.spec.t
 **Cypress browser tests:**
 ```bash
 # Run specific Cypress test file
-npm run cypress:run -- --spec cypress/e2e/ean_extended_quick.cy.ts
+npm run cypress:run -- --spec cypress/e2e/browser.cy.ts
 # Run in headed mode (see browser)
 npm run cypress:open
 
 # Run specific test in headed mode
-npx cypress open --e2e --browser electron --config specPattern=cypress/e2e/ean_extended_quick.cy.ts
+npx cypress open --e2e --browser electron --config specPattern=cypress/e2e/browser.cy.ts
+
+# Multiple specs (comma-separated)
+npm run cypress:run -- --spec cypress/e2e/browser.cy.ts,cypress/e2e/integration.cy.ts
+
+# Glob pattern
+npm run cypress:run -- --spec "cypress/e2e/**/browser*.cy.ts"
+
+# Choose a browser (if installed)
+npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --browser chrome --env BUILD_ENV=development --spec cypress/e2e/browser.cy.ts
 ```
 
 **Note:**
@@ -181,7 +190,7 @@ npx cypress open --e2e --browser electron --config specPattern=cypress/e2e/ean_e
 **Important Notes:**
 - Always run from the `master/` directory (or appropriate workspace folder)
 - Node tests use ts-mocha with `-p test/tsconfig.json` flag
-- Cypress tests use the npm script which sets `NODE_ENV=development BUILD_ENV=development`
+- Cypress tests via npm scripts automatically set `NODE_ENV=development BUILD_ENV=development` and include the OpenSSL legacy provider flag
 - For PowerShell, use semicolons `;` not `&` or `&&` to chain commands
 
 ### Test File Organization
@@ -316,6 +325,6 @@ When preparing a release:
 
 ---
 
-**Last Updated**: 2025-11-16
+**Last Updated**: 2025-11-30
 
 **Note to Copilot**: When suggesting changes, always consider the impact on `DEPENDENCIES.md` and whether it needs updates. This project has complex dependency management due to bundling, version pinning, and security overrides - treat dependency changes with extra care.
