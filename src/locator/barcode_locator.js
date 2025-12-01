@@ -261,7 +261,7 @@ function findPatches() {
 }
 
 /**
- * Finds those connected areas which contain at least 6 patches
+ * Finds those connected areas which contain at least minConnectedPatches patches
  * and returns them ordered DESC by the number of contained patches
  * @param {Number} maxLabel
  */
@@ -270,6 +270,8 @@ function findBiggestConnectedAreas(maxLabel) {
     let sum;
     let labelHist = [];
     let topLabels = [];
+    // Use configurable minimum, defaulting to 5 for backwards compatibility
+    const minPatches = _config.minConnectedPatches ?? 5;
 
     for (i = 0; i < maxLabel; i++) {
         labelHist.push(0);
@@ -288,8 +290,8 @@ function findBiggestConnectedAreas(maxLabel) {
 
     labelHist.sort((a, b) => b.val - a.val);
 
-    // extract top areas with at least 6 patches present
-    topLabels = labelHist.filter((el) => el.val >= 5);
+    // extract top areas with at least minPatches patches present
+    topLabels = labelHist.filter((el) => el.val >= minPatches);
 
     return topLabels;
 }
@@ -540,20 +542,33 @@ export default {
 
         binarizeImage();
         const patchesFound = findPatches();
+        const totalPatches = _numPatches.x * _numPatches.y;
+        const minPatchesRequired = Math.ceil(totalPatches * 0.05);
+        
         // return unless 5% or more patches are found
-        if (patchesFound.length < _numPatches.x * _numPatches.y * 0.05) {
+        if (patchesFound.length < minPatchesRequired) {
+            if (typeof ENV !== 'undefined' && ENV.development && _config.debug?.showFoundPatches) {
+                console.log(`Locator: Found ${patchesFound.length}/${totalPatches} patches (need ${minPatchesRequired}, grid: ${_numPatches.x}x${_numPatches.y})`);
+            }
             return null;
         }
 
         // rasterrize area by comparing angular similarity;
         const maxLabel = rasterizeAngularSimilarity(patchesFound);
         if (maxLabel < 1) {
+            if (typeof ENV !== 'undefined' && ENV.development && _config.debug?.showFoundPatches) {
+                console.log(`Locator: No angular similarity clusters found from ${patchesFound.length} patches`);
+            }
             return null;
         }
 
         // search for area with the most patches (biggest connected area)
         const topLabels = findBiggestConnectedAreas(maxLabel);
         if (topLabels.length === 0) {
+            if (typeof ENV !== 'undefined' && ENV.development && _config.debug?.showFoundPatches) {
+                const minPatches = _config.minConnectedPatches ?? 5;
+                console.log(`Locator: No connected areas with >= ${minPatches} patches found (had ${maxLabel} labels, try reducing minConnectedPatches)`);
+            }
             return null;
         }
 

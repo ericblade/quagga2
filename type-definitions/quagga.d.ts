@@ -1017,6 +1017,18 @@ export interface QuaggaJSConfigObject {
          * Available values: x-small, small, medium, large, x-large
          */
         patchSize?: string;
+        
+        /**
+         * Minimum number of connected patches required to consider an area as potentially
+         * containing a barcode. Lower values help detect smaller barcodes but may increase
+         * false positives. Higher values require larger barcodes but are more reliable.
+         * 
+         * For small barcodes in large images, try reducing this to 2 or 3.
+         * 
+         * @default 5
+         */
+        minConnectedPatches?: number;
+        
         willReadFrequently?: boolean;
         debug?: {
             /**

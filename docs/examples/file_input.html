@@ -33,6 +33,16 @@
     <p>This also works great on a wide range of mobile-phones where the camera
         access through <code>getUserMedia</code> is still very limited.</p>
 
+    <details>
+        <summary><strong>Tips for difficult images</strong></summary>
+        <ul>
+            <li><strong>Small barcodes:</strong> Use higher Resolution (1280-1920px), reduce Min Patches to 2-3</li>
+            <li><strong>Tall/narrow images:</strong> The image will be scaled proportionally; use higher resolution to preserve detail</li>
+            <li><strong>Not detecting:</strong> Try disabling Half-Sample for more detail, or use medium/large Patch-Size</li>
+            <li><strong>Rotated barcodes:</strong> The locator can detect barcodes at any angle</li>
+        </ul>
+    </details>
+
     <div class="controls">
         <fieldset class="input-group">
             <input type="file" accept="image/*" capture="camera"/>
@@ -75,6 +85,16 @@
                     <option value="medium">medium</option>
                     <option selected="selected" value="large">large</option>
                     <option value="x-large">x-large</option>
+                </select>
+            </label>
+            <label>
+                <span>Min Patches</span>
+                <select name="locator_min-connected-patches">
+                    <option value="2">2 (small barcodes)</option>
+                    <option value="3">3</option>
+                    <option selected="selected" value="5">5 (default)</option>
+                    <option value="8">8</option>
+                    <option value="10">10 (large barcodes)</option>
                 </select>
             </label>
             <label>
