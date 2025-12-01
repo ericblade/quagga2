@@ -4,7 +4,6 @@ import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
 import CameraAccess from '../input/camera_access';
-import { computeImageArea } from '../common/cv_utils';
 import FrameGrabber from '../input/frame_grabber.js';
 import InputStream from '../input/input_stream/input_stream';
 import BarcodeLocator from '../locator/barcode_locator';
@@ -218,7 +217,7 @@ export default class Quagga {
         // Redraw scanner area each frame when locate is false via public API.
         const cfg = this.context.config;
         if (cfg && cfg.locate === false && cfg.inputStream?.area) {
-            this.drawScannerArea(cfg.inputStream.area as any);
+            this.drawScannerArea();
         }
     }
 
@@ -319,56 +318,45 @@ export default class Quagga {
 
     /**
      * Public method to draw a scanner area overlay using the current Quagga instance's overlay canvas.
-     * Consumers can call this manually if they clear or customize the overlay each frame.
-     * Accepts an area configuration object with positioning and optional styling.
-     * Includes lightweight caching to avoid recomputing geometry/style when unchanged.
+     * Draws based on the instance's configured inputStream.area, using the actual adjusted boxSize
+     * to match the real scanning area after patch alignment.
+     * Only draws when locate is false and an area is configured with styling.
      */
-    private _cachedCanvasSize?: { x: number; y: number };
-    private _cachedAreaValues?: { top?: string; right?: string; bottom?: string; left?: string };
     private _cachedStyleValues?: { borderColor?: string; borderWidth?: number; backgroundColor?: string };
-    private _cachedRect?: { x: number; y: number; width: number; height: number };
     private _resolvedStyle?: { color: string; width: number; bg?: string };
-    drawScannerArea(area: {
-        top?: string; right?: string; bottom?: string; left?: string;
-        borderColor?: string; borderWidth?: number; backgroundColor?: string;
-    }): void {
+    drawScannerArea(): void {
+        const area = this.context.config?.inputStream?.area;
         if (!area) return;
         const overlayCtx = this.context.canvasContainer.ctx.overlay;
         if (!overlayCtx) return;
-        if (!this.context.inputStream) return;
+
         // Only draw when locate is false
         if (this.context.config?.locate !== false) return;
-        // Quick checks for visualization presence and default geometry
+
+        // Quick checks for visualization presence
         const hasAnyStyle = (area.borderColor !== undefined && area.borderColor !== '')
             || (area.borderWidth !== undefined && area.borderWidth! > 0)
             || (area.backgroundColor !== undefined && area.backgroundColor !== '');
         if (!hasAnyStyle) return;
-        const isDefaultGeometry = (area.top === '0%' || area.top === undefined)
-            && (area.right === '0%' || area.right === undefined)
-            && (area.bottom === '0%' || area.bottom === undefined)
-            && (area.left === '0%' || area.left === undefined);
-        if (isDefaultGeometry) return;
 
-        const canvasSize = this.context.inputStream.getCanvasSize();
-        const sizeChanged = !this._cachedCanvasSize
-            || this._cachedCanvasSize.x !== canvasSize.x
-            || this._cachedCanvasSize.y !== canvasSize.y;
-        if (sizeChanged) {
-            this._cachedCanvasSize = { x: canvasSize.x, y: canvasSize.y };
-            this._cachedRect = undefined;
-        }
+        // When locate is false, use the actual adjusted boxSize that matches the scanning area
+        if (!this.context.boxSize) return;
 
-        const areaChanged = !this._cachedAreaValues
-            || this._cachedAreaValues.top !== area.top
-            || this._cachedAreaValues.right !== area.right
-            || this._cachedAreaValues.bottom !== area.bottom
-            || this._cachedAreaValues.left !== area.left;
-        if (areaChanged) {
-            this._cachedAreaValues = { top: area.top, right: area.right, bottom: area.bottom, left: area.left };
-            this._cachedRect = undefined;
-        }
+        // Get the offset for the constrained area
+        const topRightOffset = this.context.inputStream.getTopRight();
+        const offsetX = topRightOffset.x;
+        const offsetY = topRightOffset.y;
 
-        const styleChanged = !this._cachedStyleValues
+        const box = this.context.boxSize;
+        const topLeft = box[0];
+        const bottomLeft = box[1];
+        const topRight = box[3];
+
+        // Add the offset to position correctly on canvas
+        const x = topLeft[0] + offsetX;
+        const y = topLeft[1] + offsetY;
+        const width = topRight[0] - topLeft[0];
+        const height = bottomLeft[1] - topLeft[1];        const styleChanged = !this._cachedStyleValues
             || this._cachedStyleValues.borderColor !== area.borderColor
             || this._cachedStyleValues.borderWidth !== area.borderWidth
             || this._cachedStyleValues.backgroundColor !== area.backgroundColor;
@@ -380,39 +368,20 @@ export default class Quagga {
             };
             const shouldDrawBorder = area.borderColor !== undefined || area.borderWidth !== undefined;
             const color = area.borderColor ?? 'rgba(0, 255, 0, 0.5)';
-            const width = shouldDrawBorder ? (area.borderWidth ?? 2) : 0;
+            const borderWidth = shouldDrawBorder ? (area.borderWidth ?? 2) : 0;
             const bg = area.backgroundColor;
-            this._resolvedStyle = { color, width, bg };
+            this._resolvedStyle = { color, width: borderWidth, bg };
         }
 
-        if (!this._cachedRect) {
-            const w = this._cachedCanvasSize!.x;
-            const h = this._cachedCanvasSize!.y;
-            // Use the same converter logic as barcode detection to ensure consistency
-            const computed = computeImageArea(w, h, {
-                top: area.top || '0%',
-                right: area.right || '0%',
-                bottom: area.bottom || '0%',
-                left: area.left || '0%',
-            });
-            this._cachedRect = {
-                x: computed.sx,
-                y: computed.sy,
-                width: computed.sw,
-                height: computed.sh,
-            };
-        }
-
-        const rect = this._cachedRect!;
         const style = this._resolvedStyle!;
         if (style.bg) {
             overlayCtx.fillStyle = style.bg;
-            overlayCtx.fillRect(rect.x, rect.y, rect.width, rect.height);
+            overlayCtx.fillRect(x, y, width, height);
         }
         if (style.width > 0) {
             overlayCtx.strokeStyle = style.color;
             overlayCtx.lineWidth = style.width;
-            overlayCtx.strokeRect(rect.x, rect.y, rect.width, rect.height);
+            overlayCtx.strokeRect(x, y, width, height);
         }
     }
 }
