@@ -335,7 +335,7 @@ export default class Quagga {
 
         // Quick checks for visualization presence
         const hasAnyStyle = (area.borderColor !== undefined && area.borderColor !== '')
-            || (area.borderWidth !== undefined && area.borderWidth! > 0)
+            || (area.borderWidth !== undefined && area.borderWidth > 0)
             || (area.backgroundColor !== undefined && area.backgroundColor !== '');
         if (!hasAnyStyle) return;
 
