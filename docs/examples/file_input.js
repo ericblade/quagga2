@@ -77,9 +77,6 @@ $(function() {
                     return parseInt(value);
                 }
             },
-            numOfWorkers: function(value) {
-                return parseInt(value);
-            },
             decoder: {
                 readers: function(value) {
                     if (value === 'ean_extended') {

@@ -205,9 +205,6 @@ $(function() {
                     };
                 }
             },
-            numOfWorkers: function(value) {
-                return parseInt(value);
-            },
             decoder: {
                 readers: function(value) {
                     if (value === 'ean_extended') {
@@ -241,7 +238,6 @@ $(function() {
                 patchSize: "medium",
                 halfSample: true
             },
-            numOfWorkers: 2,
             frequency: 10,
             decoder: {
                 readers : [{
