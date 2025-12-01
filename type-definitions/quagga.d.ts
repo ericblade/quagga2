@@ -593,14 +593,12 @@ export interface QuaggaJSStatic {
     CameraAccess: QuaggaJSCameraAccess;
 
     /**
-     * Draws a scanner guidance area onto the overlay canvas using the current instance's overlay context.
+     * Draws a scanner area overlay onto the overlay canvas using the current instance's configured area.
+     * Uses the actual adjusted scanning area (after patch alignment) to accurately show where barcodes will be detected.
      * Useful when user code clears the overlay each frame and wants to re-render the area.
-     * Only draws when the provided area passes visualization checks (non-empty styling & non-default geometry).
+     * Only draws when locate is false and inputStream.area is configured with styling.
      */
-    drawScannerArea(area: {
-        top?: string; right?: string; bottom?: string; left?: string;
-        borderColor?: string; borderWidth?: number; backgroundColor?: string;
-    }): void;
+    drawScannerArea(): void;
 }
 
 /**
