@@ -356,7 +356,8 @@ export default class Quagga {
         const x = topLeft[0] + offsetX;
         const y = topLeft[1] + offsetY;
         const width = topRight[0] - topLeft[0];
-        const height = bottomLeft[1] - topLeft[1];        const styleChanged = !this._cachedStyleValues
+        const height = bottomLeft[1] - topLeft[1];
+        const styleChanged = !this._cachedStyleValues
             || this._cachedStyleValues.borderColor !== area.borderColor
             || this._cachedStyleValues.borderWidth !== area.borderWidth
             || this._cachedStyleValues.backgroundColor !== area.backgroundColor;
