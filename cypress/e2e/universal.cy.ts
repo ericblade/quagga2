@@ -9,6 +9,8 @@ import '../../src/locator/test/skeletonizer.spec.ts';
 import '../../src/quagga/test/transform.spec.ts';
 // Tests for Quagga class (transformResult method)
 import '../../src/quagga/test/quagga.spec.ts';
+// Tests for drawScannerArea method
+import '../../src/quagga/test/drawScannerArea.spec.ts';
 import '../../src/common/test/image_wrapper.spec.ts';
 // Tests for QuaggaJSStaticInterface (init method)
 import '../../src/test/quagga.spec.ts';
