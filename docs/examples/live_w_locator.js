@@ -84,6 +84,12 @@ $(function() {
         },
         initCameraSelection: function(){
             var streamLabel = Quagga.CameraAccess.getActiveStreamLabel();
+            var selectedDeviceId = null;
+            try {
+                // Prefer explicit deviceId from current state if present
+                var constraints = (this.state && this.state.inputStream && this.state.inputStream.constraints) || {};
+                selectedDeviceId = constraints.deviceId || null;
+            } catch(e) {}
 
             return Quagga.CameraAccess.enumerateVideoDevices()
             .then(function(devices) {
@@ -98,7 +104,12 @@ $(function() {
                     var $option = document.createElement("option");
                     $option.value = device.deviceId || device.id;
                     $option.appendChild(document.createTextNode(pruneText(device.label || device.deviceId || device.id)));
-                    $option.selected = streamLabel === device.label;
+                    // Preserve explicit selection by deviceId when available; fallback to stream label
+                    if (selectedDeviceId) {
+                        $option.selected = ($option.value === selectedDeviceId);
+                    } else {
+                        $option.selected = (streamLabel === device.label);
+                    }
                     $deviceSelection.appendChild($option);
                 });
             });
@@ -195,14 +206,20 @@ $(function() {
                 constraints: function(value){
                     if (/^(\d+)x(\d+)$/.test(value)) {
                         var values = value.split('x');
-                        return {
+                        // Update resolution while preserving any existing deviceId selection
+                        var current = App.state && App.state.inputStream && App.state.inputStream.constraints || {};
+                        var next = {
                             width: {min: parseInt(values[0])},
                             height: {min: parseInt(values[1])}
                         };
+                        if (current.deviceId) {
+                            next.deviceId = current.deviceId;
+                        }
+                        return next;
                     }
-                    return {
-                        deviceId: value
-                    };
+                    // Switching camera: set deviceId and drop facingMode to avoid conflicts
+                    var next = { deviceId: value };
+                    return next;
                 }
             },
             decoder: {
