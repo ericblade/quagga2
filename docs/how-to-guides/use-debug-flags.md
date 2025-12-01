@@ -149,6 +149,8 @@ Quagga.init({
 
 These flags draw debugging information directly on the canvas, allowing you to visualize the barcode detection algorithm's internal state.
 
+Note: The scan area overlay (defined via `inputStream.area`) is not a debug flag. When `locate: false`, Quagga draws the scan area on the overlay canvas each processed frame. You can also draw it manually using `Quagga.drawScannerArea()`. See the [Configuration Reference](../reference/configuration.md#inputstream-area-drawing) and [API](../reference/api.md#quagga-drawscannerarea).
+
 #### `decoder.debug.drawBoundingBox` {#decoder-debug-drawboundingbox}
 
 **What it shows**: Draws a box around the detected barcode location
