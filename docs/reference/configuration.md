@@ -377,6 +377,15 @@ area: {
 }
 ```
 
+#### Drawing Behavior {#inputstream-area-drawing}
+
+- When `locate: false`: the scanner area is drawn on the overlay canvas every processed frame (if `canvas.createOverlay: true`). Use `borderColor`/`borderWidth` for the outline and `backgroundColor` for a translucent fill.
+- When `locate: true`: the area values can constrain processing internally, but the area overlay is not drawn by default.
+- Public API: you can trigger drawing yourself at any time via `Quagga.drawScannerArea()`, which uses the configured `inputStream.area` and draws the actual adjusted scanning area.
+- Requirement: the overlay canvas must exist (`canvas.createOverlay: true`).
+
+> **Note**: When `locate: false`, the actual adjusted scanning area dimensions (after patch alignment) are available in `result.boxes[0]` within callbacks like `onProcessed`. These dimensions may differ slightly from percentage-based calculations due to rounding to patch size multiples. See [Result Properties](#result-properties) in the API reference for details.
+
 ### `inputStream.singleChannel` {#inputstream-singlechannel}
 
 **Type**: `boolean`
@@ -831,11 +840,11 @@ Quagga.init({
 Quagga.onProcessed(function(result) {
   const ctx = Quagga.canvas.ctx.overlay;
   const canvas = Quagga.canvas.dom.overlay;
-  
+
   // Check if overlay exists before using
   if (ctx && canvas) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     if (result && result.box) {
       Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, ctx, {
         color: "green",

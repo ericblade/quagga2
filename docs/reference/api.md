@@ -210,6 +210,46 @@ Quagga.onProcessed(function(result) {
 - Performance monitoring
 - Drawing custom overlays
 
+### `Quagga.drawScannerArea()` {#quagga-drawscannerarea}
+
+Manually draws the scanner area overlay on the overlay canvas using the configured `inputStream.area`.
+
+**Parameters**: None (uses the area configuration from `Quagga.init()`)
+
+**Returns**: `void`
+
+**Behavior**:
+
+- Only draws when `locate` is `false` and `inputStream.area` is configured with styling
+- Uses the actual adjusted scanning area (after patch alignment) to accurately match where barcodes will be detected
+- Automatically accounts for the area offset and dimensions
+- Skips drawing if no styling is provided (no `borderColor`, `borderWidth`, or `backgroundColor`)
+- Requires `canvas.createOverlay: true` so the overlay canvas exists
+- Drawing occurs automatically every processed frame when conditions are met
+
+**Example**:
+
+```javascript
+// Configure area during init
+Quagga.init({
+  inputStream: {
+    area: {
+      top: "30%",
+      right: "10%",
+      bottom: "30%",
+      left: "10%",
+      borderColor: "#0F0",
+      borderWidth: 2,
+      backgroundColor: "rgba(255,0,0,0.15)"
+    }
+  },
+  locate: false
+});
+
+// Later, manually redraw if you've cleared the overlay
+Quagga.drawScannerArea();
+```
+
 ### `Quagga.offDetected(handler)` {#quagga-offdetected}
 
 Removes a previously registered `onDetected` handler.
@@ -412,7 +452,21 @@ The result object passed to `onDetected`, `onProcessed`, and `decodeSingle` call
 | `angle` | Number | Barcode rotation angle (radians) |
 | `pattern` | Array | Binary pattern (0=space, 1=bar) |
 | `box` | Array | Bounding box coordinates (4 corner points) |
-| `boxes` | Array | All candidate boxes found during localization |
+| `boxes` | Array | All candidate boxes found during localization. When `locate` is `false`, this contains a single box representing the actual adjusted scanning area (after patch alignment) |
+
+> **Note: `boxes` with `locate: false`**
+>
+> When `locate` is `false` and an `inputStream.area` is configured, `result.boxes` contains a single box representing the actual scanning area dimensions. This box reflects the adjusted dimensions after patch alignment (which can differ slightly from the percentage-based area due to rounding to patch size multiples). Use these coordinates if you need to know the exact scanning rectangle:
+>
+> ```javascript
+> Quagga.onProcessed(function(result) {
+>   if (result.boxes && result.boxes.length > 0) {
+>     // When locate=false, boxes[0] is the actual scanning area
+>     const scanArea = result.boxes[0];
+>     console.log("Scanning area corners:", scanArea);
+>   }
+> });
+> ```
 
 > **Important: Coordinate System**
 >
@@ -538,10 +592,10 @@ When drawing on the overlay canvas, use `result.box` and `result.boxes` coordina
 Quagga.onProcessed(function(result) {
   const ctx = Quagga.canvas.ctx.overlay;
   const canvas = Quagga.canvas.dom.overlay;
-  
+
   // Clear previous drawings
   ctx.clearRect(0, 0, canvas.width, canvas.height);
-  
+
   // Draw box directly - coordinates already match the overlay canvas
   if (result && result.box) {
     Quagga.ImageDebug.drawPath(result.box, {x: 0, y: 1}, ctx, {
