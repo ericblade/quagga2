@@ -24,19 +24,15 @@ $(function() {
     var App = {
         init: function() {
             var self = this;
-
             Quagga.init(this.state, function(err) {
                 if (err) {
                     return self.handleError(err);
                 }
                 //Quagga.registerResultCollector(resultCollector);
                 App.attachListeners();
-                App.checkCapabilities();
                 Quagga.start();
-                // Remember last successful constraints so we can recover from bad device selections
-                try {
-                    App.lastGoodConstraints = JSON.parse(JSON.stringify(App.state.inputStream.constraints || {}));
-                } catch(e) {}
+                App.initCameraSelection();
+                App.checkCapabilities();
             });
         },
         handleError: function(err) {
@@ -47,10 +43,6 @@ $(function() {
                 var hadSpecificDevice = attempted && attempted.deviceId;
                 if (hadSpecificDevice) {
                     // Detach to avoid stacked handlers
-                    App.detachListeners();
-                    // Clear bad device selection; fall back to previous working constraints if available
-                    var fallback = App.lastGoodConstraints || {};
-                    App.state.inputStream.constraints = fallback;
                     // Try reinitializing to restore a working stream
                     Quagga.stop();
                     App.init();
@@ -303,6 +295,15 @@ $(function() {
                     height: {min: 480},
                     facingMode: "environment",
                     aspectRatio: {min: 1, max: 2}
+                },
+                area: {
+                    top: "30%",
+                    right: "10%",
+                    left: "10%",
+                    bottom: "30%",
+                    // borderColor: "#0F0",
+                    // borderWidth: 2,
+                    backgroundColor: "rgba(255,0,0,0.15)"
                 }
             },
             locator: {
@@ -333,7 +334,7 @@ $(function() {
                 result.boxes.filter(function (box) {
                     return box !== result.box;
                 }).forEach(function (box) {
-                    Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "green", lineWidth: 2});
+                    Quagga.ImageDebug.drawPath(box, {x: 0, y: 1}, drawingCtx, {color: "orange", lineWidth: 2});
                 });
             }
 
