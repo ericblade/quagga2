@@ -2,7 +2,7 @@
 
 ### Questions, Bugs, Enhancements / Suggestions {#questions-bugs-enhancements}
 
-For questions, bug reports, and enhancement requests / suggestions, please use the GitHub issue 
+For questions, bug reports, and enhancement requests / suggestions, please use the GitHub issue
 tracker at https://github.com/ericblade/quagga2/issues
 
 ### Chat / Real Time Communication? {#chat}
@@ -26,7 +26,7 @@ npm run build
 
 There are several tests included in Quagga2, in the test/ folder.  Please make sure before you
 send in any pull requests, that you have run ```npm test``` against the existing tests, as well as
-implemented any tests that may be needed to test your new code.  If you're not sure how to properly 
+implemented any tests that may be needed to test your new code.  If you're not sure how to properly
 unit test your new code, then go ahead and make that pull request, and we'll try to help you before
 merging.
 
@@ -47,6 +47,22 @@ npm run test:node
 
 # Browser tests only (requires Cypress)
 npm run test:browser-all
+
+# Cypress: run only specific spec(s)
+# Pass --spec through npm using --
+npm run cypress:run -- --spec cypress/e2e/browser.cy.ts
+
+# Multiple specs (comma-separated)
+npm run cypress:run -- --spec cypress/e2e/browser.cy.ts,cypress/e2e/integration.cy.ts
+
+# Glob pattern
+npm run cypress:run -- --spec "cypress/e2e/**/browser*.cy.ts"
+
+# Open interactive runner
+npm run cypress:open
+
+# Choose a browser (if installed)
+npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --browser chrome --env BUILD_ENV=development --spec cypress/e2e/browser.cy.ts
 
 # Integration tests only (Node)
 npx ts-mocha -p test/tsconfig.json test/integration/**/*.spec.ts
@@ -72,7 +88,7 @@ If you need to make changes to Quagga2 to support some external code (such as an
 you will probably need to be able to test the code in your other repo.  One such way to do that is
 to ```npm install @ericblade/quagga2``` inside the external repo, which will initialize the module
 structure, and fill it with the current release of quagga2.  Once that is completed, then copy the
-lib/quagga.js (node) and/or dist/quagga.js and/or dist/quagga.min.js files into 
+lib/quagga.js (node) and/or dist/quagga.js and/or dist/quagga.min.js files into
 ExternalRepo/node_modules/@ericblade/quagga2, preserving the "lib" or "dist" folder. Then your code
 will have the new changes that you have implemented in your copy of the quagga2 repo.
 
@@ -84,4 +100,3 @@ to be useful, the odds are that other users will, as well!
 ## BE AWESOME {#be-awesome}
 
 Don't forget to BE AWESOME.
-
