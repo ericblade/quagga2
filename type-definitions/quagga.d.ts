@@ -591,6 +591,16 @@ export interface QuaggaJSStatic {
     };
 
     CameraAccess: QuaggaJSCameraAccess;
+
+    /**
+     * Draws a scanner guidance area onto the overlay canvas using the current instance's overlay context.
+     * Useful when user code clears the overlay each frame and wants to re-render the area.
+     * Only draws when the provided area passes visualization checks (non-empty styling & non-default geometry).
+     */
+    drawScannerArea(area: {
+        top?: string; right?: string; bottom?: string; left?: string;
+        borderColor?: string; borderWidth?: number; backgroundColor?: string;
+    }): void;
 }
 
 /**
