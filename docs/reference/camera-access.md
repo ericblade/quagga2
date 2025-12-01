@@ -11,7 +11,7 @@ The CameraAccess API allows you to:
 - Request and release camera access
 - Enumerate available video devices
 - Control camera torch (flash)
-- Get information about active video tracks
+- Get information about active video streams and tracks
 
 All methods return Promises for async operation handling.
 
@@ -158,11 +158,48 @@ console.log('Using camera:', label);
 - Verify correct camera is being used
 - Logging and debugging
 
+### `CameraAccess.getActiveStream()` {#cameraaccess-getactivestream}
+
+Gets the complete MediaStream object for the currently active video.
+
+**Returns**: `MediaStream | null` - The active MediaStream object, or `null` if no camera is active.
+
+**Example**:
+
+```javascript
+const stream = Quagga.CameraAccess.getActiveStream();
+
+if (stream) {
+  console.log('Stream ID:', stream.id);
+  console.log('Stream active:', stream.active);
+  console.log('Video tracks:', stream.getVideoTracks().length);
+  console.log('Audio tracks:', stream.getAudioTracks().length);
+
+  // Clone the stream
+  const clonedStream = stream.clone();
+}
+
+// Pass stream to WebRTC peer connection
+if (stream?.active) {
+  peerConnection.addStream(stream);
+}
+```
+
+**Use cases**:
+
+- Pass the stream to WebRTC peer connections
+- Clone the stream for multiple consumers
+- Check if the stream is still active via `stream.active`
+- Access the stream ID
+- Work with all tracks (video and audio) in the stream
+
+**Note**: For accessing just the video track, use `getActiveTrack()` instead.
+
 ### `CameraAccess.getActiveTrack()` {#cameraaccess-getactivetrack}
 
 Gets the MediaStreamTrack for the currently active video.
 
-**Returns**: `MediaStreamTrack` - Active video track object.
+**Returns**: `MediaStreamTrack | null` - Active video track object, or `null` if no camera is active.
 
 **Example**:
 

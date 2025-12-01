@@ -159,6 +159,23 @@ describe('CameraAccess (browser)', () => {
         });
     });
 
+    describe('getActiveStream', () => {
+        after(() => Quagga.CameraAccess.release());
+        it('no active stream', () => {
+            const x = Quagga.CameraAccess.getActiveStream();
+            expect(x).to.equal(null);
+        });
+
+        it('with active stream', async () => {
+            const video = document.createElement('video');
+            await Quagga.CameraAccess.request(video, {});
+            const stream = Quagga.CameraAccess.getActiveStream();
+            expect(stream).to.be.an.instanceof(MediaStream);
+            expect(stream?.active).to.equal(true);
+            expect(stream?.getVideoTracks()).to.have.length(1);
+        });
+    });
+
     describe('getActiveStreamLabel', () => {
         after(() => Quagga.CameraAccess.release());
         it('no active stream', () => {

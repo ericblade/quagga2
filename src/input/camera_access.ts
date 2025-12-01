@@ -148,6 +148,16 @@ function getActiveTrack(): MediaStreamTrack | null {
 }
 
 /**
+ * Returns the active MediaStream, or null if no stream is active.
+ * Use this when you need access to the full stream, for example to pass to WebRTC
+ * or to clone the stream. For just the video track, use getActiveTrack() instead.
+ * @returns The active MediaStream, or null if no camera is currently active.
+ */
+function getActiveStream(): MediaStream | null {
+    return streamRef ?? null;
+}
+
+/**
  * Used for accessing information about the active stream track and available video devices.
  */
 const QuaggaJSCameraAccess: CameraAccessType = {
@@ -174,6 +184,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         });
     },
     enumerateVideoDevices,
+    getActiveStream,
     getActiveStreamLabel(): string {
         const track = getActiveTrack();
         return track ? track.label : '';
