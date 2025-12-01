@@ -33,10 +33,31 @@ $(function() {
                 App.attachListeners();
                 App.checkCapabilities();
                 Quagga.start();
+                // Remember last successful constraints so we can recover from bad device selections
+                try {
+                    App.lastGoodConstraints = JSON.parse(JSON.stringify(App.state.inputStream.constraints || {}));
+                } catch(e) {}
             });
         },
         handleError: function(err) {
             console.log(err);
+            // If we attempted to open a specific device and failed, revert to last known-good constraints
+            try {
+                var attempted = (App.state && App.state.inputStream && App.state.inputStream.constraints) || {};
+                var hadSpecificDevice = attempted && attempted.deviceId;
+                if (hadSpecificDevice) {
+                    // Detach to avoid stacked handlers
+                    App.detachListeners();
+                    // Clear bad device selection; fall back to previous working constraints if available
+                    var fallback = App.lastGoodConstraints || {};
+                    App.state.inputStream.constraints = fallback;
+                    // Try reinitializing to restore a working stream
+                    Quagga.stop();
+                    App.init();
+                }
+            } catch(e2) {
+                // Ignore and leave UI available for user to pick another device
+            }
         },
         checkCapabilities: function() {
             var track = Quagga.CameraAccess.getActiveTrack();
