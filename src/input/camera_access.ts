@@ -147,6 +147,10 @@ function getActiveTrack(): MediaStreamTrack | null {
     return tracks && tracks?.length ? tracks[0] : null;
 }
 
+function getActiveStream(): MediaStream | null {
+    return streamRef ?? null;
+}
+
 /**
  * Used for accessing information about the active stream track and available video devices.
  */
@@ -174,6 +178,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         });
     },
     enumerateVideoDevices,
+    getActiveStream,
     getActiveStreamLabel(): string {
         const track = getActiveTrack();
         return track ? track.label : '';
