@@ -33,10 +33,31 @@ $(function() {
                 App.attachListeners();
                 App.checkCapabilities();
                 Quagga.start();
+                // Remember last successful constraints so we can recover from bad device selections
+                try {
+                    App.lastGoodConstraints = JSON.parse(JSON.stringify(App.state.inputStream.constraints || {}));
+                } catch(e) {}
             });
         },
         handleError: function(err) {
             console.log(err);
+            // If we attempted to open a specific device and failed, revert to last known-good constraints
+            try {
+                var attempted = (App.state && App.state.inputStream && App.state.inputStream.constraints) || {};
+                var hadSpecificDevice = attempted && attempted.deviceId;
+                if (hadSpecificDevice) {
+                    // Detach to avoid stacked handlers
+                    App.detachListeners();
+                    // Clear bad device selection; fall back to previous working constraints if available
+                    var fallback = App.lastGoodConstraints || {};
+                    App.state.inputStream.constraints = fallback;
+                    // Try reinitializing to restore a working stream
+                    Quagga.stop();
+                    App.init();
+                }
+            } catch(e2) {
+                // Ignore and leave UI available for user to pick another device
+            }
         },
         checkCapabilities: function() {
             var track = Quagga.CameraAccess.getActiveTrack();
@@ -84,6 +105,16 @@ $(function() {
         },
         initCameraSelection: function(){
             var streamLabel = Quagga.CameraAccess.getActiveStreamLabel();
+            var selectedDeviceId = null;
+            try {
+                // Prefer explicit deviceId from current state if present
+                var constraints = (this.state && this.state.inputStream && this.state.inputStream.constraints) || {};
+                if (constraints.deviceId) {
+                    selectedDeviceId = (typeof constraints.deviceId === 'object' && constraints.deviceId.exact) ? constraints.deviceId.exact : constraints.deviceId;
+                } else {
+                    selectedDeviceId = null;
+                }
+            } catch(e) {}
 
             return Quagga.CameraAccess.enumerateVideoDevices()
             .then(function(devices) {
@@ -98,7 +129,12 @@ $(function() {
                     var $option = document.createElement("option");
                     $option.value = device.deviceId || device.id;
                     $option.appendChild(document.createTextNode(pruneText(device.label || device.deviceId || device.id)));
-                    $option.selected = streamLabel === device.label;
+                    // Preserve explicit selection by deviceId when available; fallback to stream label
+                    if (selectedDeviceId) {
+                        $option.selected = ($option.value === selectedDeviceId);
+                    } else {
+                        $option.selected = (streamLabel === device.label);
+                    }
                     $deviceSelection.appendChild($option);
                 });
             });
@@ -183,30 +219,62 @@ $(function() {
                 var setting = path.substring(9);
                 return self.applySetting(setting, value);
             }
-            self._accessByPath(self.state, path, value);
+            // If switching cameras, replace constraints entirely with { deviceId: { exact } }
+            if (path === 'inputStream.constraints' && value && typeof value === 'object' && 'deviceId' in value && Object.keys(value).length === 1) {
+                if (!self.state.inputStream) self.state.inputStream = {};
+                var dev = value.deviceId;
+                self.state.inputStream.constraints = { deviceId: (typeof dev === 'object' ? dev : { exact: dev }) };
+            } else {
+                self._accessByPath(self.state, path, value);
+            }
 
             console.log(JSON.stringify(self.state));
-            App.detachListeners();
-            Quagga.stop();
-            App.init();
+
+            // For camera/device changes, perform a clean stop → init → start sequence
+            var isDeviceSwitch = (path === 'inputStream.constraints' && value && typeof value === 'object' && 'deviceId' in value);
+            if (isDeviceSwitch) {
+                try {
+                    // Ensure we don't stack DOM/event listeners across re-inits
+                    App.detachListeners();
+                    var stopResult = Quagga.stop();
+                    // If stop returns a promise (newer builds), wait before re-init
+                    if (stopResult && typeof stopResult.then === 'function') {
+                        stopResult.then(function(){
+                            // Reattach fresh listeners via init
+                            App.init();
+                        });
+                    } else {
+                        App.init();
+                    }
+                } catch(e) {
+                    // Fallback: attempt reinit anyway
+                    App.init();
+                }
+            } else {
+                App.detachListeners();
+                Quagga.stop();
+                App.init();
+            }
         },
         inputMapper: {
             inputStream: {
                 constraints: function(value){
                     if (/^(\d+)x(\d+)$/.test(value)) {
                         var values = value.split('x');
-                        return {
+                        // Update resolution while preserving any existing deviceId selection
+                        var current = App.state && App.state.inputStream && App.state.inputStream.constraints || {};
+                        var next = {
                             width: {min: parseInt(values[0])},
                             height: {min: parseInt(values[1])}
                         };
+                        if (current.deviceId) {
+                            next.deviceId = current.deviceId;
+                        }
+                        return next;
                     }
-                    return {
-                        deviceId: value
-                    };
+                    // Switching camera: use ONLY deviceId with exact match to avoid conflicting constraints
+                    return { deviceId: { exact: value } };
                 }
-            },
-            numOfWorkers: function(value) {
-                return parseInt(value);
             },
             decoder: {
                 readers: function(value) {
@@ -241,7 +309,6 @@ $(function() {
                 patchSize: "medium",
                 halfSample: true
             },
-            numOfWorkers: 2,
             frequency: 10,
             decoder: {
                 readers : [{

@@ -1,6 +1,5 @@
 import { vec2 } from 'gl-matrix';
 import { QuaggaJSResultObject, QuaggaJSReaderConfig, BarcodeReaderConstructor } from '../../type-definitions/quagga.d';
-import { drawAreaIfConfigured } from '../common/area_overlay';
 import Events from '../common/events';
 import ImageWrapper from '../common/image_wrapper';
 import BarcodeDecoder from '../decoder/barcode_decoder';
@@ -64,13 +63,6 @@ export default class Quagga {
         this.context.canvasContainer.dom.overlay = dom.overlay;
         this.context.canvasContainer.ctx.image = ctx.image;
         this.context.canvasContainer.ctx.overlay = ctx.overlay;
-
-        // Draw area overlay if configured
-        drawAreaIfConfigured(
-            this.context.config,
-            this.context.canvasContainer.ctx.overlay,
-            this.context.inputStream.getCanvasSize(),
-        );
     }
 
     canRecord = (callback: (err?: Error) => void): void => {
@@ -221,6 +213,12 @@ export default class Quagga {
         if (this.hasCodeResult(result as QuaggaJSResultObject)) {
             Events.publish('detected', resultToPublish as never);
         }
+
+        // Redraw scanner area each frame when locate is false via public API.
+        const cfg = this.context.config;
+        if (cfg && cfg.locate === false && cfg.inputStream?.area) {
+            this.drawScannerArea();
+        }
     }
 
     async locateAndDecode(): Promise<void> {
@@ -316,5 +314,75 @@ export default class Quagga {
             this.context.decoder.registerReader(name, reader);
         }
         QWorkers.registerReader(name, reader);
+    }
+
+    /**
+     * Public method to draw a scanner area overlay using the current Quagga instance's overlay canvas.
+     * Draws based on the instance's configured inputStream.area, using the actual adjusted boxSize
+     * to match the real scanning area after patch alignment.
+     * Only draws when locate is false and an area is configured with styling.
+     */
+    private _cachedStyleValues?: { borderColor?: string; borderWidth?: number; backgroundColor?: string };
+    private _resolvedStyle?: { color: string; width: number; bg?: string };
+    drawScannerArea(): void {
+        const area = this.context.config?.inputStream?.area;
+        if (!area) return;
+        const overlayCtx = this.context.canvasContainer.ctx.overlay;
+        if (!overlayCtx) return;
+
+        // Only draw when locate is false
+        if (this.context.config?.locate !== false) return;
+
+        // Quick checks for visualization presence
+        const hasAnyStyle = (area.borderColor !== undefined && area.borderColor !== '')
+            || (area.borderWidth !== undefined && area.borderWidth > 0)
+            || (area.backgroundColor !== undefined && area.backgroundColor !== '');
+        if (!hasAnyStyle) return;
+
+        // When locate is false, use the actual adjusted boxSize that matches the scanning area
+        if (!this.context.boxSize) return;
+
+        // Get the offset for the constrained area
+        const topRightOffset = this.context.inputStream.getTopRight();
+        const offsetX = topRightOffset.x;
+        const offsetY = topRightOffset.y;
+
+        const box = this.context.boxSize;
+        const topLeft = box[0];
+        const bottomLeft = box[1];
+        const topRight = box[3];
+
+        // Add the offset to position correctly on canvas
+        const x = topLeft[0] + offsetX;
+        const y = topLeft[1] + offsetY;
+        const width = topRight[0] - topLeft[0];
+        const height = bottomLeft[1] - topLeft[1];
+        const styleChanged = !this._cachedStyleValues
+            || this._cachedStyleValues.borderColor !== area.borderColor
+            || this._cachedStyleValues.borderWidth !== area.borderWidth
+            || this._cachedStyleValues.backgroundColor !== area.backgroundColor;
+        if (styleChanged) {
+            this._cachedStyleValues = {
+                borderColor: area.borderColor,
+                borderWidth: area.borderWidth,
+                backgroundColor: area.backgroundColor,
+            };
+            const shouldDrawBorder = area.borderColor !== undefined || area.borderWidth !== undefined;
+            const color = area.borderColor ?? 'rgba(0, 255, 0, 0.5)';
+            const borderWidth = shouldDrawBorder ? (area.borderWidth ?? 2) : 0;
+            const bg = area.backgroundColor;
+            this._resolvedStyle = { color, width: borderWidth, bg };
+        }
+
+        const style = this._resolvedStyle!;
+        if (style.bg) {
+            overlayCtx.fillStyle = style.bg;
+            overlayCtx.fillRect(x, y, width, height);
+        }
+        if (style.width > 0) {
+            overlayCtx.strokeStyle = style.color;
+            overlayCtx.lineWidth = style.width;
+            overlayCtx.strokeRect(x, y, width, height);
+        }
     }
 }
