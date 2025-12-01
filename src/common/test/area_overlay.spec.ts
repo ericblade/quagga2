@@ -6,9 +6,8 @@ import {
     isAreaDefined,
     shouldDrawAreaOverlay,
     drawAreaOverlay,
-    drawAreaIfConfigured,
 } from '../area_overlay';
-import { QuaggaJSConfigObject, XYSize } from '../../../type-definitions/quagga.d';
+import { type XYSize } from '../../../type-definitions/quagga.d';
 
 describe('Area Overlay', () => {
     describe('calculateAreaRect', () => {
@@ -203,128 +202,4 @@ describe('Area Overlay', () => {
         });
     });
 
-    describe('drawAreaIfConfigured', () => {
-        let mockCtx: sinon.SinonStubbedInstance<CanvasRenderingContext2D>;
-
-        beforeEach(() => {
-            mockCtx = {
-                strokeStyle: '',
-                lineWidth: 0,
-                fillStyle: '',
-                strokeRect: sinon.stub(),
-                fillRect: sinon.stub(),
-            } as unknown as sinon.SinonStubbedInstance<CanvasRenderingContext2D>;
-        });
-
-        it('should not draw if config is undefined', () => {
-            const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
-
-            drawAreaIfConfigured(undefined, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
-        });
-
-        it('should not draw if ctx is null', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '10%', borderColor: 'red' },
-                },
-            };
-            const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, null, canvasSize);
-
-            // No assertion needed - just verify it doesn't throw
-        });
-
-        it('should not draw if borderColor and borderWidth are not defined', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '10%' },
-                },
-            };
-            const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
-        });
-
-        it('should not draw if borderColor is defined but area is not defined', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '0%', right: '0%', bottom: '0%', left: '0%', borderColor: 'red' },
-                },
-            };
-            const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
-        });
-
-        it('should draw if borderColor is defined and area is defined', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '10%', right: '10%', bottom: '10%', left: '10%', borderColor: 'red' },
-                },
-            };
-            const canvasSize: XYSize = { x: 800, y: 600, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.true;
-            expect(mockCtx.strokeStyle).to.equal('red');
-        });
-
-        it('should draw if borderWidth is defined and area is defined', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '10%', borderWidth: 5 },
-                },
-            };
-            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.true;
-            expect(mockCtx.lineWidth).to.equal(5);
-        });
-
-        it('should use custom borderColor and borderWidth from config', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: { top: '10%', borderColor: 'blue', borderWidth: 5 },
-                },
-            };
-            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect(mockCtx.strokeStyle).to.equal('blue');
-            expect(mockCtx.lineWidth).to.equal(5);
-        });
-
-        it('should draw backgroundColor when specified', () => {
-            const config: QuaggaJSConfigObject = {
-                inputStream: {
-                    area: {
-                        top: '10%',
-                        right: '10%',
-                        bottom: '10%',
-                        left: '10%',
-                        backgroundColor: 'rgba(0, 255, 0, 0.1)',
-                    },
-                },
-            };
-            const canvasSize: XYSize = { x: 100, y: 100, type: 'XYSize' };
-
-            drawAreaIfConfigured(config, mockCtx as unknown as CanvasRenderingContext2D, canvasSize);
-
-            expect((mockCtx.fillRect as sinon.SinonStub).called).to.be.true;
-            expect(mockCtx.fillStyle).to.equal('rgba(0, 255, 0, 0.1)');
-            // Should NOT draw border when only backgroundColor is specified
-            expect((mockCtx.strokeRect as sinon.SinonStub).called).to.be.false;
-        });
-    });
 });

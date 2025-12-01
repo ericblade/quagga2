@@ -1,4 +1,4 @@
-import { QuaggaJSConfigObject, XYSize } from '../../type-definitions/quagga.d';
+import { type XYSize } from '../../type-definitions/quagga.d';
 
 interface AreaRect {
     x: number;
@@ -10,7 +10,7 @@ interface AreaRect {
 /**
  * Calculates the area rectangle from the area configuration percentages.
  * This converts percentage-based area boundaries to pixel coordinates.
- * 
+ *
  * @param canvasSize - The size of the canvas
  * @param area - The area configuration with top, right, bottom, left as percentage strings
  * @returns The calculated rectangle with x, y, width, height
@@ -37,7 +37,7 @@ export function calculateAreaRect(
 
 /**
  * Checks if the area is defined and different from the default (full canvas).
- * 
+ *
  * @param area - The area configuration
  * @returns true if area is defined and not the default full canvas
  */
@@ -58,7 +58,7 @@ export function isAreaDefined(
 
 /**
  * Checks if area visualization should be drawn based on borderColor or borderWidth being defined.
- * 
+ *
  * @param area - The area configuration
  * @returns true if visualization should be drawn (borderColor is defined or borderWidth > 0)
  */
@@ -78,7 +78,7 @@ export function shouldDrawAreaOverlay(
 /**
  * Draws the scan area boundary on the overlay canvas.
  * This visually highlights the region where Quagga is looking for barcodes.
- * 
+ *
  * @param ctx - The canvas 2D rendering context (overlay canvas)
  * @param canvasSize - The size of the canvas
  * @param area - The area configuration with top, right, bottom, left as percentage strings
@@ -108,42 +108,4 @@ export function drawAreaOverlay(
         ctx.lineWidth = borderWidth;
         ctx.strokeRect(rect.x, rect.y, rect.width, rect.height);
     }
-}
-
-/**
- * Draws the area overlay if configured to do so.
- * This is the main function to call from the Quagga processing loop.
- * Drawing is triggered when area.borderColor or area.borderWidth is defined.
- * 
- * @param config - The Quagga configuration object
- * @param ctx - The canvas 2D rendering context (overlay canvas)
- * @param canvasSize - The size of the canvas
- */
-export function drawAreaIfConfigured(
-    config: QuaggaJSConfigObject | undefined,
-    ctx: CanvasRenderingContext2D | null,
-    canvasSize: XYSize,
-): void {
-    if (!config || !ctx) {
-        return;
-    }
-
-    const inputStream = config.inputStream;
-    if (!inputStream) {
-        return;
-    }
-
-    const { area } = inputStream;
-
-    // Only draw if area visualization is configured and area is actually defined
-    if (!area || !shouldDrawAreaOverlay(area) || !isAreaDefined(area)) {
-        return;
-    }
-
-    const shouldDrawBorder = area.borderColor !== undefined || area.borderWidth !== undefined;
-    const borderColor = area.borderColor ?? 'rgba(0, 255, 0, 0.5)';
-    const borderWidth = shouldDrawBorder ? (area.borderWidth ?? 2) : 0;
-    const backgroundColor = area.backgroundColor;
-
-    drawAreaOverlay(ctx, canvasSize, area, borderColor, borderWidth, backgroundColor);
 }
