@@ -41,6 +41,7 @@ import EAN5Reader from '../reader/ean_5_reader';
 import EAN8Reader from '../reader/ean_8_reader';
 import EANReader from '../reader/ean_reader';
 import I2of5Reader from '../reader/i2of5_reader';
+import PharmacodeReader from '../reader/pharmacode_reader';
 import UPCEReader from '../reader/upc_e_reader';
 import UPCReader from '../reader/upc_reader';
 import Bresenham from './bresenham';
@@ -60,6 +61,7 @@ const READERS = {
     '2of5_reader': TwoOfFiveReader,
     code_93_reader: Code93Reader,
     code_32_reader: Code32Reader,
+    pharmacode_reader: PharmacodeReader,
 };
 
 export default {

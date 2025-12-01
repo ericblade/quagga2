@@ -48,7 +48,7 @@ Please see <https://github.com/DevinNorgarb/vue-quagga-2>
 
 QuaggaJS is a barcode-scanner entirely written in JavaScript supporting real-time localization and decoding of various types of barcodes such as __EAN__,
 __CODE 128__, __CODE 39__, __EAN 8__, __UPC-A__, __UPC-C__, __I2of5__,
-__2of5__, __CODE 93__, __CODE 32__ and __CODABAR__. The library is also capable of using
+__2of5__, __CODE 93__, __CODE 32__, __CODABAR__, and __PHARMACODE__. The library is also capable of using
 `getUserMedia` to get direct access to the user's camera stream. Although the
 code relies on heavy image-processing even recent smartphones are capable of
 locating and decoding barcodes in real-time.
@@ -640,6 +640,7 @@ barcodes which should be decoded during the session. Possible values are:
 - 2of5_reader
 - code_93_reader
 - code_32_reader
+- pharmacode_reader
 
 Why are not all types activated by default? Simply because one should
 explicitly define the set of barcodes for their use-case. More decoders means

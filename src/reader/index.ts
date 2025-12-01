@@ -11,6 +11,7 @@ import EAN5Reader from './ean_5_reader';
 import EAN8Reader from './ean_8_reader';
 import EANReader from './ean_reader';
 import I2of5Reader from './i2of5_reader';
+import PharmacodeReader from './pharmacode_reader';
 import UPCEReader from './upc_e_reader';
 import UPCReader from './upc_reader';
 
@@ -28,6 +29,7 @@ export {
     EAN8Reader,
     EANReader,
     I2of5Reader,
+    PharmacodeReader,
     UPCEReader,
     UPCReader,    
 }
