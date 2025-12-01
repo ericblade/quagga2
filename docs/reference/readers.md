@@ -20,6 +20,7 @@ Quagga2 includes built-in readers for the following barcode formats:
 | `2of5_reader` | [Standard 2 of 5](https://en.wikipedia.org/wiki/Two-out-of-five_code) | Industrial, airline tickets |
 | `code_93_reader` | [Code 93](https://en.wikipedia.org/wiki/Code_93) | Logistics, retail |
 | `code_32_reader` | [Code 32](https://en.wikipedia.org/wiki/Pharmacode#Code_32) | Italian pharmaceuticals |
+| `pharmacode_reader` | [Pharmacode](https://en.wikipedia.org/wiki/Pharmacode) | Pharmaceutical packaging |
 
 ## Basic Configuration {#basic-configuration}
 

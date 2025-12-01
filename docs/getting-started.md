@@ -8,7 +8,7 @@ Quagga2 is a JavaScript barcode scanner library that works in both browsers and 
 
 - **Scan barcodes in real-time** using your device's camera
 - **Decode barcodes from images** (photos, screenshots, etc.)
-- **Support multiple formats**: EAN, CODE 128, CODE 39, EAN 8, UPC-A, UPC-C, I2of5, 2of5, CODE 93, CODE 32, and CODABAR
+- **Support multiple formats**: EAN, CODE 128, CODE 39, EAN 8, UPC-A, UPC-C, I2of5, 2of5, CODE 93, CODE 32, CODABAR, and PHARMACODE
 - **Work offline** - all processing happens in the browser/Node.js, no server required
 
 Unlike some libraries, Quagga2 includes a barcode **locator** that can find and decode barcodes regardless of their rotation or scale in the image.
