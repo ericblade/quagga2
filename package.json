@@ -44,7 +44,6 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-typescript-sort-keys": "^3.3.0",
-    "gl-matrix": "^3.4.4",
     "lodash": "^4.17.21",
     "mocha": "^5.2.0",
     "ndarray": "^1.0.19",
@@ -190,5 +189,8 @@
   },
   "publishConfig": {
     "access": "public"
+  },
+  "dependencies": {
+    "gl-matrix": "^3.4.4"
   }
 }
