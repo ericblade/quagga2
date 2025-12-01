@@ -773,6 +773,10 @@ export function computeImageArea(inputWidth, inputHeight, area) {
     const context = { width: inputWidth, height: inputHeight };
 
     const parsedArea = Object.keys(area).reduce((result, key) => {
+        // Skip styling properties that aren't dimension converters
+        if (!_dimensionsConverters[key]) {
+            return result;
+        }
         const value = area[key];
         const parsed = _parseCSSDimensionValues(value);
         const calculated = _dimensionsConverters[key](parsed, context);
