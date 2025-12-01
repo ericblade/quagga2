@@ -19,6 +19,7 @@ These packages contain code that is **imported by the source code** and **bundle
 - **`gl-matrix`** (^3.4.4)
   - **Purpose**: High-performance vector and matrix math operations
   - **Usage**: Used throughout the codebase for geometric calculations
+  - **Location**: Listed in `dependencies` (not `devDependencies`) - see [Type Definition Dependencies](#type-definition-dependencies) below
   - **Files**:
     - `src/quagga/quagga.ts` - vec2 operations for bounding boxes
     - `src/quagga/initBuffers.ts` - vec2 for buffer initialization
@@ -26,6 +27,7 @@ These packages contain code that is **imported by the source code** and **bundle
     - `src/common/image_wrapper.ts` - vec2 for image transforms
     - `src/common/cvutils/ImageRef.ts` - vec2, vec3 for computer vision
     - `src/common/cluster.js` - vec2 for clustering algorithms
+    - `type-definitions/quagga.d.ts` - vec2 type import for `Moment.vec` property
 
 - **`lodash`** (^4.17.21)
   - **Purpose**: Utility functions for object manipulation
@@ -234,11 +236,49 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 
 ---
 
+## Type Definition Dependencies
+
+### Exception: `gl-matrix` in `dependencies`
+
+While most packages in Quagga2 are listed in `devDependencies` because they are bundled (see [Background](#background)), **`gl-matrix` is an exception** and is listed in `dependencies`.
+
+**Why?**
+
+The TypeScript type definition file (`type-definitions/quagga.d.ts`) imports `vec2` from `gl-matrix`:
+
+```typescript
+import { vec2 } from 'gl-matrix';
+```
+
+This type is used in the `Moment` interface:
+
+```typescript
+export type Moment = {
+    // ... other properties
+    vec?: vec2;
+};
+```
+
+When TypeScript consumers use Quagga2 with type checking, the TypeScript compiler needs to resolve this import to provide proper type information. If `gl-matrix` were in `devDependencies`, it would not be installed when consumers run `npm install @ericblade/quagga2`, causing TypeScript compilation errors.
+
+**Key distinction:**
+
+- **Runtime bundling**: `gl-matrix` code IS bundled into `dist/quagga.min.js` - consumers don't need it at runtime
+- **Type resolution**: TypeScript consumers DO need `gl-matrix` installed to resolve types in `quagga.d.ts`
+
+This is a special case where type definitions create a true development-time dependency for consumers using TypeScript.
+
+---
+
 ## FAQ
 
 **Q: Why are runtime dependencies in `devDependencies` instead of `dependencies`?**
 
 A: Quagga2 is a **bundled library**. Consumers install the package and use the pre-built files (`dist/quagga.min.js` or `lib/quagga.js`), not the source code. They never run `npm install` on Quagga2's dependencies. Therefore, from npm's perspective, all packages are development dependencies (used during build), not runtime dependencies (used after install).
+
+**Q: Why is `gl-matrix` in `dependencies` if everything else is in `devDependencies`?**
+
+A: This is an exception for TypeScript type resolution. The type definition file (`type-definitions/quagga.d.ts`) imports `vec2` from `gl-matrix` to provide proper typing for the `Moment.vec` property. TypeScript consumers need `gl-matrix` installed to resolve these types during compilation. See [Type Definition Dependencies](#type-definition-dependencies) for details.
 
 **Q: How can I tell if a package is actually used in the code?**
 
@@ -283,4 +323,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-11-22
+Last updated: 2025-12-01
