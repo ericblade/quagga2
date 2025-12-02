@@ -141,75 +141,67 @@ describe('Quagga pause/start (browser)', () => {
         });
 
         it('should correctly handle multiple pause/start cycles', function (done) {
-            this.timeout(20000);
+            this.timeout(12000);
 
-            // Create a container for the video element
-            const container = document.createElement('div');
-            container.id = 'test-container-cycles';
-            document.body.appendChild(container);
+            const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-            Quagga.init({
-                inputStream: {
-                    type: 'LiveStream',
-                    target: container,
-                    constraints: {
-                        width: 320,
-                        height: 240,
-                    },
-                },
-                decoder: {
-                    readers: ['ean_reader'],
-                },
-                locate: false,
-            }, (err) => {
-                if (err) {
-                    container.remove();
-                    done(err);
-                    return;
-                }
+            const runTest = async () => {
+                // Create a container for the video element
+                const container = document.createElement('div');
+                container.id = 'test-container-cycles';
+                document.body.appendChild(container);
 
-                Quagga.onProcessed(processedHandler);
-                Quagga.start();
+                try {
+                    await new Promise<void>((resolve, reject) => {
+                        Quagga.init({
+                            inputStream: {
+                                type: 'LiveStream',
+                                target: container,
+                                constraints: { width: 320, height: 240 },
+                            },
+                            decoder: { readers: ['ean_reader'] },
+                            locate: false,
+                        }, (err) => (err ? reject(err) : resolve()));
+                    });
 
-                // First cycle
-                setTimeout(() => {
+                    Quagga.onProcessed(processedHandler);
+                    Quagga.start();
+
+                    // First cycle - start processing
+                    await delay(250);
                     const count1 = processedCount;
                     expect(count1).to.be.greaterThan(0, 'Should process frames in first cycle');
 
+                    // First pause
                     Quagga.pause();
+                    await delay(100);
+                    expect(processedCount).to.equal(count1, 'No frames during first pause');
 
-                    setTimeout(() => {
-                        const countAfterPause1 = processedCount;
-                        expect(countAfterPause1).to.equal(count1, 'No frames during first pause');
+                    // Second cycle - resume processing
+                    Quagga.start();
+                    await delay(250);
+                    const count2 = processedCount;
+                    expect(count2).to.be.greaterThan(count1, 'Should process frames in second cycle');
 
-                        // Second cycle
-                        Quagga.start();
+                    // Second pause
+                    Quagga.pause();
+                    await delay(100);
+                    expect(processedCount).to.equal(count2, 'No frames during second pause');
 
-                        setTimeout(() => {
-                            const count2 = processedCount;
-                            expect(count2).to.be.greaterThan(countAfterPause1, 'Should process frames in second cycle');
+                    // Third cycle - resume processing
+                    Quagga.start();
+                    await delay(250);
+                    expect(processedCount).to.be.greaterThan(count2, 'Should process frames in third cycle');
 
-                            Quagga.pause();
+                    done();
+                } catch (err) {
+                    done(err);
+                } finally {
+                    container.remove();
+                }
+            };
 
-                            setTimeout(() => {
-                                const countAfterPause2 = processedCount;
-                                expect(countAfterPause2).to.equal(count2, 'No frames during second pause');
-
-                                // Third cycle
-                                Quagga.start();
-
-                                setTimeout(() => {
-                                    const count3 = processedCount;
-                                    expect(count3).to.be.greaterThan(countAfterPause2, 'Should process frames in third cycle');
-
-                                    container.remove();
-                                    done();
-                                }, 300);
-                            }, 150);
-                        }, 300);
-                    }, 150);
-                }, 300);
-            });
+            runTest();
         });
     });
 
