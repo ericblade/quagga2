@@ -15,6 +15,16 @@ describe('Pharmacode Decoder Tests', () => {
         { 'name': 'image-011.jpg', 'result': '12345', format: 'pharmacode' },
         { 'name': 'image-012.jpg', 'result': '65535', format: 'pharmacode' },
     ];
+
+    const pharmacodeRealWorldTestSet = [
+        { 'name': 'image-013.png', 'result': '3', format: 'pharmacode' },
+        { 'name': 'image-014.png', 'result': '7', format: 'pharmacode' },
+        { 'name': 'image-015.png', 'result': '131', format: 'pharmacode' },
+        { 'name': 'image-016.png', 'result': '1234', format: 'pharmacode' },
+        { 'name': 'image-017.png', 'result': '12345', format: 'pharmacode', multiple: true },
+        { 'name': 'image-018.png', 'result': '3', format: 'pharmacode', multiple: true },
+    ];
+
     // Use locate: false since test images are synthetically generated and pre-cropped to contain only the barcode (location detection not required)
     runDecoderTestBothHalfSample('pharmacode', (halfSample) => generateConfig({
         locate: false,
@@ -25,4 +35,15 @@ describe('Pharmacode Decoder Tests', () => {
             readers: ['pharmacode_reader']
         }
     }), pharmacodeTestSet);
+
+    // Real-world images require locate: true
+    runDecoderTestBothHalfSample('pharmacode (real-world)', (halfSample) => generateConfig({
+        locate: true,
+        locator: {
+            halfSample,
+        },
+        decoder: {
+            readers: ['pharmacode_reader']
+        }
+    }), pharmacodeRealWorldTestSet);
 });
