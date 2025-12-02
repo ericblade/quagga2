@@ -42,7 +42,8 @@ Please see <https://github.com/ptc-iot-sharing/ThingworxBarcodeScannerWidget>
 
 ## Using Vue?
 
-Please see <https://github.com/DevinNorgarb/vue-quagga-2>
+- **Vue 2**: <https://github.com/DevinNorgarb/vue-quagga-2>
+- **Vue 3**: <https://github.com/nick-0101/vue3-quagga-2>
 
 ## What is QuaggaJS?
 
