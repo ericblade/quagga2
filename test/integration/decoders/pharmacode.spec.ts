@@ -17,16 +17,20 @@ describe('Pharmacode Decoder Tests', () => {
     ];
 
     // Real-world test images added by @ericblade
-    // Note: Expected values need verification - the decoder returns values that differ from what's in the test
-    // The decoder consistently returns '4' for both 013 and 014, suggesting these may be the same barcode
-    // or the expected values in the test are incorrect
+    // Images 013, 014, 018 contain Pharmacode value 123456
+    // Image 017 contains multiple barcodes: 4174 and 3715
+    // Images 015, 016 have unknown values
+    // These tests are marked allowFail because:
+    // 1. The locator struggles with Pharmacode's simple structure (few bars, no start/stop patterns)
+    // 2. Without locate:true, the decoder scans through wrong parts of the image
+    // 3. With locate:true, the locator often fails to find the barcode region
     const pharmacodeRealWorldTestSet = [
-        { 'name': 'image-013.png', 'result': '3', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-014.png', 'result': '7', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-013.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-014.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
         { 'name': 'image-015.png', 'result': '131', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
         { 'name': 'image-016.png', 'result': '1234', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-017.png', 'result': '12345', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-018.png', 'result': '3', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-017.png', 'result': '4174', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-018.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
     ];
 
     // Use locate: false since test images are synthetically generated and pre-cropped to contain only the barcode (location detection not required)
@@ -40,16 +44,16 @@ describe('Pharmacode Decoder Tests', () => {
         }
     }), pharmacodeTestSet);
 
-    // Real-world images - using locate: false for cropped images (013-014) and locate: true for photos (015-018)
-    // Currently marked allowFail as expected values need verification
+    // Real-world images require locate: true to find barcode regions
+    // Currently marked allowFail due to locator limitations with Pharmacode's simple structure
     runDecoderTestBothHalfSample('pharmacode (real-world)', (halfSample) => generateConfig({
-        locate: false,
+        locate: true,
         inputStream: {
-            size: 800,
+            size: 1600,
         },
         locator: {
             halfSample,
-            patchSize: 'medium',
+            patchSize: 'small',
         },
         decoder: {
             readers: ['pharmacode_reader']
