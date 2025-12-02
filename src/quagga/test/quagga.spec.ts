@@ -2,6 +2,7 @@
 import { expect } from 'chai';
 import { describe, it, beforeEach } from 'mocha';
 import Quagga from '../quagga';
+import QuaggaStatic from '../../quagga';
 import type { Box } from '../transform';
 
 describe('src/quagga/quagga.ts', () => {
@@ -191,6 +192,18 @@ describe('src/quagga/quagga.ts', () => {
             quagga.context.initAborted = false;
             await quagga.stop();
             expect(quagga.context.initAborted).to.be.false;
+        });
+    });
+
+    describe('drawScannerArea', () => {
+        it('exposes drawScannerArea as a function', () => {
+            expect(QuaggaStatic).to.be.an('object');
+            expect((QuaggaStatic as any).drawScannerArea).to.be.a('function');
+        });
+
+        it('calling drawScannerArea without init does not throw', () => {
+            // Should be a no-op when not configured
+            expect(() => (QuaggaStatic as any).drawScannerArea()).to.not.throw();
         });
     });
 });

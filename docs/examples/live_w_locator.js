@@ -22,6 +22,8 @@ $(function() {
         }
     });
     var App = {
+        _initDebounceTimer: null,
+        _pendingReinit: false,
         init: function() {
             var self = this;
             Quagga.init(this.state, function(err) {
@@ -33,7 +35,23 @@ $(function() {
                 Quagga.start();
                 App.initCameraSelection();
                 App.checkCapabilities();
+                // Sync UI checkboxes to match actual state after init
+                $('input[name="locate"]').prop('checked', App.state.locate);
             });
+        },
+        reinit: function() {
+            // Debounced reinit: cancel pending and schedule a new one
+            console.log('[App.reinit] Called, current timer:', App._initDebounceTimer !== null, 'Current state.locate:', App.state.locate);
+            if (App._initDebounceTimer) {
+                console.log('[App.reinit] Cancelling pending init');
+                clearTimeout(App._initDebounceTimer);
+            }
+            App._initDebounceTimer = setTimeout(function() {
+                console.log('[App.reinit] Debounce expired, calling init() with state.locate:', App.state.locate);
+                App._initDebounceTimer = null;
+                App._pendingReinit = false;
+                App.init();
+            }, 250);
         },
         handleError: function(err) {
             console.log(err);
@@ -134,7 +152,13 @@ $(function() {
         attachListeners: function() {
             var self = this;
 
+            console.log('[App.attachListeners] Called - this should only happen once per init');
             self.initCameraSelection();
+
+            // Remove any existing handlers to prevent stacking
+            $(".controls").off("click", "button.stop");
+            $(".controls .reader-config-group").off("change", "input, select");
+
             $(".controls").on("click", "button.stop", function(e) {
                 e.preventDefault();
                 Quagga.stop();
@@ -148,7 +172,7 @@ $(function() {
                     name = $target.attr("name"),
                     state = self._convertNameToState(name);
 
-                console.log("Value of "+ state + " changed to " + value);
+                console.log("Value of "+ state + " changed to " + value, "checkbox checked prop:", $target.prop("checked"), "target type:", $target.attr("type"));
                 self.setState(state, value);
             });
         },
@@ -203,6 +227,8 @@ $(function() {
         setState: function(path, value) {
             var self = this;
 
+            console.log('[App.setState] ENTRY: path=', path, 'value=', value, 'current state.locate=', self.state.locate);
+
             if (typeof self._accessByPath(self.inputMapper, path) === "function") {
                 value = self._accessByPath(self.inputMapper, path)(value);
             }
@@ -220,32 +246,31 @@ $(function() {
                 self._accessByPath(self.state, path, value);
             }
 
+            console.log('[App.setState] AFTER _accessByPath: state.locate=', self.state.locate);
             console.log(JSON.stringify(self.state));
 
-            // For camera/device changes, perform a clean stop → init → start sequence
-            var isDeviceSwitch = (path === 'inputStream.constraints' && value && typeof value === 'object' && 'deviceId' in value);
-            if (isDeviceSwitch) {
-                try {
-                    // Ensure we don't stack DOM/event listeners across re-inits
-                    App.detachListeners();
-                    var stopResult = Quagga.stop();
-                    // If stop returns a promise (newer builds), wait before re-init
-                    if (stopResult && typeof stopResult.then === 'function') {
-                        stopResult.then(function(){
-                            // Reattach fresh listeners via init
-                            App.init();
-                        });
-                    } else {
-                        App.init();
-                    }
-                } catch(e) {
-                    // Fallback: attempt reinit anyway
-                    App.init();
-                }
+            console.log('[App.setState] path:', path, 'pending:', App._pendingReinit);
+            // Prevent overlapping stop/reinit sequences
+            if (App._pendingReinit) {
+                // Already stopping/reiniting, just update the debounce timer
+                console.log('[App.setState] Already pending, just updating debounce');
+                App.reinit();
+                return;
+            }
+
+            console.log('[App.setState] Calling stop and scheduling reinit');
+            App._pendingReinit = true;
+            App.detachListeners();
+            var stopResult = Quagga.stop();
+            if (stopResult && typeof stopResult.then === 'function') {
+                stopResult.then(function(){
+                    console.log('[App.setState] Stop completed (promise), calling reinit');
+                    App.reinit();
+                });
             } else {
-                App.detachListeners();
-                Quagga.stop();
-                App.init();
+                // Older sync stop; reinit with debounce
+                console.log('[App.setState] Stop completed (sync), calling reinit');
+                App.reinit();
             }
         },
         inputMapper: {
@@ -322,9 +347,21 @@ $(function() {
         lastResult : null
     };
 
-    App.init();
+    console.log('[Startup] Calling initial App.reinit()');
+    App.reinit();
 
+    var processedCount = 0;
     Quagga.onProcessed(function(result) {
+        processedCount++;
+        /*
+        console.log('onProcessed #' + processedCount + ':', result ? {
+            hasBox: !!result.box,
+            boxLength: result.box ? result.box.length : 0,
+            hasBoxes: !!result.boxes,
+            boxesLength: result.boxes ? result.boxes.length : 0,
+            codeResult: !!result.codeResult
+        } : 'null result');
+*/
         var drawingCtx = Quagga.canvas.ctx.overlay,
             drawingCanvas = Quagga.canvas.dom.overlay;
 
