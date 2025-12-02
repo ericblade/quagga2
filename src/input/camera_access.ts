@@ -1,7 +1,7 @@
 // TODO: when this file was written years ago, HTMLMediaElement.play() did not return a useful value
 // to let us know when the video started playing.  Now, it does.  So, we shouldn't need to run this
 // odd waitForVideo() function that polls to see if the video has started.
-import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
 import Exception from '../quagga/Exception';
 import type {
@@ -60,8 +60,8 @@ async function initCamera(video: HTMLVideoElement | null, constraints: MediaStre
 }
 
 function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): MediaTrackConstraints {
-    const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
-        'aspectRatio', 'deviceId']);
+    // Start with all constraints except deprecated ones
+    const normalized: MediaTrackConstraints = omit(videoConstraints, ['facing', 'minAspectRatio', 'maxAspectRatio']);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined'
             && videoConstraints.minAspectRatio > 0) {
