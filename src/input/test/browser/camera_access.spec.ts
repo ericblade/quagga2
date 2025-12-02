@@ -26,6 +26,37 @@ describe('CameraAccess (browser)', () => {
             const actualConstraints = await pickConstraints(givenConstraints);
             expect(actualConstraints.video).to.deep.equal({ deviceId: 'dummy' });
         });
+
+        it('should pass through advanced constraints with zoom', async () => {
+            const givenConstraints = {
+                width: 640,
+                height: 480,
+                advanced: [{ zoom: 2 }],
+            };
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal(givenConstraints);
+        });
+
+        it('should pass through frameRate constraints', async () => {
+            const givenConstraints = {
+                width: 640,
+                height: 480,
+                frameRate: { ideal: 30, max: 60 },
+            };
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal(givenConstraints);
+        });
+
+        it('should pass through multiple advanced constraints', async () => {
+            const givenConstraints = {
+                width: 640,
+                height: 480,
+                facingMode: 'environment',
+                advanced: [{ zoom: 2 }, { torch: true }],
+            };
+            const actualConstraints = await pickConstraints(givenConstraints);
+            expect(actualConstraints.video).to.deep.equal(givenConstraints);
+        });
     });
 
     // These tests rely on Cypress providing a fake camera device via Chrome's
