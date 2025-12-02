@@ -618,6 +618,12 @@ export interface QuaggaJSCameraAccess {
     enumerateVideoDevices(
         videoConstraints?: MediaTrackConstraintsWithDeprecated
     ): Promise<MediaDeviceInfo[]> | never;
+    /**
+     * Returns the active MediaStream, or null if no stream is active.
+     * Use this when you need access to the full stream, for example to pass to WebRTC
+     * or to clone the stream. For just the video track, use getActiveTrack() instead.
+     */
+    getActiveStream(): MediaStream | null;
     getActiveStreamLabel(): string;
     getActiveTrack(): MediaStreamTrack | null;
     release(): Promise<void>;

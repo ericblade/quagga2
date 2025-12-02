@@ -13,7 +13,7 @@ describe('testing node import', () => {
         const { CameraAccess: CA } = Q;
         expect(CA).to.be.an('object').with.keys([
             'request', 'release', 'enumerateVideoDevices',
-            'getActiveStreamLabel', 'getActiveTrack', 'requestedVideoElement',
+            'getActiveStream', 'getActiveStreamLabel', 'getActiveTrack', 'requestedVideoElement',
             'enableTorch', 'disableTorch',
         ]);
     });

@@ -27,20 +27,20 @@ interface InputStream {
     getRealHeight(): number;
     setWidth(width: number): void;
     setHeight(height: number): void;
-
+    
     // Frame access
     getFrame(): HTMLVideoElement | HTMLImageElement | null;
-
+    
     // Event handling
     addEventListener(event: string, handler: Function): void;
     clearEventHandlers(): void;
     trigger(eventName: string, args?: any): void;
-
+    
     // Playback control
     play(): void;
     pause(): void;
     ended(): boolean;
-
+    
     // Configuration
     setInputStream(config: any): void;
     getConfig(): any;
@@ -82,7 +82,7 @@ Quagga.init({
 
 Based on the `type` configuration, the appropriate stream factory is called:
 
-- `LiveStream` → `createLiveStream(video)`
+- `LiveStream` → `createLiveStream(video)` 
 - `VideoStream` → `createVideoStream(video)`
 - `ImageStream` → `createImageStream()`
 
@@ -228,7 +228,7 @@ Because initialization involves async operations (camera access, file loading), 
 ```javascript
 useLayoutEffect(() => {
     let cancelled = false;
-
+    
     Quagga.init(config, (err) => {
         if (cancelled) return;  // Ignore if unmounted
         if (err) {
@@ -237,7 +237,7 @@ useLayoutEffect(() => {
         }
         Quagga.start();
     });
-
+    
     return () => {
         cancelled = true;
         Quagga.stop();

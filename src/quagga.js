@@ -122,6 +122,9 @@ const QuaggaJSStaticInterface = {
     get canvas() {
         return _context.canvasContainer;
     },
+    drawScannerArea: function () {
+        return instance.drawScannerArea();
+    },
     decodeSingle: function (config, resultCallback) {
         const quaggaInstance = new Quagga();
         config = merge({

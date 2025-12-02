@@ -1,7 +1,7 @@
 // TODO: when this file was written years ago, HTMLMediaElement.play() did not return a useful value
 // to let us know when the video started playing.  Now, it does.  So, we shouldn't need to run this
 // odd waitForVideo() function that polls to see if the video has started.
-import pick from 'lodash/pick';
+import omit from 'lodash/omit';
 import { getUserMedia, enumerateDevices } from '../common/mediaDevices';
 import Exception from '../quagga/Exception';
 import type {
@@ -60,8 +60,9 @@ async function initCamera(video: HTMLVideoElement | null, constraints: MediaStre
 }
 
 function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): MediaTrackConstraints {
-    const normalized = pick(videoConstraints, ['width', 'height', 'facingMode',
-        'aspectRatio', 'deviceId']);
+    // Remove deprecated properties (facing, minAspectRatio, maxAspectRatio) while
+    // preserving all valid MediaTrackConstraints including advanced, zoom, torch, etc.
+    const normalized: MediaTrackConstraints = omit(videoConstraints, ['facing', 'minAspectRatio', 'maxAspectRatio']);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined'
             && videoConstraints.minAspectRatio > 0) {
@@ -148,6 +149,16 @@ function getActiveTrack(): MediaStreamTrack | null {
 }
 
 /**
+ * Returns the active MediaStream, or null if no stream is active.
+ * Use this when you need access to the full stream, for example to pass to WebRTC
+ * or to clone the stream. For just the video track, use getActiveTrack() instead.
+ * @returns The active MediaStream, or null if no camera is currently active.
+ */
+function getActiveStream(): MediaStream | null {
+    return streamRef ?? null;
+}
+
+/**
  * Used for accessing information about the active stream track and available video devices.
  */
 const QuaggaJSCameraAccess: CameraAccessType = {
@@ -174,6 +185,7 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         });
     },
     enumerateVideoDevices,
+    getActiveStream,
     getActiveStreamLabel(): string {
         const track = getActiveTrack();
         return track ? track.label : '';

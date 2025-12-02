@@ -126,6 +126,48 @@ Quagga.stop().then(() => {
 - Does not remove event listeners (use `offDetected()` / `offProcessed()` for that)
 - Returns a Promise that resolves when camera release is complete
 
+### `Quagga.pause()` {#quagga-pause}
+
+Pauses frame processing without stopping the camera or releasing resources.
+
+**Parameters**: None
+
+**Returns**: `void`
+
+**Example**:
+
+```javascript
+// Pause scanning temporarily
+Quagga.pause();
+
+// Later, resume scanning
+Quagga.start();
+```
+
+**Behavior**:
+
+- Stops processing new frames (no more `onProcessed` or `onDetected` callbacks)
+- **Does not stop the camera** - the video stream continues running
+- **Does not release resources** - the camera remains connected
+- Can be resumed by calling `Quagga.start()`
+
+**Use Cases**:
+
+- Temporarily pause scanning while showing a modal or dialog
+- Reduce CPU usage when the scanner is not visible
+- Pause after detecting a barcode to allow user confirmation before resuming
+
+**Difference from `stop()`**:
+
+| Aspect | `pause()` | `stop()` |
+|--------|-----------|----------|
+| Frame processing | Stops | Stops |
+| Camera stream | **Continues** | Disconnects |
+| Resources | **Retained** | Released |
+| Resume with | `start()` | `init()` + `start()` |
+
+> **Note**: Since `pause()` keeps the camera running, the user's camera indicator light will remain on. If you want to fully release the camera, use `stop()` instead.
+
 ### `Quagga.onDetected(callback)` {#quagga-ondetected}
 
 Registers a callback that is triggered when a barcode is successfully located and decoded.

@@ -42,7 +42,8 @@ Please see <https://github.com/ptc-iot-sharing/ThingworxBarcodeScannerWidget>
 
 ## Using Vue?
 
-Please see <https://github.com/DevinNorgarb/vue-quagga-2>
+- **Vue 2**: <https://github.com/DevinNorgarb/vue-quagga-2>
+- **Vue 3**: <https://github.com/nick-0101/vue3-quagga-2>
 
 ## What is QuaggaJS?
 
@@ -450,6 +451,8 @@ empty.
 Quagga2 exposes a CameraAccess API that is available for performing some shortcut access to commonly
 used camera functions.  This API is available as `Quagga.CameraAccess` and is documented below.
 
+**[Full CameraAccess API Documentation](https://ericblade.github.io/quagga2/reference/camera-access.html)** - Detailed reference with examples, error handling, and advanced usage.
+
 ## CameraAccess.request(HTMLVideoElement | null, MediaTrackConstraints?)
 
 Will attempt to initialize the camera and start playback given the specified video element.  Camera
@@ -500,7 +503,7 @@ Returns the MediaStreamTrack for the active video track
 
 Turns off Torch. (Camera Flash)  Resolves when complete, throws on error.  Does not work on iOS devices of at least version 16.4 and earlier.  May or may not work on later versions.
 
-## CameraAccess
+## CameraAccess.enableTorch()
 
 Turns on Torch. (Camera Flash)  Resolves when complete, throws on error.  Does not work on iOS devices of at least version 16.4 and earlier.  May or may not work on later versions.
 

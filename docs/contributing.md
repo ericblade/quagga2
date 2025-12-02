@@ -39,14 +39,23 @@ merging.
 **Running Specific Tests**:
 
 ```bash
-# All tests (unit + integration, Node + browser)
+# All tests (Node unit/integration + full Cypress suite)
 npm test
+
+# Run Node and Cypress in parallel (faster local iteration)
+npm run test:parallel
 
 # Node tests only
 npm run test:node
 
 # Browser tests only (requires Cypress)
 npm run test:browser-all
+
+# E2E examples spec with server (headless)
+npm run test:e2e
+
+# E2E examples spec (interactive, Electron)
+npm run test:e2e:open
 
 # Cypress: run only specific spec(s)
 # Pass --spec through npm using --
@@ -60,6 +69,9 @@ npm run cypress:run -- --spec "cypress/e2e/**/browser*.cy.ts"
 
 # Open interactive runner
 npm run cypress:open
+
+# Open only the examples E2E spec (Electron)
+npm run cypress:open:e2e
 
 # Choose a browser (if installed)
 npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --browser chrome --env BUILD_ENV=development --spec cypress/e2e/browser.cy.ts
@@ -81,6 +93,11 @@ environments by default. If a test is known to fail in a specific environment, m
 - Both flags - Test can fail in both environments
 
 See `test/integration/README.md` for complete details on the test failure marking system.
+
+**Notes**:
+
+- The Cypress E2E examples (`cypress/e2e/examples.cy.ts`) require the local examples server on port 8080; the `test`, `test:e2e`, and `test:e2e:open` scripts start it automatically via `start-server-and-test`.
+- The parallel runner uses prefixed logs (`e2e`, `node`) and exits non-zero if either side fails (`--kill-others-on-fail --success=all`).
 
 #### Working on a changed copy of Quagga2 from another repository (ie, developing an external plugin) {#working-on-external-plugin}
 

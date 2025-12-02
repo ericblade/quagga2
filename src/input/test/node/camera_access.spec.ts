@@ -49,6 +49,13 @@ describe('CameraAccess (node)', () => {
         });
     });
 
+    describe('getActiveStream', () => {
+        it('no active stream', () => {
+            const x = Quagga.CameraAccess.getActiveStream();
+            expect(x).to.equal(null);
+        });
+    });
+
     describe('getActiveStreamLabel', () => {
         it('no active stream', () => {
             const x = Quagga.CameraAccess.getActiveStreamLabel();
