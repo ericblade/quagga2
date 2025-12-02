@@ -644,6 +644,7 @@ Controls the barcode localization algorithm. Only relevant when `locate: true`.
 locator: {
   halfSample: true,
   patchSize: "medium",
+  singleMoment: false,
   debug: {
     showCanvas: false,
     showPatches: false,
@@ -733,6 +734,44 @@ locator: {
   halfSample: true
 }
 ```
+
+### `locator.singleMoment` {#locator-singlemoment}
+
+**Type**: `boolean`
+
+**Default**: `false`
+
+**Description**: Enables single-moment patch detection for sparse barcodes like Pharmacode. When `true`:
+
+- Patches containing only 1 bar segment (moment) with near-vertical orientation will be considered barcode-like
+- The minimum connected patches threshold is lowered from 5 to 2
+
+**When to use `true`**:
+
+- Scanning sparse barcodes with few bars (like Pharmacode, which has only 2-16 bars)
+- The standard locator fails to find barcodes with simple structures
+- You're specifically targeting barcode formats without typical start/stop patterns
+
+**Example - Pharmacode Scanning**:
+
+```javascript
+Quagga.init({
+  locate: true,
+  inputStream: {
+    size: 1600
+  },
+  locator: {
+    patchSize: "small",
+    singleMoment: true,  // Enable sparse barcode detection
+    halfSample: false
+  },
+  decoder: {
+    readers: ['pharmacode_reader']
+  }
+});
+```
+
+**Note**: Enabling this option may increase false positives from non-barcode regions. Use with specific readers that expect sparse patterns.
 
 ### `locator.debug` {#locator-debug}
 

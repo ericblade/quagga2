@@ -1004,6 +1004,16 @@ export interface QuaggaJSConfigObject {
          * Available values: x-small, small, medium, large, x-large
          */
         patchSize?: string;
+
+        /**
+         * Enable single-moment patch detection for sparse barcodes like Pharmacode.
+         * When true, patches containing only 1 bar segment (moment) with near-vertical
+         * orientation will be considered barcode-like, and the minimum connected
+         * patches threshold is lowered from 5 to 2.
+         * @default false
+         */
+        singleMoment?: boolean;
+
         willReadFrequently?: boolean;
         debug?: {
             /**
