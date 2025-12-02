@@ -1,6 +1,5 @@
 import { describe, it, afterEach, beforeEach } from 'mocha';
 import { expect } from 'chai';
-import sinon from 'sinon';
 import Quagga from '../../../quagga';
 import CameraAccess from '../../../input/camera_access';
 
@@ -22,7 +21,6 @@ describe('Quagga pause/start (browser)', () => {
     afterEach(async () => {
         Quagga.offProcessed(processedHandler);
         await Quagga.stop();
-        sinon.restore();
     });
 
     describe('pause()', () => {
