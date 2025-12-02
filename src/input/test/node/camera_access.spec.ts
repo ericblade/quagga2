@@ -12,8 +12,8 @@ describe('CameraAccess (node)', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
             } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
-                // expect(err.message).to.equal('enumerateDevices is not defined');
                 expect(err.code).to.equal(-1);
+                expect(err.message).to.include('enumerateDevices is not defined');
             }
         });
 
@@ -25,6 +25,20 @@ describe('CameraAccess (node)', () => {
             } catch (err: any) {
                 // In node, enumerateDevices is not available, so it should reject
                 expect(err.code).to.equal(-1);
+                expect(err.message).to.include('enumerateDevices is not defined');
+            }
+        });
+
+        it('error includes helpful description when serialized', async () => {
+            try {
+                await Quagga.CameraAccess.enumerateVideoDevices();
+                expect.fail('Should have thrown');
+            } catch (err: any) {
+                const json = JSON.stringify(err);
+                const parsed = JSON.parse(json);
+                expect(parsed.message).to.include('enumerateDevices is not defined');
+                expect(parsed.message).to.include('iOS');
+                expect(parsed.code).to.equal(-1);
             }
         });
     });
@@ -36,8 +50,21 @@ describe('CameraAccess (node)', () => {
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
             } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
-                // expect(err.message).to.equal('getUserMedia is not defined');
                 expect(err.code).to.equal(-1);
+                expect(err.message).to.include('getUserMedia is not defined');
+            }
+        });
+
+        it('error includes helpful description when serialized', async () => {
+            try {
+                await Quagga.CameraAccess.request(null, {});
+                expect.fail('Should have thrown');
+            } catch (err: any) {
+                const json = JSON.stringify(err);
+                const parsed = JSON.parse(json);
+                expect(parsed.message).to.include('getUserMedia is not defined');
+                expect(parsed.message).to.include('iOS');
+                expect(parsed.code).to.equal(-1);
             }
         });
     });
