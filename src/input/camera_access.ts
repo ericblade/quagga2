@@ -60,7 +60,8 @@ async function initCamera(video: HTMLVideoElement | null, constraints: MediaStre
 }
 
 function deprecatedConstraints(videoConstraints: MediaTrackConstraintsWithDeprecated): MediaTrackConstraints {
-    // Start with all constraints except deprecated ones
+    // Remove deprecated properties (facing, minAspectRatio, maxAspectRatio) while
+    // preserving all valid MediaTrackConstraints including advanced, zoom, torch, etc.
     const normalized: MediaTrackConstraints = omit(videoConstraints, ['facing', 'minAspectRatio', 'maxAspectRatio']);
 
     if (typeof videoConstraints.minAspectRatio !== 'undefined'
