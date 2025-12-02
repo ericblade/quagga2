@@ -1,6 +1,7 @@
 import { describe, it } from 'mocha';
 import { expect } from 'chai';
 import CameraAccess from '../../camera_access';
+import Exception from '../../../quagga/Exception';
 
 const Quagga = { CameraAccess };
 
@@ -11,9 +12,10 @@ describe('CameraAccess (node)', () => {
                 const x = await Quagga.CameraAccess.enumerateVideoDevices();
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
-                expect(err.code).to.equal(-1);
-                expect(err.message).to.include('enumerateDevices is not defined');
+            } catch (err: unknown) {
+                const ex = err as Exception;
+                expect(ex.code).to.equal(-1);
+                expect(ex.message).to.include('enumerateDevices is not defined');
             }
         });
 
@@ -22,10 +24,11 @@ describe('CameraAccess (node)', () => {
                 const x = await Quagga.CameraAccess.enumerateVideoDevices({ width: 320 });
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch (err: any) {
+            } catch (err: unknown) {
+                const ex = err as Exception;
                 // In node, enumerateDevices is not available, so it should reject
-                expect(err.code).to.equal(-1);
-                expect(err.message).to.include('enumerateDevices is not defined');
+                expect(ex.code).to.equal(-1);
+                expect(ex.message).to.include('enumerateDevices is not defined');
             }
         });
 
@@ -33,7 +36,7 @@ describe('CameraAccess (node)', () => {
             try {
                 await Quagga.CameraAccess.enumerateVideoDevices();
                 expect.fail('Should have thrown');
-            } catch (err: any) {
+            } catch (err: unknown) {
                 const json = JSON.stringify(err);
                 const parsed = JSON.parse(json);
                 expect(parsed.message).to.include('enumerateDevices is not defined');
@@ -49,9 +52,10 @@ describe('CameraAccess (node)', () => {
                 const x = await Quagga.CameraAccess.request(null, {});
                 // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
                 expect(x).to.not.exist;
-            } catch (err: any) { // TODO: error TS1196: Catch clause variable type annotation must be 'any' or 'unknown' if specified.
-                expect(err.code).to.equal(-1);
-                expect(err.message).to.include('getUserMedia is not defined');
+            } catch (err: unknown) {
+                const ex = err as Exception;
+                expect(ex.code).to.equal(-1);
+                expect(ex.message).to.include('getUserMedia is not defined');
             }
         });
 
@@ -59,7 +63,7 @@ describe('CameraAccess (node)', () => {
             try {
                 await Quagga.CameraAccess.request(null, {});
                 expect.fail('Should have thrown');
-            } catch (err: any) {
+            } catch (err: unknown) {
                 const json = JSON.stringify(err);
                 const parsed = JSON.parse(json);
                 expect(parsed.message).to.include('getUserMedia is not defined');
