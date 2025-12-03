@@ -51,8 +51,7 @@ describe('Pharmacode Decoder Tests', () => {
     }), pharmacodeTestSet);
 
     // Real-world images require locate: true to find barcode regions
-    // Using singleMoment: true helps the locator find sparse Pharmacode barcodes
-    // Currently marked allowFail due to remaining locator limitations with Pharmacode's simple structure
+    // Currently marked allowFail due to locator limitations with Pharmacode's simple structure
     runDecoderTestBothHalfSample('pharmacode (real-world)', (halfSample) => generateConfig({
         locate: true,
         inputStream: {
@@ -61,7 +60,6 @@ describe('Pharmacode Decoder Tests', () => {
         locator: {
             halfSample,
             patchSize: 'small',
-            singleMoment: true,
         },
         decoder: {
             readers: ['pharmacode_reader']

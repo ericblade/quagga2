@@ -16,17 +16,7 @@ import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
 
-// Constants for locator thresholds
-// Minimum moments required per patch for standard barcode detection
-const MIN_MOMENTS_NORMAL = 2;
-// Minimum moments required per patch for sparse barcode detection (singleMoment mode)
-const MIN_MOMENTS_SPARSE = 1;
-// Minimum connected patches required for standard barcode detection
-const MIN_PATCHES_NORMAL = 5;
-// Minimum connected patches required for sparse barcode detection (singleMoment mode)
-const MIN_PATCHES_SPARSE = 2;
-// Angle threshold for vertical bar detection (radians) - approximately 30 degrees
-const VERTICAL_ANGLE_THRESHOLD = Math.PI / 6;
+
 
 let _config;
 let _currentImageWrapper;
@@ -282,8 +272,7 @@ function findBiggestConnectedAreas(maxLabel) {
     let sum;
     let labelHist = [];
     let topLabels = [];
-    // For sparse barcodes (like Pharmacode), use lower threshold when singleMoment hint is enabled
-    const minPatches = _config.singleMoment ? MIN_PATCHES_SPARSE : MIN_PATCHES_NORMAL;
+
 
     for (i = 0; i < maxLabel; i++) {
         labelHist.push(0);
@@ -302,8 +291,8 @@ function findBiggestConnectedAreas(maxLabel) {
 
     labelHist.sort((a, b) => b.val - a.val);
 
-    // extract top areas with at least minPatches patches present
-    topLabels = labelHist.filter((el) => el.val >= minPatches);
+    // extract top areas with at least 5 patches present
+    topLabels = labelHist.filter((el) => el.val >= 5);
 
     return topLabels;
 }
@@ -394,10 +383,8 @@ function describePatch(moments, patchPos, x, y) {
     let patch;
     const patchesFound = [];
     const minComponentWeight = Math.ceil(_patchSize.x / 3);
-    // For sparse barcodes (like Pharmacode), allow single-moment patches when singleMoment hint is enabled
-    const minMoments = _config.singleMoment ? 1 : 2;
 
-    if (moments.length >= minMoments) {
+    if (moments.length >= 2) {
         // only collect moments which's area covers at least minComponentWeight pixels.
         for (k = 0; k < moments.length; k++) {
             if (moments[k].m00 > minComponentWeight) {
@@ -405,69 +392,38 @@ function describePatch(moments, patchPos, x, y) {
             }
         }
 
-        // if at least minMoments moments are found which have at least minComponentWeights covered
-        if (eligibleMoments.length >= minMoments) {
-            if (eligibleMoments.length === 1 && _config.singleMoment) {
-                // For single-moment patches (sparse barcode mode), use the moment directly
-                // but only if it has a near-vertical orientation (typical for barcodes)
-                const moment = eligibleMoments[0];
-                const rad = moment.rad ?? 0;
-                // Check if orientation is roughly vertical (within ~30 degrees of vertical)
-                // Vertical bars have rad near 0 or PI
-                const normalizedRad = Math.abs(rad % Math.PI);
-                const isVertical = normalizedRad < Math.PI / 6 || normalizedRad > (5 * Math.PI / 6);
+        // if at least 2 moments are found which have at least minComponentWeights covered
+        if (eligibleMoments.length >= 2) {
+            matchingMoments = similarMoments(eligibleMoments);
+            avg = 0;
+            // determine the similarity of the moments
+            for (k = 0; k < matchingMoments.length; k++) {
+                avg += matchingMoments[k]?.rad ?? 0;
+            }
 
-                if (isVertical) {
-                    patch = {
-                        index: patchPos[1] * _numPatches.x + patchPos[0],
-                        pos: {
-                            x,
-                            y,
-                        },
-                        box: [
-                            vec2.clone([x, y]),
-                            vec2.clone([x + _subImageWrapper.size.x, y]),
-                            vec2.clone([x + _subImageWrapper.size.x, y + _subImageWrapper.size.y]),
-                            vec2.clone([x, y + _subImageWrapper.size.y]),
-                        ],
-                        moments: eligibleMoments,
-                        rad,
-                        vec: vec2.clone([Math.cos(rad), Math.sin(rad)]),
-                    };
-                    patchesFound.push(patch);
-                }
-            } else {
-                matchingMoments = similarMoments(eligibleMoments);
-                avg = 0;
-                // determine the similarity of the moments
-                for (k = 0; k < matchingMoments.length; k++) {
-                    avg += matchingMoments[k]?.rad ?? 0;
-                }
-
-                // Only two of the moments are allowed not to fit into the equation
-                // add the patch to the set
-                if (matchingMoments.length > 1
-                        && matchingMoments.length >= (eligibleMoments.length / 4) * 3
-                        && matchingMoments.length > moments.length / 4) {
-                    avg /= matchingMoments.length;
-                    patch = {
-                        index: patchPos[1] * _numPatches.x + patchPos[0],
-                        pos: {
-                            x,
-                            y,
-                        },
-                        box: [
-                            vec2.clone([x, y]),
-                            vec2.clone([x + _subImageWrapper.size.x, y]),
-                            vec2.clone([x + _subImageWrapper.size.x, y + _subImageWrapper.size.y]),
-                            vec2.clone([x, y + _subImageWrapper.size.y]),
-                        ],
-                        moments: matchingMoments,
-                        rad: avg,
-                        vec: vec2.clone([Math.cos(avg), Math.sin(avg)]),
-                    };
-                    patchesFound.push(patch);
-                }
+            // Only two of the moments are allowed not to fit into the equation
+            // add the patch to the set
+            if (matchingMoments.length > 1
+                    && matchingMoments.length >= (eligibleMoments.length / 4) * 3
+                    && matchingMoments.length > moments.length / 4) {
+                avg /= matchingMoments.length;
+                patch = {
+                    index: patchPos[1] * _numPatches.x + patchPos[0],
+                    pos: {
+                        x,
+                        y,
+                    },
+                    box: [
+                        vec2.clone([x, y]),
+                        vec2.clone([x + _subImageWrapper.size.x, y]),
+                        vec2.clone([x + _subImageWrapper.size.x, y + _subImageWrapper.size.y]),
+                        vec2.clone([x, y + _subImageWrapper.size.y]),
+                    ],
+                    moments: matchingMoments,
+                    rad: avg,
+                    vec: vec2.clone([Math.cos(avg), Math.sin(avg)]),
+                };
+                patchesFound.push(patch);
             }
         }
     }
