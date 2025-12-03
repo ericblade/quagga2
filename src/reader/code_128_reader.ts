@@ -5,10 +5,13 @@ class Code128Reader extends BarcodeReader {
     CODE_C = 99;
     CODE_B = 100;
     CODE_A = 101;
+    FNC1 = 102;
     START_CODE_A = 103;
     START_CODE_B = 104;
     START_CODE_C = 105;
     STOP_CODE = 106;
+    // ASCII 29 is the Group Separator character used to represent FNC1 in GS1-128 barcodes
+    FNC1_CHAR = String.fromCharCode(29);
     CODE_PATTERN = [
             [2, 1, 2, 2, 2, 2],
             [2, 2, 2, 1, 2, 2],
@@ -326,6 +329,9 @@ class Code128Reader extends BarcodeReader {
                         case this.CODE_C:
                             codeset = this.CODE_C;
                             break;
+                        case this.FNC1:
+                            result.push(this.FNC1_CHAR);
+                            break;
                         case this.STOP_CODE:
                             done = true;
                             break;
@@ -350,6 +356,9 @@ class Code128Reader extends BarcodeReader {
                             case this.CODE_C:
                                 codeset = this.CODE_C;
                                 break;
+                            case this.FNC1:
+                                result.push(this.FNC1_CHAR);
+                                break;
                             case this.STOP_CODE:
                                 done = true;
                                 break;
@@ -369,6 +378,9 @@ class Code128Reader extends BarcodeReader {
                             break;
                         case this.CODE_B:
                             codeset = this.CODE_B;
+                            break;
+                        case this.FNC1:
+                            result.push(this.FNC1_CHAR);
                             break;
                         case this.STOP_CODE:
                             done = true;

@@ -8,7 +8,7 @@ Quagga2 includes built-in readers for the following barcode formats:
 
 | Reader Name | Barcode Format | Common Uses |
 |-------------|----------------|-------------|
-| `code_128_reader` | [Code 128](https://en.wikipedia.org/wiki/Code_128) | General purpose, shipping, packaging |
+| `code_128_reader` | [Code 128](https://en.wikipedia.org/wiki/Code_128), [GS1-128](https://en.wikipedia.org/wiki/GS1-128) | General purpose, shipping, packaging, supply chain |
 | `ean_reader` | [EAN-13](https://en.wikipedia.org/wiki/International_Article_Number) | Retail products worldwide |
 | `ean_8_reader` | [EAN-8](https://en.wikipedia.org/wiki/EAN-8) | Small retail products |
 | `code_39_reader` | [Code 39](https://en.wikipedia.org/wiki/Code_39) | Automotive, defense, healthcare |
@@ -99,6 +99,70 @@ Some barcode formats are subsets or extensions of others:
 - **Code 39** and **Code 39 VIN** share similar patterns
 
 Be careful when enabling multiple related formats together.
+
+## GS1-128 Barcodes {#gs1-128-barcodes}
+
+[GS1-128](https://en.wikipedia.org/wiki/GS1-128) (formerly known as EAN-128 or UCC-128) is a subset of Code 128 used extensively in supply chain and logistics. It uses special FNC1 (Function Code 1) characters to separate variable-length data fields called Application Identifiers (AIs).
+
+### How GS1-128 Works {#gs1-128-how-it-works}
+
+GS1-128 barcodes encode structured data using standardized Application Identifiers. For example:
+- **AI 01** = GTIN (Global Trade Item Number)
+- **AI 10** = Batch/Lot Number
+- **AI 17** = Expiration Date
+- **AI 21** = Serial Number
+
+The FNC1 character acts as a field separator between variable-length AIs, allowing decoders to know where one field ends and another begins.
+
+### FNC1 Character Handling {#fnc1-character-handling}
+
+When the `code_128_reader` decodes a GS1-128 barcode, FNC1 characters are represented as ASCII 29 (Group Separator, `\x1D` or `\u001d`). This follows the GS1 standard for representing FNC1 in decoded data.
+
+```javascript
+Quagga.decodeSingle({
+  src: 'gs1-128-barcode.jpg',
+  decoder: {
+    readers: ['code_128_reader']
+  }
+}, function(result) {
+  if (result && result.codeResult) {
+    const code = result.codeResult.code;
+    // FNC1 characters appear as ASCII 29 (Group Separator)
+    const GS = String.fromCharCode(29);  // '\x1D'
+    
+    // Split on Group Separator to get individual AI fields
+    const fields = code.split(GS);
+    console.log('Fields:', fields);
+    // Example output: ["", "01034531200000111719050810ABCD1234", ...]
+    
+    // Or check for GS1-128 format (starts with FNC1)
+    if (code.startsWith(GS)) {
+      console.log('This is a GS1-128 barcode');
+    }
+  }
+});
+```
+
+### Parsing GS1-128 Data {#parsing-gs1-128-data}
+
+Once decoded, you can parse the GS1-128 data using the Application Identifier structure:
+
+```javascript
+function parseGS1(code) {
+  const GS = String.fromCharCode(29);
+  // Remove leading FNC1 if present
+  const data = code.startsWith(GS) ? code.substring(1) : code;
+  
+  // Split by FNC1 separator
+  const segments = data.split(GS);
+  
+  // Parse each segment for its AI
+  // (A full implementation would use a complete AI table)
+  return segments;
+}
+```
+
+For full GS1 parsing, consider using a dedicated library like [gs1-barcode-parser](https://www.npmjs.com/package/gs1-barcode-parser) after decoding with Quagga2.
 
 ## EAN Extensions {#ean-extensions}
 
