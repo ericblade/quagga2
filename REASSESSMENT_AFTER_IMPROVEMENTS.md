@@ -1,8 +1,35 @@
 # Reassessment: Half-Sampling Test Coverage
 
-**Date:** November 26, 2025 (Third Assessment)  
-**Previous Assessments:** November 22, 2025 (Original), November 23, 2025 (Second)  
-**Context:** Reassessment requested to determine additional tests needed before addressing duplicate canvas drawing issue
+**Date:** December 3, 2025 (Fourth Assessment)  
+**Previous Assessments:** November 22, 2025 (Original), November 23, 2025 (Second), November 26, 2025 (Third)  
+**Context:** Reassessment after significant testing reorganization to determine if duplicate canvas drawing bug still exists
+
+---
+
+## Bug Status: STILL PRESENT ❌
+
+The duplicate canvas drawing bug in `frame_grabber_browser.js:127-160` **is still present**:
+
+```javascript
+// Line 129-140: First draw to tempCanvas (ALWAYS executed)
+const tempCanvas = document.createElement('canvas');
+tempCtx.drawImage(drawable, ...);  // ← DRAW #1
+
+// Lines 142-145: Grayscale conversion (unused when halfSample=true)
+const originalImageData = tempCtx.getImageData(...);
+computeGray(originalImageData, grayData, _streamConfig);
+
+if (doHalfSample) {
+    // Lines 147-160: Second draw to _canvas
+    _ctx.drawImage(drawable, ...);  // ← DRAW #2
+    grayAndHalfSampleFromCanvasData(ctxData, _size, _data);
+}
+```
+
+**Problem:** When `halfSample=true`:
+- First `drawImage()` + grayscale conversion is completely **UNUSED**
+- Second `drawImage()` duplicates the work
+- ~50% performance overhead
 
 ---
 
@@ -197,5 +224,18 @@ function runDecoderTest(name, config, testSet) {
 
 ---
 
-**Updated:** November 26, 2025  
-**Status:** Awaiting unit test implementation before optimization
+**Updated:** December 3, 2025  
+**Status:** Bug still present. Awaiting unit test implementation before optimization.
+
+---
+
+## Quick Answer: What's Needed?
+
+**Minimum required before fixing the bug:**
+
+| Test | Purpose | Effort |
+|------|---------|--------|
+| Canvas drawing count test | Verify fix works (drawImage called once, not twice) | 1 day |
+| Frame grabber unit tests | Catch regressions in EXIF rotation, grayscale, etc. | 2-3 days |
+
+**The integration tests (which have been significantly improved) will catch correctness regressions, but won't verify the performance optimization actually eliminates the duplicate work.**
