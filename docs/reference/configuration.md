@@ -560,6 +560,7 @@ decoder: {
 - `2of5_reader` - Standard 2 of 5
 - `code_93_reader` - Code 93
 - `code_32_reader` - Code 32 (Italian Pharmacode)
+- `pharmacode_reader` - Pharmacode (Pharmaceutical Binary Code)
 
 See [Supported Barcode Types](readers.md) for complete details.
 

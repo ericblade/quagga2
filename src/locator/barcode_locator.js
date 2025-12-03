@@ -16,6 +16,8 @@ import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
 
+
+
 let _config;
 let _currentImageWrapper;
 let _skelImageWrapper;
@@ -271,6 +273,7 @@ function findBiggestConnectedAreas(maxLabel) {
     let labelHist = [];
     let topLabels = [];
 
+
     for (i = 0; i < maxLabel; i++) {
         labelHist.push(0);
     }
@@ -288,7 +291,7 @@ function findBiggestConnectedAreas(maxLabel) {
 
     labelHist.sort((a, b) => b.val - a.val);
 
-    // extract top areas with at least 6 patches present
+    // extract top areas with at least 5 patches present
     topLabels = labelHist.filter((el) => el.val >= 5);
 
     return topLabels;

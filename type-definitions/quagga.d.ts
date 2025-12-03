@@ -1004,6 +1004,7 @@ export interface QuaggaJSConfigObject {
          * Available values: x-small, small, medium, large, x-large
          */
         patchSize?: string;
+
         willReadFrequently?: boolean;
         debug?: {
             /**
@@ -1122,4 +1123,5 @@ export type QuaggaJSCodeReader =
     | 'i2of5_reader'
     | '2of5_reader'
     | 'code_93_reader'
-    | 'code_32_reader';
+    | 'code_32_reader'
+    | 'pharmacode_reader';

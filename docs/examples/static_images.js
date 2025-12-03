@@ -9,11 +9,18 @@ $(function() {
             });
         },
         config: {
-            "default": {
+                "default": {
                 inputStream: { name: "Test",
                     type: "ImageStream",
                     length: 10,
-                    size: 800
+                    size: 800,
+                    area: {
+                        top: "30%",
+                        right: "10%",
+                        left: "10%",
+                        bottom: "30%",
+                        backgroundColor: "rgba(255,0,0,0.15)"
+                    }
                 },
                 locator: {
                     patchSize: "medium",
