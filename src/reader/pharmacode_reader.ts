@@ -207,21 +207,14 @@ class PharmacodeReader extends BarcodeReader {
             }
         }
 
-        // Calculate the Pharmacode value
+        // Calculate the Pharmacode value using the correct algorithm
         // Reading from right to left (reverse the bars array)
-        // Narrow bar at position i adds 2^i
-        // Wide bar at position i adds 2^(i+1)
+        // For each bar: value = value * 2 + (1 for narrow, 2 for wide)
         let value = 0;
-        let position = 0;
 
         for (let i = bars.length - 1; i >= 0; i--) {
             const isWide = bars[i] > threshold;
-            if (isWide) {
-                value += Math.pow(2, position + 1);
-            } else {
-                value += Math.pow(2, position);
-            }
-            position++;
+            value = value * 2 + (isWide ? 2 : 1);
         }
 
         return { value };
