@@ -77,11 +77,6 @@ $(function() {
                     return parseInt(value);
                 }
             },
-            locator: {
-                minConnectedPatches: function(value) {
-                    return parseInt(value);
-                }
-            },
             decoder: {
                 readers: function(value) {
                     if (value === 'ean_extended') {
@@ -108,8 +103,7 @@ $(function() {
             },
             locator: {
                 patchSize: "medium",
-                halfSample: true,
-                minConnectedPatches: 5
+                halfSample: true
             },
             decoder: {
                 readers: [{

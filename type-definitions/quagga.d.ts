@@ -899,19 +899,6 @@ export interface QuaggaJSConfigObject {
 
         singleChannel?: boolean;
         size?: number;
-        /**
-         * Minimum size (in pixels) for the shorter dimension of the image.
-         * When specified, if the calculated shorter dimension would be less than minSize,
-         * the image is scaled up to ensure the shorter dimension equals minSize.
-         * This prevents over-compression of narrow images (e.g., tall barcodes on product boxes).
-         * 
-         * Example: For a 500x2000 image with size=800 and minSize=400:
-         * - Without minSize: scales to 200x800 (severe horizontal compression)
-         * - With minSize=400: scales to 400x1600 (preserves barcode detail)
-         * 
-         * @default undefined (no minimum enforced)
-         */
-        minSize?: number;
         sequence?: boolean;
 
         debug?: {
@@ -1017,18 +1004,6 @@ export interface QuaggaJSConfigObject {
          * Available values: x-small, small, medium, large, x-large
          */
         patchSize?: string;
-        
-        /**
-         * Minimum number of connected patches required to consider an area as potentially
-         * containing a barcode. Lower values help detect smaller barcodes but may increase
-         * false positives. Higher values require larger barcodes but are more reliable.
-         * 
-         * For small barcodes in large images, try reducing this to 2 or 3.
-         * 
-         * @default 5
-         */
-        minConnectedPatches?: number;
-        
         willReadFrequently?: boolean;
         debug?: {
             /**
