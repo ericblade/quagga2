@@ -15,7 +15,7 @@ describe('src/quagga/initCanvas.ts', () => {
             };
         });
 
-        it('should return container with null overlay when there is no document', () => {
+        it('should return container with all null properties when there is no document (Node.js)', () => {
             // Node.js environment - no document
             context.config = {
                 inputStream: { type: 'ImageStream' },
@@ -23,11 +23,13 @@ describe('src/quagga/initCanvas.ts', () => {
 
             const result = initCanvas(context);
 
-            // In Node.js (no document), should return default container
+            // In Node.js (no document), should return default container with all null values
             expect(result).to.be.an('object');
             // Since we're in Node.js where document is undefined,
-            // the overlay should be null (default container)
+            // all dom and ctx properties should be null
+            expect(result!.dom.image).to.be.null;
             expect(result!.dom.overlay).to.be.null;
+            expect(result!.ctx.image).to.be.null;
             expect(result!.ctx.overlay).to.be.null;
         });
 

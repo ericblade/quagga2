@@ -8,3 +8,4 @@ import '../../src/input/test/browser/data_uri.spec.ts';
 import '../../src/common/test/browser/mediaDevices.spec.ts';
 import '../../src/input/test/browser/frame_grabber_halfsample.spec.ts';
 import '../../src/quagga/test/browser/pause_start.spec.ts';
+import '../../src/quagga/test/browser/initCanvas.spec.ts';
