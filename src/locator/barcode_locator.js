@@ -16,6 +16,18 @@ import Rasterizer from './rasterizer';
 import Tracer from './tracer';
 import skeletonizer from './skeletonizer';
 
+// Constants for locator thresholds
+// Minimum moments required per patch for standard barcode detection
+const MIN_MOMENTS_NORMAL = 2;
+// Minimum moments required per patch for sparse barcode detection (singleMoment mode)
+const MIN_MOMENTS_SPARSE = 1;
+// Minimum connected patches required for standard barcode detection
+const MIN_PATCHES_NORMAL = 5;
+// Minimum connected patches required for sparse barcode detection (singleMoment mode)
+const MIN_PATCHES_SPARSE = 2;
+// Angle threshold for vertical bar detection (radians) - approximately 30 degrees
+const VERTICAL_ANGLE_THRESHOLD = Math.PI / 6;
+
 let _config;
 let _currentImageWrapper;
 let _skelImageWrapper;
@@ -271,7 +283,7 @@ function findBiggestConnectedAreas(maxLabel) {
     let labelHist = [];
     let topLabels = [];
     // For sparse barcodes (like Pharmacode), use lower threshold when singleMoment hint is enabled
-    const minPatches = _config.singleMoment ? 2 : 5;
+    const minPatches = _config.singleMoment ? MIN_PATCHES_SPARSE : MIN_PATCHES_NORMAL;
 
     for (i = 0; i < maxLabel; i++) {
         labelHist.push(0);
