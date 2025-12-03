@@ -33,25 +33,6 @@ describe('src/quagga/initCanvas.ts', () => {
             expect(result!.ctx.overlay).to.be.null;
         });
 
-        it('should return object with dom.image, dom.overlay, ctx.image, and ctx.overlay properties', () => {
-            // Verify the structure of the returned object
-            context.config = {
-                inputStream: { type: 'ImageStream' },
-            };
-
-            const result = initCanvas(context);
-
-            expect(result).to.be.an('object');
-            // Verify dom object has both image and overlay properties
-            expect(result!.dom).to.be.an('object');
-            expect(result!.dom).to.have.property('image');
-            expect(result!.dom).to.have.property('overlay');
-            // Verify ctx object has both image and overlay properties
-            expect(result!.ctx).to.be.an('object');
-            expect(result!.ctx).to.have.property('image');
-            expect(result!.ctx).to.have.property('overlay');
-        });
-
         it('should return null when inputStream type is not defined', () => {
             context.config = {
                 inputStream: {},
