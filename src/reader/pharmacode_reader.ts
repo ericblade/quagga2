@@ -130,12 +130,18 @@ class PharmacodeReader extends BarcodeReader {
                 if (currentWidth === 0) {
                     break;
                 }
+                // If we hit the edge of the scan area, don't count this as a valid space
+                // It's likely truncated or includes the edge boundary
+                if (pos >= this._row.length) {
+                    // Reached the edge, stop here without adding this space
+                    break;
+                }
                 // Check if this might be the trailing quiet zone
-                // A very large space likely means end of barcode
-                if (spaces.length > 0) {
-                    const avgSpace = spaces.reduce((a, b) => a + b, 0) / spaces.length;
-                    if (currentWidth > avgSpace * 3) {
-                        // This is likely the quiet zone, not an inter-bar space
+                // The quiet zone is typically much larger than inter-bar spaces
+                if (spaces.length >= 2) {
+                    const sortedSpaces = spaces.slice().sort((a, b) => a - b);
+                    const median = sortedSpaces[Math.floor(sortedSpaces.length / 2)];
+                    if (currentWidth > median * 2.5) {
                         break;
                     }
                 }
@@ -145,11 +151,13 @@ class PharmacodeReader extends BarcodeReader {
 
         // Validate bar count
         if (bars.length < MIN_BAR_COUNT || bars.length > MAX_BAR_COUNT) {
+            console.log('[pharmacode] invalid bar count:', bars.length, 'bars:', bars);
             return null;
         }
 
         // We should have (n-1) spaces for n bars
         if (spaces.length !== bars.length - 1) {
+            console.log('[pharmacode] space count mismatch: bars:', bars.length, 'spaces:', spaces.length, 'bars:', bars, 'spaces:', spaces);
             return null;
         }
 
@@ -212,7 +220,7 @@ class PharmacodeReader extends BarcodeReader {
         // Narrow bar at position n adds 2^n
         // Wide bar at position n adds 2^(n+1)
         let value = 0;
-        
+
         // Reverse bars to process right-to-left
         const reversedBars = bars.slice().reverse();
 
@@ -240,16 +248,19 @@ class PharmacodeReader extends BarcodeReader {
         // Find the start of the barcode
         const startInfo = this._findStart();
         if (!startInfo) {
+            console.log('[pharmacode] no start found');
             return null;
         }
 
         // Extract bars and spaces
         const extracted = this._extractBarsAndSpaces(startInfo.start);
         if (!extracted) {
+            console.log('[pharmacode] failed to extract bars');
             return null;
         }
 
         const { bars, spaces, end } = extracted;
+        console.log('[pharmacode] extracted bars:', bars.length, 'bars:', bars);
 
         // Validate space uniformity
         if (!this._validateSpaces(spaces)) {
