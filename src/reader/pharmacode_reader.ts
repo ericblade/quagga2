@@ -208,13 +208,21 @@ class PharmacodeReader extends BarcodeReader {
         }
 
         // Calculate the Pharmacode value using the correct algorithm
-        // Reading from right to left (reverse the bars array)
-        // For each bar: value = value * 2 + (1 for narrow, 2 for wide)
+        // Position n starts at 0 on the RIGHT (last bar in array)
+        // Narrow bar at position n adds 2^n
+        // Wide bar at position n adds 2^(n+1)
         let value = 0;
+        
+        // Reverse bars to process right-to-left
+        const reversedBars = bars.slice().reverse();
 
-        for (let i = bars.length - 1; i >= 0; i--) {
-            const isWide = bars[i] > threshold;
-            value = value * 2 + (isWide ? 2 : 1);
+        for (let i = 0; i < reversedBars.length; i++) {
+            const isWide = reversedBars[i] > threshold;
+            if (isWide) {
+                value += Math.pow(2, i + 1);
+            } else {
+                value += Math.pow(2, i);
+            }
         }
 
         return { value };
