@@ -232,73 +232,108 @@ class PharmacodeReader extends BarcodeReader {
      * This is a spec requirement for pharmacodes
      */
     protected _validateBarRatios(bars: number[]): { narrowWidth: number, wideRatio: number } | null {
-        const narrowBars: number[] = [];
-        const wideBars: number[] = [];
+        // If all bars are essentially the same width (low variance), accept as single-width
+        const avgAll = bars.reduce((a, b) => a + b, 0) / bars.length;
+        const varAll = bars.reduce((a, b) => a + Math.abs(b - avgAll), 0) / bars.length;
+        const cvAll = avgAll === 0 ? 0 : varAll / avgAll;
+        if (cvAll <= 0.1) {
+            return { narrowWidth: avgAll, wideRatio: 2.0 };
+        }
 
-        // Find the minimum bar width (likely narrow bar)
-        const minWidth = Math.min(...bars);
-        const threshold = minWidth * WIDE_BAR_THRESHOLD;
-
-        bars.forEach(width => {
-            if (width <= threshold) {
-                narrowBars.push(width);
-            } else {
-                wideBars.push(width);
-            }
-        });
-
-        // If all bars are narrow or all bars are wide, that's valid
-        // Just return the average width as "narrow" and a default ratio
-        if (narrowBars.length === 0 || wideBars.length === 0) {
+        // Explore multiple possible thresholds (midpoints between sorted unique widths)
+        // and pick the one that best matches an allowed ratio with low per-bar deviation.
+        const sortedUnique = Array.from(new Set(bars.slice().sort((a, b) => a - b)));
+        if (sortedUnique.length < 2) {
+            // All bars identical: treat as single-width (valid pharmacode of all narrow or all wide)
             const avgWidth = bars.reduce((a, b) => a + b, 0) / bars.length;
             return { narrowWidth: avgWidth, wideRatio: 2.0 };
         }
 
-        // Get average widths
-        const avgNarrow = narrowBars.reduce((a, b) => a + b, 0) / narrowBars.length;
-        const avgWide = wideBars.reduce((a, b) => a + b, 0) / wideBars.length;
+        type Candidate = {
+            threshold: number;
+            narrowBars: number[];
+            wideBars: number[];
+            avgN: number;
+            avgW: number;
+            ratio: number;
+            ratioDiff: number;
+            matchedRatio: number;
+        };
 
-        // Calculate the actual ratio
-        const actualRatio = avgWide / avgNarrow;
+        const candidates: Candidate[] = [];
 
-        // Check if actual ratio matches one of the allowed ratios
-        let matchedRatio: number | null = null;
-        for (const allowedRatio of ALLOWED_WIDE_BAR_RATIOS) {
-            const tolerance = allowedRatio * WIDE_BAR_RATIO_TOLERANCE;
-            if (Math.abs(actualRatio - allowedRatio) <= tolerance) {
-                matchedRatio = allowedRatio;
-                break;
-            }
-        }
-
-        if (!matchedRatio) {
-            return null;
-        }
-
-        // Now validate that EACH individual bar follows the ratio consistently
-        // Each narrow bar should be ~1x the narrow width
-        // Each wide bar should be ~ratio x the narrow width
-        const narrowTolerance = avgNarrow * 0.3; // Allow 30% deviation from narrow average
-        const wideTolerance = (avgWide) * 0.3;   // Allow 30% deviation from wide average
-
-        for (const bar of bars) {
-            const isWide = bar > threshold;
-            if (isWide) {
-                // Check if this wide bar is roughly avgWide
-                if (Math.abs(bar - avgWide) > wideTolerance) {
-                    console.log('REJECTED: Wide bar width inconsistent:', bar, 'expected ~', avgWide);
-                    return null;
-                }
-            } else {
-                // Check if this narrow bar is roughly avgNarrow
-                if (Math.abs(bar - avgNarrow) > narrowTolerance) {
-                    console.log('REJECTED: Narrow bar width inconsistent:', bar, 'expected ~', avgNarrow);
-                    return null;
+        // Generate candidate thresholds at midpoints between consecutive unique widths
+        for (let i = 0; i < sortedUnique.length - 1; i++) {
+            const t = (sortedUnique[i] + sortedUnique[i + 1]) / 2;
+            const n: number[] = [];
+            const w: number[] = [];
+            for (const b of bars) {
+                if (b < t) {
+                    n.push(b);
+                } else {
+                    w.push(b);
                 }
             }
+
+            if (n.length === 0 || w.length === 0) {
+                continue; // need both groups
+            }
+
+            const avgN = n.reduce((a, b) => a + b, 0) / n.length;
+            const avgW = w.reduce((a, b) => a + b, 0) / w.length;
+            const ratio = avgW / avgN;
+
+            // Find closest allowed ratio
+            let bestRatio = ALLOWED_WIDE_BAR_RATIOS[0];
+            let bestDiff = Math.abs(ratio - bestRatio);
+            for (const r of ALLOWED_WIDE_BAR_RATIOS) {
+                const d = Math.abs(ratio - r);
+                if (d < bestDiff) {
+                    bestDiff = d;
+                    bestRatio = r;
+                }
+            }
+
+            candidates.push({
+                threshold: t,
+                narrowBars: n,
+                wideBars: w,
+                avgN,
+                avgW,
+                ratio,
+                ratioDiff: bestDiff,
+                matchedRatio: bestRatio,
+            });
         }
 
-        return { narrowWidth: avgNarrow, wideRatio: matchedRatio };
+        // Sort candidates by how close the ratio is to allowed ratios
+        candidates.sort((a, b) => a.ratioDiff - b.ratioDiff);
+
+        for (const c of candidates) {
+            // Check ratio within tolerance
+            const tolerance = c.matchedRatio * WIDE_BAR_RATIO_TOLERANCE;
+            if (Math.abs(c.ratio - c.matchedRatio) > tolerance) {
+                continue;
+            }
+
+            // Per-bar consistency checks
+            const narrowTolerance = c.avgN * 0.3;
+            const wideTolerance = c.avgW * 0.3;
+            let ok = true;
+            for (const b of c.narrowBars) {
+                if (Math.abs(b - c.avgN) > narrowTolerance) { ok = false; break; }
+            }
+            if (!ok) continue;
+            for (const b of c.wideBars) {
+                if (Math.abs(b - c.avgW) > wideTolerance) { ok = false; break; }
+            }
+            if (!ok) continue;
+
+            // Accept first viable candidate (closest ratio)
+            return { narrowWidth: c.avgN, wideRatio: c.matchedRatio };
+        }
+
+        return null;
     }
 
     /**
