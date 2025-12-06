@@ -92,6 +92,34 @@ class PharmacodeReader extends BarcodeReader {
     }
 
     /**
+     * Smooth bar widths to reduce edge-detection jitter from colored barcodes.
+     * Applies median filter to adjacent bars: if a bar is 1–3px different from neighbors,
+     * snap it to the median of local bars to stabilize measurements.
+     */
+    protected _smoothBarWidths(bars: number[]): number[] {
+        if (bars.length <= 2) {
+            return bars; // Not enough bars to smooth
+        }
+
+        const smoothed = bars.slice();
+        for (let i = 1; i < smoothed.length - 1; i++) {
+            const prev = smoothed[i - 1];
+            const curr = smoothed[i];
+            const next = smoothed[i + 1];
+            
+            // If current bar is significantly different from neighbors, snap to median
+            const median = [prev, curr, next].sort((a, b) => a - b)[1];
+            const deviation = Math.abs(curr - median);
+            
+            // If deviation is small (1–3px), snap to median to reduce noise
+            if (deviation > 0 && deviation <= 3) {
+                smoothed[i] = median;
+            }
+        }
+        return smoothed;
+    }
+
+    /**
      * Extract all bar and space widths from the pattern
      */
     protected _extractBarsAndSpaces(startPos: number): { bars: number[], spaces: number[], end: number } | null {
@@ -166,7 +194,10 @@ class PharmacodeReader extends BarcodeReader {
             return null;
         }
 
-        return { bars, spaces, end: pos };
+        // Apply smoothing to reduce edge-detection jitter on colored barcodes
+        const smoothedBars = this._smoothBarWidths(bars);
+
+        return { bars: smoothedBars, spaces, end: pos };
     }
 
     /**
@@ -350,6 +381,64 @@ class PharmacodeReader extends BarcodeReader {
         return this._matchRange(end, trailingWhitespaceEnd, 0);
     }
 
+    /**
+     * Check pattern consistency: extract bars from slightly shifted positions.
+     * Real barcodes should produce consistent bar patterns even with small shifts.
+     * Text patterns are typically edge-based and will break with a small shift.
+     */
+    protected _validatePatternConsistency(startInfo: BarcodePosition, bars: number[]): boolean {
+        // Check all patterns for consistency (not just short ones)
+        // Text patterns are usually inconsistent with small shifts
+        
+        const originalStart = startInfo.start;
+        let consistentOffsets = 0;
+        let totalChecks = 0;
+
+        // Check positions offset by ±1 and ±2 pixels (simulate scanning lines nearby)
+        for (const offset of [-2, -1, 1, 2]) {
+            const shiftedStart = originalStart + offset;
+            if (shiftedStart < 0 || shiftedStart >= this._row.length) {
+                continue;
+            }
+
+            totalChecks++;
+
+            // Try to extract bars from shifted position
+            const shiftedExtracted = this._extractBarsAndSpaces(shiftedStart);
+            if (!shiftedExtracted) {
+                continue;
+            }
+
+            // If we got bars and they match in count, it's more likely a real barcode
+            if (shiftedExtracted.bars.length === bars.length) {
+                // Check if bar widths are roughly similar (within 25%)
+                let barsMatch = true;
+                for (let i = 0; i < bars.length; i++) {
+                    const diff = Math.abs(shiftedExtracted.bars[i] - bars[i]) / Math.max(bars[i], 1);
+                    if (diff > 0.25) {
+                        barsMatch = false;
+                        break;
+                    }
+                }
+                if (barsMatch) {
+                    consistentOffsets++;
+                }
+            }
+        }
+
+        // Real barcodes should be consistent across multiple shifted positions
+        // Text patterns typically fail this test
+        if (totalChecks > 0 && consistentOffsets >= totalChecks * 0.5) {
+            return true; // Consistent across at least 50% of positions
+        }
+
+        // Pattern was not consistent - likely text/noise
+        if (totalChecks > 0) {
+            console.log('REJECTED: Pattern inconsistent - consistent in', consistentOffsets, 'of', totalChecks, 'shifted positions (likely text artifact)');
+        }
+        return false;
+    }
+
     public decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null {
         // Find the start of the barcode
         const startInfo = this._findStart();
@@ -369,6 +458,12 @@ class PharmacodeReader extends BarcodeReader {
 
         // Validate space uniformity
         if (!this._validateSpaces(spaces)) {
+            return null;
+        }
+
+        // For short patterns, validate consistency across shifted positions
+        // to reject text/noise patterns that appear as bars due to edge detection
+        if (!this._validatePatternConsistency(startInfo, bars)) {
             return null;
         }
 
