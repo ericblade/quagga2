@@ -179,6 +179,12 @@ class PharmacodeReader extends BarcodeReader {
                     if (currentWidth > median * 2.5) {
                         break;
                     }
+                } else if (spaces.length === 0 && bars.length >= 1) {
+                    // For the first space, check against the first bar width
+                    // Normal inter-bar spaces shouldn't exceed ~10x the bar width
+                    if (currentWidth > bars[0] * 10) {
+                        break;
+                    }
                 }
                 spaces.push(currentWidth);
             }
@@ -387,6 +393,7 @@ class PharmacodeReader extends BarcodeReader {
      * Text patterns are typically edge-based and will break with a small shift.
      */
     protected _validatePatternConsistency(startInfo: BarcodePosition, bars: number[]): boolean {
+        console.log('>>> CONSISTENCY CHECK ENTRY - bars:', bars, 'start:', startInfo.start);
         // Check all patterns for consistency (not just short ones)
         // Text patterns are usually inconsistent with small shifts
         
@@ -429,12 +436,13 @@ class PharmacodeReader extends BarcodeReader {
         // Real barcodes should be consistent across multiple shifted positions
         // Text patterns typically fail this test
         if (totalChecks > 0 && consistentOffsets >= totalChecks * 0.5) {
+            console.log('<<< CONSISTENCY CHECK PASSED - consistent:', consistentOffsets, 'of', totalChecks);
             return true; // Consistent across at least 50% of positions
         }
 
         // Pattern was not consistent - likely text/noise
         if (totalChecks > 0) {
-            console.log('REJECTED: Pattern inconsistent - consistent in', consistentOffsets, 'of', totalChecks, 'shifted positions (likely text artifact)');
+            console.log('<<< CONSISTENCY CHECK FAILED - consistent:', consistentOffsets, 'of', totalChecks, '(likely text artifact)');
         }
         return false;
     }
@@ -455,6 +463,17 @@ class PharmacodeReader extends BarcodeReader {
         const { bars, spaces, end } = extracted;
 
         console.log('Extracted barcode - bars:', bars.length, 'spaces:', spaces.length, 'end:', end, 'row length:', this._row.length, 'start:', startInfo.start);
+
+        // Reject extremely short patterns (total width < 20px)
+        // Calculate actual barcode width from sum of bars and spaces
+        const barsWidth = bars.reduce((sum, w) => sum + w, 0);
+        const spacesWidth = spaces.reduce((sum, w) => sum + w, 0);
+        const totalBarcodeWidth = barsWidth + spacesWidth;
+        console.log('WIDTH CHECK: totalBarcodeWidth =', totalBarcodeWidth, '(bars:', barsWidth, 'spaces:', spacesWidth, ')');
+        if (totalBarcodeWidth < 20) {
+            console.log('REJECTED: Barcode too narrow -', totalBarcodeWidth, 'px (minimum 20px)');
+            return null;
+        }
 
         // Validate space uniformity
         if (!this._validateSpaces(spaces)) {
