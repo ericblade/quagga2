@@ -5,13 +5,11 @@ describe('Pharmacode Decoder Tests', () => {
     // Note: Tests only run with halfSample: false currently work reliably
     // halfSample: true causes bar width detection issues for some images
     const pharmacodeTestSet = [
-        // image-001 is marked unreadable by reference decoder - skip it
+        { 'name': 'image-001.jpg', 'result': '3', format: 'pharmacode' },
         { 'name': 'image-002.jpg', 'result': '7', format: 'pharmacode' },
         { 'name': 'image-003.jpg', 'result': '12', format: 'pharmacode' },
         { 'name': 'image-004.jpg', 'result': '15', format: 'pharmacode' },
-        // image-005 has 6 bars: NNNNNW (left to right), which should decode to 64
-        // Currently marked allowFail due to bar width threshold issues
-        { 'name': 'image-005.jpg', 'result': '64', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-005.jpg', 'result': '64', format: 'pharmacode' },
         // images 006-012 also have bar width detection issues with halfSample:true
         { 'name': 'image-006.jpg', 'result': '100', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
         { 'name': 'image-007.jpg', 'result': '255', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
