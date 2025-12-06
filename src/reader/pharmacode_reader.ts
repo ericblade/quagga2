@@ -32,13 +32,20 @@ const MAX_VALUE = 131070;
 
 // Threshold ratio to distinguish narrow from wide bars
 // A bar wider than this ratio of the narrow bar width is considered wide
-const WIDE_BAR_THRESHOLD = 1.75;
+const WIDE_BAR_THRESHOLD = 1.6;
 
 // Maximum allowed variation in space widths (coefficient of variation)
-const MAX_SPACE_VARIANCE = 0.4;
+// Reduced from 0.4 to help with false positives, but allowing some tolerance
+const MAX_SPACE_VARIANCE = 0.35;
 
-// Maximum allowed variation in narrow bar widths
-const MAX_NARROW_BAR_VARIANCE = 0.4;
+// Minimum quiet zone requirement in barcode widths (pharmaceutical spec: 6mm min)
+// We use 1x narrow bar width as a minimum quiet zone
+const MIN_QUIET_ZONE_WIDTHS = 1;
+
+// Allowed narrow/wide bar ratios (1:2, 1:2.5, 1:3)
+// These are multipliers applied to narrow bar width
+const ALLOWED_WIDE_BAR_RATIOS = [2.0, 2.5, 3.0];
+const WIDE_BAR_RATIO_TOLERANCE = 0.05; // Allow 5% deviation from the detected ratio
 
 class PharmacodeReader extends BarcodeReader {
     FORMAT = 'pharmacode';
@@ -151,13 +158,11 @@ class PharmacodeReader extends BarcodeReader {
 
         // Validate bar count
         if (bars.length < MIN_BAR_COUNT || bars.length > MAX_BAR_COUNT) {
-            console.log('[pharmacode] invalid bar count:', bars.length, 'bars:', bars);
             return null;
         }
 
         // We should have (n-1) spaces for n bars
         if (spaces.length !== bars.length - 1) {
-            console.log('[pharmacode] space count mismatch: bars:', bars.length, 'spaces:', spaces.length, 'bars:', bars, 'spaces:', spaces);
             return null;
         }
 
@@ -186,6 +191,106 @@ class PharmacodeReader extends BarcodeReader {
     }
 
     /**
+     * Validate that narrow and wide bars follow a consistent ratio (1:2, 1:2.5, or 1:3)
+     * This is a spec requirement for pharmacodes
+     */
+    protected _validateBarRatios(bars: number[]): { narrowWidth: number, wideRatio: number } | null {
+        const narrowBars: number[] = [];
+        const wideBars: number[] = [];
+
+        // Find the minimum bar width (likely narrow bar)
+        const minWidth = Math.min(...bars);
+        const threshold = minWidth * WIDE_BAR_THRESHOLD;
+
+        bars.forEach(width => {
+            if (width <= threshold) {
+                narrowBars.push(width);
+            } else {
+                wideBars.push(width);
+            }
+        });
+
+        // If all bars are narrow or all bars are wide, that's valid
+        // Just return the average width as "narrow" and a default ratio
+        if (narrowBars.length === 0 || wideBars.length === 0) {
+            const avgWidth = bars.reduce((a, b) => a + b, 0) / bars.length;
+            return { narrowWidth: avgWidth, wideRatio: 2.0 };
+        }
+
+        // Get average widths
+        const avgNarrow = narrowBars.reduce((a, b) => a + b, 0) / narrowBars.length;
+        const avgWide = wideBars.reduce((a, b) => a + b, 0) / wideBars.length;
+
+        // Calculate the actual ratio
+        const actualRatio = avgWide / avgNarrow;
+
+        // Check if actual ratio matches one of the allowed ratios
+        let matchedRatio: number | null = null;
+        for (const allowedRatio of ALLOWED_WIDE_BAR_RATIOS) {
+            const tolerance = allowedRatio * WIDE_BAR_RATIO_TOLERANCE;
+            if (Math.abs(actualRatio - allowedRatio) <= tolerance) {
+                matchedRatio = allowedRatio;
+                break;
+            }
+        }
+
+        if (!matchedRatio) {
+            return null;
+        }
+
+        // Now validate that EACH individual bar follows the ratio consistently
+        // Each narrow bar should be ~1x the narrow width
+        // Each wide bar should be ~ratio x the narrow width
+        const narrowTolerance = avgNarrow * 0.3; // Allow 30% deviation from narrow average
+        const wideTolerance = (avgWide) * 0.3;   // Allow 30% deviation from wide average
+
+        for (const bar of bars) {
+            const isWide = bar > threshold;
+            if (isWide) {
+                // Check if this wide bar is roughly avgWide
+                if (Math.abs(bar - avgWide) > wideTolerance) {
+                    console.log('REJECTED: Wide bar width inconsistent:', bar, 'expected ~', avgWide);
+                    return null;
+                }
+            } else {
+                // Check if this narrow bar is roughly avgNarrow
+                if (Math.abs(bar - avgNarrow) > narrowTolerance) {
+                    console.log('REJECTED: Narrow bar width inconsistent:', bar, 'expected ~', avgNarrow);
+                    return null;
+                }
+            }
+        }
+
+        return { narrowWidth: avgNarrow, wideRatio: matchedRatio };
+    }
+
+    /**
+     * Verify that there is sufficient quiet zone at start and end
+     * When area constraints are used, the quiet zone may be truncated,
+     * so we check if we have at least SOME quiet zone or hit the scan boundary
+     */
+    protected _validateQuietZones(startInfo: BarcodePosition, narrowWidth: number, end: number): boolean {
+        const minQuietZone = narrowWidth * MIN_QUIET_ZONE_WIDTHS;
+
+        // Check leading quiet zone
+        // If we're very close to the start (within 2 pixels), we likely hit the area boundary
+        // In that case, accept it as we can't verify the quiet zone
+        if (startInfo.start >= 2 && startInfo.start < minQuietZone) {
+            return false;
+        }
+
+        // Check trailing quiet zone
+        // If we're at or very close to the end of the row, we likely hit the area boundary
+        // or found a large quiet zone that extended to the edge - both are acceptable
+        const remainingSpace = this._row.length - end;
+        if (remainingSpace >= 2 && remainingSpace < minQuietZone) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
      * Classify bars as narrow or wide and decode the value
      */
     protected _decodeBars(bars: number[]): { value: number } | null {
@@ -198,22 +303,15 @@ class PharmacodeReader extends BarcodeReader {
 
         // Separate bars into narrow and wide for validation
         const narrowBars: number[] = [];
+        const wideBars: number[] = [];
 
         bars.forEach(width => {
             if (width <= threshold) {
                 narrowBars.push(width);
+            } else {
+                wideBars.push(width);
             }
         });
-
-        // Validate narrow bar consistency
-        if (narrowBars.length > 0) {
-            const narrowMean = narrowBars.reduce((a, b) => a + b, 0) / narrowBars.length;
-            const narrowVariance = narrowBars.reduce((sum, w) => sum + Math.pow(w - narrowMean, 2), 0) / narrowBars.length;
-            const narrowCv = Math.sqrt(narrowVariance) / narrowMean;
-            if (narrowCv > MAX_NARROW_BAR_VARIANCE) {
-                return null;
-            }
-        }
 
         // Calculate the Pharmacode value using the correct algorithm
         // Position n starts at 0 on the RIGHT (last bar in array)
@@ -233,6 +331,14 @@ class PharmacodeReader extends BarcodeReader {
             }
         }
 
+        // Build human-readable bar pattern for debugging
+        let pattern = '';
+        for (let i = reversedBars.length - 1; i >= 0; i--) {
+            pattern += reversedBars[i] > threshold ? 'W' : 'N';
+        }
+
+        console.log('Pharmacode decode - bars:', bars, 'threshold:', threshold, 'pattern:', pattern, 'value:', value);
+
         return { value };
     }
 
@@ -248,24 +354,42 @@ class PharmacodeReader extends BarcodeReader {
         // Find the start of the barcode
         const startInfo = this._findStart();
         if (!startInfo) {
-            console.log('[pharmacode] no start found');
             return null;
         }
 
         // Extract bars and spaces
         const extracted = this._extractBarsAndSpaces(startInfo.start);
         if (!extracted) {
-            console.log('[pharmacode] failed to extract bars');
             return null;
         }
 
         const { bars, spaces, end } = extracted;
-        console.log('[pharmacode] extracted bars:', bars.length, 'bars:', bars);
+
+        console.log('Extracted barcode - bars:', bars.length, 'spaces:', spaces.length, 'end:', end, 'row length:', this._row.length, 'start:', startInfo.start);
 
         // Validate space uniformity
         if (!this._validateSpaces(spaces)) {
             return null;
         }
+
+        // Validate bar width ratios are consistent (1:2, 1:2.5, or 1:3)
+        const ratioInfo = this._validateBarRatios(bars);
+        if (!ratioInfo) {
+            console.log('REJECTED: Bar ratio validation failed - bars:', bars);
+            return null;
+        }
+        console.log('Bar ratio validation PASSED - narrowWidth:', ratioInfo.narrowWidth, 'ratio:', ratioInfo.wideRatio);
+
+        // Validate quiet zones meet pharmaceutical spec
+        if (!this._validateQuietZones(startInfo, ratioInfo.narrowWidth, end)) {
+            console.log('REJECTED: Quiet zone validation failed - start:', startInfo.start, 'end:', this._row.length - end, 'required:', ratioInfo.narrowWidth);
+            return null;
+        }
+
+        // Reject very short patterns (likely text artifacts)
+        // Already validated via bar ratio check - if bars pass ratio validation,
+        // they are likely legitimate
+
 
         // Decode the bars
         const decoded = this._decodeBars(bars);
