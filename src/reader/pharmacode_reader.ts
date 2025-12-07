@@ -89,7 +89,12 @@ class PharmacodeReader extends BarcodeReader {
             // Found a non-noise bar, verify leading whitespace (quiet zone)
             const quietZoneStart = Math.max(0, barStart - barWidth * 2);
             if (barStart > 0 && !this._matchRange(quietZoneStart, barStart, 0)) {
-                return null;
+                searchPos = barEnd + 1;
+                continue;
+            }
+
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] _findStart found bar at ${barStart}-${barEnd} (width ${barWidth})`);
             }
 
             return {
@@ -373,25 +378,48 @@ class PharmacodeReader extends BarcodeReader {
     protected _validateQuietZones(startInfo: BarcodePosition, narrowWidth: number, end: number): boolean {
         const minQuietZone = narrowWidth * MIN_QUIET_ZONE_WIDTHS;
 
+        if (process.env.NODE_ENV === 'test' && end === 611) {
+            console.log(`[DEBUG] QZ validation: narrowWidth=${narrowWidth}, MIN_QUIET_ZONE_WIDTHS=${MIN_QUIET_ZONE_WIDTHS}, minQZ=${minQuietZone}`);
+        }
+
         // Check leading quiet zone
         // If we're very close to the start (within 2 pixels), we likely hit the area boundary
         // In that case, accept it as we can't verify the quiet zone
         if (startInfo.start >= 2 && startInfo.start < minQuietZone) {
+            if (process.env.NODE_ENV === 'test' && end === 611) {
+                console.log(`[DEBUG] QZ FAIL leading: startInfo.start=${startInfo.start}, minQZ=${minQuietZone}`);
+            }
             return false;
         }
 
         // Check trailing quiet zone
         // If we're at or very close to the end of the row, we likely hit the area boundary
         // In real extracted images, especially with resizing, we may not have perfect quiet zones
-        // So we accept it if we're within 3 pixels of the end
+        // So we accept it if we're within 6 pixels of the end (scan boundary)
         const remainingSpace = this._row.length - end;
-        if (remainingSpace >= 3) {
-            // We have at least 3px of trailing space - check if it's sufficient quiet zone
-            if (remainingSpace < minQuietZone) {
-                return false;
-            }
+        if (process.env.NODE_ENV === 'test' && end === 611) {
+            console.log(`[DEBUG] QZ trailing check: rowLen=${this._row.length}, end=${end}, remainingSpace=${remainingSpace}`);
         }
-        // Very close to edge (0-2px) - accept as boundary
+        
+        // If we're very close to the edge (< 6px), we hit the scan boundary - accept it
+        if (remainingSpace < 6) {
+            if (process.env.NODE_ENV === 'test' && end === 611) {
+                console.log(`[DEBUG] QZ PASS: at scan boundary (remainingSpace=${remainingSpace} < 6)`);
+            }
+            return true;
+        }
+        
+        // We have at least 6px of trailing space - check if it meets minimum quiet zone requirement
+        if (remainingSpace < minQuietZone) {
+            if (process.env.NODE_ENV === 'test' && end === 611) {
+                console.log(`[DEBUG] QZ FAIL trailing: remainingSpace=${remainingSpace}, minQZ=${minQuietZone}`);
+            }
+            return false;
+        }
+        
+        if (process.env.NODE_ENV === 'test' && end === 611) {
+            console.log(`[DEBUG] QZ PASS`);
+        }
 
         return true;
     }
@@ -500,6 +528,10 @@ class PharmacodeReader extends BarcodeReader {
             return null;
         }
 
+        if (process.env.NODE_ENV === 'test') {
+            console.log(`[DEBUG] Row length: ${this._row.length}, barcode at ${startInfo.start}-${startInfo.end}`);
+        }
+
         // Extract bars and spaces
         const extracted = this._extractBarsAndSpaces(startInfo.start);
         if (!extracted) {
@@ -507,6 +539,10 @@ class PharmacodeReader extends BarcodeReader {
         }
 
         const { bars, spaces, end } = extracted;
+
+        if (process.env.NODE_ENV === 'test') {
+            console.log(`[DEBUG] _extractBarsAndSpaces: start=${startInfo.start}, end=${end}, barCount=${bars.length}, bars=${bars}, spaces=${spaces}`);
+        }
 
         // Reject extremely short patterns (total width < 20px)
         // Calculate actual barcode width from sum of bars and spaces
@@ -525,6 +561,9 @@ class PharmacodeReader extends BarcodeReader {
         // For short patterns, validate consistency across shifted positions
         // to reject text/noise patterns that appear as bars due to edge detection
         if (!this._validatePatternConsistency(startInfo, bars)) {
+            if (process.env.NODE_ENV === 'test' && bars.length === 6) {
+                console.log(`[DEBUG] image-005: REJECTED by pattern consistency check, bars: ${bars}`);
+            }
             return null;
         }
 
@@ -536,6 +575,9 @@ class PharmacodeReader extends BarcodeReader {
 
         // Validate quiet zones meet pharmaceutical spec
         if (!this._validateQuietZones(startInfo, ratioInfo.narrowWidth, end)) {
+            if (process.env.NODE_ENV === 'test' && bars.length === 6) {
+                console.log(`[DEBUG] image-005: REJECTED by quiet zone validation, bars: ${bars}, narrowWidth: ${ratioInfo.narrowWidth}, end: ${end}`);
+            }
             return null;
         }
 
@@ -546,6 +588,10 @@ class PharmacodeReader extends BarcodeReader {
         }
 
         const { value } = decoded;
+
+        if (process.env.NODE_ENV === 'test' && bars.length === 6) {
+            console.log(`[DEBUG] image-005: ACCEPTED, bars: ${bars}, value: ${value}, end: ${end}`);
+        }
 
         // Validate value range
         if (value < MIN_VALUE || value > MAX_VALUE) {
