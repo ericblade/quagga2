@@ -62,33 +62,43 @@ class PharmacodeReader extends BarcodeReader {
      * Find the start of the barcode (first black bar after leading whitespace)
      */
     protected _findStart(): BarcodePosition | null {
-        const offset = this._nextSet(this._row);
-        if (offset >= this._row.length) {
-            return null;
+        let searchPos = 0;
+
+        // Loop through to skip noise bars at the beginning
+        while (searchPos < this._row.length) {
+            const offset = this._nextSet(this._row, searchPos);
+            if (offset >= this._row.length) {
+                return null;
+            }
+
+            // Find the end of this black bar
+            const barStart = offset;
+            let barEnd = barStart;
+            while (barEnd < this._row.length && this._row[barEnd]) {
+                barEnd++;
+            }
+
+            const barWidth = barEnd - barStart;
+
+            // Skip noise: bars narrower than 5 pixels are almost certainly noise
+            if (barWidth < 5) {
+                searchPos = barEnd + 1;
+                continue;
+            }
+
+            // Found a non-noise bar, verify leading whitespace (quiet zone)
+            const quietZoneStart = Math.max(0, barStart - barWidth * 2);
+            if (barStart > 0 && !this._matchRange(quietZoneStart, barStart, 0)) {
+                return null;
+            }
+
+            return {
+                start: barStart,
+                end: barEnd,
+            };
         }
 
-        // Find the first black bar
-        const barStart = offset;
-        let barEnd = barStart;
-        while (barEnd < this._row.length && this._row[barEnd]) {
-            barEnd++;
-        }
-
-        if (barEnd === barStart) {
-            return null;
-        }
-
-        // Verify there's some leading whitespace (quiet zone)
-        const barWidth = barEnd - barStart;
-        const quietZoneStart = Math.max(0, barStart - barWidth * 2);
-        if (barStart > 0 && !this._matchRange(quietZoneStart, barStart, 0)) {
-            return null;
-        }
-
-        return {
-            start: barStart,
-            end: barEnd,
-        };
+        return null;
     }
 
     /**
@@ -372,11 +382,16 @@ class PharmacodeReader extends BarcodeReader {
 
         // Check trailing quiet zone
         // If we're at or very close to the end of the row, we likely hit the area boundary
-        // or found a large quiet zone that extended to the edge - both are acceptable
+        // In real extracted images, especially with resizing, we may not have perfect quiet zones
+        // So we accept it if we're within 3 pixels of the end
         const remainingSpace = this._row.length - end;
-        if (remainingSpace >= 2 && remainingSpace < minQuietZone) {
-            return false;
+        if (remainingSpace >= 3) {
+            // We have at least 3px of trailing space - check if it's sufficient quiet zone
+            if (remainingSpace < minQuietZone) {
+                return false;
+            }
         }
+        // Very close to edge (0-2px) - accept as boundary
 
         return true;
     }
