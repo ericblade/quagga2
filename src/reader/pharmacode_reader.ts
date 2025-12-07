@@ -384,7 +384,7 @@ class PharmacodeReader extends BarcodeReader {
     /**
      * Classify bars as narrow or wide and decode the value
      */
-    protected _decodeBars(bars: number[], narrowWidth?: number): { value: number } | null {
+    protected _decodeBars(bars: number[], narrowWidth?: number): { value: number, pattern: string } | null {
         // Use provided narrowWidth if available (from _validateBarRatios inference)
         // Otherwise, find the minimum bar width (likely narrow bar)
         const minWidth = narrowWidth ?? Math.min(...bars);
@@ -392,18 +392,6 @@ class PharmacodeReader extends BarcodeReader {
         // If all bars are similar width, it might be a valid Pharmacode with all narrow or all wide bars
         // But we need to determine the threshold
         const threshold = minWidth * WIDE_BAR_THRESHOLD;
-
-        // Separate bars into narrow and wide for validation
-        const narrowBars: number[] = [];
-        const wideBars: number[] = [];
-
-        bars.forEach(width => {
-            if (width <= threshold) {
-                narrowBars.push(width);
-            } else {
-                wideBars.push(width);
-            }
-        });
 
         // Calculate the Pharmacode value using the correct algorithm
         // Position n starts at 0 on the RIGHT (last bar in array)
@@ -429,7 +417,7 @@ class PharmacodeReader extends BarcodeReader {
             pattern += reversedBars[i] > threshold ? 'W' : 'N';
         }
 
-        return { value };
+        return { value, pattern };
     }
 
     /**
@@ -446,9 +434,6 @@ class PharmacodeReader extends BarcodeReader {
      * Text patterns are typically edge-based and will break with a small shift.
      */
     protected _validatePatternConsistency(startInfo: BarcodePosition, bars: number[]): boolean {
-        // Check all patterns for consistency (not just short ones)
-        // Text patterns are usually inconsistent with small shifts
-        
         const originalStart = startInfo.start;
         let consistentOffsets = 0;
         let totalChecks = 0;
@@ -490,8 +475,6 @@ class PharmacodeReader extends BarcodeReader {
         if (totalChecks > 0 && consistentOffsets >= totalChecks * 0.5) {
             return true; // Consistent across at least 50% of positions
         }
-
-        // Pattern was not consistent - likely text/noise
         return false;
     }
 
@@ -541,11 +524,6 @@ class PharmacodeReader extends BarcodeReader {
             return null;
         }
 
-        // Reject very short patterns (likely text artifacts)
-        // Already validated via bar ratio check - if bars pass ratio validation,
-        // they are likely legitimate
-
-
         // Decode the bars, passing the inferred narrowWidth for all-wide/all-narrow patterns
         const decoded = this._decodeBars(bars, ratioInfo.narrowWidth);
         if (!decoded) {
@@ -579,6 +557,7 @@ class PharmacodeReader extends BarcodeReader {
             end: end,
             startInfo: startInfo,
             decodedCodes: decodedCodes,
+            pattern: decoded.pattern,
             format: this.FORMAT,
         };
     }

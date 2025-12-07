@@ -47,6 +47,7 @@ export interface Barcode {
     end: number,
     endInfo?: BarcodePosition,
     format: BarcodeFormat,
+    pattern?: string,
     start: number,
     startInfo: BarcodePosition,
     supplement?: Barcode,
