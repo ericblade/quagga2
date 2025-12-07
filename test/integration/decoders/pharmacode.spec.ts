@@ -54,8 +54,6 @@ describe('Pharmacode Decoder Tests', () => {
         }
     }), pharmacodeTestSet, 'pharmacode');
 
-    // Real-world images require locate: true to find barcode regions
-    // Currently marked allowFail due to locator limitations with Pharmacode's simple structure
     runDecoderTestBothHalfSample('pharmacode set 2', (halfSample) => generateConfig({
         locate: false,
         inputStream: {
@@ -70,7 +68,7 @@ describe('Pharmacode Decoder Tests', () => {
         }
     }), pharmacodeRealWorldPositiveTestSet, 'pharmacode');
 
-    // Dedicated run for image-018 with a narrowed search area (top 50%)
+    // Dedicated run for image-018 with a narrowed search area (bottom 50%) - top 50% has an unreadable code
     runDecoderTestBothHalfSample('pharmacode area constrained', (halfSample) => generateConfig({
         locate: false,
         inputStream: {
