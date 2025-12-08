@@ -254,6 +254,13 @@ export default {
                 Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
             }
 
+            // Debug: Log gray-scale values before binarization
+            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+                const graylineSample = barcodeLine.line.slice(0, Math.min(150, barcodeLine.line.length));
+                console.log(`[DEBUG] Grayscale values (y=${line[1]}, first 150): ${graylineSample.join(',')}`);
+                console.log(`[DEBUG] Grayscale min=${barcodeLine.min}, max=${barcodeLine.max}, range=${barcodeLine.max - barcodeLine.min}`);
+            }
+
             Bresenham.toBinaryLine(barcodeLine);
 
             if (typeof ENV !== 'undefined' && ENV.development && config.debug.showPattern) {

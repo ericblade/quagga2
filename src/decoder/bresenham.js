@@ -104,6 +104,12 @@ Bresenham.toBinaryLine = function (result) {
     let i;
     let j;
 
+    // Debug output for pharmacode
+    const isPharmacodeTest = process.env.NODE_ENV === 'test' && line.length === 804;
+    if (isPharmacodeTest) {
+        console.log(`[DEBUG] toBinaryLine: line.length=${line.length}, min=${min}, max=${max}, center=${center}, threshold=${threshold}`);
+    }
+
     // 1. find extrema
     currentDir = line[0] > center ? Slope.DIR.UP : Slope.DIR.DOWN;
     extrema.push({
@@ -133,6 +139,10 @@ Bresenham.toBinaryLine = function (result) {
         pos: line.length,
         val: line[line.length - 1],
     });
+
+    if (isPharmacodeTest) {
+        console.log(`[DEBUG] toBinaryLine: found ${extrema.length} extrema at positions: ${extrema.map(e => `${e.pos}(${e.val})`).join(',')}`);
+    }
 
     for (j = extrema[0].pos; j < extrema[1].pos; j++) {
         line[j] = line[j] > center ? 0 : 1;

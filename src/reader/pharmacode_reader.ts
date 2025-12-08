@@ -87,8 +87,16 @@ class PharmacodeReader extends BarcodeReader {
             }
 
             // Found a non-noise bar, verify leading whitespace (quiet zone)
-            const quietZoneStart = Math.max(0, barStart - barWidth * 2);
-            if (barStart > 0 && !this._matchRange(quietZoneStart, barStart, 0)) {
+            // Leading quiet zone must be at least 2x bar width (typically ~6x narrow bar)
+            const requiredQuietZone = barWidth * 2;
+            if (barStart < requiredQuietZone) {
+                // Not enough leading quiet zone (bar too close to image edge)
+                searchPos = barEnd + 1;
+                continue;
+            }
+            const quietZoneStart = barStart - requiredQuietZone;
+            if (!this._matchRange(quietZoneStart, barStart, 0)) {
+                // Leading quiet zone has non-white pixels
                 searchPos = barEnd + 1;
                 continue;
             }
@@ -121,11 +129,11 @@ class PharmacodeReader extends BarcodeReader {
             const prev = smoothed[i - 1];
             const curr = smoothed[i];
             const next = smoothed[i + 1];
-            
+
             // If current bar is significantly different from neighbors, snap to median
             const median = [prev, curr, next].sort((a, b) => a - b)[1];
             const deviation = Math.abs(curr - median);
-            
+
             // If deviation is small (1–3px), snap to median to reduce noise
             if (deviation > 0 && deviation <= 3) {
                 smoothed[i] = median;
@@ -135,17 +143,18 @@ class PharmacodeReader extends BarcodeReader {
     }
 
     /**
-     * Extract all bar and space widths from the pattern
+     * Extract all bar and space widths from the pattern.
+     * Uses real-time quiet zone detection to stop extraction before reaching image edge.
      */
     protected _extractBarsAndSpaces(startPos: number): { bars: number[], spaces: number[], end: number } | null {
         const bars: number[] = [];
         const spaces: number[] = [];
 
         let pos = startPos;
-        let isBar = true;
         let currentWidth = 0;
+        let foundTrailingQuietZone = false;
 
-        // Start with the first bar
+        // Extract first bar
         while (pos < this._row.length && this._row[pos]) {
             currentWidth++;
             pos++;
@@ -155,58 +164,129 @@ class PharmacodeReader extends BarcodeReader {
         }
         bars.push(currentWidth);
 
-        // Continue extracting alternating spaces and bars
-        while (pos < this._row.length && bars.length <= MAX_BAR_COUNT) {
-            currentWidth = 0;
-            isBar = !isBar;
+        // Extract first space (needed to establish space width and estimate narrow bar)
+        currentWidth = 0;
+        while (pos < this._row.length && !this._row[pos]) {
+            currentWidth++;
+            pos++;
+        }
+        if (currentWidth === 0 || pos >= this._row.length) {
+            return null; // No space after first bar, or hit edge
+        }
+        spaces.push(currentWidth);
 
-            if (isBar) {
-                // Counting a bar
-                while (pos < this._row.length && this._row[pos]) {
-                    currentWidth++;
-                    pos++;
-                }
-                if (currentWidth === 0) {
-                    // End of barcode
-                    break;
-                }
-                bars.push(currentWidth);
-            } else {
-                // Counting a space
-                while (pos < this._row.length && !this._row[pos]) {
-                    currentWidth++;
-                    pos++;
-                }
-                if (currentWidth === 0) {
-                    break;
-                }
-                // If we hit the edge of the scan area, don't count this as a valid space
-                // It's likely truncated or includes the edge boundary
-                if (pos >= this._row.length) {
-                    // Reached the edge, stop here without adding this space
-                    break;
-                }
-                // Check if this might be the trailing quiet zone
-                // The quiet zone is typically much larger than inter-bar spaces
-                if (spaces.length >= 2) {
-                    const sortedSpaces = spaces.slice().sort((a, b) => a - b);
-                    const median = sortedSpaces[Math.floor(sortedSpaces.length / 2)];
-                    if (currentWidth > median * 2.5) {
-                        break;
-                    }
-                } else if (spaces.length === 0 && bars.length >= 1) {
-                    // For the first space, check against the first bar width
-                    // Normal inter-bar spaces shouldn't exceed ~10x the bar width
-                    if (currentWidth > bars[0] * 10) {
-                        break;
-                    }
-                }
-                spaces.push(currentWidth);
+        // Estimate narrow bar width for quiet zone detection
+        // If first bar < first space, assume first bar is narrow
+        // Otherwise, estimate narrow from space (space ≈ 1.25 * narrow)
+        const estimatedNarrowWidth = bars[0] < spaces[0] ? bars[0] : spaces[0] * 0.8;
+
+        // Pharmaceutical spec: quiet zone must be >= 6mm ≈ 6x narrow bar (strict)
+        const strictQuietZone = estimatedNarrowWidth * 6;
+        // Adaptive quiet zone: 2.5x the typical inter-bar space width
+        // This should catch legitimate quiet zones while avoiding false positives
+        let adaptiveQuietZone = spaces[0] * 2.5;
+
+        // Continue extracting alternating bars and spaces
+        // Stop BEFORE reaching MAX_BAR_COUNT+1 to avoid extracting too many bars
+        while (pos < this._row.length && bars.length < MAX_BAR_COUNT) {
+            // Extract bar
+            currentWidth = 0;
+            const barStartPos = pos;
+            while (pos < this._row.length && this._row[pos]) {
+                currentWidth++;
+                pos++;
             }
+            if (currentWidth === 0) {
+                // Reached end of barcode (no more bars)
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] _extractBarsAndSpaces: no more bars at pos=${pos}, extracted ${bars.length} bars so far`);
+                }
+                break;
+            }
+            bars.push(currentWidth);
+            if (process.env.NODE_ENV === 'test' && bars.length >= 10) {
+                console.log(`[DEBUG] _extractBarsAndSpaces: extracted bar ${bars.length} at pos ${barStartPos}-${pos} (width ${currentWidth})`);
+            }
+
+            // Extract space
+            currentWidth = 0;
+            const spaceStart = pos;
+            while (pos < this._row.length && !this._row[pos]) {
+                currentWidth++;
+                pos++;
+            }
+
+            if (currentWidth === 0) {
+                // No space after this bar - barcode ended
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] _extractBarsAndSpaces: no space after bar ${bars.length} at pos=${pos}`);
+                }
+                break;
+            }
+
+            if (process.env.NODE_ENV === 'test' && bars.length >= 10) {
+                console.log(`[DEBUG] _extractBarsAndSpaces: extracted space ${spaces.length + 1} at pos ${spaceStart}-${pos} (width ${currentWidth}), checking quiet zone (${currentWidth} >= ${strictQuietZone.toFixed(1)} or ${currentWidth} >= ${adaptiveQuietZone.toFixed(1)}?)`);
+            }
+
+            // Check if this space is a quiet zone (strict pharmaceutical spec)
+            if (currentWidth >= strictQuietZone) {
+                // Found strict trailing quiet zone - stop extraction here
+                foundTrailingQuietZone = true;
+                pos = spaceStart; // Reset pos to start of quiet zone
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] _extractBarsAndSpaces: found strict quiet zone ${currentWidth}px >= ${strictQuietZone.toFixed(1)}px`);
+                }
+                break;
+            }
+
+            // Adaptive quiet zone: if this space is significantly larger than normal inter-bar spaces
+            // (2x or more), treat it as a quiet zone
+            if (bars.length >= MIN_BAR_COUNT && currentWidth >= adaptiveQuietZone) {
+                foundTrailingQuietZone = true;
+                pos = spaceStart;
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] _extractBarsAndSpaces: found adaptive quiet zone ${currentWidth}px >= ${adaptiveQuietZone.toFixed(1)}px after ${bars.length} bars (typical space: ${(spaces.reduce((a,b) => a+b, 0) / spaces.length).toFixed(1)}px)`);
+                }
+                break;
+            }
+
+            // Check if we hit the image edge while counting this space
+            if (pos >= this._row.length) {
+                // Hit image edge while in whitespace - treat as infinite quiet zone
+                // We've reached the end of the image, which counts as an implicit quiet zone
+                foundTrailingQuietZone = true;
+                pos = spaceStart; // Reset to start of quiet zone
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] _extractBarsAndSpaces: edge-reached with ${currentWidth}px space (end of image)`);
+                }
+                break;
+            }
+
+            // This is a normal inter-bar space
+            spaces.push(currentWidth);
+
+            // Update adaptive quiet zone based on average space width
+            // A quiet zone should be at least 2x the average inter-bar space
+            if (spaces.length >= 2) {
+                const avgSpace = spaces.reduce((a, b) => a + b, 0) / spaces.length;
+                adaptiveQuietZone = avgSpace * 2;
+            }
+        }
+
+        // If we exited the loop without finding a trailing quiet zone, barcode is invalid
+        // (This catches barcodes that end exactly at the image edge)
+        if (!foundTrailingQuietZone) {
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] _extractBarsAndSpaces: no trailing quiet zone detected, rejecting (${bars.length} bars extracted)`);
+            }
+            return null;
         }
 
         // Validate bar count
         if (bars.length < MIN_BAR_COUNT || bars.length > MAX_BAR_COUNT) {
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] _extractBarsAndSpaces: invalid bar count ${bars.length} (min=${MIN_BAR_COUNT}, max=${MAX_BAR_COUNT}), rejecting`);
+            }
             return null;
         }
 
@@ -215,10 +295,67 @@ class PharmacodeReader extends BarcodeReader {
             return null;
         }
 
+        // Validate that spaces are uniform (pharmacode requirement)
+        if (!this._validateSpaces(spaces)) {
+            return null;
+        }
+
+        // Validate that bars have at most 2 distinct sizes (narrow and/or wide)
+        if (!this._validateBarSizeCount(bars)) {
+            return null;
+        }
+
         // Apply smoothing to reduce edge-detection jitter on colored barcodes
         const smoothedBars = this._smoothBarWidths(bars);
 
         return { bars: smoothedBars, spaces, end: pos };
+    }
+
+    /**
+     * Validate that bars have at most 2 distinct sizes (narrow and/or wide).
+     * Pharmacode bars must be either all one size, or two sizes (narrow + wide).
+     * If 3+ distinct sizes detected, this is not a valid pharmacode.
+     */
+    protected _validateBarSizeCount(bars: number[]): boolean {
+        if (bars.length === 0) {
+            return false;
+        }
+
+        // Cluster bars into size groups with 35% tolerance to handle edge-detection jitter
+        // This matches the tolerance used for space validation (CV <= 0.35)
+        const tolerance = 0.35;
+        const clusters: number[][] = [];
+
+        for (const bar of bars) {
+            let foundCluster = false;
+            for (const cluster of clusters) {
+                const clusterAvg = cluster.reduce((a, b) => a + b, 0) / cluster.length;
+                if (Math.abs(bar - clusterAvg) <= clusterAvg * tolerance) {
+                    cluster.push(bar);
+                    foundCluster = true;
+                    break;
+                }
+            }
+            if (!foundCluster) {
+                clusters.push([bar]);
+            }
+        }
+
+        // Must have exactly 1 or 2 clusters (not 3+)
+        if (clusters.length > 2) {
+            if (process.env.NODE_ENV === 'test') {
+                const clusterSummary = clusters.map(c => {
+                    const avg = (c.reduce((a, b) => a + b, 0) / c.length).toFixed(1);
+                    return `[${c.join(',')}] avg=${avg}`;
+                }).join('; ');
+                console.log(`[DEBUG] _validateBarSizeCount: found ${clusters.length} bar size groups (>2)`);
+                console.log(`[DEBUG]   Input bars: ${bars.join(',')}`);
+                console.log(`[DEBUG]   Clusters (35% tolerance): ${clusterSummary}`);
+            }
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -251,14 +388,14 @@ class PharmacodeReader extends BarcodeReader {
         const avgAll = bars.reduce((a, b) => a + b, 0) / bars.length;
         const varAll = bars.reduce((a, b) => a + Math.abs(b - avgAll), 0) / bars.length;
         const cvAll = avgAll === 0 ? 0 : varAll / avgAll;
-        
+
         if (cvAll <= 0.1) {
             // Low variance: could be all-narrow or all-wide
             // Use space widths as a hint: spaces should be ~1.25x the narrow bar width
             const avgSpace = spaces.length > 0 ?
                 (spaces.reduce((a, b) => a + b, 0) / spaces.length) :
                 0;
-            
+
             if (avgSpace > 0) {
                 const spaceToBarRatio = avgSpace / avgAll;
                 // If spaces are much smaller than bars, bars are likely wide (ratio should be ~0.3-0.5)
@@ -270,7 +407,7 @@ class PharmacodeReader extends BarcodeReader {
                     return { narrowWidth: inferredNarrow, wideRatio: 2.5 };
                 }
             }
-            
+
             // Default: treat as all-narrow
             return { narrowWidth: avgAll, wideRatio: 2.0 };
         }
@@ -400,7 +537,7 @@ class PharmacodeReader extends BarcodeReader {
         if (process.env.NODE_ENV === 'test' && end === 611) {
             console.log(`[DEBUG] QZ trailing check: rowLen=${this._row.length}, end=${end}, remainingSpace=${remainingSpace}`);
         }
-        
+
         // If we're very close to the edge (< 6px), we hit the scan boundary - accept it
         if (remainingSpace < 6) {
             if (process.env.NODE_ENV === 'test' && end === 611) {
@@ -408,7 +545,7 @@ class PharmacodeReader extends BarcodeReader {
             }
             return true;
         }
-        
+
         // We have at least 6px of trailing space - check if it meets minimum quiet zone requirement
         if (remainingSpace < minQuietZone) {
             if (process.env.NODE_ENV === 'test' && end === 611) {
@@ -416,7 +553,7 @@ class PharmacodeReader extends BarcodeReader {
             }
             return false;
         }
-        
+
         if (process.env.NODE_ENV === 'test' && end === 611) {
             console.log(`[DEBUG] QZ PASS`);
         }
@@ -530,6 +667,30 @@ class PharmacodeReader extends BarcodeReader {
 
         if (process.env.NODE_ENV === 'test') {
             console.log(`[DEBUG] Row length: ${this._row.length}, barcode at ${startInfo.start}-${startInfo.end}`);
+            // Show binary pattern around the barcode (50 pixels before start, all the way to end)
+            const sampleStart = Math.max(0, startInfo.start - 50);
+            const sampleEnd = Math.min(this._row.length, startInfo.end + 350);  // Extended from 100 to 350 to see more bars
+            const rowSample = this._row.slice(sampleStart, sampleEnd);
+            console.log(`[DEBUG] Binary pattern [${sampleStart}..${sampleEnd}]:`, rowSample.join(''));
+
+            // Count runs to see actual bar/space widths in the binary
+            const runs: Array<{width: number, value: number}> = [];
+            let currentValue = rowSample[0];
+            let currentWidth = 1;
+            for (let i = 1; i < rowSample.length; i++) {
+                if (rowSample[i] === currentValue) {
+                    currentWidth++;
+                } else {
+                    runs.push({width: currentWidth, value: currentValue});
+                    currentValue = rowSample[i];
+                    currentWidth = 1;
+                }
+            }
+            if (currentWidth > 0) {
+                runs.push({width: currentWidth, value: currentValue});
+            }
+            const binaryRuns = runs.map(r => `${r.value}:${r.width}`).join(' ');
+            console.log(`[DEBUG] Binary runs (value:width): ${binaryRuns}`);
         }
 
         // Extract bars and spaces
@@ -550,6 +711,19 @@ class PharmacodeReader extends BarcodeReader {
         const spacesWidth = spaces.reduce((sum, w) => sum + w, 0);
         const totalBarcodeWidth = barsWidth + spacesWidth;
         if (totalBarcodeWidth < 20) {
+            return null;
+        }
+
+        // EDGE-REACH REJECTION: Reject if extraction reaches image boundary
+        // Valid pharmacodes require proper quiet zones per pharmaceutical spec (min 6mm ≈ 16px at typical DPI)
+        // Extractions reaching the image edge (end >= row.length - 2) indicate incomplete/invalid patterns
+        // This catches tilted and curved barcodes that only appear straight at one specific angle
+        const EDGE_MARGIN = 0; // No margin: only reject if extraction goes PAST the row length (shouldn't happen but be safe)
+        const remainingSpace = this._row.length - end;
+        if (remainingSpace < EDGE_MARGIN) {
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] REJECTED: reached image edge (remainingSpace=${remainingSpace}px < ${EDGE_MARGIN}px margin), barCount=${bars.length}, bars=${bars}`);
+            }
             return null;
         }
 

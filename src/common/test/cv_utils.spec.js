@@ -1049,6 +1049,87 @@ describe('CV Utils', () => {
             computeGray(imageData, outArray);
             expect(outArray[0]).to.equal(0);
         });
+
+        it('should treat transparent pixels as white regardless of RGB values', () => {
+            // Transparent black (0,0,0,0) should be treated as white
+            const imageData = new Uint8Array([
+                0, 0, 0, 0,  // transparent black
+            ]);
+            const outArray = new Uint8Array(1);
+            computeGray(imageData, outArray);
+            // Result should be 255 (white) because alpha=0
+            expect(outArray[0]).to.equal(255);
+            // Alpha channel should NOT be modified (imageData not used after computeGray)
+            expect(imageData[3]).to.equal(0);
+        });
+
+        it('should handle transparent white as white', () => {
+            // Transparent white (255,255,255,0) should still be white
+            const imageData = new Uint8Array([
+                255, 255, 255, 0,  // transparent white
+            ]);
+            const outArray = new Uint8Array(1);
+            computeGray(imageData, outArray);
+            // Result should be 255 (white)
+            expect(outArray[0]).to.equal(255);
+            // Alpha channel should NOT be modified
+            expect(imageData[3]).to.equal(0);
+        });
+
+        it('should handle semi-transparent pixels by their RGB value', () => {
+            // Semi-transparent red (255,0,0,128) should use RGB red luminance
+            const imageData = new Uint8Array([
+                255, 0, 0, 128,  // semi-transparent red
+            ]);
+            const outArray = new Uint8Array(1);
+            computeGray(imageData, outArray);
+            // Result should be red luminance (~76), alpha=128 is not fully transparent
+            expect(outArray[0]).to.be.closeTo(76, 1);
+            // Alpha channel should NOT be modified (not fully transparent)
+            expect(imageData[3]).to.equal(128);
+        });
+
+        it('should handle fully opaque pixels with various alpha values', () => {
+            // Same RGB but different alpha should produce same grayscale output (if not alpha=0)
+            const imageData = new Uint8Array([
+                255, 0, 0, 255,  // fully opaque red
+                255, 0, 0, 128,  // semi-transparent red
+                255, 0, 0, 1,    // barely opaque red
+            ]);
+            const outArray = new Uint8Array(3);
+            computeGray(imageData, outArray);
+            // All three should produce the same grayscale red luminance (none are alpha=0)
+            expect(outArray[0]).to.be.closeTo(76, 1);
+            expect(outArray[1]).to.be.closeTo(76, 1);
+            expect(outArray[2]).to.be.closeTo(76, 1);
+            // Alpha channels should NOT be modified
+            expect(imageData[3]).to.equal(255);
+            expect(imageData[7]).to.equal(128);
+            expect(imageData[11]).to.equal(1);
+        });
+
+        it('should handle PNG with transparent background and opaque content', () => {
+            // Simulating a PNG: transparent areas + opaque black text
+            const imageData = new Uint8Array([
+                0, 0, 0, 0,      // transparent (background)
+                0, 0, 0, 255,    // opaque black (text)
+                255, 255, 255, 0, // transparent white (background)
+                0, 0, 0, 255,    // opaque black (text)
+            ]);
+            const outArray = new Uint8Array(4);
+            computeGray(imageData, outArray);
+            // All transparent areas (alpha=0) should become white (255) in grayscale output
+            // All opaque areas should use their RGB values
+            expect(outArray[0]).to.equal(255);    // transparent black -> white
+            expect(outArray[1]).to.equal(0);      // opaque black -> black
+            expect(outArray[2]).to.equal(255);    // transparent white -> white
+            expect(outArray[3]).to.equal(0);      // opaque black -> black
+            // Alpha channels should NOT be modified (imageData not used after computeGray)
+            expect(imageData[3]).to.equal(0);     // first pixel alpha (unchanged)
+            expect(imageData[7]).to.equal(255);   // second pixel alpha (unchanged)
+            expect(imageData[11]).to.equal(0);    // third pixel alpha (unchanged)
+            expect(imageData[15]).to.equal(255);  // fourth pixel alpha (unchanged)
+        });
     });
 
     describe('grayAndHalfSampleFromCanvasData', () => {
