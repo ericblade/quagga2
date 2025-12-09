@@ -77,6 +77,12 @@ Bresenham.getBarcodeLine = function (imageWrapper, p1, p2) {
         }
     }
 
+    // Log the sampled scanline coordinates for pharmacode test runs (line length 804)
+    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test' && line.length === 804) {
+        // Helps correlate false positives to the precise y position of the sampled line
+        // console.log(`[DEBUG] getBarcodeLine: p1=(${x0},${y0}) -> p2=(${x1},${y1}), lineLength=${line.length}`);
+    }
+
     return {
         line,
         min,
@@ -107,7 +113,7 @@ Bresenham.toBinaryLine = function (result) {
     // Debug output for pharmacode
     const isPharmacodeTest = process.env.NODE_ENV === 'test' && line.length === 804;
     if (isPharmacodeTest) {
-        console.log(`[DEBUG] toBinaryLine: line.length=${line.length}, min=${min}, max=${max}, center=${center}, threshold=${threshold}`);
+        // console.log(`[DEBUG] toBinaryLine: line.length=${line.length}, min=${min}, max=${max}, center=${center}, threshold=${threshold}`);
     }
 
     // 1. find extrema
@@ -141,7 +147,7 @@ Bresenham.toBinaryLine = function (result) {
     });
 
     if (isPharmacodeTest) {
-        console.log(`[DEBUG] toBinaryLine: found ${extrema.length} extrema at positions: ${extrema.map(e => `${e.pos}(${e.val})`).join(',')}`);
+        // console.log(`[DEBUG] toBinaryLine: found ${extrema.length} extrema at positions: ${extrema.map(e => `${e.pos}(${e.val})`).join(',')}`);
     }
 
     for (j = extrema[0].pos; j < extrema[1].pos; j++) {
