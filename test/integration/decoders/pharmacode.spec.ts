@@ -40,7 +40,14 @@ describe('Pharmacode Decoder Tests', () => {
     const pharmacodeRealWorldNoCodeTestSet = [
         { 'name': 'image-015.png', 'result': '', format: 'pharmacode' },
         { 'name': 'image-016.png', 'result': '', format: 'pharmacode' },
+        { 'name': 'image-016-sheared.png', 'result': '', format: 'pharmacode' },
         { 'name': 'image-017.png', 'result': '', format: 'pharmacode' },
+    ];
+
+    // Cross-barcode rejection: i2of5 images should be rejected by pharmacode reader
+    // This ensures the pharmacode reader doesn't accidentally decode other barcode types
+    const pharmacodeCrossBarcodRejectionTestSet = [
+        { 'name': 'image-011.jpg', 'result': '', format: 'pharmacode' },
     ];
 
     // Use locate: false since test images are synthetically generated and pre-cropped to contain only the barcode (location detection not required)
@@ -101,5 +108,22 @@ describe('Pharmacode Decoder Tests', () => {
                 readers: ['pharmacode_reader']
             }
         }), pharmacodeRealWorldNoCodeTestSet, 'pharmacode');
+    });
+
+    // Cross-barcode rejection: Pharmacode reader should reject other barcode types (e.g., i2of5)
+    [true, false].forEach((halfSample) => {
+        runNoCodeTest(`pharmacode rejects i2of5 barcodes halfSample:${halfSample}`, generateConfig({
+            locate: false,
+            inputStream: {
+                size: 800,
+            },
+            locator: {
+                halfSample,
+                patchSize: 'large',
+            },
+            decoder: {
+                readers: ['pharmacode_reader']
+            }
+        }), pharmacodeCrossBarcodRejectionTestSet, 'i2of5');
     });
 });

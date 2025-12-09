@@ -62,17 +62,21 @@ class PharmacodeReader extends BarcodeReader {
      * Find the start of the barcode (first black bar after leading whitespace)
      */
     protected _findStart(): BarcodePosition | null {
+        // Strategy: scan left→right; accept the first bar that:
+        // 1. Has a sufficient leading quiet zone (≥ 2× bar width, min 20px)
+        // 2. Is followed by another bar at a reasonable distance (≤ 10× bar width)
+        //    This rejects isolated noise bars surrounded by large white spaces.
+
+        const minQuietZone = 20;
         let searchPos = 0;
 
-        // Loop through to skip noise bars at the beginning
         while (searchPos < this._row.length) {
-            const offset = this._nextSet(this._row, searchPos);
-            if (offset >= this._row.length) {
-                return null;
+            const barStart = this._nextSet(this._row, searchPos);
+            if (barStart >= this._row.length) {
+                return null; // no more black pixels
             }
 
-            // Find the end of this black bar
-            const barStart = offset;
+            // Find the end of this black run
             let barEnd = barStart;
             while (barEnd < this._row.length && this._row[barEnd]) {
                 barEnd++;
@@ -80,35 +84,49 @@ class PharmacodeReader extends BarcodeReader {
 
             const barWidth = barEnd - barStart;
 
-            // Skip noise: bars narrower than 5 pixels are almost certainly noise
+            // Skip narrow noise bars
             if (barWidth < 5) {
                 searchPos = barEnd + 1;
                 continue;
             }
 
-            // Found a non-noise bar, verify leading whitespace (quiet zone)
-            // Leading quiet zone must be at least 2x bar width (typically ~6x narrow bar)
-            const requiredQuietZone = barWidth * 2;
-            if (barStart < requiredQuietZone) {
-                // Not enough leading quiet zone (bar too close to image edge)
+            // Check leading quiet zone
+            const requiredQuietZone = Math.max(barWidth * 2, minQuietZone);
+            const quietZoneStart = barStart - requiredQuietZone;
+            if (quietZoneStart < 0) {
                 searchPos = barEnd + 1;
                 continue;
             }
-            const quietZoneStart = barStart - requiredQuietZone;
+
             if (!this._matchRange(quietZoneStart, barStart, 0)) {
-                // Leading quiet zone has non-white pixels
+                searchPos = barEnd + 1;
+                continue;
+            }
+
+            // Forward-look: Check that the next bar appears within a reasonable distance.
+            // A real barcode has bars followed by narrow spaces (5-15px), not huge gaps.
+            // Allow up to 10× bar width for the space (being generous for very narrow bars).
+            const maxSpaceToNextBar = Math.max(barWidth * 10, 50);
+            const nextBarStart = this._nextSet(this._row, barEnd);
+            if (nextBarStart >= this._row.length) {
+                // No next bar; this is an isolated bar, likely noise
+                searchPos = barEnd + 1;
+                continue;
+            }
+
+            const spaceToNextBar = nextBarStart - barEnd;
+            if (spaceToNextBar > maxSpaceToNextBar) {
+                // Space is too large; this is likely an isolated bar
                 searchPos = barEnd + 1;
                 continue;
             }
 
             if (process.env.NODE_ENV === 'test') {
-                console.log(`[DEBUG] _findStart found bar at ${barStart}-${barEnd} (width ${barWidth})`);
+                const quietZoneWidth = barStart - quietZoneStart;
+                console.log(`[DEBUG] _findStart found bar at ${barStart}-${barEnd} (width ${barWidth}, quiet zone ${quietZoneWidth}px, next bar in ${spaceToNextBar}px)`);
             }
 
-            return {
-                start: barStart,
-                end: barEnd,
-            };
+            return { start: barStart, end: barEnd };
         }
 
         return null;
@@ -488,8 +506,9 @@ class PharmacodeReader extends BarcodeReader {
             }
 
             // Per-bar consistency checks
-            const narrowTolerance = c.avgN * 0.3;
-            const wideTolerance = c.avgW * 0.3;
+            // Real pharmacodes have consistent bar widths; tilted/curved ones show variation
+            const narrowTolerance = c.avgN * 0.15;
+            const wideTolerance = c.avgW * 0.15;
             let ok = true;
             for (const b of c.narrowBars) {
                 if (Math.abs(b - c.avgN) > narrowTolerance) { ok = false; break; }
@@ -505,6 +524,57 @@ class PharmacodeReader extends BarcodeReader {
         }
 
         return null;
+    }
+
+    /**
+     * Validate periodicity of bar and space widths
+     * Real pharmacodes have consistent bar/space widths with low variation
+     * Tilted barcodes create varying widths due to angle-dependent cross-sections
+     * Uses coefficient of variation (CV = stdDev / mean) to detect this
+     */
+    protected _validatePeriodicity(bars: number[], spaces: number[]): boolean {
+        // Calculate coefficient of variation for bars
+        if (bars.length > 0) {
+            const barMean = bars.reduce((a, b) => a + b, 0) / bars.length;
+            const barVariance = bars.reduce((a, b) => a + Math.pow(b - barMean, 2), 0) / bars.length;
+            const barStdDev = Math.sqrt(barVariance);
+            const barCV = barMean !== 0 ? barStdDev / barMean : 0;
+
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] Bar CV: ${barCV.toFixed(3)} (mean=${barMean.toFixed(2)}, stdDev=${barStdDev.toFixed(2)})`);
+            }
+
+            // Reject if bar CV is too high (indicates tilted/curved barcode with varying cross-sections)
+            // Threshold of 0.65 allows for reasonable variation in valid codes while still catching severe misalignments
+            if (barCV > 0.65) {
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] REJECTED by periodicity check: bar CV=${barCV.toFixed(3)} > 0.65`);
+                }
+                return false;
+            }
+        }
+
+        // Calculate coefficient of variation for spaces
+        if (spaces.length > 0) {
+            const spaceMean = spaces.reduce((a, b) => a + b, 0) / spaces.length;
+            const spaceVariance = spaces.reduce((a, b) => a + Math.pow(b - spaceMean, 2), 0) / spaces.length;
+            const spaceStdDev = Math.sqrt(spaceVariance);
+            const spaceCV = spaceMean !== 0 ? spaceStdDev / spaceMean : 0;
+
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] Space CV: ${spaceCV.toFixed(3)} (mean=${spaceMean.toFixed(2)}, stdDev=${spaceStdDev.toFixed(2)})`);
+            }
+
+            // Reject if space CV is too high
+            if (spaceCV > 0.55) {
+                if (process.env.NODE_ENV === 'test') {
+                    console.log(`[DEBUG] REJECTED by periodicity check: space CV=${spaceCV.toFixed(3)} > 0.55`);
+                }
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -662,6 +732,19 @@ class PharmacodeReader extends BarcodeReader {
         // Find the start of the barcode
         const startInfo = this._findStart();
         if (!startInfo) {
+            return null;
+        }
+
+        // REJECT if barcode starts too late in the scan (>50% of line length)
+        // Valid pharmacodes should be found near the image edge or early in the scan.
+        // Starting too far into the image indicates we're picking up noise or a shifted pattern
+        // (i.e., sampling mid-bar, which reverses the encoding).
+        // This also rejects tilted barcodes that only appear straight at one specific angle.
+        const startPositionPercent = (startInfo.start / this._row.length) * 100;
+        if (startInfo.start > this._row.length * 0.50) {
+            if (process.env.NODE_ENV === 'test') {
+                console.log(`[DEBUG] REJECTED: barcode starts at ${startInfo.start}/${this._row.length} (${startPositionPercent.toFixed(1)}%), too late in scan (>50%)`);
+            }
             return null;
         }
 
