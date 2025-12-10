@@ -20,6 +20,14 @@ describe('Code 128 Decoder Tests', () => {
         // read this one -- it works only with inputStream size set to 1600 presently, but
         // other samples break at that high a size.
         // { name: 'image-011.png', result: '33c64780-a9c0-e92a-820c-fae7011c11e2' },
+        // GS1-128 barcodes from issue #390 - real-world food packaging barcodes
+        // image-012 works with halfSample: false, but not with halfSample: true
+        { 'name': 'image-012.jpg', 'result': '01906641589574681121102531020003402152731515', format: 'code_128', allowFailInNode: true, allowFailInBrowser: true },
+        // image-013 and image-014 require higher resolution settings to decode properly
+        // According to issue #390, image-013 needs size: 1280, patchSize: 'small'
+        // and image-014 needs size: 1600, patchSize: 'large'
+        { 'name': 'image-013.jpg', 'result': '', format: 'code_128', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-014.jpg', 'result': '', format: 'code_128', allowFailInNode: true, allowFailInBrowser: true },
     ];
     runDecoderTestBothHalfSample('code_128', (halfSample) => generateConfig({
         inputStream: {
