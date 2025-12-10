@@ -141,6 +141,31 @@ This file controls which packages `npm-check-updates` can upgrade:
 
 ## Testing Requirements
 
+### CRITICAL: NODE_OPTIONS Flag
+
+**⚠️ IMPORTANT:** Cypress tests MUST be run with `NODE_OPTIONS=--openssl-legacy-provider` due to Node.js 17+ security changes disabling legacy OpenSSL algorithms. Our build dependencies require these algorithms.
+
+**Always use npm scripts** (which include this flag automatically):
+```bash
+npm run cypress:run              # Correct - includes NODE_OPTIONS
+npm run cypress:open            # Correct - interactive runner with NODE_OPTIONS
+npm run test                    # Correct - full test suite with NODE_OPTIONS
+```
+
+**When running Cypress directly, include the flag:**
+```bash
+# Correct - runs specific spec with NODE_OPTIONS
+npm run cypress:run -- --spec cypress/e2e/integration.cy.ts
+
+# Also correct - explicit NODE_OPTIONS
+npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider npx cypress run --spec cypress/e2e/integration.cy.ts
+
+# WRONG - missing NODE_OPTIONS, will timeout
+npx cypress run --spec cypress/e2e/integration.cy.ts
+```
+
+Tests will appear to hang with "timed out waiting for async callback" if `NODE_OPTIONS` is missing.
+
 ### Running Tests
 
 - **Type checking**: `npm run check-types`

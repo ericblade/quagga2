@@ -195,6 +195,8 @@ export declare module Readers {
             StartNotFoundException: string;
         };
 
+        static adjacentLineValidationMatches: number;
+
         constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>);
 
         abstract decode(row?: Array<number>, start?: BarcodePosition | number): Barcode | null;

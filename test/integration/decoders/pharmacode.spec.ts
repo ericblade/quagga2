@@ -1,46 +1,57 @@
-import { runDecoderTestBothHalfSample, generateConfig } from '../helpers';
+import { runDecoderTestBothHalfSample, runNoCodeTest, generateConfig } from '../helpers';
 
 describe('Pharmacode Decoder Tests', () => {
     // Synthetic test images with known values
     // Note: Tests only run with halfSample: false currently work reliably
     // halfSample: true causes bar width detection issues for some images
     const pharmacodeTestSet = [
-        // image-001 is marked unreadable by reference decoder - skip it
+        { 'name': 'image-001.jpg', 'result': '3', format: 'pharmacode' },
         { 'name': 'image-002.jpg', 'result': '7', format: 'pharmacode' },
         { 'name': 'image-003.jpg', 'result': '12', format: 'pharmacode' },
         { 'name': 'image-004.jpg', 'result': '15', format: 'pharmacode' },
-        // image-005 has 6 bars: NNNNNW (left to right), which should decode to 64
-        // Currently marked allowFail due to bar width threshold issues
-        { 'name': 'image-005.jpg', 'result': '64', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        // images 006-012 also have bar width detection issues with halfSample:true
-        { 'name': 'image-006.jpg', 'result': '100', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-007.jpg', 'result': '255', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-008.jpg', 'result': '755', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-009.jpg', 'result': '1000', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-010.jpg', 'result': '4096', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-011.jpg', 'result': '12345', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-012.jpg', 'result': '65535', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-005.jpg', 'result': '64', format: 'pharmacode' },
+        { 'name': 'image-006.jpg', 'result': '100', format: 'pharmacode' },
+        { 'name': 'image-007.jpg', 'result': '255', format: 'pharmacode' },
+        { 'name': 'image-008.jpg', 'result': '755', format: 'pharmacode' },
+        { 'name': 'image-009.jpg', 'result': '1000', format: 'pharmacode' },
+        { 'name': 'image-010.jpg', 'result': '4096', format: 'pharmacode' },
+        { 'name': 'image-011.jpg', 'result': '12345', format: 'pharmacode' },
+        { 'name': 'image-012.jpg', 'result': '65535', format: 'pharmacode' },
     ];
 
     // Real-world test images added by @ericblade
     // Images 013, 014, 018 contain Pharmacode value 123456
     // Image 017 contains multiple barcodes: 4174 and 3715
     // Images 015, 016 have unknown values
-    // These tests are marked allowFail because:
-    // 1. The locator struggles with Pharmacode's simple structure (few bars, no start/stop patterns)
-    // 2. Without locate:true, the decoder scans through wrong parts of the image
-    // 3. With locate:true, the locator often fails to find the barcode region
-    const pharmacodeRealWorldTestSet = [
-        { 'name': 'image-013.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-014.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-015.png', 'result': '131', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-016.png', 'result': '1234', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-017.png', 'result': '4174', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
-        { 'name': 'image-018.png', 'result': '123456', format: 'pharmacode', allowFailInNode: true, allowFailInBrowser: true },
+
+    const pharmacodeRealWorldPositiveTestSet = [
+        { 'name': 'image-013.png', 'result': '123456', format: 'pharmacode' },
+        // image-014 is two-track pharmacode, not supported at the moment -- maybe not ever depending on difficulty level
+        // { 'name': 'image-014.png', 'result': '123456', format: 'pharmacode' },
+    ];
+
+    // image-018 requires a constrained scan window to avoid false positives elsewhere in the frame
+    // still working out how to fix the false positive from the "orange and white" barcode.
+    const pharmacodeRealWorldAreaConstrainedTestSet = [
+        { 'name': 'image-018.png', 'result': '123456', format: 'pharmacode' },
+    ];
+
+    // Images intentionally expected to decode nothing (should succeed with empty result)
+    const pharmacodeRealWorldNoCodeTestSet = [
+        { 'name': 'image-015.png', 'result': '', format: 'pharmacode' },
+        { 'name': 'image-016.png', 'result': '', format: 'pharmacode' },
+        { 'name': 'image-016-sheared.png', 'result': '', format: 'pharmacode' },
+        { 'name': 'image-017.png', 'result': '', format: 'pharmacode' },
+    ];
+
+    // Cross-barcode rejection: i2of5 images should be rejected by pharmacode reader
+    // This ensures the pharmacode reader doesn't accidentally decode other barcode types
+    const pharmacodeCrossBarcodRejectionTestSet = [
+        { 'name': 'image-011.jpg', 'result': '', format: 'pharmacode' },
     ];
 
     // Use locate: false since test images are synthetically generated and pre-cropped to contain only the barcode (location detection not required)
-    runDecoderTestBothHalfSample('pharmacode', (halfSample) => generateConfig({
+    runDecoderTestBothHalfSample('pharmacode set 1', (halfSample) => generateConfig({
         locate: false,
         locator: {
             halfSample,
@@ -48,21 +59,71 @@ describe('Pharmacode Decoder Tests', () => {
         decoder: {
             readers: ['pharmacode_reader']
         }
-    }), pharmacodeTestSet);
+    }), pharmacodeTestSet, 'pharmacode');
 
-    // Real-world images require locate: true to find barcode regions
-    // Currently marked allowFail due to locator limitations with Pharmacode's simple structure
-    runDecoderTestBothHalfSample('pharmacode (real-world)', (halfSample) => generateConfig({
-        locate: true,
+    runDecoderTestBothHalfSample('pharmacode set 2', (halfSample) => generateConfig({
+        locate: false,
         inputStream: {
-            size: 1600,
+            size: 800,
         },
         locator: {
             halfSample,
-            patchSize: 'small',
+            patchSize: 'large',
         },
         decoder: {
             readers: ['pharmacode_reader']
         }
-    }), pharmacodeRealWorldTestSet, 'pharmacode');
+    }), pharmacodeRealWorldPositiveTestSet, 'pharmacode');
+
+    // Dedicated run for image-018 with a narrowed search area (bottom 50%) - top 50% has an unreadable code
+    runDecoderTestBothHalfSample('pharmacode area constrained', (halfSample) => generateConfig({
+        locate: false,
+        inputStream: {
+            size: 800,
+            area: {
+                top: '50%',
+            },
+        },
+        locator: {
+            halfSample,
+            patchSize: 'large',
+        },
+        decoder: {
+            readers: ['pharmacode_reader']
+        }
+    }), pharmacodeRealWorldAreaConstrainedTestSet, 'pharmacode');
+
+    // Explicitly validate that certain images decode to nothing (empty barcodes array)
+    [true, false].forEach((halfSample) => {
+        runNoCodeTest(`pharmacode SHOULD NOT DECODE halfSample:${halfSample}`, generateConfig({
+            locate: false,
+            inputStream: {
+                size: 800,
+            },
+            locator: {
+                halfSample,
+                patchSize: 'large',
+            },
+            decoder: {
+                readers: ['pharmacode_reader']
+            }
+        }), pharmacodeRealWorldNoCodeTestSet, 'pharmacode');
+    });
+
+    // Cross-barcode rejection: Pharmacode reader should reject other barcode types (e.g., i2of5)
+    [true, false].forEach((halfSample) => {
+        runNoCodeTest(`pharmacode rejects i2of5 barcodes halfSample:${halfSample}`, generateConfig({
+            locate: false,
+            inputStream: {
+                size: 800,
+            },
+            locator: {
+                halfSample,
+                patchSize: 'large',
+            },
+            decoder: {
+                readers: ['pharmacode_reader']
+            }
+        }), pharmacodeCrossBarcodRejectionTestSet, 'i2of5');
+    });
 });

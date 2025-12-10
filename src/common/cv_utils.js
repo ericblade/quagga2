@@ -542,13 +542,25 @@ export function computeGray(imageData, outArray, config) {
 
     if (singleChannel) {
         for (let i = 0; i < l; i++) {
-            // eslint-disable-next-line no-param-reassign
-            outArray[i] = imageData[i * 4 + 0];
+            const alpha = imageData[i * 4 + 3];
+            if (alpha === 0) {
+                // eslint-disable-next-line no-param-reassign
+                outArray[i] = 255; // Treat transparent pixels as white
+            } else {
+                // eslint-disable-next-line no-param-reassign
+                outArray[i] = imageData[i * 4 + 0];
+            }
         }
     } else {
         for (let i = 0; i < l; i++) {
-            // eslint-disable-next-line no-param-reassign
-            outArray[i] = 0.299 * imageData[i * 4 + 0] + 0.587 * imageData[i * 4 + 1] + 0.114 * imageData[i * 4 + 2];
+            const alpha = imageData[i * 4 + 3];
+            if (alpha === 0) {
+                // eslint-disable-next-line no-param-reassign
+                outArray[i] = 255; // Treat transparent pixels as white
+            } else {
+                // eslint-disable-next-line no-param-reassign
+                outArray[i] = 0.299 * imageData[i * 4 + 0] + 0.587 * imageData[i * 4 + 1] + 0.114 * imageData[i * 4 + 2];
+            }
         }
     }
 }

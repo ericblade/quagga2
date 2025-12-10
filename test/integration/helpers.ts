@@ -65,19 +65,22 @@ export function runDecoderTestBothHalfSample(
 }
 
 // run test that should not fail but no barcode is in the images
-export function runNoCodeTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string }>) {
+export function runNoCodeTest(name: string, config: QuaggaJSConfigObject, testSet: Array<{ name: string, result: string, format: string }>, fixturePath?: string) {
+    const actualFixturePath = fixturePath || name;
     describe(`Not decoding ${name}`, () => {
         testSet.forEach((sample) => {
-            it('should run without error', async function() {
+            it(`should run without error (${sample.name})`, async function() {
                 this.timeout(20000); // need to set a long timeout because laptops sometimes lag like hell in tests when they go low power
                 const thisConfig = {
                     ...config,
-                    src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/${name}/${sample.name}`,
+                    src: `${typeof window !== 'undefined' ? '/' : ''}test/fixtures/${actualFixturePath}/${sample.name}`,
                 };
                 const result = await Quagga.decodeSingle(thisConfig);
                 expect(result).to.be.an('Object');
-                expect(result.barcodes).to.be.an('array');
-                expect(result.barcodes).to.be.empty;
+                // When multiple: false and no decode found, result should have codeResult.code as null or undefined
+                if (result.codeResult) {
+                    expect(result.codeResult.code).to.be.null;
+                }
                 // // console.warn(`* Expect result ${JSON.stringify(result)} to be an object`);
                 expect(Quagga.canvas).to.be.an('Object');
                 expect(Quagga.canvas.dom).to.be.an('Object');

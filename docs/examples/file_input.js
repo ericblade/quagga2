@@ -1,7 +1,18 @@
 $(function() {
     var App = {
         init: function() {
+            App.syncCheckboxesFromState();
             App.attachListeners();
+        },
+        syncCheckboxesFromState: function() {
+            var self = this;
+            $(".controls .reader-config-group input[type=checkbox]").each(function() {
+                var $checkbox = $(this),
+                    name = $checkbox.attr("name"),
+                    state = self._convertNameToState(name),
+                    value = self._accessByPath(self.state, state);
+                $checkbox.prop("checked", !!value);
+            });
         },
         attachListeners: function() {
             var self = this;
@@ -147,6 +158,7 @@ $(function() {
     }
 
     Quagga.onProcessed(function(result) {
+        console.warn('* onProcessed', result);
         var drawingCtx = Quagga.canvas.ctx.overlay,
             drawingCanvas = Quagga.canvas.dom.overlay,
             area;
@@ -174,10 +186,11 @@ $(function() {
                 drawingCtx.strokeStyle = "#0F0";
                 drawingCtx.strokeRect(area.x, area.y, area.width, area.height);
             }
-    }
+        }
     });
 
     Quagga.onDetected(function(result) {
+        console.warn('* onDetected', result);
         var code = result.codeResult.code,
             $node,
             canvas = Quagga.canvas.dom.image;

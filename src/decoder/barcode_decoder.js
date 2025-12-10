@@ -236,6 +236,79 @@ export default {
         }
 
         /**
+         * Validate that barcode position is stable across adjacent Y-scanlines.
+         * Real barcodes have consistent start position; tilted barcodes shift left/right as Y changes.
+         * @param {Array} line The original scan line [p1, p2]
+         * @param {Object} result The successful decode result with .start position
+         * @param {Object} reader The reader instance that succeeded
+         * @param {Object} inputImageWrapper The full image data
+         * @returns {boolean} true if barcode position is stable (≥1 adjacent Y-line matches)
+         */
+        function validateAdjacentYLines(line, result, reader, inputImageWrapper) {
+            // Extract original Y position and X start position
+            const originalY = Math.round(line[1].y);
+            const originalXStart = result.start;
+            const constructorFn = reader.constructor;
+            const requiredMatches = (constructorFn && constructorFn.adjacentLineValidationMatches) || 0;
+
+            if (requiredMatches <= 0) {
+                return true;
+            }
+
+            let matchCount = 0;
+            let done = false;
+
+            // Check Y±1, Y±2, Y±3 to see if barcode appears at same X position
+            for (const yOffset of [1, 2, 3]) {
+                if (done) {
+                    break;
+                }
+                for (const direction of [-1, 1]) {
+                    if (done) {
+                        break;
+                    }
+                    const newY = originalY + (yOffset * direction);
+
+                    // Bounds check
+                    if (newY < 0 || newY >= inputImageWrapper.size.y) {
+                        continue;
+                    }
+
+                    // Create new line at adjusted Y, keeping same X range
+                    const newP1 = { x: line[0].x, y: newY };
+                    const newP2 = { x: line[1].x, y: newY };
+
+                    try {
+                        // Extract grayscale at new Y
+                        const newBarcodeLine = Bresenham.getBarcodeLine(inputImageWrapper, newP1, newP2);
+
+                        // Binarize
+                        Bresenham.toBinaryLine(newBarcodeLine);
+
+                        // Set the row for _findStart() to search in
+                        reader._row = newBarcodeLine.line;
+
+                        // Try to find barcode start at this Y
+                        const startFound = reader._findStart();
+
+                        if (startFound !== null && startFound.start === originalXStart) {
+                            matchCount++;
+                            if (matchCount >= requiredMatches) {
+                                done = true;
+                                break;
+                            }
+                        }
+                    } catch (e) {
+                        // Ignore errors, treat failures as "no match" so we can try again on the next line to try
+                    }
+                }
+            }
+
+            const isValid = matchCount >= requiredMatches;
+            return isValid;
+        }
+
+        /**
          * Attempts to decode a barcode from a scan line.
          * Readers are tried in order (as specified in config.readers).
          * The first reader to return a non-null result wins.
@@ -261,12 +334,33 @@ export default {
             }
 
             // Iterate readers in order - first successful decode wins
+            let successfulReaderIndex = -1;
             for (i = 0; i < _barcodeReaders.length && result === null; i++) {
+                // Provide image context to readers that want it (e.g., pharmacode PGM dumps)
+                if (typeof _barcodeReaders[i].setImageWrapper === 'function') {
+                    _barcodeReaders[i].setImageWrapper(inputImageWrapper);
+                }
                 result = _barcodeReaders[i].decodePattern(barcodeLine.line);
+                if (result !== null) {
+                    successfulReaderIndex = i;
+                }
             }
             if (result === null) {
                 return null;
             }
+
+            // Validate that barcode position is stable across adjacent Y-scanlines
+            // This rejects tilted barcodes that only appear valid at one specific angle
+            // Only apply to PharmacodeReader (which explicitly made _findStart public for this validation)
+            if (successfulReaderIndex >= 0 && _barcodeReaders[successfulReaderIndex].constructor.name === 'PharmacodeReader') {
+                if (!validateAdjacentYLines(line, result, _barcodeReaders[successfulReaderIndex], inputImageWrapper)) {
+                    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
+                        // console.log(`[DEBUG] REJECTED by adjacent Y-line validation: barcode position unstable (tilted barcode)`);
+                    }
+                    return null;
+                }
+            }
+
             return {
                 codeResult: result,
                 barcodeLine,

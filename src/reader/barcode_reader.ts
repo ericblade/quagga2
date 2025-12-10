@@ -47,6 +47,7 @@ export interface Barcode {
     end: number,
     endInfo?: BarcodePosition,
     format: BarcodeFormat,
+    pattern?: string,
     start: number,
     startInfo: BarcodePosition,
     supplement?: Barcode,
@@ -76,6 +77,9 @@ export abstract class BarcodeReader {
             PatternNotFoundException: 'Pattern could not be found!',
         };
     }
+
+    // Reader-specific adjacent-line validation threshold (0 => disabled)
+    static adjacentLineValidationMatches = 0;
 
     constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         this._row = [];
