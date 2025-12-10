@@ -155,7 +155,7 @@ const QuaggaJSStaticInterface = {
                 this.init(config, () => {
                     // Sync the decodeSingle instance's canvas to the global _context so Quagga.canvas works
                     _context.canvasContainer = quaggaInstance.context.canvasContainer;
-                    
+
                     Events.once('processed', (result) => {
                         quaggaInstance.stop();
                         if (resultCallback) {

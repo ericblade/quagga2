@@ -50,6 +50,8 @@ const WIDE_BAR_RATIO_TOLERANCE = 0.05; // Allow 5% deviation from the detected r
 class PharmacodeReader extends BarcodeReader {
     FORMAT = 'pharmacode';
 
+    static adjacentLineValidationMatches = 1;
+
     SINGLE_CODE_ERROR = 0.7;
 
     AVG_CODE_ERROR = 0.48;
@@ -706,8 +708,6 @@ class PharmacodeReader extends BarcodeReader {
         if (!this._validatePeriodicity(bars, spaces)) {
             return null;
         }
-
-
 
         // For short patterns, validate consistency across shifted positions
         // to reject text/noise patterns that appear as bars due to edge detection

@@ -248,24 +248,31 @@ export default {
             // Extract original Y position and X start position
             const originalY = Math.round(line[1].y);
             const originalXStart = result.start;
-            let matchCount = 0;
+            const constructorFn = reader.constructor;
+            const requiredMatches = (constructorFn && constructorFn.adjacentLineValidationMatches) || 0;
 
-            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                // console.log(`[DEBUG] validateAdjacentYLines: original Y=${originalY}, X start=${originalXStart}`);
+            if (requiredMatches <= 0) {
+                return true;
             }
+
+            let matchCount = 0;
+            let done = false;
 
             // Check Y±1, Y±2, Y±3 to see if barcode appears at same X position
             for (const yOffset of [1, 2, 3]) {
+                if (done) {
+                    break;
+                }
                 for (const direction of [-1, 1]) {
+                    if (done) {
+                        break;
+                    }
                     const newY = originalY + (yOffset * direction);
 
                     // Bounds check
-                        if (newY < 0 || newY >= inputImageWrapper.size.y) {
-                            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                                // console.log(`[DEBUG]   Y offset ${yOffset * direction}: out of bounds`);
-                            }
-                            continue;
-                        }
+                    if (newY < 0 || newY >= inputImageWrapper.size.y) {
+                        continue;
+                    }
 
                     // Create new line at adjusted Y, keeping same X range
                     const newP1 = { x: line[0].x, y: newY };
@@ -286,28 +293,18 @@ export default {
 
                         if (startFound !== null && startFound.start === originalXStart) {
                             matchCount++;
-                            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                                // console.log(`[DEBUG]   Y offset ${yOffset * direction}: MATCH at X=${startFound.start}`);
-                            }
-                        } else {
-                            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                                const foundPos = startFound ? startFound.start : 'null';
-                                // console.log(`[DEBUG]   Y offset ${yOffset * direction}: no match (found X=${foundPos})`);
+                            if (matchCount >= requiredMatches) {
+                                done = true;
+                                break;
                             }
                         }
                     } catch (e) {
-                        if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                            // console.log(`[DEBUG]   Y offset ${yOffset * direction}: error during validation - ${e.message}`);
-                        }
+                        // Ignore errors, treat failures as "no match" so we can try again on the next line to try
                     }
                 }
             }
 
-            const isValid = matchCount >= 1;
-            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                // console.log(`[DEBUG] validateAdjacentYLines result: ${matchCount} matches, ${isValid ? 'ACCEPTED' : 'REJECTED'}`);
-            }
-
+            const isValid = matchCount >= requiredMatches;
             return isValid;
         }
 
@@ -328,13 +325,6 @@ export default {
                     ImageDebug.drawPath(line, { x: 'x', y: 'y' }, _canvas.ctx.overlay, { color: 'red', lineWidth: 3 });
                 }
                 Bresenham.debug.printFrequency(barcodeLine.line, _canvas.dom.frequency);
-            }
-
-            // Debug: Log gray-scale values before binarization
-            if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                const graylineSample = barcodeLine.line.slice(0, Math.min(150, barcodeLine.line.length));
-                // console.log(`[DEBUG] Grayscale values (y=${line[1]}, first 150): ${graylineSample.join(',')}`);
-                // console.log(`[DEBUG] Grayscale min=${barcodeLine.min}, max=${barcodeLine.max}, range=${barcodeLine.max - barcodeLine.min}`);
             }
 
             Bresenham.toBinaryLine(barcodeLine);

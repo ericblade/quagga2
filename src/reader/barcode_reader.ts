@@ -78,6 +78,9 @@ export abstract class BarcodeReader {
         };
     }
 
+    // Reader-specific adjacent-line validation threshold (0 => disabled)
+    static adjacentLineValidationMatches = 0;
+
     constructor(config: BarcodeReaderConfig, supplements?: Array<BarcodeReader>) {
         this._row = [];
         this.config = config || {};
