@@ -299,7 +299,7 @@ export default {
                             }
                         }
                     } catch (e) {
-                        // Ignore errors, treat failures as "no match" so we can try again on the next line to try
+                        // Ignore errors, treat failures as "no match" so we can try again on the next line
                     }
                 }
             }
@@ -352,11 +352,8 @@ export default {
             // Validate that barcode position is stable across adjacent Y-scanlines
             // This rejects tilted barcodes that only appear valid at one specific angle
             // Only apply to PharmacodeReader (which explicitly made _findStart public for this validation)
-            if (successfulReaderIndex >= 0 && _barcodeReaders[successfulReaderIndex].constructor.name === 'PharmacodeReader') {
+            if (successfulReaderIndex >= 0 && _barcodeReaders[successfulReaderIndex] instanceof PharmacodeReader) {
                 if (!validateAdjacentYLines(line, result, _barcodeReaders[successfulReaderIndex], inputImageWrapper)) {
-                    if (typeof process !== 'undefined' && process.env && process.env.NODE_ENV === 'test') {
-                        // console.log(`[DEBUG] REJECTED by adjacent Y-line validation: barcode position unstable (tilted barcode)`);
-                    }
                     return null;
                 }
             }

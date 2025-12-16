@@ -10,7 +10,6 @@ module.exports = {
         'http',
         'https',
         'url',
-        'ndarray-pixels',
     ],
 };
 module.exports.output.libraryTarget = 'commonjs';

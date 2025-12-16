@@ -46,7 +46,7 @@ describe('Pharmacode Decoder Tests', () => {
 
     // Cross-barcode rejection: i2of5 images should be rejected by pharmacode reader
     // This ensures the pharmacode reader doesn't accidentally decode other barcode types
-    const pharmacodeCrossBarcodRejectionTestSet = [
+    const pharmacodeCrossBarcodeRejectionTestSet = [
         { 'name': 'image-011.jpg', 'result': '', format: 'pharmacode' },
     ];
 
@@ -124,6 +124,6 @@ describe('Pharmacode Decoder Tests', () => {
             decoder: {
                 readers: ['pharmacode_reader']
             }
-        }), pharmacodeCrossBarcodRejectionTestSet, 'i2of5');
+        }), pharmacodeCrossBarcodeRejectionTestSet, 'i2of5');
     });
 });
