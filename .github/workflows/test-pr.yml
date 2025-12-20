@@ -47,3 +47,9 @@ jobs:
     - name: test package require
       run: |
         npm run test:require
+    - name: test node bundle decodeSingle
+      run: npm run test:node-bundle
+      env:
+        NODE_OPTIONS: --openssl-legacy-provider
+    - name: test browser bundle decodeSingle
+      run: npm run test:browser-bundle

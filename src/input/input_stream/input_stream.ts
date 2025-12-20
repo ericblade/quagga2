@@ -103,7 +103,15 @@ const inputStreamFactory: InputStreamFactory = {
                 // Use ndarray-pixels to decode the image
                 // Cast to Uint8Array for ndarray-pixels compatibility
                 const uint8Data = new Uint8Array(imageData.buffer, imageData.byteOffset, imageData.byteLength);
-                const pixels = await getPixels(uint8Data, mimeType);
+                let pixels;
+                try {
+                    pixels = await getPixels(uint8Data, mimeType);
+                } catch (err) {
+                    if ((err as Error).message?.includes('Cannot find module')) {
+                        throw new Error('missing dependencies: npm install ndarray-pixels sharp');
+                    }
+                    throw err;
+                }
 
                 loaded = true;
                 if (typeof ENV !== 'undefined' && ENV.development) {
