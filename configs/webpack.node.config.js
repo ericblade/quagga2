@@ -11,6 +11,7 @@ module.exports = {
         'https',
         'url',
         'sharp',
+        'ndarray-pixels',
     ],
 };
 module.exports.target = 'node';

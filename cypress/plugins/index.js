@@ -65,10 +65,10 @@ module.exports = (on, config) => {
         };
         process.on('exit', safeUnlink);
         process.on('SIGINT', () => { safeUnlink(); process.exit(1); });
-        process.on('SIGTERM', () => { safeUnlink(); });
+        process.on('SIGTERM', () => { safeUnlink(); process.exit(1);});
         global.__bundleCleanupHandlersRegistered = true;
     }
-    
+
     if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
         const webpackOptions = {
             webpackOptions: require('../../configs/webpack.config'),
@@ -76,7 +76,7 @@ module.exports = (on, config) => {
         };
         on('file:preprocessor', webpack(webpackOptions));
     }
-    
+
     // on('file:preprocessor', require('@cypress/code-coverage/use-babelrc'));
     return config;
 };
