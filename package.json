@@ -6,7 +6,9 @@
   "types": "type-definitions/quagga.d.ts",
   "browser": "dist/quagga.min.js",
   "optionalDependencies": {
-    "fsevents": "2.3.3"
+    "fsevents": "2.3.3",
+    "ndarray-pixels": "^5.0.1",
+    "sharp": "^0.34.0"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
@@ -72,9 +74,9 @@
     "coverage:node": "// DOES NOT WORK YET // npx cross-env NODE_ENV=test BUILD_ENV=development nyc --no-clean ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.*",
     "coverage": "npm run cypress:run",
     "server:examples": "npx http-server docs/examples -p 8080",
-    "cypress:open": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress open --env BUILD_ENV=development --browser electron",
+    "cypress:open": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress open --env BUILD_ENV=development --browser electron --config specPattern='cypress/e2e/**/!(browser-bundle).cy.ts'",
     "cypress:open:e2e": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress open --e2e --env BUILD_ENV=development --config specPattern=\"cypress/e2e/examples.cy.ts\" --browser electron",
-    "cypress:run": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --env BUILD_ENV=development",
+    "cypress:run": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --env BUILD_ENV=development --config specPattern='cypress/e2e/**/!(browser-bundle).cy.ts'",
     "cypress:run:e2e": "npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --env BUILD_ENV=development --spec \"cypress/e2e/examples.cy.ts\"",
     "test:e2e": "npx start-server-and-test server:examples http://localhost:8080 cypress:run:e2e",
     "test:e2e:open": "npx start-server-and-test server:examples http://localhost:8080 cypress:open:e2e",
@@ -84,6 +86,8 @@
     "test:import": "mocha test/test-import.mjs",
     "test:node": "npx cross-env NODE_ENV=test ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
     "test:require": "mocha test/test-require",
+    "test:node-bundle": "npm run build:node && npx cross-env NODE_ENV=test mocha test/node-bundle.spec.js",
+    "test:browser-bundle": "npm run build:prod && npx cross-env NODE_ENV=development BUILD_ENV=development NODE_OPTIONS=--openssl-legacy-provider cypress run --spec cypress/e2e/browser-bundle.cy.ts",
     "test:module": "npm run test:require && npm run test:import",
     "test": "npx start-server-and-test server:examples http://localhost:8080 cypress:run && npx cross-env NODE_ENV=test BUILD_ENV=development ts-mocha -p test/tsconfig.json src/**/test/node/*.spec.* src/**/test/*.spec.* test/integration/**/*.spec.ts",
     "test:parallel": "npx concurrently --kill-others-on-fail --success=all -n e2e,node -c green,blue \"npx start-server-and-test server:examples http://localhost:8080 cypress:run\" \"npm run test:node\"",

@@ -145,6 +145,18 @@ These packages are **only used during build/development** and are **not bundled 
   - **Purpose**: Native file watching for better performance
   - **Usage**: Automatically used by Webpack/build tools on macOS
 
+- **`ndarray-pixels`** (^5.0.1)
+  - **Platform**: Node.js only
+  - **Purpose**: Image decoding for `decodeSingle` in Node.js
+  - **Usage**: Required for Node.js `decodeSingle()` support; install with `npm install ndarray-pixels sharp`
+  - **Note**: Marked external in Node webpack build; not bundled into `lib/quagga.js`
+
+- **`sharp`** (^0.34.0)
+  - **Platform**: Node.js only
+  - **Purpose**: Native image processing (used by `ndarray-pixels` on Node.js)
+  - **Usage**: Required for Node.js `decodeSingle()` support; transitive dependency of `ndarray-pixels`
+  - **Note**: Marked external in Node webpack build; not bundled into `lib/quagga.js`
+
 ---
 
 ## Overrides
