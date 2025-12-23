@@ -8,7 +8,7 @@
   "optionalDependencies": {
     "fsevents": "2.3.3",
     "ndarray-pixels": "^5.0.1",
-    "sharp": "^0.34.0"
+    "sharp": "^0.34.5"
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
