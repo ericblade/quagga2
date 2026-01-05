@@ -114,9 +114,9 @@ These packages are **only used during build/development** and are **not bundled 
 - **`sinon-chai`** (^3.7.0) - Sinon assertions for Chai
 - **`ts-mocha`** (^11.1.0) - TypeScript support for Mocha
 - **`ts-node`** (^10.9.2) - TypeScript execution for Node.js
-- **`cypress`** (^13.17.0) - End-to-end browser testing
-- **`@cypress/webpack-preprocessor`** (6.0.0) - Webpack integration for Cypress
-- **`@cypress/code-coverage`** (^3.12.4) - Code coverage for Cypress tests
+- **`cypress`** (^15.8.1) - End-to-end browser testing
+- **`@cypress/webpack-preprocessor`** (^6.0.4) - Webpack integration for Cypress (pinned to v6 for Webpack 4 compatibility)
+- **`@cypress/code-coverage`** (^3.14.7) - Code coverage for Cypress tests
 - **`nyc`** (^17.1.0) - Code coverage tool (Istanbul wrapper)
 
 ### Linting & Code Quality
@@ -218,7 +218,7 @@ Some packages are pinned to specific versions due to compatibility issues:
 - **`chai@^4.3.10`** - Pinned to v4 because v5+ and v6+ are ESM-only, incompatible with CommonJS tests
 - **`sinon-chai@^3.7.0`** - Pinned to match `chai@4.x` compatibility
 - **`webpack@^4.44.2`** - Pinned to v4 because v5 requires significant config migration
-- **`cypress@^13.17.0`** - Pinned to v13 for stability
+- **`@cypress/webpack-preprocessor@^6.0.4`** - Pinned to v6.x because v7.x requires Webpack 5 (we're on Webpack 4)
 
 These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-check-updates`.
 
@@ -227,8 +227,15 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 - **TypeScript ecosystem** (`typescript`, `@typescript-eslint/*`, `ts-*`): Keep up-to-date
 - **Babel ecosystem** (`@babel/*`): Keep up-to-date for security and features
 - **Testing tools** (`mocha`, `chai`, `sinon`): Upgrade cautiously, test thoroughly
+- **Cypress** (`cypress`, `@cypress/*`): Keep up-to-date (as of 2026-01, upgraded to v15.8.1)
 - **Webpack & bundlers**: Major version upgrades require careful migration planning
 - **Runtime dependencies** (`gl-matrix`, `lodash`, `ndarray*`): Keep up-to-date unless breaking changes occur
+
+**Note on Cypress and Webpack compatibility:**
+- Cypress itself can be upgraded to the latest version (v15.x+)
+- However, `@cypress/webpack-preprocessor` must stay on v6.x due to Webpack 4 constraint
+- Version 7.x of `@cypress/webpack-preprocessor` requires Webpack 5
+- To upgrade to webpack-preprocessor v7.x+, the project would need to migrate to Webpack 5 first
 
 ---
 
@@ -335,4 +342,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-12-01
+Last updated: 2026-01-05
