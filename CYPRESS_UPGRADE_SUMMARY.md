@@ -66,7 +66,7 @@ Created comprehensive migration guide: [`PLAYWRIGHT_MIGRATION.md`](./PLAYWRIGHT_
 
 **Feasibility**: ✅ Technically feasible  
 **Effort**: 8-16 hours  
-**Recommendation**: Consider for future when doing Webpack 5 migration
+**Recommendation**: Consider Playwright migration for the future when undertaking Webpack 5 migration
 
 ### Benefits of Playwright
 - Better community support (Microsoft-backed)
