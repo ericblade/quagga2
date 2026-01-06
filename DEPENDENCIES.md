@@ -220,7 +220,7 @@ Some packages are pinned to specific versions due to compatibility issues:
 - **`chai@^4.3.10`** - Pinned to v4 because v5+ and v6+ are ESM-only, incompatible with CommonJS tests
 - **`sinon-chai@^3.7.0`** - Pinned to match `chai@4.x` compatibility
 - **`webpack@^4.44.2`** - Pinned to v4 because v5 requires significant config migration
-- **`@cypress/webpack-preprocessor@^6.0.4`** - Pinned to v6.x because v7.x requires Webpack 5 (we're on Webpack 4)
+- **`@cypress/webpack-preprocessor@^6.0.4`** - Pinned to v6.x because v7.x requires Webpack 5 (we're on Webpack 4); Cypress itself is **not** pinned and may be upgraded independently
 
 These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-check-updates`.
 
