@@ -114,9 +114,9 @@ These packages are **only used during build/development** and are **not bundled 
 - **`sinon-chai`** (^3.7.0) - Sinon assertions for Chai
 - **`ts-mocha`** (^11.1.0) - TypeScript support for Mocha
 - **`ts-node`** (^10.9.2) - TypeScript execution for Node.js
-- **`cypress`** (^13.17.0) - End-to-end browser testing
-- **`@cypress/webpack-preprocessor`** (6.0.0) - Webpack integration for Cypress
-- **`@cypress/code-coverage`** (^3.12.4) - Code coverage for Cypress tests
+- **`cypress`** (^15.8.1) - End-to-end browser testing
+- **`@cypress/webpack-preprocessor`** (^6.0.4) - Webpack integration for Cypress (pinned to v6 for Webpack 4 compatibility)
+- **`@cypress/code-coverage`** (^3.14.7) - Code coverage for Cypress tests
 - **`nyc`** (^17.1.0) - Code coverage tool (Istanbul wrapper)
 
 ### Linting & Code Quality
@@ -161,7 +161,9 @@ These packages are **only used during build/development** and are **not bundled 
 
 ## Overrides
 
-No package overrides are currently needed. Cypress 13.17.0+ uses `@cypress/request@^3.0.6` which includes the security fix for the `form-data` vulnerability (versions >= 3.0.6 use `form-data@~4.0.0` which is safe).
+No package overrides are currently needed. The Cypress 15.8.1 upgrade (2026-01-05) resolved several security issues in the Cypress ecosystem. 
+
+**Note**: Some vulnerabilities remain in pinned dependencies (Webpack 4, mocha 5) that cannot be upgraded without breaking changes. These are documented in the "Security Considerations" section below.
 
 ---
 
@@ -218,7 +220,7 @@ Some packages are pinned to specific versions due to compatibility issues:
 - **`chai@^4.3.10`** - Pinned to v4 because v5+ and v6+ are ESM-only, incompatible with CommonJS tests
 - **`sinon-chai@^3.7.0`** - Pinned to match `chai@4.x` compatibility
 - **`webpack@^4.44.2`** - Pinned to v4 because v5 requires significant config migration
-- **`cypress@^13.17.0`** - Pinned to v13 for stability
+- **`@cypress/webpack-preprocessor@^6.0.4`** - Pinned to v6.x because v7.x requires Webpack 5 (we're on Webpack 4); Cypress itself is **not** pinned and may be upgraded independently
 
 These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-check-updates`.
 
@@ -227,8 +229,15 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 - **TypeScript ecosystem** (`typescript`, `@typescript-eslint/*`, `ts-*`): Keep up-to-date
 - **Babel ecosystem** (`@babel/*`): Keep up-to-date for security and features
 - **Testing tools** (`mocha`, `chai`, `sinon`): Upgrade cautiously, test thoroughly
+- **Cypress** (`cypress`, `@cypress/*`): Keep up-to-date (as of 2026-01, upgraded to v15.8.1)
 - **Webpack & bundlers**: Major version upgrades require careful migration planning
 - **Runtime dependencies** (`gl-matrix`, `lodash`, `ndarray*`): Keep up-to-date unless breaking changes occur
+
+**Note on Cypress and Webpack compatibility:**
+- Cypress itself can be upgraded to the latest version (v15.x+)
+- However, `@cypress/webpack-preprocessor` must stay on v6.x due to Webpack 4 constraint
+- Version 7.x of `@cypress/webpack-preprocessor` requires Webpack 5
+- To upgrade to webpack-preprocessor v7.x+, the project would need to migrate to Webpack 5 first
 
 ---
 
@@ -237,8 +246,22 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 ### Known Issues
 
 1. **`@babel/polyfill` is deprecated** - Should migrate to `core-js@3` + `regenerator-runtime`
-2. **Old `mocha` version** - v5.2.0 is from 2018, may have unpatched vulnerabilities
-3. **Webpack 4** - No longer receives updates, consider upgrading to Webpack 5
+2. **Old `mocha` version** - v5.2.0 is from 2018; newer versions have breaking changes requiring migration
+3. **Webpack 4** - No longer receives updates; v5 migration would require significant effort
+4. **Security vulnerabilities in pinned dependencies**:
+   - `minimatch` (via mocha 5) - ReDoS vulnerability; resolved in mocha 10+
+   - `js-yaml` (via @cypress/code-coverage) - Prototype pollution; low risk in test context
+   - Various Webpack 4 transitive dependencies - Addressed in Webpack 5
+
+**Risk Assessment**:
+- Test-only dependencies with known vulnerabilities pose **low risk** (not shipped to production)
+- Webpack 4 vulnerabilities are in the build toolchain, not in the output bundles
+- Production bundles (`dist/quagga.min.js`, `lib/quagga.js`) do not contain vulnerable code
+
+**Recent Improvements** (2026-01-05):
+- Upgraded Cypress from 13.17.0 to 15.8.1, reducing overall vulnerabilities from 21 to 15
+- Eliminated 2 low-severity and 4 high-severity issues
+- All remaining high-severity issues are in pinned dependencies (Webpack 4, mocha 5)
 
 ### Monitoring
 
@@ -335,4 +358,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-12-01
+Last updated: 2026-01-05

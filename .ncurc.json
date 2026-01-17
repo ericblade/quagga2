@@ -1,11 +1,9 @@
 {
     "upgrade": true,
     "reject": [
-        "@cypress/code-coverage",
         "@cypress/webpack-preprocessor",
         "babel-loader",
         "chai",
-        "cypress",
         "eslint",
         "mocha",
         "sinon-chai",
