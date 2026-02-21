@@ -19,6 +19,7 @@ These packages contain code that is **imported by the source code** and **bundle
 - **`gl-matrix`** (^3.4.4)
   - **Purpose**: High-performance vector and matrix math operations
   - **Usage**: Used throughout the codebase for geometric calculations
+  - **Location**: Listed in `dependencies` (not `devDependencies`) - see [Type Definition Dependencies](#type-definition-dependencies) below
   - **Files**:
     - `src/quagga/quagga.ts` - vec2 operations for bounding boxes
     - `src/quagga/initBuffers.ts` - vec2 for buffer initialization
@@ -26,6 +27,7 @@ These packages contain code that is **imported by the source code** and **bundle
     - `src/common/image_wrapper.ts` - vec2 for image transforms
     - `src/common/cvutils/ImageRef.ts` - vec2, vec3 for computer vision
     - `src/common/cluster.js` - vec2 for clustering algorithms
+    - `type-definitions/quagga.d.ts` - vec2 type import for `Moment.vec` property
 
 - **`lodash`** (^4.17.21)
   - **Purpose**: Utility functions for object manipulation
@@ -103,9 +105,9 @@ These packages are **only used during build/development** and are **not bundled 
 - **`sinon-chai`** (^3.7.0) - Sinon assertions for Chai
 - **`ts-mocha`** (^11.1.0) - TypeScript support for Mocha
 - **`ts-node`** (^10.9.2) - TypeScript execution for Node.js
-- **`cypress`** (^13.17.0) - End-to-end browser testing
-- **`@cypress/webpack-preprocessor`** (6.0.0) - Webpack integration for Cypress
-- **`@cypress/code-coverage`** (^3.12.4) - Code coverage for Cypress tests
+- **`cypress`** (^15.8.1) - End-to-end browser testing
+- **`@cypress/webpack-preprocessor`** (^6.0.4) - Webpack integration for Cypress (pinned to v6 for Webpack 4 compatibility)
+- **`@cypress/code-coverage`** (^3.14.7) - Code coverage for Cypress tests
 - **`nyc`** (^17.1.0) - Code coverage tool (Istanbul wrapper)
 
 ### Linting & Code Quality
@@ -133,11 +135,25 @@ These packages are **only used during build/development** and are **not bundled 
   - **Purpose**: Native file watching for better performance
   - **Usage**: Automatically used by Webpack/build tools on macOS
 
+- **`ndarray-pixels`** (^5.0.1)
+  - **Platform**: Node.js only
+  - **Purpose**: Image decoding for `decodeSingle` in Node.js
+  - **Usage**: Required for Node.js `decodeSingle()` support; install with `npm install ndarray-pixels sharp`
+  - **Note**: Marked external in Node webpack build; not bundled into `lib/quagga.js`
+
+- **`sharp`** (^0.34.0)
+  - **Platform**: Node.js only
+  - **Purpose**: Native image processing (used by `ndarray-pixels` on Node.js)
+  - **Usage**: Required for Node.js `decodeSingle()` support; transitive dependency of `ndarray-pixels`
+  - **Note**: Marked external in Node webpack build; not bundled into `lib/quagga.js`
+
 ---
 
 ## Overrides
 
-No package overrides are currently needed. Cypress 13.17.0+ uses `@cypress/request@^3.0.6` which includes the security fix for the `form-data` vulnerability (versions >= 3.0.6 use `form-data@~4.0.0` which is safe).
+No package overrides are currently needed. The Cypress 15.8.1 upgrade (2026-01-05) resolved several security issues in the Cypress ecosystem. 
+
+**Note**: Some vulnerabilities remain in pinned dependencies (Webpack 4, mocha 5) that cannot be upgraded without breaking changes. These are documented in the "Security Considerations" section below.
 
 ---
 
@@ -194,7 +210,7 @@ Some packages are pinned to specific versions due to compatibility issues:
 - **`chai@^4.3.10`** - Pinned to v4 because v5+ and v6+ are ESM-only, incompatible with CommonJS tests
 - **`sinon-chai@^3.7.0`** - Pinned to match `chai@4.x` compatibility
 - **`webpack@^4.44.2`** - Pinned to v4 because v5 requires significant config migration
-- **`cypress@^13.17.0`** - Pinned to v13 for stability
+- **`@cypress/webpack-preprocessor@^6.0.4`** - Pinned to v6.x because v7.x requires Webpack 5 (we're on Webpack 4); Cypress itself is **not** pinned and may be upgraded independently
 
 These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-check-updates`.
 
@@ -203,8 +219,15 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 - **TypeScript ecosystem** (`typescript`, `@typescript-eslint/*`, `ts-*`): Keep up-to-date
 - **Babel ecosystem** (`@babel/*`): Keep up-to-date for security and features
 - **Testing tools** (`mocha`, `chai`, `sinon`): Upgrade cautiously, test thoroughly
+- **Cypress** (`cypress`, `@cypress/*`): Keep up-to-date (as of 2026-01, upgraded to v15.8.1)
 - **Webpack & bundlers**: Major version upgrades require careful migration planning
 - **Runtime dependencies** (`gl-matrix`, `lodash`, `ndarray*`): Keep up-to-date unless breaking changes occur
+
+**Note on Cypress and Webpack compatibility:**
+- Cypress itself can be upgraded to the latest version (v15.x+)
+- However, `@cypress/webpack-preprocessor` must stay on v6.x due to Webpack 4 constraint
+- Version 7.x of `@cypress/webpack-preprocessor` requires Webpack 5
+- To upgrade to webpack-preprocessor v7.x+, the project would need to migrate to Webpack 5 first
 
 ---
 
@@ -212,8 +235,22 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 
 ### Known Issues
 
-1. **Old `mocha` version** - v5.2.0 is from 2018, may have unpatched vulnerabilities
-2. **Webpack 4** - No longer receives updates, consider upgrading to Webpack 5
+1. **Old `mocha` version** - v5.2.0 is from 2018; newer versions have breaking changes requiring migration
+2. **Webpack 4** - No longer receives updates; v5 migration would require significant effort
+3. **Security vulnerabilities in pinned dependencies**:
+   - `minimatch` (via mocha 5) - ReDoS vulnerability; resolved in mocha 10+
+   - `js-yaml` (via @cypress/code-coverage) - Prototype pollution; low risk in test context
+   - Various Webpack 4 transitive dependencies - Addressed in Webpack 5
+
+**Risk Assessment**:
+- Test-only dependencies with known vulnerabilities pose **low risk** (not shipped to production)
+- Webpack 4 vulnerabilities are in the build toolchain, not in the output bundles
+- Production bundles (`dist/quagga.min.js`, `lib/quagga.js`) do not contain vulnerable code
+
+**Recent Improvements** (2026-01-05):
+- Upgraded Cypress from 13.17.0 to 15.8.1, reducing overall vulnerabilities from 21 to 15
+- Eliminated 2 low-severity and 4 high-severity issues
+- All remaining high-severity issues are in pinned dependencies (Webpack 4, mocha 5)
 
 ### Monitoring
 
@@ -223,11 +260,49 @@ These are configured in `.ncurc.json` to prevent accidental upgrades via `npm-ch
 
 ---
 
+## Type Definition Dependencies
+
+### Exception: `gl-matrix` in `dependencies`
+
+While most packages in Quagga2 are listed in `devDependencies` because they are bundled (see [Background](#background)), **`gl-matrix` is an exception** and is listed in `dependencies`.
+
+**Why?**
+
+The TypeScript type definition file (`type-definitions/quagga.d.ts`) imports `vec2` from `gl-matrix`:
+
+```typescript
+import { vec2 } from 'gl-matrix';
+```
+
+This type is used in the `Moment` interface:
+
+```typescript
+export type Moment = {
+    // ... other properties
+    vec?: vec2;
+};
+```
+
+When TypeScript consumers use Quagga2 with type checking, the TypeScript compiler needs to resolve this import to provide proper type information. If `gl-matrix` were in `devDependencies`, it would not be installed when consumers run `npm install @ericblade/quagga2`, causing TypeScript compilation errors.
+
+**Key distinction:**
+
+- **Runtime bundling**: `gl-matrix` code IS bundled into `dist/quagga.min.js` - consumers don't need it at runtime
+- **Type resolution**: TypeScript consumers DO need `gl-matrix` installed to resolve types in `quagga.d.ts`
+
+This is a special case where type definitions create a true development-time dependency for consumers using TypeScript.
+
+---
+
 ## FAQ
 
 **Q: Why are runtime dependencies in `devDependencies` instead of `dependencies`?**
 
 A: Quagga2 is a **bundled library**. Consumers install the package and use the pre-built files (`dist/quagga.min.js` or `lib/quagga.js`), not the source code. They never run `npm install` on Quagga2's dependencies. Therefore, from npm's perspective, all packages are development dependencies (used during build), not runtime dependencies (used after install).
+
+**Q: Why is `gl-matrix` in `dependencies` if everything else is in `devDependencies`?**
+
+A: This is an exception for TypeScript type resolution. The type definition file (`type-definitions/quagga.d.ts`) imports `vec2` from `gl-matrix` to provide proper typing for the `Moment.vec` property. TypeScript consumers need `gl-matrix` installed to resolve these types during compilation. See [Type Definition Dependencies](#type-definition-dependencies) for details.
 
 **Q: How can I tell if a package is actually used in the code?**
 
@@ -245,11 +320,7 @@ A: `optionalDependencies` are packages that enhance functionality if available b
 
 **Q: Can I remove `@babel/polyfill`?**
 
-A: **It has been removed.** Investigation in November 2025 confirmed that `@babel/polyfill` was never actually imported or used in the codebase - it was a historical dependency that had no effect. The `@babel/preset-env` configuration with `useBuiltIns: "entry"` requires explicit imports of `core-js` at entry points, but no such imports existed. The `@babel/plugin-transform-runtime` handles async/await via `@babel/runtime`, which is bundled automatically. Removal has no impact on bundle size or functionality.
-
-**Q: Why was `core-js` removed?**
-
-A: `core-js` was removed along with `@babel/polyfill` because it was never actually used. The Babel configuration with `useBuiltIns: "entry"` only injects polyfills when you explicitly import `core-js/stable` at entry points - no such imports existed in the codebase. Modern browsers (targeted via "last 2 versions" in webpack config) support ES6+ APIs natively (Promise, Array.includes, Object.entries, etc.), so polyfills aren't needed. The `@babel/plugin-transform-runtime` handles async/await syntax via `@babel/runtime`.
+A: **It has been removed** (November 2025). Investigation confirmed that `@babel/polyfill` was never actually imported or used in the codebase - it was a historical dependency with no effect. The `@babel/preset-env` configuration with `useBuiltIns: "entry"` requires explicit imports of `core-js` at entry points, but no such imports existed. `core-js` itself was also removed for the same reason. The `@babel/plugin-transform-runtime` handles async/await via `@babel/runtime`, which is bundled automatically. Removal had no impact on bundle size or functionality.
 
 **Q: Why can't I upgrade `chai` to version 5 or 6?**
 
@@ -276,4 +347,4 @@ This document was created in November 2025 following the TypeScript 5.9.3 upgrad
 - Security vulnerabilities are discovered and patched
 - Build tooling changes significantly
 
-Last updated: 2025-11-26
+Last updated: 2026-02-21
