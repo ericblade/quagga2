@@ -58,7 +58,7 @@
     "ts-mocha": "^11.1.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.3",
-    "webpack": "^4.44.2",
+    "webpack": "^5.105.4",
     "webpack-cli": "^3.3.12"
   },
   "overrides": {
