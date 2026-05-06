@@ -180,9 +180,9 @@ describe('Skeletonizer', () => {
                 }
             }
 
-            const start = Date.now();
+            const start = performance.now();
             skeletonizer.skeletonize();
-            const elapsed = Date.now() - start;
+            const elapsed = performance.now() - start;
 
             // Should complete in under 100ms for 8x8 image
             expect(elapsed).to.be.lessThan(100);
