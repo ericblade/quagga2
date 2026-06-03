@@ -47,7 +47,7 @@
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-typescript-sort-keys": "^3.3.0",
     "lodash": "^4.17.21",
-    "mocha": "^5.2.0",
+    "mocha": "^11.7.6",
     "ndarray": "^1.0.19",
     "ndarray-linear-interpolate": "^1.0.0",
     "ndarray-pixels": "^5.0.1",
