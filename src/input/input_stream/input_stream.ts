@@ -86,10 +86,10 @@ const inputStreamFactory: InputStreamFactory = {
 
         async function loadImages(): Promise<void> {
             loaded = false;
+            if (!baseUrl) {
+                throw new Error('Image source (src) is required in stream configuration');
+            }
             try {
-                if (!baseUrl) {
-                    throw new Error('Image source (src) is required in stream configuration');
-                }
                 // Load the image data first
                 const imageData = await loadImageData(baseUrl);
 
