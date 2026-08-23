@@ -57,6 +57,7 @@ const inputStreamFactory: InputStreamFactory = {
                 _config = config;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
                 this.setAttribute('src', (typeof config.src !== 'undefined') ? config.src : '');
+                return Promise.resolve();
             },
 
             ended() {
@@ -181,40 +182,59 @@ const inputStreamFactory: InputStreamFactory = {
         const _topRight: Point = { x: 0, y: 0, type: 'Point' };
         const _canvasSize: XYSize = { x: 0, y: 0, type: 'XYSize' };
 
-        function loadImages(): void {
+        function loadImages(): Promise<void> {
             loaded = false;
-            ImageLoader.load(baseUrl, (imgs: Array<{ tags: any; img: HTMLImageElement}>) => {
-                imgArray = imgs;
-                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                if (imgs[0].tags && imgs[0].tags.orientation) {
-                    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-                    switch (imgs[0].tags.orientation) {
-                        case 6:
-                        case 8:
-                            width = imgs[0].img.height;
-                            height = imgs[0].img.width;
-                            break;
-                        default:
-                            width = imgs[0].img.width;
-                            height = imgs[0].img.height;
+            return new Promise((resolve, reject) => {
+                try {
+                    if (!baseUrl) {
+                        reject(new Error('Image source (src) is required in stream configuration'));
+                        return;
                     }
-                } else {
-                    width = imgs[0].img.width;
-                    height = imgs[0].img.height;
+                    ImageLoader.load(baseUrl, (imgs: Array<{ tags: any; img: HTMLImageElement}>) => {
+                        try {
+                            if (!imgs || imgs.length === 0 || !imgs[0] || !imgs[0].img) {
+                                reject(new Error('Image load failed'));
+                                return;
+                            }
+                            imgArray = imgs;
+                            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                            if (imgs[0].tags && imgs[0].tags.orientation) {
+                                // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+                                switch (imgs[0].tags.orientation) {
+                                    case 6:
+                                    case 8:
+                                        width = imgs[0].img.height;
+                                        height = imgs[0].img.width;
+                                        break;
+                                    default:
+                                        width = imgs[0].img.width;
+                                        height = imgs[0].img.height;
+                                }
+                            } else {
+                                width = imgs[0].img.width;
+                                height = imgs[0].img.height;
+                            }
+                            // eslint-disable-next-line no-nested-ternary
+                            calculatedWidth = _config?.size ? width / height > 1 ? _config.size : Math.floor((width / height) * _config.size) : width;
+                            // eslint-disable-next-line no-nested-ternary
+                            calculatedHeight = _config?.size ? width / height > 1 ? Math.floor((height / width) * _config.size) : _config.size : height;
+                            _canvasSize.x = calculatedWidth;
+                            _canvasSize.y = calculatedHeight;
+                            loaded = true;
+                            frameIdx = 0;
+                            setTimeout(() => {
+                                // eslint-disable-next-line @typescript-eslint/no-use-before-define
+                                publishEvent('canrecord', []);
+                                resolve();
+                            }, 0);
+                        } catch (error) {
+                            reject(error);
+                        }
+                    }, offset, size, _config?.sequence, _config);
+                } catch (error) {
+                    reject(error);
                 }
-                // eslint-disable-next-line no-nested-ternary
-                calculatedWidth = _config?.size ? width / height > 1 ? _config.size : Math.floor((width / height) * _config.size) : width;
-                // eslint-disable-next-line no-nested-ternary
-                calculatedHeight = _config?.size ? width / height > 1 ? Math.floor((height / width) * _config.size) : _config.size : height;
-                _canvasSize.x = calculatedWidth;
-                _canvasSize.y = calculatedHeight;
-                loaded = true;
-                frameIdx = 0;
-                setTimeout(() => {
-                    // eslint-disable-next-line @typescript-eslint/no-use-before-define
-                    publishEvent('canrecord', []);
-                }, 0);
-            }, offset, size, _config?.sequence, _config);
+            });
         }
 
         function publishEvent(eventName: string, args: Array<any>): void {
@@ -275,7 +295,7 @@ const inputStreamFactory: InputStreamFactory = {
                     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
                     size = stream.length;
                 }
-                loadImages();
+                return loadImages();
             },
 
             ended() {

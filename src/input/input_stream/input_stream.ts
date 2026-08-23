@@ -27,7 +27,7 @@ const inputStreamFactory: InputStreamFactory = {
         // TODO: frame should be a type NdArray, but NdArray doesn't have ts definitions
         // TODO: there is a ts-ndarray that might work, though
         let frame: any = null;
-        let baseUrl: string;
+        let baseUrl: string = '';
         const ended = false;
         let calculatedWidth: number;
         let calculatedHeight: number;
@@ -86,6 +86,9 @@ const inputStreamFactory: InputStreamFactory = {
 
         async function loadImages(): Promise<void> {
             loaded = false;
+            if (!baseUrl) {
+                throw new Error('Image source (src) is required in stream configuration');
+            }
             try {
                 // Load the image data first
                 const imageData = await loadImageData(baseUrl);
@@ -143,7 +146,9 @@ const inputStreamFactory: InputStreamFactory = {
                     publishEvent('canrecord', []);
                 }, 0);
             } catch (err) {
-                console.error('**** quagga loadImages error:', err);
+                if (process.env.NODE_ENV !== 'test') {
+                    console.error('**** quagga loadImages error:', err);
+                }
                 throw new Error('error decoding pixels in loadImages');
             }
         }
@@ -191,10 +196,16 @@ const inputStreamFactory: InputStreamFactory = {
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
                 _config = stream;
                 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment,@typescript-eslint/no-unsafe-member-access
-                baseUrl = _config?.src;
+                baseUrl = _config?.src || '';
                 size = 1;
-                loadImages().catch((err) => {
-                    console.error('Failed to load images:', err);
+                return loadImages().catch((err) => {
+                    const shouldLog = typeof process !== 'undefined'
+                        ? process.env.NODE_ENV !== 'test'
+                        : true;
+                    if (shouldLog && (typeof ENV === 'undefined' || ENV.development)) {
+                        console.error('Failed to load images:', err);
+                    }
+                    throw err;
                 });
             },
 

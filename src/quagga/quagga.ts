@@ -120,7 +120,15 @@ export default class Quagga {
 
         if (inputStream) {
             inputStream.setAttribute('preload', 'auto');
-            inputStream.setInputStream(this.context.config.inputStream);
+            const setInputStreamPromise = inputStream.setInputStream(this.context.config.inputStream);
+            if (setInputStreamPromise && typeof setInputStreamPromise.catch === 'function') {
+                setInputStreamPromise.catch((err: unknown) => {
+                    const message = err && typeof err === 'object' && 'message' in err
+                        ? String((err as { message?: unknown }).message)
+                        : String(err);
+                    callback(err instanceof Error ? err : new Error(message));
+                });
+            }
             inputStream.addEventListener('canrecord', this.canRecord.bind(undefined, callback));
         }
 

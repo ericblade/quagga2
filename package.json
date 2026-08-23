@@ -1,6 +1,6 @@
 {
   "name": "@ericblade/quagga2",
-  "version": "1.10.1",
+  "version": "1.11.0",
   "description": "An advanced barcode-scanner written in JavaScript",
   "main": "lib/quagga.js",
   "types": "type-definitions/quagga.d.ts",
@@ -8,10 +8,10 @@
   "optionalDependencies": {
     "fsevents": "2.3.3",
     "ndarray-pixels": "^5.0.1",
-    "sharp": "^0.34.5"
+    "sharp": "^0.35.3"
   },
   "devDependencies": {
-    "@babel/core": "^7.28.5",
+    "@babel/core": "^7.29.7",
     "@babel/plugin-proposal-class-properties": "^7.18.6",
     "@babel/plugin-proposal-nullish-coalescing-operator": "^7.18.6",
     "@babel/plugin-proposal-object-rest-spread": "^7.20.7",
@@ -46,7 +46,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
     "eslint-plugin-typescript-sort-keys": "^3.3.0",
-    "lodash": "^4.17.21",
+    "lodash": "^4.18.1",
     "mocha": "^5.2.0",
     "ndarray": "^1.0.19",
     "ndarray-linear-interpolate": "^1.0.0",

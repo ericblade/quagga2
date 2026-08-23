@@ -56,7 +56,6 @@ class EANReader extends BarcodeReader {
         if (!offset) {
             offset = this._nextSet(this._row);
         }
-        let found = false;
         for (let i = offset; i < this._row.length; i++) {
             // console.warn(`* loop i=${offset} len=${this._row.length} isWhite=${isWhite} counterPos=${counterPos}`);
             if (this._row[i] ^ (isWhite ? 1 : 0)) {
@@ -66,7 +65,6 @@ class EANReader extends BarcodeReader {
                     const error = this._matchPattern(counter, pattern);
                     // console.warn('* matchPattern', error, counter, pattern);
                     if (error < epsilon && bestMatch.error && error < bestMatch.error) {
-                        found = true;
                         bestMatch.error = error;
                         bestMatch.start = i - counter.reduce((sum, value) => sum + value, 0);
                         bestMatch.end = i;
@@ -88,12 +86,7 @@ class EANReader extends BarcodeReader {
                 isWhite = !isWhite;
             }
         }
-        if (found) {
-            // console.warn('* return bestMatch', JSON.stringify(bestMatch));
-        } else {
-            // console.warn('* return null');
-        }
-        return found ? bestMatch : null;
+        return null;
     }
 
     // TODO: findPattern and decodeCode appear to share quite similar code, can it be reduced?
@@ -117,7 +110,6 @@ class EANReader extends BarcodeReader {
             // console.warn('* decodeCode after length');
         }
 
-        let found = false;
         for (let i = offset; i < this._row.length; i++) {
             if (this._row[i] ^ (isWhite ? 1 : 0)) {
                 counter[counterPos]++;
@@ -144,7 +136,7 @@ class EANReader extends BarcodeReader {
                 isWhite = !isWhite;
             }
         }
-        return found ? bestMatch : null;
+        return null;
     }
 
     protected _findStart(): BarcodePosition | null {
