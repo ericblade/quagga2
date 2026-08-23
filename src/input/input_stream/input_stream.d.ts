@@ -24,7 +24,7 @@ export interface InputStream {
     setCanvasSize(size: XYSize): void;
     setCurrentTime(time: number): void;
     setHeight(height: number): void;
-    setInputStream(config: any): void;
+    setInputStream(config: any): Promise<void>;
     setTopRight(topRight: Point): void;
     setWidth(width: number): void;
     trigger(eventName: any, args?: any): void;

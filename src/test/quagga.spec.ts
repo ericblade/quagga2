@@ -15,6 +15,12 @@ describe('src/quagga.js', () => {
         sinon.restore();
     });
 
+    const isErrorLike = (err: unknown): boolean => !!err && (
+        err instanceof Error
+        || (typeof DOMException !== 'undefined' && err instanceof DOMException)
+        || typeof (err as { message?: string }).message === 'string'
+    );
+
     describe('init', () => {
         it('returns undefined when callback provided', (done) => {
             // @ts-expect-error
@@ -39,7 +45,7 @@ describe('src/quagga.js', () => {
             );
         });
 
-        it('error message includes helpful guidance', () => {
+        it('error message when calling start before init includes helpful guidance', () => {
             try {
                 QuaggaJSStaticInterface.start();
                 expect.fail('Expected an error to be thrown');
@@ -51,12 +57,38 @@ describe('src/quagga.js', () => {
             }
         });
 
-        it('start(config) returns a Promise when no callback is provided', () => {
-            // When config is provided without a callback, start should return a Promise
-            const result = QuaggaJSStaticInterface.start({ inputStream: { type: 'ImageStream' } });
+        it('start(config) rejects with "Image source (src) is required in stream configuration" when the source is missing', () => {
+            const result = QuaggaJSStaticInterface.start({
+                inputStream: { type: 'ImageStream', src: '' },
+            });
             expect(result).to.be.a('promise');
-            // The promise should reject since init will fail without proper setup
-            // but we're primarily testing the return type here
+            return result!.catch((err) => {
+                expect(err).to.exist;
+                expect(isErrorLike(err)).to.equal(true);
+                expect((err as Error).message).to.equal('Image source (src) is required in stream configuration');
+            });
+        });
+
+        it('start(config) with a bad file source rejects with the specific "error decoding pixels in loadImages" error', () => {
+            const result = QuaggaJSStaticInterface.start({
+                inputStream: { type: 'ImageStream', src: 'dummy.jpg' },
+            });
+            expect(result).to.be.a('promise');
+            return result!.catch((err) => {
+                expect(err).to.exist;
+                expect(isErrorLike(err)).to.equal(true);
+                expect((err as Error).message).to.equal('error decoding pixels in loadImages');
+            });
+        });
+
+        it('start(config) returns a Promise when no callback is provided', () => {
+            // When config is provided without a callback, start should return a Promise.
+            const result = QuaggaJSStaticInterface.start({ inputStream: { type: 'ImageStream', src: 'dummy.jpg' } });
+            expect(result).to.be.a('promise');
+            return result!.catch((err) => {
+                expect(err).to.exist;
+                expect(isErrorLike(err)).to.equal(true);
+            });
         });
 
         it('start(config, callback) returns undefined and calls callback', (done) => {
