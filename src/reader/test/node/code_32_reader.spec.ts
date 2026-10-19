@@ -6,6 +6,6 @@ describe('Code32Reader constructor', () => {
     it('allows zero-argument construction', () => {
         const reader = new Code32Reader();
         expect(reader.config).to.deep.equal({});
-        expect(reader._row).to.deep.equal([]);
+        expect(reader.FORMAT).to.equal('code_32_reader');
     });
 });
