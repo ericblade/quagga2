@@ -3,7 +3,7 @@ import { expect } from 'chai';
 import Code32Reader from '../code_32_reader';
 
 describe('Code 32 checksum', () => {
-    const reader = new Code32Reader();
+    const reader = new Code32Reader({});
 
     it('accepts 012345676', () => {
         expect((reader as any)._checkChecksum('A012345676')).to.equal(true);
