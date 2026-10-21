@@ -25,9 +25,25 @@ class Code32Reader extends Code39Reader {
         return 'A' + code32;
     }
 
-    // TODO (this was todo in original repo, no text was there. sorry.)
+    // Italian Pharmacode check digit: double the even positions, then the
+    // remainder of the sum divided by 10. See the 1988 ministerial decree.
     protected _checkChecksum(code: string): boolean {
-        return !!code;
+        const digits = code.charAt(0) === 'A' ? code.slice(1) : code;
+        if (!/^\d{9}$/.test(digits)) {
+            return false;
+        }
+        let sum = 0;
+        for (let i = 0; i < 8; i++) {
+            let value = digits.charCodeAt(i) - 48;
+            if (i % 2 === 1) {
+                value *= 2;
+                if (value > 9) {
+                    value -= 9;
+                }
+            }
+            sum += value;
+        }
+        return (sum % 10) === (digits.charCodeAt(8) - 48);
     }
 
     public decode() {
@@ -44,13 +60,9 @@ class Code32Reader extends Code39Reader {
 
         code = code.replace(patterns.AEIO, '');
 
-        if (!this._checkChecksum(code)) {
-            return null;
-        }
-
         const code32 = this._decodeCode32(code);
 
-        if (!code32) {
+        if (!code32 || !this._checkChecksum(code32)) {
             return null;
         }
 
