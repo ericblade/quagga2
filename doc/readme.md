@@ -110,7 +110,7 @@ The following picture highlights the patches (cells) which were found during the
 
 ![Image found patches][found_patches_image]
 
-It's noticable that some cells were falsely classified as being part of a barcode pattern. Those false positives can be taken care of by finding connected areas (consisting of more than one cell) and discarding all remaining cells.
+It's noticeable that some cells were falsely classified as being part of a barcode pattern. Those false positives can be taken care of by finding connected areas (consisting of more than one cell) and discarding all remaining cells.
 
 ### Finding connected cells
 Basically, cells can be considered part of a barcode if they are neighbors and share common properties. This grouping is archived by a simple recursive component-labeling algorithm which operates on similarity of orientation, instead of color. For a patch to become member of a label, its vector must point in the same direction as its neighbor's. In order to account for deviations caused by distortion and other geometric influences, the orientation can deviate up to 5 %. The next image illustrates those connected cells where the color defines a certain group.  
