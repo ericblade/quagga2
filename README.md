@@ -723,6 +723,7 @@ Only two properties are relevant for the use in Quagga (`halfSample` and
 {
   halfSample: true,
   patchSize: "medium", // x-small, small, medium, large, x-large
+  thresholding: "global", // global, patch
   debug: {
     showCanvas: false,
     showPatches: false,
@@ -758,6 +759,10 @@ If you have really large barcodes which can be read close-up, then the use of
 from the camera lens (lack of auto-focus, or small barcodes) then it's advised
 to set the size to `small` or even `x-small`. For the latter it's also
 recommended to crank up the resolution in order to find a barcode.
+
+The `thresholding` property selects one binarization threshold for the whole
+image (`global`) or one per patch (`patch`). `patch` helps when large uniform
+areas, such as a white background, take up much of the image.
 
 ## Examples
 
