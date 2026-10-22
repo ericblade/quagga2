@@ -644,6 +644,7 @@ Controls the barcode localization algorithm. Only relevant when `locate: true`.
 locator: {
   halfSample: true,
   patchSize: "medium",
+  thresholding: "global",
   debug: {
     showCanvas: false,
     showPatches: false,
@@ -731,6 +732,33 @@ inputStream: {
 locator: {
   patchSize: "large",
   halfSample: true
+}
+```
+
+### `locator.thresholding` {#locator-thresholding}
+
+**Type**: `string`
+
+**Options**: `"global"` | `"patch"`
+
+**Default**: `"global"`
+
+**Description**: How the locator turns the image into black and white before it looks for bar
+patterns.
+
+- `"global"`: one Otsu threshold for the whole image.
+- `"patch"`: one Otsu threshold per locator patch, computed from the patch and half a patch around
+  it. Patches without contrast are treated as background.
+
+A single threshold fails when large uniform areas make up much of the image, such as a white
+background, a white border, or the empty corners of a rotated photo: they pull the threshold
+above the barcode's light bars, so the barcode turns into one dark area and is not located.
+Use `"patch"` for such images.
+
+```javascript
+locator: {
+  halfSample: true,
+  thresholding: "patch"
 }
 ```
 

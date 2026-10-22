@@ -3,6 +3,7 @@ import ImageWrapper from '../common/image_wrapper';
 import {
     calculatePatchSize,
     otsuThreshold,
+    otsuThresholdFromHistogram,
     hsv2rgb,
     cluster,
     topGeneric,
@@ -199,11 +200,72 @@ function boxFromPatches(patches) {
     return box;
 }
 
+// Patches whose gray values span fewer levels than this are background for 'patch' thresholding.
+const MIN_PATCH_CONTRAST = 40;
+
+function patchHistogram(x0, y0, x1, y1) {
+    const { data } = _currentImageWrapper;
+    const width = _currentImageWrapper.size.x;
+    const hist = new Int32Array(256);
+    for (let y = y0; y < y1; y++) {
+        for (let x = x0; x < x1; x++) {
+            hist[data[y * width + x]]++;
+        }
+    }
+    return hist;
+}
+
+function hasContrast(hist, count) {
+    // Ignore the darkest and lightest 2% so that a few outliers do not count as contrast.
+    let lo = 0;
+    let hi = hist.length - 1;
+    let skipped = 0;
+    while (lo < hi && skipped + hist[lo] <= count * 0.02) {
+        skipped += hist[lo++];
+    }
+    skipped = 0;
+    while (hi > lo && skipped + hist[hi] <= count * 0.02) {
+        skipped += hist[hi--];
+    }
+    return hi - lo >= MIN_PATCH_CONTRAST;
+}
+
+// Otsu threshold per patch, over the patch plus a margin of half a patch; flat patches stay empty.
+function binarizePerPatch() {
+    const { data } = _currentImageWrapper;
+    const target = _binaryImageWrapper.data;
+    const width = _currentImageWrapper.size.x;
+    const height = _currentImageWrapper.size.y;
+    const marginX = Math.floor(_patchSize.x / 2);
+    const marginY = Math.floor(_patchSize.y / 2);
+    for (let py = 0; py < _numPatches.y; py++) {
+        for (let px = 0; px < _numPatches.x; px++) {
+            const x = px * _patchSize.x;
+            const y = py * _patchSize.y;
+            const x0 = Math.max(0, x - marginX);
+            const y0 = Math.max(0, y - marginY);
+            const x1 = Math.min(width, x + _patchSize.x + marginX);
+            const y1 = Math.min(height, y + _patchSize.y + marginY);
+            const hist = patchHistogram(x0, y0, x1, y1);
+            const threshold = hasContrast(hist, (x1 - x0) * (y1 - y0)) ? otsuThresholdFromHistogram(hist) : 0;
+            for (let v = y; v < y + _patchSize.y; v++) {
+                for (let u = x; u < x + _patchSize.x; u++) {
+                    target[v * width + u] = data[v * width + u] < threshold ? 1 : 0;
+                }
+            }
+        }
+    }
+}
+
 /**
  * Creates a binary image of the current image
  */
 function binarizeImage() {
-    otsuThreshold(_currentImageWrapper, _binaryImageWrapper);
+    if (_config.thresholding === 'patch') {
+        binarizePerPatch();
+    } else {
+        otsuThreshold(_currentImageWrapper, _binaryImageWrapper);
+    }
     _binaryImageWrapper.zeroBorder();
     if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showCanvas) {
         _binaryImageWrapper.show(_canvasContainer.dom.binary, 255);
