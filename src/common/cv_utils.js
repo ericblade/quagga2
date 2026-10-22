@@ -250,6 +250,29 @@ export function computeBinaryImage(imageWrapper, integralWrapper, targetWrapper)
     }
 }
 
+/**
+ * Mean of axial angles (period PI), unwrapped around their circular mean so that angles on both
+ * sides of the 0/PI wrap average correctly.
+ * @param {Array<number>} angles
+ * @returns {number} the mean in [0, PI]
+ */
+export function axialMean(angles) {
+    let x = 0;
+    let y = 0;
+    for (const angle of angles) {
+        x += Math.cos(2 * angle);
+        y += Math.sin(2 * angle);
+    }
+    const center = Math.atan2(y, x) / 2;
+    let offset = 0;
+    for (const angle of angles) {
+        const diff = angle - center;
+        offset += diff - Math.PI * Math.round(diff / Math.PI);
+    }
+    const mean = center + offset / angles.length;
+    return mean - Math.PI * Math.floor(mean / Math.PI);
+}
+
 export function cluster(points, threshold, property) {
     let i; let k; let thisCluster; let point; const
         clusters = [];
