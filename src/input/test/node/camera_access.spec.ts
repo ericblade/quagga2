@@ -1,7 +1,9 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
-import CameraAccess from '../../camera_access';
+import { describe, it } from 'mocha';
+import sinon from 'sinon';
+import * as MediaDevices from '../../../common/mediaDevices';
 import Exception from '../../../quagga/Exception';
+import CameraAccess from '../../camera_access';
 
 const Quagga = { CameraAccess };
 
@@ -74,6 +76,43 @@ describe('CameraAccess (node)', () => {
     });
 
     describe('release', () => {
+        it('preserves a new camera request while the previous release completes', async () => {
+            const oldStop = sinon.spy();
+            const newStop = sinon.spy();
+            const oldStream = { getVideoTracks: () => [{ stop: oldStop }] } as unknown as MediaStream;
+            const newStream = { getVideoTracks: () => [{ stop: newStop }] } as unknown as MediaStream;
+            const getUserMedia = sinon.stub(MediaDevices, 'getUserMedia');
+            getUserMedia.onFirstCall().resolves(oldStream);
+            getUserMedia.onSecondCall().resolves(newStream);
+            const pause = sinon.spy();
+            const video = {
+                pause,
+                setAttribute: sinon.spy(),
+                addEventListener: sinon.spy(),
+                videoWidth: 20,
+                videoHeight: 20,
+            } as unknown as HTMLVideoElement;
+
+            try {
+                await CameraAccess.request(null);
+                const releasing = CameraAccess.release();
+                expect(oldStop.callCount).to.equal(0);
+                await CameraAccess.request(video);
+                await releasing;
+
+                expect(CameraAccess.getActiveStream()).to.equal(newStream);
+                expect(CameraAccess.requestedVideoElement).to.equal(video);
+                expect(oldStop.callCount).to.equal(1);
+                expect(newStop.callCount).to.equal(0);
+                await CameraAccess.release();
+                expect(newStop.callCount).to.equal(1);
+                expect(pause.callCount).to.equal(1);
+            } finally {
+                await CameraAccess.release();
+                getUserMedia.restore();
+            }
+        });
+
         it('works (no-op)', () => {
             // eslint-disable-next-line @typescript-eslint/no-unused-expressions,no-unused-expressions
             expect(Quagga.CameraAccess.release).to.not.throw;
