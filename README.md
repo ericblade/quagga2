@@ -716,8 +716,8 @@ It controls the behavior of the localization-process and needs to be adjusted
 for each specific use-case. The default settings are simply a combination of
 values which worked best during development.
 
-Only two properties are relevant for the use in Quagga (`halfSample` and
-`patchSize`) whereas the rest is only needed for development and debugging.
+The `halfSample`, `patchSize`, and `thresholding` properties control localization;
+the `debug` options are only needed for development and debugging.
 
 ```javascript
 {
@@ -762,7 +762,15 @@ recommended to crank up the resolution in order to find a barcode.
 
 The `thresholding` property selects one binarization threshold for the whole
 image (`global`) or one per patch (`patch`). `patch` helps when large uniform
-areas, such as a white background, take up much of the image.
+areas, such as a white background, take up much of the image. It changes the
+locator's binary image; the decoder still samples the grayscale input and
+binarizes its scanlines separately. Patch mode can also lose reads or produce
+additional incorrect results, so compare both modes on representative inputs
+before enabling it. The default remains `global`.
+
+See the [configuration reference](docs/reference/configuration.md#locator-thresholding)
+for details and the [thresholding comparison](docs/examples/locator_thresholding.html)
+for a visual comparison using the white-border regression fixtures.
 
 ## Examples
 

@@ -545,15 +545,33 @@ describe('CV Utils', () => {
         function reference(hist) {
             const sum = (a, b, f) => { let s = 0; for (let i = a; i <= b; i++) s += f(i); return s; };
             const vet = [0];
-            for (let k = 1; k < 255; k++) {
+            const max = hist.length - 1;
+            for (let k = 1; k < max; k++) {
                 const p1 = sum(0, k, (i) => hist[i]);
-                const p2 = sum(k + 1, 255, (i) => hist[i]);
+                const p2 = sum(k + 1, max, (i) => hist[i]);
                 const p12 = p1 * p2 || 1;
-                const m12 = sum(0, k, (i) => i * hist[i]) * p2 - sum(k + 1, 255, (i) => i * hist[i]) * p1;
+                const m12 = sum(0, k, (i) => i * hist[i]) * p2 - sum(k + 1, max, (i) => i * hist[i]) * p1;
                 vet[k] = m12 * m12 / p12;
             }
             return vet.indexOf(Math.max(...vet));
         }
+
+        it('should preserve empty, flat, endpoint, and tied histogram behavior', () => {
+            [2, 16, 256].forEach((bins) => {
+                const empty = new Int32Array(bins);
+                const flat = new Int32Array(bins).fill(10);
+                const dark = new Int32Array(bins);
+                dark[0] = 100;
+                const light = new Int32Array(bins);
+                light[bins - 1] = 100;
+                const endpoints = new Int32Array(bins);
+                endpoints[0] = 100;
+                endpoints[bins - 1] = 100;
+                [empty, flat, dark, light, endpoints].forEach((hist) => {
+                    expect(otsuThresholdFromHistogram(hist)).to.equal(reference(hist));
+                });
+            });
+        });
 
         it('should match the per-split computation', () => {
             let seed = 1;

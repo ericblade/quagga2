@@ -1,7 +1,7 @@
 import { runDecoderTest, generateConfig } from '../helpers';
 
 // upc and ean fixtures centered on the white canvas a 20 degree rotation would need. With
-// thresholding: 'global', 2 of the 8 are decoded (6 of 8 are not located). Only halfSample:
+// thresholding: 'global', 2 of the 8 are decoded. Only halfSample:
 // true is tested; with halfSample: false, 'patch' decodes 4 of the 8.
 describe('Locator thresholding: patch (white border)', () => {
     const upcSet = [
