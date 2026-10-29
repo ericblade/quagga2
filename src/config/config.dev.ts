@@ -43,6 +43,7 @@ const DevConfig: QuaggaJSConfigObject = {
     locator: {
         halfSample: true,
         patchSize: 'medium', // x-small, small, medium, large, x-large
+        thresholding: 'global', // global, patch
         debug: {
             showCanvas: false,
             showPatches: false,

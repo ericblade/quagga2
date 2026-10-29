@@ -30,6 +30,7 @@ const {
     _computeDivisors,
     DILATE,
     ERODE,
+    otsuThresholdFromHistogram,
 } = require('../cv_utils');
 
 describe('CV Utils', () => {
@@ -536,6 +537,57 @@ describe('CV Utils', () => {
             };
             const threshold = determineOtsuThreshold(imageWrapper, 4);
             expect(threshold).to.be.a('number');
+        });
+    });
+
+    describe('otsuThresholdFromHistogram', () => {
+        // The per-split computation determineOtsuThreshold used before.
+        function reference(hist) {
+            const sum = (a, b, f) => { let s = 0; for (let i = a; i <= b; i++) s += f(i); return s; };
+            const vet = [0];
+            const max = hist.length - 1;
+            for (let k = 1; k < max; k++) {
+                const p1 = sum(0, k, (i) => hist[i]);
+                const p2 = sum(k + 1, max, (i) => hist[i]);
+                const p12 = p1 * p2 || 1;
+                const m12 = sum(0, k, (i) => i * hist[i]) * p2 - sum(k + 1, max, (i) => i * hist[i]) * p1;
+                vet[k] = m12 * m12 / p12;
+            }
+            return vet.indexOf(Math.max(...vet));
+        }
+
+        it('should preserve empty, flat, endpoint, and tied histogram behavior', () => {
+            [2, 16, 256].forEach((bins) => {
+                const empty = new Int32Array(bins);
+                const flat = new Int32Array(bins).fill(10);
+                const dark = new Int32Array(bins);
+                dark[0] = 100;
+                const light = new Int32Array(bins);
+                light[bins - 1] = 100;
+                const endpoints = new Int32Array(bins);
+                endpoints[0] = 100;
+                endpoints[bins - 1] = 100;
+                [empty, flat, dark, light, endpoints].forEach((hist) => {
+                    expect(otsuThresholdFromHistogram(hist)).to.equal(reference(hist));
+                });
+            });
+        });
+
+        it('should match the per-split computation', () => {
+            let seed = 1;
+            const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
+            for (let n = 0; n < 200; n++) {
+                const hist = new Int32Array(256);
+                const peaks = 1 + Math.floor(random() * 3);
+                for (let p = 0; p < peaks; p++) {
+                    const center = Math.floor(random() * 256);
+                    const count = Math.floor(random() * 100000);
+                    for (let i = 0; i < count; i++) {
+                        hist[Math.min(255, Math.max(0, center + Math.round((random() - 0.5) * 60)))]++;
+                    }
+                }
+                expect(otsuThresholdFromHistogram(hist)).to.equal(reference(hist));
+            }
         });
     });
 

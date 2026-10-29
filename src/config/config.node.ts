@@ -25,6 +25,7 @@ const NodeConfig: QuaggaJSConfigObject = {
     locator: {
         halfSample: true,
         patchSize: 'medium', // x-small, small, medium, large, x-large
+        thresholding: 'global', // global, patch
     },
 };
 
