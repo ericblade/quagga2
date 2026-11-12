@@ -9,6 +9,8 @@ const START_END = [0x01A, 0x029, 0x00B, 0x00E];
 const MIN_ENCODED_CHARS = 4;
 const MAX_ACCEPTABLE = 2.0;
 const PADDING = 1.5;
+// bits of the three spaces in a 7-element character pattern (bars are the even elements)
+const SPACE_MASK = 0b0101010;
 
 interface ThresholdSize {
     size: number,
@@ -64,13 +66,24 @@ class NewCodabarReader extends BarcodeReader {
         let bitmask = 1 << (numCounters - 1);
         let threshold = 0;
         let pattern = 0;
+        let wideBars = 0;
 
         for (let i = 0; i < numCounters; i++) {
             threshold = (i & 1) === 0 ? barThreshold : spaceThreshold;
             if (this._counters[offset + i] > threshold) {
                 pattern |= bitmask;
+                if ((i & 1) === 0) {
+                    wideBars++;
+                }
             }
             bitmask >>= 1;
+        }
+
+        // The only characters with three wide bars (: / . +) have no wide space.
+        // Their three spaces are all narrow, so the midpoint between them says
+        // nothing, and a space one pixel wider than the others would be read as wide.
+        if (wideBars === 3) {
+            pattern &= ~SPACE_MASK;
         }
 
         return pattern;
@@ -173,7 +186,7 @@ class NewCodabarReader extends BarcodeReader {
         for (let i = 0; i < result.length; i++) {
             pattern = this._charToPattern(result[i]);
             for (let j = 6; j >= 0; j--) {
-                const kind = (j & 1) === 2 ? categorization.bar : categorization.space;
+                const kind = (j & 1) === 0 ? categorization.bar : categorization.space;
                 const cat = (pattern & 1) === 1 ? kind.wide : kind.narrow;
                 cat.size += this._counters[pos + j];
                 cat.counts++;

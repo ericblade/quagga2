@@ -9,7 +9,7 @@ describe('Codabar Decoder Tests', () => {
         { 'name': 'image-005.jpg', 'result': 'C$399.95A', format: 'codabar' },
         { 'name': 'image-006.jpg', 'result': 'B546745735B', format: 'codabar' },
         { 'name': 'image-007.jpg', 'result': 'C$399.95A', format: 'codabar' },
-        { 'name': 'image-008.jpg', 'result': 'A16:9/4:3/3:2D', format: 'codabar', allowFailInNode: true, allowFailInBrowser: true },
+        { 'name': 'image-008.jpg', 'result': 'A16:9/4:3/3:2D', format: 'codabar', allowFailInBrowser: true },
         { 'name': 'image-009.jpg', 'result': 'C$399.95A', format: 'codabar' },
         { 'name': 'image-010.jpg', 'result': 'C$399.95A', format: 'codabar' },
     ];
