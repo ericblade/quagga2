@@ -173,13 +173,13 @@ const QuaggaJSCameraAccess: CameraAccessType = {
         if (QuaggaJSCameraAccess.requestedVideoElement !== null) {
             QuaggaJSCameraAccess.requestedVideoElement.pause();
         }
+        streamRef = null;
+        QuaggaJSCameraAccess.requestedVideoElement = null;
         return new Promise<void>((resolve) => {
             setTimeout(() => {
                 if (tracks && tracks.length) {
                     tracks.forEach((track) => track.stop());
                 }
-                streamRef = null;
-                QuaggaJSCameraAccess.requestedVideoElement = null;
                 resolve();
             }, 0);
         });
