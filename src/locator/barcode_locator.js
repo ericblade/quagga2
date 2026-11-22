@@ -9,6 +9,7 @@ import {
     imageRef,
     halfSample,
     computeImageArea,
+    axialMean,
 } from '../common/cv_utils';
 import ArrayHelper from '../common/array_helper';
 import ImageDebug from '../common/image_debug';
@@ -126,16 +127,14 @@ function boxFromPatches(patches) {
     let scale;
 
     // draw all patches which are to be taken into consideration
-    overAvg = 0;
     for (i = 0; i < patches.length; i++) {
         patch = patches[i];
-        overAvg += patch.rad;
         if (typeof ENV !== 'undefined' && ENV.development && _config.debug.showPatches) {
             ImageDebug.drawRect(patch.pos, _subImageWrapper.size, _canvasContainer.ctx.binary, { color: 'red' });
         }
     }
 
-    overAvg /= patches.length;
+    overAvg = axialMean(patches.map((p) => p.rad));
     overAvg = (overAvg * 180 / Math.PI + 90) % 180 - 90;
     if (overAvg < 0) {
         overAvg += 180;
@@ -395,18 +394,13 @@ function describePatch(moments, patchPos, x, y) {
         // if at least 2 moments are found which have at least minComponentWeights covered
         if (eligibleMoments.length >= 2) {
             matchingMoments = similarMoments(eligibleMoments);
-            avg = 0;
-            // determine the similarity of the moments
-            for (k = 0; k < matchingMoments.length; k++) {
-                avg += matchingMoments[k]?.rad ?? 0;
-            }
 
             // Only two of the moments are allowed not to fit into the equation
             // add the patch to the set
             if (matchingMoments.length > 1
                     && matchingMoments.length >= (eligibleMoments.length / 4) * 3
                     && matchingMoments.length > moments.length / 4) {
-                avg /= matchingMoments.length;
+                avg = axialMean(matchingMoments.map((moment) => moment?.rad ?? 0));
                 patch = {
                     index: patchPos[1] * _numPatches.x + patchPos[0],
                     pos: {

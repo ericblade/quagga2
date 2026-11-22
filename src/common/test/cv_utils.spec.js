@@ -30,6 +30,7 @@ const {
     _computeDivisors,
     DILATE,
     ERODE,
+    axialMean,
 } = require('../cv_utils');
 
 describe('CV Utils', () => {
@@ -811,6 +812,27 @@ describe('CV Utils', () => {
             ];
             const clusters = cluster(points, 0.1);
             expect(clusters).to.be.an('array');
+        });
+    });
+
+    describe('axialMean', () => {
+        const deg = (d) => (d * Math.PI) / 180;
+
+        it('should average angles away from the wrap like a plain mean', () => {
+            expect(axialMean([deg(80), deg(100)])).to.be.closeTo(deg(90), 1e-9);
+            expect(axialMean([deg(30), deg(40), deg(50)])).to.be.closeTo(deg(40), 1e-9);
+        });
+
+        it('should average near-horizontal angles across the 0/PI wrap', () => {
+            // A plain mean of 2° and 178° is 90°, perpendicular to both bars.
+            expect(axialMean([deg(2), deg(178)])).to.be.closeTo(0, 1e-9);
+            expect(axialMean([deg(176), deg(2)])).to.be.closeTo(deg(179), 1e-9);
+        });
+
+        it('should return a single angle unchanged', () => {
+            for (let d = 0; d < 180; d += 7) {
+                expect(axialMean([deg(d)])).to.be.closeTo(deg(d), 1e-9);
+            }
         });
     });
 
