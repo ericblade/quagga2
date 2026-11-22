@@ -146,56 +146,39 @@ export function sharpenLine(line) {
     return line;
 }
 
+/**
+ * Otsu's threshold for a histogram; pixels below it are the dark class.
+ * @param {ArrayLike<number>} hist
+ * @returns {number} the threshold bin
+ */
+export function otsuThresholdFromHistogram(hist) {
+    const max = hist.length - 1;
+    let total = 0;
+    let totalMoment = 0;
+    for (let i = 0; i <= max; i++) {
+        total += hist[i];
+        totalMoment += i * hist[i];
+    }
+    const vet = [0];
+    let p1 = hist[0];
+    let moment1 = 0;
+    for (let k = 1; k < max; k++) {
+        p1 += hist[k];
+        moment1 += k * hist[k];
+        const p2 = total - p1;
+        let p12 = p1 * p2;
+        if (p12 === 0) {
+            p12 = 1;
+        }
+        const m12 = moment1 * p2 - (totalMoment - moment1) * p1;
+        vet[k] = m12 * m12 / p12;
+    }
+    return ArrayHelper.maxIndex(vet);
+}
+
 export function determineOtsuThreshold(imageWrapper, bitsPerPixel = 8) {
-    let hist;
     const bitShift = 8 - bitsPerPixel;
-
-    function px(init, end) {
-        let sum = 0;
-        for (let i = init; i <= end; i++) {
-            sum += hist[i];
-        }
-        return sum;
-    }
-
-    function mx(init, end) {
-        let sum = 0;
-
-        for (let i = init; i <= end; i++) {
-            sum += i * hist[i];
-        }
-
-        return sum;
-    }
-
-    function determineThreshold() {
-        const vet = [0];
-        let p1;
-        let p2;
-        let p12;
-        let m1;
-        let m2;
-        let m12;
-        const max = (1 << bitsPerPixel) - 1;
-
-        hist = computeHistogram(imageWrapper, bitsPerPixel);
-        for (let k = 1; k < max; k++) {
-            p1 = px(0, k);
-            p2 = px(k + 1, max);
-            p12 = p1 * p2;
-            if (p12 === 0) {
-                p12 = 1;
-            }
-            m1 = mx(0, k) * p2;
-            m2 = mx(k + 1, max) * p1;
-            m12 = m1 - m2;
-            vet[k] = m12 * m12 / p12;
-        }
-        return ArrayHelper.maxIndex(vet);
-    }
-
-    const threshold = determineThreshold();
-    return threshold << bitShift;
+    return otsuThresholdFromHistogram(computeHistogram(imageWrapper, bitsPerPixel)) << bitShift;
 }
 
 export function otsuThreshold(imageWrapper, targetWrapper) {

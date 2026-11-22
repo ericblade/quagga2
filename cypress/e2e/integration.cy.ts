@@ -20,3 +20,4 @@ import '../../test/integration/decoders/ean.spec.ts';
 import '../../test/integration/decoders/i2of5.spec.ts';
 import '../../test/integration/decoders/upc_e.spec.ts';
 import '../../test/integration/decoders/upc.spec.ts';
+import '../../test/integration/decoders/white_border.spec.ts';

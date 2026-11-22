@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quagga2 locator thresholding comparison</title>
+  <style>
+    body { font: 16px/1.5 system-ui, sans-serif; margin: 2rem auto; padding: 0 1rem; max-width: 1100px; color: #17212b; }
+    .controls { display: flex; gap: 1rem; flex-wrap: wrap; align-items: center; }
+    button, select { font: inherit; padding: .4rem; }
+    #results { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 2rem; }
+    article { min-width: 0; }
+    canvas { width: 100%; height: auto; border: 1px solid #ccc; }
+    .binary { image-rendering: pixelated; }
+    #debug { display: none; }
+    pre { white-space: pre-wrap; overflow-wrap: anywhere; }
+  </style>
+</head>
+<body>
+  <h1>Locator thresholding: global and patch</h1>
+  <p>These existing regression fixtures add a white border to UPC and EAN photos.
+    Compare the actual locator binary image and the boxes it passes to the decoder.
+    The decoder samples the grayscale image separately in both modes.</p>
+  <div class="controls">
+    <label>Fixture <select id="fixture"></select></label>
+    <label><input id="halfSample" type="checkbox" checked> Half sample</label>
+    <button id="compare">Compare</button>
+  </div>
+  <p id="status" role="status">Build with npm run build:dev and serve the repository root to use this page.</p>
+  <p>Binary images use white for the dark class (bars). Blue outlines are candidate boxes;
+    green lines produced the expected value, red lines produced another value.
+    Correct and incorrect values may coexist. This is a diagnostic example, not a timing benchmark.</p>
+  <div id="results"></div>
+  <div id="debug"></div>
+  <script src="../../dist/quagga.js"></script>
+  <script>
+    const fixtures = [
+      ['upc-001.jpg', '882428015268', 'upc_reader'],
+      ['upc-003.jpg', '882428015084', 'upc_reader'],
+      ['upc-004.jpg', '882428015343', 'upc_reader'],
+      ['upc-007.jpg', '882428015084', 'upc_reader'],
+      ['upc-009.jpg', '039047013551', 'upc_reader'],
+      ['ean-001.jpg', '3574660239843', 'ean_reader'],
+      ['ean-003.jpg', '4006209700068', 'ean_reader'],
+      ['ean-006.jpg', '4003626011159', 'ean_reader'],
+    ];
+    const select = document.querySelector('#fixture');
+    fixtures.forEach(([name], index) => select.add(new Option(name, index)));
+    const button = document.querySelector('#compare');
+    const status = document.querySelector('#status');
+    function snapshot(source, className) {
+      const canvas = document.createElement('canvas');
+      canvas.width = source.width;
+      canvas.height = source.height;
+      canvas.className = className;
+      canvas.getContext('2d').drawImage(source, 0, 0);
+      return canvas;
+    }
+    function path(ctx, points, color, closed) {
+      if (!points || !points.length) return;
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      points.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y));
+      if (closed) ctx.closePath();
+      ctx.stroke();
+    }
+    button.addEventListener('click', async () => {
+      button.disabled = true;
+      document.querySelector('#results').replaceChildren();
+      const [name, expected, reader] = fixtures[Number(select.value)];
+      const halfSample = document.querySelector('#halfSample').checked;
+      status.textContent = `Running ${name}; expected ${expected}…`;
+      try {
+        for (const thresholding of ['global', 'patch']) {
+          document.querySelector('#debug').replaceChildren();
+          const result = (await Quagga.decodeSingle({
+            src: new URL(`../../test/fixtures/white_border/${name}`, location.href).href,
+            inputStream: { size: 640 }, numOfWorkers: 0, locate: true,
+            locator: { halfSample, patchSize: 'medium', thresholding, debug: { showCanvas: true } },
+            decoder: { readers: [reader], multiple: true },
+          })) || {};
+          const binary = document.querySelector('#debug canvas.binaryBuffer');
+          if (!binary) throw new Error('Locator debug image unavailable. Run npm run build:dev and reload.');
+          const article = document.createElement('article');
+          const title = document.createElement('h2');
+          title.textContent = thresholding;
+          article.append(title, snapshot(binary, 'binary'));
+          const overlay = snapshot(Quagga.canvas.dom.image, 'overlay');
+          const ctx = overlay.getContext('2d');
+          const candidates = Array.isArray(result) ? result : (result.barcodes || []);
+          const boxes = Array.isArray(result) ? candidates.map(item => item.box).filter(Boolean) : (result.boxes || []);
+          boxes.forEach(box => path(ctx, box, '#1967d2', true));
+          const reads = candidates.filter(item => item.codeResult && item.codeResult.code);
+          reads.forEach(item => path(ctx, (item.line || []).map(p => [p.x, p.y]),
+            item.codeResult.code === expected ? '#008331' : '#d93025', false));
+          const values = [...new Set(reads.map(item => item.codeResult.code))];
+          const correct = values.includes(expected);
+          const wrong = values.filter(value => value !== expected);
+          const summary = document.createElement('pre');
+          summary.textContent = `Expected: ${expected}\nCorrect value found: ${correct ? 'yes' : 'no'}\nOther values: ${wrong.join(', ') || 'none'}\nCandidate boxes: ${boxes.length}`;
+          article.append(overlay, summary);
+          document.querySelector('#results').append(article);
+        }
+        status.textContent = `Finished ${name}; halfSample: ${halfSample}. Settings: size 640, medium patches, ${reader}, multiple: true.`;
+      } catch (error) {
+        status.textContent = error.message;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

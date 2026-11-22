@@ -1007,6 +1007,12 @@ export interface QuaggaJSConfigObject {
          */
         patchSize?: string;
 
+        /**
+         * @default "global"
+         * One Otsu threshold for the whole image ("global") or one per patch ("patch").
+         */
+        thresholding?: 'global' | 'patch';
+
         willReadFrequently?: boolean;
         debug?: {
             /**

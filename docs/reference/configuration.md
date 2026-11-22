@@ -644,6 +644,7 @@ Controls the barcode localization algorithm. Only relevant when `locate: true`.
 locator: {
   halfSample: true,
   patchSize: "medium",
+  thresholding: "global",
   debug: {
     showCanvas: false,
     showPatches: false,
@@ -731,6 +732,68 @@ inputStream: {
 locator: {
   patchSize: "large",
   halfSample: true
+}
+```
+
+### `locator.thresholding` {#locator-thresholding}
+
+**Type**: `string`
+
+**Options**: `"global"` | `"patch"`
+
+**Default**: `"global"`
+
+**Description**: How the locator turns the image into black and white before it looks for bar
+patterns.
+
+- `"global"`: one Otsu threshold for the whole image.
+- `"patch"`: one Otsu threshold per locator patch, computed from the patch and half a patch around
+  it. Patches without contrast are treated as background.
+
+A single threshold can fail when large uniform areas make up much of the image, such as a white
+background, a white border, or the empty corners of a rotated photo: they pull the threshold
+above the barcode's light bars, so the barcode turns into one dark area and is not located.
+Consider `"patch"` for such images, and validate it on representative inputs.
+It can also lose correct reads or introduce additional wrong reads; it is not a
+universal replacement for `"global"`. With `decoder.multiple: true`, one image can
+produce both the expected value and an incorrect value.
+
+The neighborhood is used only to choose the threshold for the central patch.
+Pixels outside that neighborhood do not contribute to that threshold; they are
+not replaced with white pixels. The contrast check uses that same neighborhood,
+ignores its darkest and lightest 2% of pixels, and requires a gray-level range of
+at least 40. These settings are fixed in this implementation.
+
+This option changes only the locator's binary image. The decoder samples the
+grayscale input along lines derived from the located boxes and binarizes those
+lines separately. Different boxes can change both correct and incorrect results
+even though the readers are unchanged.
+
+The [thresholding comparison](../examples/locator_thresholding.html) shows the
+binary image, candidate boxes, and decoded values for each mode. Build with
+`npm run build:dev`, serve the repository root, and open
+`docs/examples/locator_thresholding.html`. It uses the development bundle because
+locator debug canvases are unavailable in the production bundle.
+
+On the eight white-border fixtures, using Chrome 156, `inputStream.size: 640`,
+`patchSize: "medium"`, the matching UPC or EAN reader, and `multiple: true`:
+
+| `halfSample` | Global: expected value found | Patch: expected value found | Global / patch: images with other values |
+|---|---|---|---|
+| `true` | 2/8 | 8/8 | 0/8 / 0/8 |
+| `false` | 2/8 | 4/8 | 0/8 / 1/8 |
+
+With half sampling, all five UPC fixtures and `ean-001.jpg` gain the correct
+read; `ean-003.jpg` and `ean-006.jpg` remain correct. Without half sampling,
+patch mode returns `3574660130843` on `ean-001.jpg` instead of the expected
+`3574660239843`, and loses the correct read on `ean-006.jpg`. These fixtures
+illustrate the benefit and limitations; they are not a general accuracy estimate.
+
+
+```javascript
+locator: {
+  halfSample: true,
+  thresholding: "patch"
 }
 ```
 
