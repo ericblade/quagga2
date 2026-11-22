@@ -14,5 +14,6 @@ import '../../src/quagga/test/quagga.spec.ts';
 // Tests for drawScannerArea method
 import '../../src/quagga/test/drawScannerArea.spec.ts';
 import '../../src/common/test/image_wrapper.spec.ts';
+import '../../src/reader/test/codabar_reader.spec.ts';
 // Tests for QuaggaJSStaticInterface (init method)
 import '../../src/test/quagga.spec.ts';
