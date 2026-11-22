@@ -287,7 +287,8 @@ class Code128Reader extends BarcodeReader {
         let done = false;
         let shiftNext = false;
         let unshift = shiftNext;
-        let removeLastCharacter = true;
+        // result length before the last non-stop symbol (the check symbol) was decoded
+        let resultLengthBeforeCheck = 0;
         let multiplier = 0;
         let rawResult: Array<number> = [];
         let result: Array<string | number> = []; // TODO: i think this should be string only, but it creates problems if it is
@@ -298,10 +299,7 @@ class Code128Reader extends BarcodeReader {
             code = this._decodeCode(code!.end, code!.correction);
             if (code !== null) {
                 if (code.code !== this.STOP_CODE) {
-                    removeLastCharacter = true;
-                }
-
-                if (code.code !== this.STOP_CODE) {
+                    resultLengthBeforeCheck = result.length;
                     rawResult.push(code.code);
                     multiplier++;
                     checksum += multiplier * code.code;
@@ -315,9 +313,6 @@ class Code128Reader extends BarcodeReader {
                     } else if (code.code < 96) {
                         result.push(String.fromCharCode(code.code - 64));
                     } else {
-                        if (code.code !== this.STOP_CODE) {
-                            removeLastCharacter = false;
-                        }
                         switch (code.code) {
                         case this.CODE_SHIFT:
                             shiftNext = true;
@@ -342,9 +337,6 @@ class Code128Reader extends BarcodeReader {
                     if (code.code < 96) {
                         result.push(String.fromCharCode(32 + code.code));
                     } else {
-                        if (code.code !== this.STOP_CODE) {
-                            removeLastCharacter = false;
-                        }
                         switch (code.code) {
                             case this.CODE_SHIFT:
                                 shiftNext = true;
@@ -369,9 +361,6 @@ class Code128Reader extends BarcodeReader {
                     if (code.code < 100) {
                         result.push(code.code < 10 ? '0' + code.code : code.code);
                     } else {
-                        if (code.code !== this.STOP_CODE) {
-                            removeLastCharacter = false;
-                        }
                         switch (code.code) {
                         case this.CODE_A:
                             codeset = this.CODE_A;
@@ -415,10 +404,8 @@ class Code128Reader extends BarcodeReader {
             return null;
         }
 
-        // remove last code from result (checksum)
-        if (removeLastCharacter) {
-            result.splice(result.length - 1, 1);
-        }
+        // drop whatever the check symbol added to the result (e.g. FNC1_CHAR when its value is 102)
+        result.length = resultLengthBeforeCheck;
 
 
         return {
