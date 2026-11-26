@@ -118,9 +118,16 @@ class Code93Reader extends BarcodeReader {
                             decodedChar = String.fromCharCode(nextCharCode - 11);
                         } else if (nextChar >= 'K' && nextChar <= 'O') {
                             decodedChar = String.fromCharCode(nextCharCode + 16);
-                        } else if (nextChar >= 'P' && nextChar <= 'S') {
+                        } else if (nextChar >= 'P' && nextChar <= 'T') {
+                            // %T is DEL (127)
                             decodedChar = String.fromCharCode(nextCharCode + 43);
-                        } else if (nextChar >= 'T' && nextChar <= 'Z') {
+                        } else if (nextChar === 'U') {
+                            decodedChar = String.fromCharCode(0);
+                        } else if (nextChar === 'V') {
+                            decodedChar = '@';
+                        } else if (nextChar === 'W') {
+                            decodedChar = '`';
+                        } else if (nextChar >= 'X' && nextChar <= 'Z') {
                             decodedChar = String.fromCharCode(127);
                         } else {
                             return null;
